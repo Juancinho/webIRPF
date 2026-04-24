@@ -44,6 +44,55 @@ body {
 
 #root { min-height: 100vh; }
 
+/* ═══════════════════════════════════════════════════════════════════
+   LAYOUT FRAME — centered main column with flanking sidebar slot
+   ═══════════════════════════════════════════════════════════════════ */
+:root {
+  --content-max: 56rem;        /* 896px — legible column width */
+  --sidebar-w:   14rem;        /* 224px */
+  --layout-gap:  2rem;
+  --page-pad-x:  1rem;
+}
+@media (min-width: 640px)  { :root { --page-pad-x: 1.25rem; } }
+@media (min-width: 1024px) { :root { --page-pad-x: 1.5rem;  --layout-gap: 2.5rem; } }
+
+/* Centered block used by header / intro / footer so all widths line up */
+.centered-col {
+  max-width: var(--content-max);
+  margin-inline: auto;
+  padding-inline: var(--page-pad-x);
+  width: 100%;
+}
+
+/* Layout frame with grid: shrinks gracefully and keeps main column centered */
+.layout-frame {
+  display: grid;
+  grid-template-columns: minmax(0, var(--content-max));
+  justify-content: center;
+  column-gap: var(--layout-gap);
+  padding-inline: var(--page-pad-x);
+  width: 100%;
+}
+/* xl: sidebar appears to the left of main; main still fills its column at max-w content-max */
+@media (min-width: 1280px) {
+  .layout-frame {
+    grid-template-columns: var(--sidebar-w) minmax(0, var(--content-max));
+  }
+}
+/* 2xl: add an empty mirror column on the right so the main column is perfectly centered on viewport */
+@media (min-width: 1536px) {
+  .layout-frame {
+    grid-template-columns: var(--sidebar-w) minmax(0, var(--content-max)) var(--sidebar-w);
+  }
+}
+
+.layout-sidebar { grid-column: 1; min-width: 0; }
+.layout-main    { grid-column: 1; min-width: 0; }
+@media (min-width: 1280px) {
+  .layout-sidebar { grid-column: 1; }
+  .layout-main    { grid-column: 2; }
+}
+
 /* ─── Sidebar widget ─── */
 .sidebar-widget {
   position: sticky;

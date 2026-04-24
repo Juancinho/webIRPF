@@ -23,7 +23,7 @@ export default function SimuladorSubida({ bruto, anio }) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
       {/* Columna izquierda: controles */}
-      <div className="p-7 border-b lg:border-b-0 lg:border-r border-[var(--border)]">
+      <div className="p-5 sm:p-6 lg:p-7 border-b lg:border-b-0 lg:border-r border-[var(--border)]">
         <div className="mb-2 flex items-baseline justify-between">
           <label className="text-[10px] font-bold text-[var(--text)] uppercase tracking-[0.1em]">
             Incremento salarial
@@ -102,7 +102,7 @@ export default function SimuladorSubida({ bruto, anio }) {
       </div>
 
       {/* Columna derecha: resultado */}
-      <div className="p-7">
+      <div className="p-5 sm:p-6 lg:p-7">
         {/* Neto antes / después */}
         <div className="grid grid-cols-2 gap-3 mb-6">
           <div className="metric-card" style={{ background: 'var(--surface2)', borderColor: 'var(--border)' }}>

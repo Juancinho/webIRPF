@@ -20,7 +20,7 @@ export default function CalculadoraCard({ bruto, anio, onChange, onShare, shareL
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
       {/* ── Controles ── */}
-      <div className="p-7 border-b lg:border-b-0 lg:border-r border-[var(--border)]">
+      <div className="p-5 sm:p-6 lg:p-7 border-b lg:border-b-0 lg:border-r border-[var(--border)]">
 
         {/* Salario slider */}
         <div className="mb-7">
@@ -112,7 +112,7 @@ export default function CalculadoraCard({ bruto, anio, onChange, onShare, shareL
       </div>
 
       {/* ── Resultado ── */}
-      <div className="p-7">
+      <div className="p-5 sm:p-6 lg:p-7">
         {/* Números clave */}
         <div className="grid grid-cols-2 gap-3 mb-6">
           {/* Neto principal */}

@@ -12,8 +12,8 @@ import './index.css';
 
 function SectionTitle({ n, title, sub }) {
   return (
-    <div className="flex items-start gap-5 mb-8">
-      <div className="section-badge mt-0.5"
+    <div className="flex items-start gap-4 sm:gap-5 mb-6 sm:mb-8">
+      <div className="section-badge mt-0.5 shrink-0"
         style={{
           background: 'linear-gradient(135deg,#0ea5e9,#38bdf8)',
           boxShadow: '0 4px 24px rgba(56,189,248,0.2), 0 0 0 1px rgba(56,189,248,0.12) inset',
@@ -24,9 +24,9 @@ function SectionTitle({ n, title, sub }) {
         }}>
         {n}
       </div>
-      <div>
-        <h2 className="text-2xl font-extrabold text-white leading-tight tracking-tight">{title}</h2>
-        {sub && <p className="text-sm text-[#7a8baa] mt-1.5 leading-relaxed max-w-xl">{sub}</p>}
+      <div className="min-w-0">
+        <h2 className="text-xl sm:text-2xl font-extrabold text-white leading-tight tracking-tight">{title}</h2>
+        {sub && <p className="text-[13px] sm:text-sm text-[#7a8baa] mt-1.5 leading-relaxed max-w-[62ch]">{sub}</p>}
       </div>
     </div>
   );
@@ -99,7 +99,7 @@ export default function App() {
 
       {/* ── HEADER ── */}
       <header className="header-blur sticky top-0 z-30">
-        <div className="max-w-5xl mx-auto px-5 py-3.5 flex items-center justify-between gap-4">
+        <div className="centered-col py-3 sm:py-3.5 flex items-center justify-between gap-3 sm:gap-4">
           <div className="flex items-center gap-3">
             <div className="flex items-baseline gap-1.5">
               <span className="text-lg font-black text-white tracking-tight">Fiscal</span>
@@ -129,27 +129,28 @@ export default function App() {
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-5 py-12 relative z-10">
+      <div className="centered-col py-10 sm:py-12 relative z-10">
 
         {/* ── INTRO ── */}
-        <section className="text-center pt-6">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border mb-5 text-[10px] font-bold uppercase tracking-[0.12em]"
+        <section className="text-center pt-4 sm:pt-6">
+          <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full border mb-4 sm:mb-5 text-[10px] font-bold uppercase tracking-[0.12em]"
             style={{ color: '#38bdf8', borderColor: 'rgba(56,189,248,0.15)', background: 'rgba(56,189,248,0.06)' }}>
             <span className="w-1.5 h-1.5 rounded-full bg-sky-400 pulse-dot" />
-            Radiografía interactiva del sistema fiscal español
+            <span className="hidden sm:inline">Radiografía interactiva del sistema fiscal español</span>
+            <span className="sm:hidden">Radiografía fiscal interactiva</span>
           </div>
-          <h1 className="font-display text-4xl sm:text-6xl mb-5 leading-[1.1]"
+          <h1 className="font-display text-[2rem] sm:text-5xl lg:text-6xl mb-4 sm:mb-5 leading-[1.1] px-2"
             style={{ background: 'linear-gradient(135deg,#f0f4f8 0%,#e2e8f0 30%,#bae6fd 60%,#7dd3fc 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
             Tu sueldo bajo el<br className="hidden sm:block" /> microscopio fiscal
           </h1>
-          <p className="text-base sm:text-lg text-[#7a8baa] leading-relaxed max-w-2xl mx-auto">
+          <p className="text-[15px] sm:text-base lg:text-lg text-[#7a8baa] leading-relaxed max-w-[60ch] mx-auto">
             Calcula tu nómina real, compara 15 años de reformas fiscales con la inflación descontada,
             y descubre cómo los mecanismos ocultos del IRPF afectan a tu bolsillo.
             Todo con datos oficiales del <strong className="text-[var(--accent-light)] font-semibold">BOE, INE y TGSS</strong>.
           </p>
 
           {/* Intro editorial */}
-          <p className="mt-8 text-[13px] text-[#4b5563] leading-relaxed max-w-xl mx-auto border-t pt-8"
+          <p className="mt-6 sm:mt-8 text-[12.5px] sm:text-[13px] text-[#4b5563] leading-relaxed max-w-[55ch] mx-auto border-t pt-6 sm:pt-8"
             style={{ borderColor: 'var(--border)' }}>
             Esta herramienta calcula tu nómina con la normativa real de cada año desde 2012.
             Todos los importes comparativos están en <strong className="text-[#64748b]">euros constantes de 2026</strong> —
@@ -163,19 +164,18 @@ export default function App() {
 
       </div>{/* end intro wrapper */}
 
-      {/* ── TWO-COLUMN LAYOUT ── */}
-      <div className="max-w-7xl mx-auto px-5 pb-16 relative z-10">
-        <div className="flex gap-8 items-start">
+      {/* ── CENTERED LAYOUT WITH SIDEBAR SLOT ── */}
+      <div className="layout-frame pb-16 relative z-10">
 
-          {/* Sidebar — fades in from left when intro scrolls out */}
-          <aside className="sidebar-widget hidden xl:block w-56 shrink-0"
-            data-visible={sidebarVisible}
-            style={{ pointerEvents: sidebarVisible ? 'auto' : 'none' }}>
-            <SidebarWidget bruto={bruto} anio={anio} onChange={onChange} />
-          </aside>
+        {/* Sidebar — fades in from left when intro scrolls out */}
+        <aside className="layout-sidebar sidebar-widget hidden xl:block"
+          data-visible={sidebarVisible}
+          style={{ pointerEvents: sidebarVisible ? 'auto' : 'none' }}>
+          <SidebarWidget bruto={bruto} anio={anio} onChange={onChange} />
+        </aside>
 
-          {/* Main content */}
-          <main className="flex-1 min-w-0 space-y-20">
+        {/* Main content — always centered regardless of sidebar */}
+        <main className="layout-main space-y-14 sm:space-y-16 lg:space-y-20">
           <section id="calc">
           <SectionTitle n="1" title="Calcula tu nómina"
             sub="Elige salario y año — verás el desglose completo paso a paso: cotizaciones, reducciones, tramos IRPF y cuánto queda." />
@@ -240,7 +240,7 @@ export default function App() {
           <section id="comparativa">
           <SectionTitle n="3" title="Compara todos los años (2012–2026)"
             sub="Tres vistas: neto por nivel salarial, tipo efectivo IRPF, y evolución temporal de tu sueldo. Todo en €2026 (inflación descontada)." />
-          <div className="card p-6 lg:p-7">
+          <div className="card p-5 sm:p-6 lg:p-7">
             <GraficoComparativo brutoRef={bruto} anioRef={anio} />
           </div>
           <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -271,7 +271,7 @@ export default function App() {
           <section id="cuña">
           <SectionTitle n="4" title="Cuña fiscal"
             sub="Cómo se distribuye cada euro de tu sueldo entre tú, Hacienda y la Seguridad Social. Cambia entre la perspectiva del trabajador y el coste real para la empresa." />
-          <div className="card p-6 lg:p-7">
+          <div className="card p-5 sm:p-6 lg:p-7">
             <CuñaFiscal bruto={bruto} anio={anio} />
           </div>
           <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -292,7 +292,7 @@ export default function App() {
           <section id="mecanismos">
           <SectionTitle n="5" title="Mecanismos del sistema fiscal"
             sub="Dos gráficos interactivos: cómo funciona el descuento del Art.20 y cómo han cambiado los umbrales clave desde 2012. Todo explicado paso a paso." />
-          <div className="card p-6 lg:p-7">
+          <div className="card p-5 sm:p-6 lg:p-7">
             <GraficoMecanismos />
           </div>
           <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -318,13 +318,12 @@ export default function App() {
           <NormativaFAQ anioRef={anio} />
           </section>
 
-          </main>{/* end main */}
-        </div>{/* end flex */}
-      </div>{/* end two-col wrapper */}
+        </main>{/* end main */}
+      </div>{/* end layout-frame */}
 
-      <footer className="relative mt-12">
-        <div className="footer-grid max-w-7xl mx-auto px-5 py-10">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 text-xs text-[#5a6b82] mb-6 pt-6">
+      <footer className="relative mt-10 sm:mt-12">
+        <div className="footer-grid centered-col py-8 sm:py-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 text-xs text-[#5a6b82] mb-5 sm:mb-6 pt-5 sm:pt-6">
             <div>
               <p className="font-bold text-[#8899b4] mb-2 uppercase tracking-wider text-[10px]">Metodología</p>
               <p className="leading-relaxed">El motor de cálculo es una traducción a JavaScript del código Python original del autor,
