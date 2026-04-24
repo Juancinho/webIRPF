@@ -3,12 +3,12 @@ import { calcularNomina, calcularTipoMarginal, ANIOS } from '../engine/irpf';
 import { eur, pct } from '../utils/format';
 
 const SECTIONS = [
-  { id: 'calc',        n: '1', label: 'Calculadora' },
-  { id: 'simulador',   n: '2', label: 'Simulador de subida' },
-  { id: 'comparativa', n: '3', label: 'Comparativa histÃ³rica' },
-  { id: 'cuÃ±a',        n: '4', label: 'CuÃ±a fiscal' },
-  { id: 'mecanismos',  n: '5', label: 'Mecanismos fiscales' },
-  { id: 'normativa',   n: '6', label: 'Normativa y contexto' },
+  { id: 'calc', n: '1', label: 'Calculadora' },
+  { id: 'simulador', n: '2', label: 'Simulador de subida' },
+  { id: 'comparativa', n: '3', label: 'Comparativa histórica' },
+  { id: 'cuÃ±a', n: '4', label: 'Cuña fiscal' },
+  { id: 'mecanismos', n: '5', label: 'Mecanismos fiscales' },
+  { id: 'normativa', n: '6', label: 'Normativa y contexto' },
 ];
 
 export default function SidebarWidget({ bruto, anio, onChange }) {
@@ -64,7 +64,7 @@ export default function SidebarWidget({ bruto, anio, onChange }) {
 
         {/* AÃ±o */}
         <div className="metric-mini">
-          <span className="metric-mini-label block mb-2">AÃ±o fiscal</span>
+          <span className="metric-mini-label block mb-2">Año fiscal</span>
           <div className="flex flex-wrap gap-1">
             {ANIOS.map(a => (
               <button key={a} onClick={() => onChange('anio', a)}
