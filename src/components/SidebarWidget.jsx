@@ -125,7 +125,7 @@ export default function SidebarWidget({ bruto, anio, onChange }) {
             <div className="metric-mini-value" style={{ color: '#f59e0b' }}>
               {pct(m.tipoMarginalTotal * 100)}
             </div>
-            <div className="text-[9px] text-[#374151] mt-0.5">Ãºltimo â‚¬</div>
+            <div className="text-[9px] text-[#374151] mt-0.5"> último €</div>
           </div>
         </div>
 
