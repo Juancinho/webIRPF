@@ -22,14 +22,14 @@ const UMBRAL_COLORS = {
 function TooltipArt20({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-[#1a1d27] border border-[#272b40] rounded-xl p-3 shadow-2xl text-xs min-w-[200px]">
-      <p className="font-bold text-white mb-1.5 border-b border-[#272b40] pb-1.5">Rend. neto previo: {eur(label)}</p>
+    <div className="card-glass p-4 shadow-2xl text-xs min-w-[220px]" style={{ backdropFilter: 'blur(24px)' }}>
+      <p className="font-extrabold text-white mb-2.5 border-b border-[var(--border)] pb-2 text-[11px]">Rend. neto previo: {eur(label)}</p>
       {[...payload].sort((a, b) => b.value - a.value).map(p => {
         const anio = parseInt(p.dataKey.split('_')[1]);
         return (
           <div key={p.dataKey} className="flex justify-between gap-3 py-0.5">
             <span className="flex items-center gap-1.5" style={{ color: ART20_COLORS[anio] }}>
-              <span className="w-2 h-2 rounded-full shrink-0" style={{ background: ART20_COLORS[anio] }} />
+              <span className="w-2 h-2 rounded-full shrink-0" style={{ background: ART20_COLORS[anio], boxShadow: `0 0 6px ${ART20_COLORS[anio]}40` }} />
               {anio}
             </span>
             <span className="font-mono text-white">{eur(p.value)}</span>
@@ -44,11 +44,14 @@ function TooltipUmbrales({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   const labels = { smi:'SMI anual', minExento:'Mín. exento retención', art20Inf:'Art.20 umbral inf.', art20Sup:'Art.20 umbral sup.', art20Max:'Art.20 reducción máx.' };
   return (
-    <div className="bg-[#1a1d27] border border-[#272b40] rounded-xl p-3 shadow-2xl text-xs min-w-[220px]">
-      <p className="font-bold text-white mb-1.5 border-b border-[#272b40] pb-1.5">{label}</p>
+    <div className="card-glass p-4 shadow-2xl text-xs min-w-[240px]" style={{ backdropFilter: 'blur(24px)' }}>
+      <p className="font-extrabold text-white mb-2.5 border-b border-[var(--border)] pb-2 text-[11px]">{label}</p>
       {payload.filter(p => p.value).map(p => (
         <div key={p.dataKey} className="flex justify-between gap-3 py-0.5">
-          <span style={{ color: UMBRAL_COLORS[p.dataKey] }}>{labels[p.dataKey]}</span>
+          <span className="flex items-center gap-1.5" style={{ color: UMBRAL_COLORS[p.dataKey] }}>
+            <span className="w-2 h-2 rounded-full shrink-0" style={{ background: UMBRAL_COLORS[p.dataKey], boxShadow: `0 0 6px ${UMBRAL_COLORS[p.dataKey]}40` }} />
+            {labels[p.dataKey]}
+          </span>
           <span className="font-mono text-white">{eur(p.value)}</span>
         </div>
       ))}
@@ -64,56 +67,56 @@ function TabCurvaArt20() {
 
   return (
     <div>
-      <div className="rounded-xl bg-[#21253a] border border-[#272b40] p-4 mb-4 text-sm text-[#94a3b8] leading-relaxed">
-        <strong className="text-white">Qué muestra:</strong> el importe de la reducción por rendimientos del trabajo (Art. 20 LIRPF)
-        en función del rendimiento neto previo (bruto − SS trabajador). El <strong className="text-white">área bajo la curva</strong> es
-        impuesto que dejas de pagar. Cuando la curva cae en picado, estás en la <strong className="text-orange-400">zona "cliff"</strong>:
+      <div className="info-card mb-5 text-[13px] text-[#94a3b8] leading-relaxed">
+        <strong className="text-white font-semibold">Qué muestra:</strong> el importe de la reducción por rendimientos del trabajo (Art. 20 LIRPF)
+        en función del rendimiento neto previo (bruto − SS trabajador). El <strong className="text-white font-semibold">área bajo la curva</strong> es
+        impuesto que dejas de pagar. Cuando la curva cae en picado, estás en la <strong className="text-orange-400 font-semibold">zona "cliff"</strong>:
         ganar un euro más de bruto puede aumentar tu base imponible más de un euro porque pierdes parte de esta reducción.
       </div>
 
       {/* Toggles */}
-      <div className="flex gap-2 flex-wrap mb-4">
+      <div className="flex gap-2 flex-wrap mb-5">
         {ANIOS_ART20_MUESTRA.map(a => (
           <button key={a} onClick={() => toggle(a)}
-            className={`px-3 py-1 rounded-lg text-xs font-bold transition-all border-2 ${aniosVis.has(a) ? 'text-[#0f1117]' : 'border-[#272b40] text-[#94a3b8] opacity-40'}`}
+            className={`year-btn ${aniosVis.has(a) ? 'active' : ''}`}
             style={aniosVis.has(a) ? { background: ART20_COLORS[a], borderColor: ART20_COLORS[a] } : {}}>
             {a}
           </button>
         ))}
       </div>
 
-      <div style={{ height: 320 }}>
+      <div style={{ height: 340 }}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={CURVA_ART20} margin={{ left: 5, right: 20, top: 10, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#272b40" vertical={false} />
-            <XAxis dataKey="rn" stroke="#374151" tick={{ fontSize:10, fill:'#64748b' }} tickFormatter={v => `${v/1000}k€`} tickLine={false} />
-            <YAxis stroke="#374151" tick={{ fontSize:11, fill:'#64748b' }} tickFormatter={v => `${v/1000}k€`} width={50} tickLine={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="#1a2040" vertical={false} />
+            <XAxis dataKey="rn" stroke="#1a2040" tick={{ fontSize:10, fill:'#4b5563' }} tickFormatter={v => `${v/1000}k€`} tickLine={false} />
+            <YAxis stroke="#1a2040" tick={{ fontSize:11, fill:'#4b5563' }} tickFormatter={v => `${v/1000}k€`} width={50} tickLine={false} />
             <Tooltip content={<TooltipArt20 />} />
             {ANIOS_ART20_MUESTRA.filter(a => aniosVis.has(a)).map(a => (
               <Line key={a} type="monotone" dataKey={`red_${a}`}
                 stroke={ART20_COLORS[a]} strokeWidth={a === 2026 ? 2.5 : 2}
-                dot={false} activeDot={{ r: 4, strokeWidth: 0 }} isAnimationActive={false} name={String(a)} />
+                dot={false} activeDot={{ r: 5, strokeWidth: 0 }} isAnimationActive={false} name={String(a)} />
             ))}
           </LineChart>
         </ResponsiveContainer>
       </div>
 
-      <div className="flex flex-wrap gap-3 mt-2">
+      <div className="flex flex-wrap gap-4 mt-3">
         {ANIOS_ART20_MUESTRA.filter(a => aniosVis.has(a)).map(a => (
-          <span key={a} className="flex items-center gap-1.5 text-xs" style={{ color: ART20_COLORS[a] }}>
-            <span className="w-5 h-0.5 inline-block rounded" style={{ background: ART20_COLORS[a] }} />
+          <span key={a} className="flex items-center gap-2 text-xs font-medium" style={{ color: ART20_COLORS[a] }}>
+            <span className="w-5 h-0.5 inline-block rounded" style={{ background: ART20_COLORS[a], boxShadow: `0 0 8px ${ART20_COLORS[a]}40` }} />
             {a}
           </span>
         ))}
       </div>
 
       {/* Tabla comparativa de umbrales */}
-      <div className="mt-5 overflow-x-auto">
-        <table className="w-full text-xs">
+      <div className="mt-6 overflow-x-auto">
+        <table className="data-table w-full">
           <thead>
-            <tr className="border-b border-[#272b40]">
+            <tr>
               {['Año','Umbral inferior','Reducción máx.','Umbral superior','Zona cliff (€)','Pendiente'].map(h => (
-                <th key={h} className="py-2 px-2 text-left text-[#64748b] font-medium">{h}</th>
+                <th key={h}>{h}</th>
               ))}
             </tr>
           </thead>
@@ -123,19 +126,19 @@ function TabCurvaArt20() {
               const zona = d && d.art20Inf && d.art20Sup ? d.art20Sup - d.art20Inf : null;
               const pendiente = d && d.art20Max && zona ? (d.art20Max / zona).toFixed(2) : '—';
               return (
-                <tr key={a} className="border-b border-[#272b40] hover:bg-[#21253a]">
-                  <td className="py-1.5 px-2 font-bold" style={{ color: ART20_COLORS[a] }}>{a}</td>
-                  <td className="py-1.5 px-2 font-mono text-[#94a3b8]">{d?.art20Inf ? eur(d.art20Inf) : '—'}</td>
-                  <td className="py-1.5 px-2 font-mono text-white font-bold">{d?.art20Max ? eur(d.art20Max) : '—'}</td>
-                  <td className="py-1.5 px-2 font-mono text-[#94a3b8]">{d?.art20Sup ? eur(d.art20Sup) : '—'}</td>
-                  <td className="py-1.5 px-2 font-mono text-orange-400">{zona ? eur(zona) : '—'}</td>
-                  <td className="py-1.5 px-2 font-mono text-[#94a3b8]">{pendiente}€/€</td>
+                <tr key={a}>
+                  <td className="font-bold" style={{ color: ART20_COLORS[a] }}>{a}</td>
+                  <td className="font-mono text-[#94a3b8]">{d?.art20Inf ? eur(d.art20Inf) : '—'}</td>
+                  <td className="font-mono text-white font-bold">{d?.art20Max ? eur(d.art20Max) : '—'}</td>
+                  <td className="font-mono text-[#94a3b8]">{d?.art20Sup ? eur(d.art20Sup) : '—'}</td>
+                  <td className="font-mono text-orange-400">{zona ? eur(zona) : '—'}</td>
+                  <td className="font-mono text-[#94a3b8]">{pendiente}€/€</td>
                 </tr>
               );
             })}
           </tbody>
         </table>
-        <p className="text-[10px] text-[#64748b] mt-1.5">Fuente: Art. 20 LIRPF; redacciones históricas según año de reforma — BOE</p>
+        <p className="text-[10px] text-[#4b5563] mt-2 font-medium">Fuente: Art. 20 LIRPF; redacciones históricas según año de reforma — BOE</p>
       </div>
     </div>
   );
@@ -154,29 +157,29 @@ function TabEvolucionUmbrales() {
 
   return (
     <div>
-      <div className="rounded-xl bg-[#21253a] border border-[#272b40] p-4 mb-4 text-sm text-[#94a3b8] leading-relaxed">
-        <strong className="text-white">Qué muestra:</strong> la evolución de los umbrales clave en <strong className="text-white">euros nominales</strong>.
+      <div className="info-card mb-5 text-[13px] text-[#94a3b8] leading-relaxed">
+        <strong className="text-white font-semibold">Qué muestra:</strong> la evolución de los umbrales clave en <strong className="text-white font-semibold">euros nominales</strong>.
         Cuando el SMI sube más rápido que el umbral inferior del Art.20, los trabajadores de salario mínimo pasan a estar mejor protegidos.
         Cuando el mínimo exento de retención sube, más gente deja de tener retención en nómina. La diferencia entre líneas explica
         los cambios en el poder adquisitivo real que no se ven en el sueldo nominal.
       </div>
 
-      <div className="flex gap-2 flex-wrap mb-4">
+      <div className="flex gap-2 flex-wrap mb-5">
         {Object.entries(labels).map(([key, { label, color }]) => (
           <button key={key} onClick={() => toggle(key)}
-            className={`px-3 py-1 rounded-lg text-xs font-semibold border-2 transition-all ${series.has(key) ? 'text-[#0f1117]' : 'border-[#272b40] text-[#94a3b8] opacity-40'}`}
+            className={`year-btn ${series.has(key) ? 'active' : ''}`}
             style={series.has(key) ? { background: color, borderColor: color } : {}}>
             {label}
           </button>
         ))}
       </div>
 
-      <div style={{ height: 320 }}>
+      <div style={{ height: 340 }}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={DATOS_UMBRALES} margin={{ left: 5, right: 20, top: 10, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#272b40" vertical={false} />
-            <XAxis dataKey="anio" stroke="#374151" tick={{ fontSize:11, fill:'#64748b' }} tickLine={false} />
-            <YAxis stroke="#374151" tick={{ fontSize:11, fill:'#64748b' }} tickFormatter={v => `${v/1000}k€`} width={50} tickLine={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="#1a2040" vertical={false} />
+            <XAxis dataKey="anio" stroke="#1a2040" tick={{ fontSize:11, fill:'#4b5563' }} tickLine={false} />
+            <YAxis stroke="#1a2040" tick={{ fontSize:11, fill:'#4b5563' }} tickFormatter={v => `${v/1000}k€`} width={50} tickLine={false} />
             <Tooltip content={<TooltipUmbrales />} />
             {Object.entries(labels).filter(([k]) => series.has(k)).map(([key, { label, color, dash }]) => (
               <Line key={key} type="monotone" dataKey={key}
@@ -189,15 +192,15 @@ function TabEvolucionUmbrales() {
         </ResponsiveContainer>
       </div>
 
-      <div className="flex flex-wrap gap-4 mt-2">
+      <div className="flex flex-wrap gap-4 mt-3">
         {Object.entries(labels).filter(([k]) => series.has(k)).map(([key, { label, color, dash }]) => (
-          <span key={key} className="flex items-center gap-1.5 text-xs" style={{ color }}>
+          <span key={key} className="flex items-center gap-2 text-xs font-medium" style={{ color }}>
             <svg width="20" height="8"><line x1="0" y1="4" x2="20" y2="4" stroke={color} strokeWidth="2" strokeDasharray={dash} /></svg>
             {label}
           </span>
         ))}
       </div>
-      <p className="text-[10px] text-[#64748b] mt-2">
+      <p className="text-[10px] text-[#4b5563] mt-2.5 font-medium">
         Fuentes: LIRPF arts. 20, 57, 85-86 RIRPF; Órdenes anuales de cotización SS; RDs de SMI (BOE).
         Datos en euros nominales de cada año.
       </p>
@@ -209,15 +212,15 @@ export default function GraficoMecanismos() {
   const [tab, setTab] = useState('art20');
   return (
     <div>
-      <div className="flex gap-2 mb-5 flex-wrap">
+      <div className="flex gap-2.5 mb-6 flex-wrap">
         {[
-          ['art20', 'Curva de reducción Art.20'],
-          ['umbrales', 'Evolución de umbrales clave'],
+          ['art20', '📉 Curva de reducción Art.20'],
+          ['umbrales', '📊 Evolución de umbrales clave'],
         ].map(([id, label]) => (
           <button key={id} onClick={() => setTab(id)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium border transition-all ${tab === id
-              ? 'bg-[var(--accent)] border-[var(--accent)] text-white'
-              : 'border-[#272b40] text-[#94a3b8] hover:border-[var(--accent)] hover:text-[var(--accent-light)]'}`}>
+            className={`px-5 py-2.5 rounded-xl text-sm font-semibold border transition-all ${tab === id
+              ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent2)] border-transparent text-white shadow-lg shadow-indigo-500/20'
+              : 'border-[var(--border)] text-[#94a3b8] hover:border-[var(--accent)] hover:text-[var(--accent-light)] hover:bg-[var(--accent-dim)]'}`}>
             {label}
           </button>
         ))}

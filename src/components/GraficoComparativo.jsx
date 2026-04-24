@@ -29,15 +29,15 @@ function TooltipSalario({ active, payload, label, ref2026Neto }) {
   if (!active || !payload?.length) return null;
   const sorted = [...payload].sort((a, b) => b.value - a.value);
   return (
-    <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-3 shadow-2xl text-xs min-w-[220px] max-h-96 overflow-y-auto">
-      <p className="font-bold text-white mb-2 border-b border-[var(--border)] pb-1.5">Bruto equiv.: {eur(label)}</p>
+    <div className="card-glass p-4 shadow-2xl text-xs min-w-[240px] max-h-96 overflow-y-auto" style={{ backdropFilter: 'blur(24px)' }}>
+      <p className="font-extrabold text-white mb-2.5 border-b border-[var(--border)] pb-2 text-[11px]">Bruto equiv.: {eur(label)}</p>
       {sorted.map(p => {
         const anio = parseInt(p.dataKey.split('_')[1]);
         const diff = ref2026Neto != null ? p.value - ref2026Neto : null;
         return (
           <div key={p.dataKey} className="flex justify-between items-center py-0.5 gap-2">
             <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full shrink-0" style={{ background: YEAR_COLORS[anio] }} />
+              <span className="w-2 h-2 rounded-full shrink-0" style={{ background: YEAR_COLORS[anio], boxShadow: `0 0 6px ${YEAR_COLORS[anio]}40` }} />
               <span style={{ color: YEAR_COLORS[anio] }} className="font-bold w-10">{anio}</span>
             </span>
             <span className="font-mono text-white">{eur(p.value)}</span>
@@ -58,14 +58,14 @@ function TooltipAnio({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   const reform = REFORMA_ANIOS.find(r => r.anio === label);
   return (
-    <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-3 shadow-2xl text-xs min-w-[200px]">
-      <p className="font-bold pb-1.5 mb-1.5 border-b border-[var(--border)]" style={{ color: YEAR_COLORS[label] }}>
+    <div className="card-glass p-4 shadow-2xl text-xs min-w-[220px]" style={{ backdropFilter: 'blur(24px)' }}>
+      <p className="font-extrabold pb-2 mb-2 border-b border-[var(--border)] text-[11px]" style={{ color: YEAR_COLORS[label] }}>
         {label}{reform ? ` · ${reform.label}` : ''}
       </p>
       {payload.map(p => (
         <div key={p.name} className="flex justify-between gap-4 py-0.5">
           <span className="flex items-center gap-1.5" style={{ color: p.color }}>
-            <span className="w-2 h-2 rounded-full shrink-0" style={{ background: p.color }} />
+            <span className="w-2 h-2 rounded-full shrink-0" style={{ background: p.color, boxShadow: `0 0 6px ${p.color}40` }} />
             {p.name}
           </span>
           <span className="font-mono text-white">{p.dataKey === 'neto' ? eur(p.value) : `${p.value.toFixed(1)}%`}</span>
@@ -130,24 +130,23 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
   return (
     <div>
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-5">
         <div>
-          <h2 className="text-xl font-bold text-white">¿Cuánto valió tu sueldo en cada año?</h2>
-          <p className="text-sm text-[#94a3b8] mt-1">
-            Todo en <strong className="text-white">euros constantes de 2026</strong> — la inflación ya está descontada (IPC dic.→dic., INE).
+          <h2 className="text-xl font-extrabold text-white tracking-tight">¿Cuánto valió tu sueldo en cada año?</h2>
+          <p className="text-sm text-[#7a8baa] mt-1.5">
+            Todo en <strong className="text-white font-semibold">euros constantes de 2026</strong> — la inflación ya está descontada (IPC dic.→dic., INE).
           </p>
         </div>
         <div className="flex gap-2 items-center flex-wrap shrink-0">
-          <div className="flex rounded-lg border border-[#272b40] overflow-hidden text-xs">
+          <div className="flex rounded-xl border border-[var(--border)] overflow-hidden text-xs">
             {[['salario','Por nivel salarial'],['anio','Evolución por año']].map(([v, l]) => (
               <button key={v} onClick={() => setVista(v)}
-                className={`px-3 py-1.5 font-medium transition-all ${vista === v ? 'bg-[var(--accent)] text-white' : 'text-[#94a3b8] hover:bg-[#21253a]'}`}>
+                className={`px-4 py-2 font-semibold transition-all ${vista === v ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent2)] text-white' : 'text-[#94a3b8] hover:bg-[var(--surface2)]'}`}>
                 {l}
               </button>
             ))}
           </div>
-          <button onClick={() => exportCSV(aniosActivos)}
-            className="px-3 py-1.5 rounded-lg text-xs border border-[#272b40] text-[#94a3b8] hover:border-[var(--accent)] hover:text-[var(--accent-light)] transition-all flex items-center gap-1.5">
+          <button onClick={() => exportCSV(aniosActivos)} className="btn-ghost flex items-center gap-1.5">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
             CSV
           </button>
@@ -158,27 +157,23 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
       {vista === 'salario' && (
         <>
           {/* Year toggles */}
-          <div className="flex flex-wrap gap-1.5 mb-3">
+          <div className="flex flex-wrap gap-1.5 mb-4">
             {ANIOS.map(a => (
               <button key={a} onClick={() => toggleAnio(a)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all border-2 ${aniosActivos.has(a)
-                  ? 'text-[#07090f] border-transparent shadow-md'
-                  : 'border-[var(--border)] text-[var(--text)] opacity-40 hover:opacity-70'}`}
+                className={`year-btn ${aniosActivos.has(a) ? 'active' : ''}`}
                 style={aniosActivos.has(a) ? { background: YEAR_COLORS[a], borderColor: YEAR_COLORS[a] } : {}}>
                 {a}
               </button>
             ))}
             <div className="w-px bg-[var(--border)] mx-1" />
             {Object.entries(GRUPOS).map(([nombre, anios]) => (
-              <button key={nombre} onClick={() => setAniosActivos(new Set(anios))}
-                className="px-2.5 py-1 rounded-lg text-xs border border-[var(--border)] text-[var(--text)] hover:border-[var(--accent)] hover:text-[var(--accent-light)] transition-all">
+              <button key={nombre} onClick={() => setAniosActivos(new Set(anios))} className="btn-ghost">
                 {nombre}
               </button>
             ))}
-            <button onClick={() => setAniosActivos(new Set(ANIOS))}
-              className="px-2.5 py-1 rounded-lg text-xs border border-[var(--border)] text-[var(--text)] hover:border-white hover:text-white transition-all">Todos</button>
+            <button onClick={() => setAniosActivos(new Set(ANIOS))} className="btn-ghost hover:!border-white hover:!text-white">Todos</button>
             <button onClick={() => setMostrarUmbrales(v => !v)}
-              className={`px-2.5 py-1 rounded-lg text-xs border transition-all ml-auto ${mostrarUmbrales ? 'border-[var(--accent)]/50 text-[var(--accent-light)] bg-[var(--accent-dim)]' : 'border-[var(--border)] text-[var(--text)]'}`}>
+              className={`btn-ghost ml-auto ${mostrarUmbrales ? '!border-[var(--accent)]/50 !text-[var(--accent-light)] !bg-[var(--accent-dim)]' : ''}`}>
               Umbrales {anioRef}
             </button>
           </div>
@@ -250,11 +245,11 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
       {/* ── VISTA POR AÑO — Línea dual eje ── */}
       {vista === 'anio' && (
         <>
-          <div className="rounded-xl bg-[var(--surface2)] border border-[var(--border)] p-3 mb-4 text-sm text-[#94a3b8] leading-relaxed">
-            <strong className="text-white">Cómo leer este gráfico:</strong> la línea verde (eje izquierdo) muestra el salario neto anual
+          <div className="info-card mb-5 text-[13px] text-[#94a3b8] leading-relaxed">
+            <strong className="text-white font-semibold">Cómo leer este gráfico:</strong> la línea verde (eje izquierdo) muestra el salario neto anual
             en euros constantes de 2026. Las líneas de puntos (eje derecho) muestran el tipo efectivo de IRPF y la carga total
             (IRPF + SS trabajador) en %. Las bandas verticales señalan los años de reforma fiscal.{' '}
-            <strong className="text-white">Salario de referencia: {eur(bruto2026)}</strong> (equiv. {eur(brutoRef)} brutos en {anioRef}).
+            <strong className="text-white font-semibold">Salario de referencia: {eur(bruto2026)}</strong> (equiv. {eur(brutoRef)} brutos en {anioRef}).
           </div>
 
           <div style={{ height: 380 }}>
@@ -296,12 +291,12 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
           </div>
 
           {/* Tabla compacta */}
-          <div className="mt-4 overflow-x-auto">
-            <table className="w-full text-xs">
+          <div className="mt-5 overflow-x-auto">
+            <table className="data-table w-full">
               <thead>
-                <tr className="border-b border-[#272b40]">
+                <tr>
                   {['Año','Bruto nominal','Neto (€2026)','Tipo IRPF','Carga total','∆ neto vs 2026'].map(h => (
-                    <th key={h} className="py-2 px-2 text-left text-[#64748b] font-medium">{h}</th>
+                    <th key={h}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -309,13 +304,13 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
                 {dataPorAnio.map(d => {
                   const diff = d.neto - neto2026;
                   return (
-                    <tr key={d.anio} className="border-b border-[#272b40] hover:bg-[#21253a]">
-                      <td className="py-1.5 px-2 font-bold" style={{ color: YEAR_COLORS[d.anio] }}>{d.anio}</td>
-                      <td className="py-1.5 px-2 font-mono text-[#94a3b8]">{eur(d.brutoNominal)}</td>
-                      <td className="py-1.5 px-2 font-mono font-bold text-white">{eur(d.neto)}</td>
-                      <td className="py-1.5 px-2 font-mono text-red-400">{d.irpf.toFixed(1)}%</td>
-                      <td className="py-1.5 px-2 font-mono text-amber-400">{d.total.toFixed(1)}%</td>
-                      <td className={`py-1.5 px-2 font-mono font-bold ${diff >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                    <tr key={d.anio}>
+                      <td className="font-bold" style={{ color: YEAR_COLORS[d.anio] }}>{d.anio}</td>
+                      <td className="font-mono text-[#94a3b8]">{eur(d.brutoNominal)}</td>
+                      <td className="font-mono font-bold text-white">{eur(d.neto)}</td>
+                      <td className="font-mono text-red-400">{d.irpf.toFixed(1)}%</td>
+                      <td className="font-mono text-amber-400">{d.total.toFixed(1)}%</td>
+                      <td className={`font-mono font-bold ${diff >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
                         {diff >= 0 ? '+' : ''}{eur(diff)}
                       </td>
                     </tr>
@@ -347,14 +342,14 @@ function InsightSalario({ aniosActivos, bruto2026 }) {
 
   if (!datos) return null;
   return (
-    <div className="mt-3 rounded-xl bg-[#21253a] border border-[#272b40] p-4 text-sm">
+    <div className="mt-4 info-card text-[13px]">
       <p className="text-[#94a3b8] leading-relaxed">
-        Con <strong className="text-white">{eur(bruto2026)}</strong> brutos equiv. (€2026), el mejor año fue{' '}
-        <strong style={{ color: YEAR_COLORS[datos.mejor.anio] }}>{datos.mejor.anio}</strong>{' '}
+        Con <strong className="text-white font-semibold">{eur(bruto2026)}</strong> brutos equiv. (€2026), el mejor año fue{' '}
+        <strong className="font-semibold" style={{ color: YEAR_COLORS[datos.mejor.anio] }}>{datos.mejor.anio}</strong>{' '}
         ({eur(datos.mejor.val)} netos) y el peor{' '}
-        <strong style={{ color: YEAR_COLORS[datos.peor.anio] }}>{datos.peor.anio}</strong>{' '}
+        <strong className="font-semibold" style={{ color: YEAR_COLORS[datos.peor.anio] }}>{datos.peor.anio}</strong>{' '}
         ({eur(datos.peor.val)} netos). Diferencia:{' '}
-        <strong className="text-white">{eur(datos.diff)}/año · {eur(datos.diff / 12)}/mes</strong>.
+        <strong className="text-white font-semibold">{eur(datos.diff)}/año · {eur(datos.diff / 12)}/mes</strong>.
       </p>
     </div>
   );

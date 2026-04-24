@@ -29,15 +29,15 @@ const HITOS = [
 
 const FAQS = [
   { q:'¿Qué es el IRPF y cómo funciona?',
-    a:'El Impuesto sobre la Renta de las Personas Físicas es un impuesto personal, progresivo y directo sobre la renta obtenida en España (arts. 1-14 LIRPF). "Progresivo" significa que a mayor renta, mayor tipo aplicable. Para trabajadores por cuenta ajena, el empleador actúa como retenedor: calcula y retiene mensualmente el IRPF e ingresa en Hacienda.\n\nEl cálculo parte del bruto anual, se restan las cotizaciones SS, los gastos deducibles del Art.19 y la reducción Art.20, para obtener la base imponible. A ésta se aplica la tarifa por tramos (arts. 63-64 LIRPF), se resta la cuota del mínimo personal (art. 57), y el resultado es el IRPF a pagar.' },
+    a:'El Impuesto sobre la Renta de las Personas Físicas es un impuesto personal, progresivo y directo sobre la renta obtenida en España (arts. 1-14 LIRPF). \"Progresivo\" significa que a mayor renta, mayor tipo aplicable. Para trabajadores por cuenta ajena, el empleador actúa como retenedor: calcula y retiene mensualmente el IRPF e ingresa en Hacienda.\n\nEl cálculo parte del bruto anual, se restan las cotizaciones SS, los gastos deducibles del Art.19 y la reducción Art.20, para obtener la base imponible. A ésta se aplica la tarifa por tramos (arts. 63-64 LIRPF), se resta la cuota del mínimo personal (art. 57), y el resultado es el IRPF a pagar.' },
   { q:'¿Qué es la reducción Art.20 y por qué es tan importante?',
-    a:'Es el Art. 20 de la LIRPF ("Reducción por obtención de rendimientos del trabajo") y ha sido la palanca principal para proteger rentas bajas sin modificar la tarifa general.\n\nFunciona con dos umbrales: por debajo del inferior, la reducción es máxima (puede hacer la base imponible = 0). Entre ambos umbrales cae linealmente. Por encima del superior es cero. Desde 2012 a 2026 los umbrales casi se han doblado y la reducción máxima pasó de 4.080€ a 7.302€.\n\nImportante: en la zona entre umbrales se crean tipos marginales efectivos muy elevados (la "zona cliff"), porque ganar 1€ más de bruto puede reducir la reducción en 1,14–1,75€, haciendo que la base imponible crezca más que el ingreso bruto.' },
+    a:'Es el Art. 20 de la LIRPF (\"Reducción por obtención de rendimientos del trabajo\") y ha sido la palanca principal para proteger rentas bajas sin modificar la tarifa general.\n\nFunciona con dos umbrales: por debajo del inferior, la reducción es máxima (puede hacer la base imponible = 0). Entre ambos umbrales cae linealmente. Por encima del superior es cero. Desde 2012 a 2026 los umbrales casi se han doblado y la reducción máxima pasó de 4.080€ a 7.302€.\n\nImportante: en la zona entre umbrales se crean tipos marginales efectivos muy elevados (la \"zona cliff\"), porque ganar 1€ más de bruto puede reducir la reducción en 1,14–1,75€, haciendo que la base imponible crezca más que el ingreso bruto.' },
   { q:'¿Qué son los 2.000€ de gastos deducibles (Art.19.2.f)?',
-    a:'Son gastos "de difícil justificación" introducidos en la reforma de 2015 (Ley 26/2014): desplazamientos, vestuario laboral, formación no reembolsada, etc. Se restan del rendimiento bruto ANTES de calcular el Art.20. Fuente: Art. 19.2.f) LIRPF.\n\nAntes de 2015 no existían. Para rentas bajas, 2.000€ menos de base imponible al 19% equivalen a 380€ menos de IRPF, lo que puede significar pasar de pagar IRPF a no pagar nada.' },
+    a:'Son gastos \"de difícil justificación\" introducidos en la reforma de 2015 (Ley 26/2014): desplazamientos, vestuario laboral, formación no reembolsada, etc. Se restan del rendimiento bruto ANTES de calcular el Art.20. Fuente: Art. 19.2.f) LIRPF.\n\nAntes de 2015 no existían. Para rentas bajas, 2.000€ menos de base imponible al 19% equivalen a 380€ menos de IRPF, lo que puede significar pasar de pagar IRPF a no pagar nada.' },
   { q:'¿Qué es el tipo marginal y por qué puede ser engañosamente alto?',
     a:'El tipo marginal es el porcentaje que pagas sobre el siguiente euro que ganas. En teoría sigue los tramos de la tarifa (19%, 24%, 30%...). En la práctica, el tipo marginal efectivo puede ser mucho más alto en la zona del Art.20 porque al subir el sueldo pierdes parte de la reducción.\n\nEjemplo (2026): si tu rendimiento neto previo está entre 14.852€ y 17.673€, por cada €100 extra de bruto tu reducción Art.20 cae 1,75€, haciendo que la base imponible crezca 101,75€ por cada €100 de bruto. Si tributan al 19%: IRPF marginal = 19,3% + 6,35% SS = ~25,6% total. En el tramo de pendiente 1,14 puede alcanzar el 40% y más.' },
-  { q:'¿Por qué el gráfico usa "euros constantes de 2026"?',
-    a:'Para comparar poder adquisitivo real entre años hay que descontar la inflación. 30.000€ en 2012 no compran lo mismo que en 2026: los precios han subido aproximadamente un 25% entre esas fechas.\n\nUsamos el IPC diciembre a diciembre (INE) para calcular la inflación acumulada. Fuente: INE — Variaciones del IPC. Al mostrar todo en €2026 se puede comparar directamente: "¿cobré más en términos reales en 2015 que en 2023?".' },
+  { q:'¿Por qué el gráfico usa \"euros constantes de 2026\"?',
+    a:'Para comparar poder adquisitivo real entre años hay que descontar la inflación. 30.000€ en 2012 no compran lo mismo que en 2026: los precios han subido aproximadamente un 25% entre esas fechas.\n\nUsamos el IPC diciembre a diciembre (INE) para calcular la inflación acumulada. Fuente: INE — Variaciones del IPC. Al mostrar todo en €2026 se puede comparar directamente: \"¿cobré más en términos reales en 2015 que en 2023?\".' },
   { q:'¿Qué son el MEI y la cotización de solidaridad?',
     a:'El MEI (Mecanismo de Equidad Intergeneracional, art. 127 bis LGSS, desde 2023) es una cotización adicional sobre la base de contingencias comunes destinada a reponer el Fondo de Reserva de Pensiones. Lo pagan empresa (5/6) y trabajador (1/6). Va subiendo: 0,6% en 2023, 0,7% en 2024, 0,8% en 2025, 0,9% en 2026. Fuente: RDL 2/2023.\n\nLa cotización de solidaridad (desde 2025, art. 19 bis LGSS) grava el exceso del salario sobre la base máxima de cotización con tipos progresivos: ~1,15% hasta +10% de la base máx., ~1,25% hasta +50%, ~1,46% en adelante. El reparto empresa/trabajador es 5/6 - 1/6. Fuente: RDL 2/2023.' },
   { q:'¿Qué no incluye esta herramienta?',
@@ -88,32 +88,39 @@ export default function NormativaFAQ({ anioRef }) {
   const hito = HITOS.find(h => h.anios.includes(anioSel));
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       {/* Línea temporal */}
       <div>
-        <h3 className="text-base font-bold text-white mb-3">Historia normativa año a año</h3>
-        <div className="flex gap-1.5 flex-wrap mb-4">
+        <h3 className="text-lg font-extrabold text-white mb-4 tracking-tight">Historia normativa año a año</h3>
+        <div className="flex gap-1.5 flex-wrap mb-5">
           {ANIOS.map(a => (
             <button key={a} onClick={() => setAnioSel(a)}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all border-2 ${anioSel === a
-                ? 'text-[#0f1117] border-transparent' : 'border-[#272b40] text-[#94a3b8] opacity-50 hover:opacity-80'}`}
-              style={anioSel === a ? { background:YEAR_COLORS[a], borderColor:YEAR_COLORS[a] } : {}}>
+              className={`year-btn ${anioSel === a ? 'active' : ''}`}
+              style={anioSel === a ? { background: YEAR_COLORS[a], borderColor: YEAR_COLORS[a] } : {}}>
               {a}
             </button>
           ))}
         </div>
         {hito && (
-          <div className="rounded-xl p-4 border-l-4 mb-4" style={{ borderColor:hito.color, background:`${hito.color}12` }}>
-            <h4 className="font-bold text-sm mb-1.5" style={{ color:hito.color }}>{hito.titulo}</h4>
-            <p className="text-sm text-[#94a3b8] leading-relaxed mb-2">{hito.texto}</p>
-            <p className="text-xs text-[#64748b] italic">Fuente: {hito.fuente}</p>
+          <div className="rounded-2xl p-5 relative overflow-hidden mb-5 transition-all duration-500"
+            style={{
+              borderLeft: `4px solid ${hito.color}`,
+              background: `linear-gradient(135deg, ${hito.color}08 0%, transparent 60%)`,
+            }}>
+            <div className="absolute top-0 right-0 w-32 h-32 opacity-10" style={{ background: `radial-gradient(circle, ${hito.color}, transparent 70%)` }} />
+            <h4 className="font-extrabold text-sm mb-2" style={{ color: hito.color }}>{hito.titulo}</h4>
+            <p className="text-[13px] text-[#94a3b8] leading-relaxed mb-2.5">{hito.texto}</p>
+            <p className="text-[11px] text-[#64748b] italic flex items-center gap-1.5">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="opacity-50"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+              {hito.fuente}
+            </p>
           </div>
         )}
 
         {/* Ficha técnica */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="card p-5">
-            <h4 className="text-sm font-bold text-white mb-3">Parámetros — {anioSel}</h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="card p-6">
+            <h4 className="text-sm font-extrabold text-white mb-4 tracking-tight">Parámetros — {anioSel}</h4>
             {[
               ['Base máx. cotización', eur(params.baseMax)],
               ['SMI anual', eur(SMI_ANUAL[anioSel])],
@@ -129,38 +136,39 @@ export default function NormativaFAQ({ anioRef }) {
               params.art20Meta.label && ['Art.20', params.art20Meta.label],
               params.hasSolidaridad && ['Cotización solidaridad', 'Sí (sobre exceso base máx.)'],
             ].filter(Boolean).map(([l, v]) => (
-              <div key={l} className="flex justify-between py-1.5 border-b border-[#272b40] last:border-0">
-                <span className="text-xs text-[#94a3b8]">{l}</span>
-                <span className="text-xs font-mono font-semibold text-white">{v}</span>
+              <div key={l} className="flex justify-between py-2 border-b border-[var(--border)] last:border-0 group hover:bg-[var(--surface2)]/30 -mx-2 px-2 rounded-lg transition-all">
+                <span className="text-[11px] text-[#94a3b8] group-hover:text-[#b0becc] transition-colors">{l}</span>
+                <span className="text-[11px] font-mono font-semibold text-white">{v}</span>
               </div>
             ))}
           </div>
 
-          <div className="card p-5">
-            <h4 className="text-sm font-bold text-white mb-3">Tramos IRPF — {anioSel}</h4>
-            <div className="space-y-2.5">
+          <div className="card p-6">
+            <h4 className="text-sm font-extrabold text-white mb-4 tracking-tight">Tramos IRPF — {anioSel}</h4>
+            <div className="space-y-3">
               {params.tramos.map(([lim, tipo], i) => {
                 const prev = i === 0 ? 0 : params.tramos[i-1][0];
                 const label = lim === Infinity ? `Desde ${eur(prev)}` : `${eur(prev)} – ${eur(lim)}`;
                 const maxTipo = Math.max(...params.tramos.map(([,t]) => t));
                 return (
-                  <div key={i} className="flex items-center gap-3">
-                    <span className="text-xs text-[#94a3b8] w-32 shrink-0">{label}</span>
-                    <div className="flex-1 bg-[#272b40] rounded-full h-2.5 overflow-hidden">
-                      <div className="h-full rounded-full" style={{ width:`${tipo/maxTipo*100}%`, background:YEAR_COLORS[anioSel] }} />
+                  <div key={i} className="flex items-center gap-3 group">
+                    <span className="text-[10px] text-[#94a3b8] w-32 shrink-0 group-hover:text-white transition-colors">{label}</span>
+                    <div className="tramo-bar flex-1">
+                      <div style={{ width:`${tipo/maxTipo*100}%`, background: `linear-gradient(90deg, ${YEAR_COLORS[anioSel]}, ${YEAR_COLORS[anioSel]}99)` }} />
                     </div>
-                    <span className="text-xs font-mono font-bold w-10 text-right" style={{ color:YEAR_COLORS[anioSel] }}>
+                    <span className="text-[11px] font-mono font-bold w-12 text-right" style={{ color: YEAR_COLORS[anioSel] }}>
                       {(tipo*100).toFixed(1)}%
                     </span>
                   </div>
                 );
               })}
             </div>
-            <div className="mt-4 pt-4 border-t border-[#272b40]">
-              <p className="text-xs text-[#64748b] mb-1">Inflación acumulada {anioSel}→2026 (INE, dic.→dic.)</p>
+            <div className="divider-glow mt-4" />
+            <div className="pt-3">
+              <p className="text-[10px] text-[#64748b] mb-1 font-medium">Inflación acumulada {anioSel}→2026 (INE, dic.→dic.)</p>
               <p className="text-sm font-mono font-bold text-white">
                 ×{INFLACION_A_2026[anioSel].toFixed(4)}
-                <span className="text-[#94a3b8] font-normal ml-2">(+{((INFLACION_A_2026[anioSel]-1)*100).toFixed(1)}%)</span>
+                <span className="text-[#94a3b8] font-normal ml-2 text-xs">(+{((INFLACION_A_2026[anioSel]-1)*100).toFixed(1)}%)</span>
               </p>
             </div>
           </div>
@@ -169,19 +177,22 @@ export default function NormativaFAQ({ anioRef }) {
 
       {/* FAQ */}
       <div>
-        <h3 className="text-base font-bold text-white mb-3">Conceptos clave</h3>
-        <div className="space-y-2">
+        <h3 className="text-lg font-extrabold text-white mb-4 tracking-tight">Conceptos clave</h3>
+        <div className="space-y-2.5">
           {FAQS.map((f, i) => (
-            <div key={i} className="card overflow-hidden">
+            <div key={i} className="card faq-item">
               <button onClick={() => setFaqAbierta(faqAbierta === i ? null : i)}
-                className="w-full flex justify-between items-center p-4 text-left hover:bg-[#21253a] transition-colors">
-                <span className="text-sm font-medium text-white pr-4">{f.q}</span>
-                <span className="text-[var(--accent)] text-xl shrink-0 font-light">{faqAbierta === i ? '−' : '+'}</span>
+                className="faq-toggle w-full flex justify-between items-center p-5 text-left rounded-2xl">
+                <span className="text-[13px] font-semibold text-white pr-4 leading-snug">{f.q}</span>
+                <span className="w-7 h-7 rounded-lg flex items-center justify-center text-[var(--accent)] text-lg shrink-0 border border-[var(--border)] transition-all"
+                  style={faqAbierta === i ? { background: 'var(--accent)', color: 'white', borderColor: 'var(--accent)', transform: 'rotate(45deg)' } : {}}>
+                  +
+                </span>
               </button>
               {faqAbierta === i && (
-                <div className="px-4 pb-4 border-t border-[#272b40]">
+                <div className="px-5 pb-5 border-t border-[var(--border)]">
                   {f.a.split('\n\n').map((par, j) => (
-                    <p key={j} className="text-sm text-[#94a3b8] leading-relaxed mt-3">{par}</p>
+                    <p key={j} className="text-[13px] text-[#94a3b8] leading-relaxed mt-3">{par}</p>
                   ))}
                 </div>
               )}
@@ -193,34 +204,37 @@ export default function NormativaFAQ({ anioRef }) {
       {/* Fuentes con URLs */}
       <div>
         <button onClick={() => setMostrarFuentes(v => !v)}
-          className="flex items-center gap-2 text-sm font-semibold text-[#94a3b8] hover:text-white transition-colors mb-3">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          className="flex items-center gap-2.5 text-sm font-bold text-[#94a3b8] hover:text-white transition-colors mb-4 group">
+          <span className="w-8 h-8 rounded-lg border border-[var(--border)] flex items-center justify-center group-hover:border-[var(--accent)] group-hover:bg-[var(--accent-dim)] transition-all">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </span>
           {mostrarFuentes ? 'Ocultar' : 'Ver'} fuentes y referencias normativas
         </button>
         {mostrarFuentes && (
           <div className="card overflow-hidden">
-            <div className="px-4 py-3 border-b border-[#272b40] bg-[#21253a]">
-              <p className="text-xs text-[#94a3b8]">
+            <div className="px-5 py-4 border-b border-[var(--border)]" style={{ background: 'linear-gradient(135deg, var(--surface2), var(--surface))' }}>
+              <p className="text-[11px] text-[#94a3b8] leading-relaxed">
                 El motor de cálculo es una traducción directa a JavaScript del código Python original del autor,
                 que implementa la normativa estatal (LIRPF + LGSS) año a año. Los parámetros provienen de las siguientes fuentes:
               </p>
             </div>
-            <table className="w-full text-xs">
+            <table className="data-table w-full">
               <thead>
-                <tr className="border-b border-[#272b40]">
-                  <th className="py-2 px-4 text-left text-[#64748b] font-medium w-48">Concepto</th>
-                  <th className="py-2 px-4 text-left text-[#64748b] font-medium">Fuente</th>
+                <tr>
+                  <th className="text-left w-48">Concepto</th>
+                  <th className="text-left">Fuente</th>
                 </tr>
               </thead>
               <tbody>
                 {FUENTES.map(f => (
-                  <tr key={f.concepto} className="border-b border-[#272b40] last:border-0 hover:bg-[#21253a]">
-                    <td className="py-2 px-4 font-semibold text-white align-top">{f.concepto}</td>
-                    <td className="py-2 px-4 text-[#94a3b8] leading-relaxed">
+                  <tr key={f.concepto}>
+                    <td className="font-semibold text-white align-top">{f.concepto}</td>
+                    <td className="text-[#94a3b8] leading-relaxed">
                       {f.url
                         ? <a href={f.url} target="_blank" rel="noopener noreferrer"
-                            className="text-blue-400 hover:text-blue-300 hover:underline transition-colors">
-                            {f.fuente} ↗
+                            className="text-blue-400 hover:text-blue-300 hover:underline transition-colors inline-flex items-center gap-1">
+                            {f.fuente}
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
                           </a>
                         : f.fuente}
                     </td>
