@@ -170,7 +170,7 @@ export default function SidebarWidget({ bruto, anio, onChange }) {
       <div style={{ height: 1, background: 'var(--border)' }} />
 
       <p className="text-[9px] text-[#374151] leading-relaxed px-1">
-        Solo tarifa estatal Â· CÃ¡lculos orientativos Â· BOE, INE, TGSS
+        Solo tarifa estatal · Cálculos orientativos · BOE, INE, TGSS
       </p>
     </div>
   );
