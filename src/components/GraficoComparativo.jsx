@@ -116,7 +116,6 @@ function exportCSV(aniosActivos) {
 export default function GraficoComparativo({ brutoRef, anioRef }) {
   const [aniosActivos, setAniosActivos] = useState(new Set([2012, 2015, 2019, 2023, 2026]));
   const [vista, setVista] = useState('salario');
-  const [mostrarUmbrales, setMostrarUmbrales] = useState(true);
 
   const toggleAnio = useCallback(a => setAniosActivos(prev => {
     const next = new Set(prev);
@@ -194,10 +193,6 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
               </button>
             ))}
             <button onClick={() => setAniosActivos(new Set(ANIOS))} className="btn-ghost hover:!border-white hover:!text-white">Todos</button>
-            <button onClick={() => setMostrarUmbrales(v => !v)}
-              className={`btn-ghost ml-auto ${mostrarUmbrales ? '!border-[var(--accent)]/50 !text-[var(--accent-light)] !bg-[var(--accent-dim)]' : ''}`}>
-              Umbrales {anioRef}
-            </button>
           </div>
 
           <p className="text-[10px] text-[#5a6b82] mb-2 font-medium">Eje X: salario bruto equivalente (€2026) · Eje Y: <strong className="text-[#7a8baa]">salario neto</strong> resultante (€2026)</p>
@@ -211,28 +206,26 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
                   label={{ value: 'Neto', angle: -90, position: 'insideLeft', offset: 10, fill: '#4b5563', fontSize: 9 }} />
                 <Tooltip content={<TooltipSalario ref2026Neto={ref2026Neto} metrica="neto" />} />
 
-                {mostrarUmbrales && (<>
-                  {smi2026 >= 15000 && smi2026 <= 100000 && (
-                    <ReferenceLine x={smi2026} stroke="#f59e0b" strokeOpacity={0.5} strokeDasharray="4 2"
+                {smi2026 >= 15000 && smi2026 <= 100000 && (
+                    <ReferenceLine x={smi2026} stroke="#f59e0b" strokeOpacity={0.6} strokeDasharray="4 2"
                       label={{ value:`SMI ${anioRef}`, position:'insideTopLeft', fill:'#f59e0b', fontSize:9 }} />
                   )}
                   {umbralInf2026 && umbralInf2026 >= 15000 && umbralInf2026 <= 100000 && (
-                    <ReferenceLine x={umbralInf2026} stroke="#38bdf8" strokeOpacity={0.5} strokeDasharray="4 2"
+                    <ReferenceLine x={umbralInf2026} stroke="#38bdf8" strokeOpacity={0.55} strokeDasharray="4 2"
                       label={{ value:'Art.20↓', position:'insideTopRight', fill:'#38bdf8', fontSize:9 }} />
                   )}
                   {umbralSup2026 && umbralSup2026 >= 15000 && umbralSup2026 <= 100000 && (
-                    <ReferenceLine x={umbralSup2026} stroke="#38bdf8" strokeOpacity={0.3} strokeDasharray="4 2"
+                    <ReferenceLine x={umbralSup2026} stroke="#38bdf8" strokeOpacity={0.35} strokeDasharray="4 2"
                       label={{ value:'Art.20=0', position:'insideTopRight', fill:'#38bdf8', fontSize:9 }} />
                   )}
                   {umbralInf2026 && umbralSup2026 && (
                     <ReferenceArea x1={Math.max(15000, umbralInf2026)} x2={Math.min(100000, umbralSup2026)}
-                      fill="#38bdf8" fillOpacity={0.04} />
+                      fill="#38bdf8" fillOpacity={0.05} />
                   )}
                   {baseMax2026 >= 15000 && baseMax2026 <= 100000 && (
-                    <ReferenceLine x={baseMax2026} stroke="#64748b" strokeOpacity={0.4} strokeDasharray="4 2"
+                    <ReferenceLine x={baseMax2026} stroke="#64748b" strokeOpacity={0.5} strokeDasharray="4 2"
                       label={{ value:'Tope SS', position:'insideTopRight', fill:'#64748b', fontSize:9 }} />
                   )}
-                </>)}
 
                 {bruto2026 >= 15000 && bruto2026 <= 100000 && (
                   <ReferenceLine x={bruto2026} stroke="#ffffff" strokeOpacity={0.12} strokeWidth={2} strokeDasharray="6 4"

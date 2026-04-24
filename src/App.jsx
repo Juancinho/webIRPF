@@ -5,6 +5,7 @@ import SimuladorSubida from './components/SimuladorSubida';
 import GraficoComparativo from './components/GraficoComparativo';
 import GraficoMecanismos from './components/GraficoMecanismos';
 import CuñaFiscal from './components/CuñaFiscal';
+import DesgloseEducativo from './components/DesgloseEducativo';
 import NormativaFAQ from './components/NormativaFAQ';
 import SidebarWidget from './components/SidebarWidget';
 import './index.css';
@@ -168,12 +169,8 @@ export default function App() {
 
           {/* Sidebar — fades in from left when intro scrolls out */}
           <aside className="sidebar-widget hidden xl:block w-56 shrink-0"
-            style={{
-              opacity: sidebarVisible ? 1 : 0,
-              transform: sidebarVisible ? 'translateX(0)' : 'translateX(-12px)',
-              transition: 'opacity 0.5s ease, transform 0.5s ease',
-              pointerEvents: sidebarVisible ? 'auto' : 'none',
-            }}>
+            data-visible={sidebarVisible}
+            style={{ pointerEvents: sidebarVisible ? 'auto' : 'none' }}>
             <SidebarWidget bruto={bruto} anio={anio} onChange={onChange} />
           </aside>
 
@@ -187,6 +184,12 @@ export default function App() {
               onShare={() => navigator.clipboard?.writeText(getShareURL())}
               shareLabel="Compartir" />
           </div>
+
+          {/* ── Desglose educativo paso a paso ── */}
+          <div className="mt-5">
+            <DesgloseEducativo bruto={bruto} anio={anio} />
+          </div>
+
           <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
             <InfoCard>
               <strong className="text-white block mb-1.5 text-[13px]"> ¿Qué es el tipo efectivo?</strong>
