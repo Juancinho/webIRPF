@@ -1,4 +1,4 @@
-﻿import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import {
   ComposedChart, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, ReferenceLine, ReferenceArea, Legend, Brush
@@ -23,6 +23,23 @@ const GRUPOS = {
   'Reforma 2015': [2015,2016,2017],
   '2019+': [2019,2020,2021,2022,2023,2024,2025,2026],
 };
+
+/* ── Custom Brush traveller handle ── */
+function BrushHandle({ x, y, width, height }) {
+  const hw = 10;
+  return (
+    <g>
+      <rect x={x - hw / 2} y={y + 2} width={hw} height={height - 4} rx={4}
+        fill="#0f172a" stroke="#38bdf8" strokeWidth={1.5} />
+      {[-2.5, 0, 2.5].map(dy => (
+        <line key={dy}
+          x1={x - 2.5} y1={y + height / 2 + dy}
+          x2={x + 2.5} y2={y + height / 2 + dy}
+          stroke="#38bdf8" strokeWidth={1} strokeOpacity={0.7} strokeLinecap="round" />
+      ))}
+    </g>
+  );
+}
 
 // Tooltip para el gráfico por nivel salarial
 function TooltipSalario({ active, payload, label, ref2026Neto, metrica }) {
@@ -228,22 +245,13 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
                     dot={false} activeDot={{ r: 5, strokeWidth: 0 }}
                     isAnimationActive={aniosActivos.size <= 8} />
                 ))}
-                <Brush dataKey="bruto" height={22} stroke="#1a2040" fill="#0c0f1a" travellerWidth={8}
+                <Brush dataKey="bruto" height={30}
+                  stroke="rgba(56,189,248,0.25)" fill="#080c18"
+                  travellerWidth={10} traveller={<BrushHandle />}
                   tickFormatter={v => `${Math.round(v/1000)}k€`}
-                  style={{ fontSize: 10, fill: '#4b5563' }} />
+                  style={{ fontSize: 9, fill: '#4b5563' }} />
               </LineChart>
             </ResponsiveContainer>
-          </div>
-
-          {/* Leyenda clicable */}
-          <div className="flex flex-wrap gap-3 mt-3">
-            {[...aniosActivos].sort((a, b) => a - b).map(a => (
-              <button key={a} onClick={() => toggleAnio(a)}
-                className="flex items-center gap-1.5 text-xs font-medium hover:opacity-60 transition-opacity" style={{ color: YEAR_COLORS[a] }}>
-                <span className="w-5 h-0.5 inline-block rounded" style={{ background: YEAR_COLORS[a], boxShadow: `0 0 6px ${YEAR_COLORS[a]}30` }} />
-                {a}
-              </button>
-            ))}
           </div>
 
           <InsightSalario aniosActivos={aniosActivos} bruto2026={bruto2026} />
@@ -299,21 +307,13 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
                     dot={false} activeDot={{ r: 5, strokeWidth: 0 }}
                     isAnimationActive={aniosActivos.size <= 8} />
                 ))}
-                <Brush dataKey="bruto" height={22} stroke="#1a2040" fill="#0c0f1a" travellerWidth={8}
+                <Brush dataKey="bruto" height={30}
+                  stroke="rgba(56,189,248,0.25)" fill="#080c18"
+                  travellerWidth={10} traveller={<BrushHandle />}
                   tickFormatter={v => `${Math.round(v/1000)}k€`}
-                  style={{ fontSize: 10, fill: '#4b5563' }} />
+                  style={{ fontSize: 9, fill: '#4b5563' }} />
               </LineChart>
             </ResponsiveContainer>
-          </div>
-
-          <div className="flex flex-wrap gap-3 mt-3">
-            {[...aniosActivos].sort((a, b) => a - b).map(a => (
-              <button key={a} onClick={() => toggleAnio(a)}
-                className="flex items-center gap-1.5 text-xs font-medium hover:opacity-60 transition-opacity" style={{ color: YEAR_COLORS[a] }}>
-                <span className="w-5 h-0.5 inline-block rounded" style={{ background: YEAR_COLORS[a], boxShadow: `0 0 6px ${YEAR_COLORS[a]}30` }} />
-                {a}
-              </button>
-            ))}
           </div>
 
           <InsightSalario aniosActivos={aniosActivos} bruto2026={bruto2026} />

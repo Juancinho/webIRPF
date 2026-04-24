@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 * { box-sizing: border-box; }
@@ -40,8 +40,88 @@ body {
 }
 
 .font-mono { font-family: 'JetBrains Mono', 'Fira Code', monospace !important; }
+.font-display { font-family: 'DM Serif Display', Georgia, serif !important; }
 
 #root { min-height: 100vh; }
+
+/* ─── Sidebar widget ─── */
+.sidebar-widget {
+  position: sticky;
+  top: 72px;
+  max-height: calc(100vh - 88px);
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.sidebar-widget::-webkit-scrollbar { display: none; }
+
+.toc-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+}
+.toc-link:hover {
+  background: var(--surface2);
+  color: var(--text-h);
+}
+.toc-link.active {
+  background: var(--surface2);
+  color: var(--accent-light);
+}
+.toc-num {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  background: var(--surface3);
+  font-size: 9px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.toc-link.active .toc-num {
+  background: rgba(56,189,248,0.15);
+  color: var(--accent);
+}
+
+/* ─── Metric mini card (sidebar) ─── */
+.metric-mini {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+}
+.metric-mini-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text);
+  opacity: 0.5;
+  margin-bottom: 2px;
+}
+.metric-mini-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-h);
+  line-height: 1.2;
+}
+
 
 /* ─── Smooth scroll ─── */
 html { scroll-behavior: smooth; }
