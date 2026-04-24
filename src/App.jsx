@@ -89,16 +89,16 @@ export default function App() {
         <div className="max-w-5xl mx-auto px-5 py-3.5 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="flex items-baseline gap-1.5">
-              <span className="text-lg font-black text-white tracking-tight">IRPF</span>
+              <span className="text-lg font-black text-white tracking-tight">Fiscal</span>
               <span className="text-lg font-black tracking-tight"
                 style={{ background: 'linear-gradient(90deg,#818cf8,#a78bfa,#c084fc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-                2012–2026
+                Scope
               </span>
             </div>
             <span className="hidden sm:inline-flex tag"
               style={{ color: '#a78bfa', borderColor: 'rgba(167,139,250,0.2)', background: 'rgba(167,139,250,0.06)' }}>
               <span className="w-1.5 h-1.5 rounded-full bg-violet-400 pulse-dot" />
-              Divulgación fiscal · Open data
+              España · 2012–2026
             </span>
           </div>
           <div className="flex items-center gap-3">
@@ -115,28 +115,28 @@ export default function App() {
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border mb-5 text-[10px] font-bold uppercase tracking-[0.12em]"
             style={{ color: '#a78bfa', borderColor: 'rgba(167,139,250,0.2)', background: 'rgba(167,139,250,0.06)' }}>
             <span className="w-1.5 h-1.5 rounded-full bg-violet-400 pulse-dot" />
-            Herramienta interactiva de análisis fiscal
+            Radiografía interactiva del sistema fiscal español
           </div>
           <h1 className="text-4xl sm:text-6xl font-black tracking-tight mb-5 leading-[1.1]"
             style={{ background: 'linear-gradient(135deg,#e0e7ff 0%,#c7d2fe 20%,#a5b4fc 40%,#c084fc 65%,#f0abfc 85%,#fca5e4 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-            La subida de impuestos<br className="hidden sm:block" /> que no ves en tu nómina
+            Tu sueldo bajo el<br className="hidden sm:block" /> microscopio fiscal
           </h1>
           <p className="text-base sm:text-lg text-[#7a8baa] leading-relaxed max-w-2xl mx-auto">
-            Cuando el salario sube lo mismo que la inflación pero los tramos del IRPF no se actualizan,
-            pagas más impuestos sin que nadie lo haya decidido. Se llama <strong className="text-[var(--accent-light)] font-semibold">ilusión fiscal</strong> o
-            «subida de impuestos en frío» y lleva ocurriendo en España desde 2012.
+            Calcula tu nómina real, compara 15 años de reformas fiscales con la inflación descontada,
+            y descubre cómo los mecanismos ocultos del IRPF afectan a tu bolsillo.
+            Todo con datos oficiales del <strong className="text-[var(--accent-light)] font-semibold">BOE, INE y TGSS</strong>.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mt-10 text-left">
-            <HechoDestacado color="#f43f5e" icono="📊"
-              titulo="Tramos IRPF sin actualizar por inflación"
-              texto="Los umbrales de los tramos del IRPF no se actualizan automáticamente con el IPC. Si tu salario sube un 3% y la inflación también sube un 3%, en términos reales ganas lo mismo — pero tributas más." />
-            <HechoDestacado color="#f59e0b" icono="💰"
-              titulo="SMI +90% nominal desde 2012"
-              texto="El Salario Mínimo Interprofesional ha pasado de ~8.980€ a 17.094€ anuales. En términos reales (€2026) ha ganado aproximadamente un 52% de poder adquisitivo en 14 años." />
-            <HechoDestacado color="#10b981" icono="📋"
-              titulo="Art.20: la palanca menos conocida"
-              texto="La reducción por rendimientos del trabajo ha crecido de 4.080€ (2012) a 7.302€ (2026). Es el mecanismo que más ha protegido a las rentas bajas, pero pocos saben que existe." />
+            <HechoDestacado color="#f43f5e" icono="🔍"
+              titulo="Progresividad en frío"
+              texto="Los tramos del IRPF no se ajustan con el IPC. Si tu salario sube un 3% y la inflación también, ganas lo mismo en poder adquisitivo pero pagas más impuestos. Es una subida silenciosa." />
+            <HechoDestacado color="#f59e0b" icono="📈"
+              titulo="SMI ×1,9 en 14 años"
+              texto="El Salario Mínimo ha pasado de ~8.980€ a 17.094€ anuales (+90% nominal). Pero descontando la inflación, la subida real es del ~52%. Esta herramienta te muestra la diferencia." />
+            <HechoDestacado color="#10b981" icono="🛡️"
+              titulo="Art.20: el escudo invisible"
+              texto="La reducción por rendimientos del trabajo ha crecido de 4.080€ a 7.302€. Es el mecanismo que más protege a rentas bajas — y también el que crea las «trampas fiscales» que aquí visualizamos." />
           </div>
         </section>
 
@@ -276,7 +276,7 @@ export default function App() {
           </div>
           <div className="section-separator" />
           <p className="text-center text-[10px] text-[#374151] mt-4">
-            Herramienta de divulgación · Datos IPC: INE (dic.→dic.) · Parámetros: LIRPF, LGSS, Órdenes anuales SS · BOE
+            FiscalScope · Datos IPC: INE (dic.→dic.) · Parámetros: LIRPF, LGSS, Órdenes anuales SS · BOE
           </p>
         </div>
       </footer>
