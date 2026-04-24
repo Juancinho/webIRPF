@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { calcularNomina, calcularTipoMarginal, ANIOS, obtenerParametros, SMI_ANUAL } from '../engine/irpf';
 import { eur, pct, num } from '../utils/format';
 
-const TRAMO_COLORS = ['#60a5fa','#818cf8','#a78bfa','#c084fc','#e879f9','#f472b6'];
+const TRAMO_COLORS = ['#38bdf8','#22d3ee','#2dd4bf','#34d399','#a3e635','#fbbf24'];
 
 export default function CalculadoraCard({ bruto, anio, onChange, onShare, shareLabel }) {
   const [pagas, setPagas] = useState(12);
@@ -61,7 +61,7 @@ export default function CalculadoraCard({ bruto, anio, onChange, onShare, shareL
             {ANIOS.map(a => (
               <button key={a} onClick={() => onChange('anio', a)}
                 className={`year-btn ${anio === a ? 'active' : ''}`}
-                style={anio === a ? { background: 'linear-gradient(135deg, var(--accent), var(--accent2))', boxShadow: '0 2px 16px rgba(129,140,248,0.35)' } : {}}>
+                style={anio === a ? { background: 'linear-gradient(135deg, var(--accent), var(--accent2))', boxShadow: '0 2px 12px rgba(56,189,248,0.25)' } : {}}>
                 {a}
               </button>
             ))}

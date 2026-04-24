@@ -13,8 +13,8 @@ export const YEAR_COLORS = {
   2012:'#f87171',2013:'#fb923c',2014:'#fbbf24',
   2015:'#facc15',2016:'#a3e635',2017:'#4ade80',
   2018:'#34d399',2019:'#2dd4bf',2020:'#38bdf8',
-  2021:'#60a5fa',2022:'#818cf8',2023:'#a78bfa',
-  2024:'#c084fc',2025:'#e879f9',2026:'#ffffff',
+  2021:'#60a5fa',2022:'#38bdf8',2023:'#22d3ee',
+  2024:'#2dd4bf',2025:'#34d399',2026:'#ffffff',
 };
 
 const GRUPOS = {
@@ -212,8 +212,8 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
                       fill="#38bdf8" fillOpacity={0.04} />
                   )}
                   {baseMax2026 >= 15000 && baseMax2026 <= 100000 && (
-                    <ReferenceLine x={baseMax2026} stroke="#a78bfa" strokeOpacity={0.4} strokeDasharray="4 2"
-                      label={{ value:'Tope SS', position:'insideTopRight', fill:'#a78bfa', fontSize:9 }} />
+                    <ReferenceLine x={baseMax2026} stroke="#64748b" strokeOpacity={0.4} strokeDasharray="4 2"
+                      label={{ value:'Tope SS', position:'insideTopRight', fill:'#64748b', fontSize:9 }} />
                   )}
                 </>)}
 
