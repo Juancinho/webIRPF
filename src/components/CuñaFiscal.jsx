@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+﻿import { useMemo, useState } from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { calcularNomina } from '../engine/irpf';
 import { eur } from '../utils/format';
@@ -89,7 +89,7 @@ export default function CuñaFiscal({ bruto, anio }) {
               background: 'linear-gradient(135deg, var(--accent), var(--accent2))',
               color: 'white', boxShadow: '0 2px 12px rgba(56,189,248,0.25)',
             } : { color: '#64748b' }}>
-            👤 Perspectiva trabajador
+             Perspectiva trabajador
           </button>
           <button onClick={() => setVista('empresa')}
             className="px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-300"
@@ -97,7 +97,7 @@ export default function CuñaFiscal({ bruto, anio }) {
               background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
               color: 'white', boxShadow: '0 2px 12px rgba(99,102,241,0.25)',
             } : { color: '#64748b' }}>
-            🏢 Coste real empresa
+             Coste real empresa
           </button>
         </div>
       </div>

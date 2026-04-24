@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+﻿import { useState, useMemo, useCallback } from 'react';
 import {
   ComposedChart, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, ReferenceLine, ReferenceArea, Legend, Brush
@@ -34,7 +34,7 @@ function TooltipSalario({ active, payload, label, ref2026Neto, metrica }) {
       <p className="text-[10px] text-[#7a8baa] mb-0.5">Salario bruto equivalente (€2026)</p>
       <p className="font-extrabold text-white mb-2.5 border-b border-[var(--border)] pb-2 text-[13px]">{eur(label)}</p>
       <p className="text-[9px] text-[var(--accent-light)] font-semibold uppercase tracking-wider mb-1.5">
-        {isPct ? 'Tipo efectivo IRPF' : '↓ Salario neto resultante'}
+        {isPct ? 'Tipo efectivo IRPF' : 'Salario neto resultante'}
       </p>
       {sorted.map(p => {
         const anio = parseInt(p.dataKey.split('_')[1]);
@@ -144,7 +144,7 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
         </div>
         <div className="flex gap-2 items-center flex-wrap shrink-0">
           <div className="flex rounded-xl border border-[var(--border)] overflow-hidden text-xs">
-            {[['salario','💶 Neto por salario'],['tipo','📊 Tipo efectivo'],['anio','📅 Evolución por año']].map(([v, l]) => (
+            {[['salario',' Neto por salario'],['tipo',' Tipo efectivo'],['anio',' Evolución por año']].map(([v, l]) => (
               <button key={v} onClick={() => setVista(v)}
                 className={`px-3 py-2 font-semibold transition-all ${vista === v ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent2)] text-white' : 'text-[#94a3b8] hover:bg-[var(--surface2)]'}`}>
                 {l}

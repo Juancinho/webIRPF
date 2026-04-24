@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, ReferenceLine, Legend
@@ -28,7 +28,7 @@ function ToggleReal({ real, setReal }) {
           color: 'white',
           boxShadow: '0 2px 12px rgba(56,189,248,0.25)',
         } : { color: '#64748b' }}>
-        💰 € nominales
+         € nominales
       </button>
       <button onClick={() => setReal(true)}
         className="relative px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-300"
@@ -37,7 +37,7 @@ function ToggleReal({ real, setReal }) {
           color: 'white',
           boxShadow: '0 2px 12px rgba(16,185,129,0.3)',
         } : { color: '#64748b' }}>
-        📊 € reales 2026
+         € reales 2026
       </button>
     </div>
   );
@@ -51,7 +51,7 @@ function TooltipArt20({ active, payload, label, real }) {
       <p className="text-[10px] text-[#7a8baa] mb-0.5">Tu sueldo bruto − SS {real ? '(€2026)' : '(€ nominales)'}</p>
       <p className="font-extrabold text-white mb-2 border-b border-[var(--border)] pb-2 text-[13px]">{eur(label)}</p>
       <p className="text-[9px] text-[var(--accent-light)] font-semibold uppercase tracking-wider mb-1.5">
-        ↓ Descuento que se resta de tu base imponible:
+        Descuento que se resta de tu base imponible:
       </p>
       {[...payload].sort((a, b) => b.value - a.value).map(p => {
         const anio = parseInt(p.dataKey.split('_')[1]);
@@ -113,12 +113,12 @@ function TabCurvaArt20() {
       {/* Explicación */}
       <div className="info-card mb-5 text-[13px] text-[#94a3b8] leading-relaxed space-y-3">
         <div>
-          <strong className="text-white font-semibold">📖 ¿Qué es esto?</strong>{' '}
+          <strong className="text-white font-semibold"> ¿Qué es esto?</strong>{' '}
           El Art. 20 te permite restar una cantidad de tu sueldo <em>antes</em> de calcular el IRPF.
           Es un «descuento» que reduce tu base imponible — cuanto más alto, menos impuestos pagas.
         </div>
         <div>
-          <strong className="text-white font-semibold">📊 Ejes del gráfico:</strong>
+          <strong className="text-white font-semibold"> Ejes del gráfico:</strong>
           <ul className="mt-1.5 space-y-1 ml-4 list-disc">
             <li><strong className="text-white">→ Horizontal:</strong> tu sueldo bruto menos la Seguridad Social</li>
             <li><strong className="text-white">↑ Vertical:</strong> euros que se descuentan de tu base imponible</li>
@@ -126,7 +126,7 @@ function TabCurvaArt20() {
           </ul>
         </div>
         <div className="border-t border-[var(--border)] pt-3">
-          <strong className="text-orange-400 font-semibold">⚠ Zona cliff:</strong>{' '}
+          <strong className="text-orange-400 font-semibold">Zona cliff:</strong>{' '}
           donde la línea baja en picado. Si te suben el sueldo 100€ ahí, pierdes parte del descuento
           y tu base imponible sube <em>más</em> de 100€. Puedes pagar más impuestos que lo que recibes de subida.
         </div>
@@ -136,7 +136,7 @@ function TabCurvaArt20() {
 
       {real && (
         <div className="mb-4 px-4 py-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5 text-[12px] text-emerald-300/80 leading-relaxed">
-          💡 <strong className="text-emerald-300">Vista en €2026:</strong> ahora puedes comparar directamente entre años.
+           <strong className="text-emerald-300">Vista en €2026:</strong> ahora puedes comparar directamente entre años.
           Si dos líneas coinciden, el descuento tiene el mismo valor <em>real</em>. Si la de 2026 está por encima de la de 2012,
           el descuento ha crecido más que la inflación.
         </div>
@@ -185,7 +185,7 @@ function TabCurvaArt20() {
       {/* Tabla */}
       <div className="mt-6">
         <p className="text-[11px] text-[#7a8baa] mb-3 font-medium leading-relaxed">
-          📋 <strong className="text-white">Tabla resumen:</strong> la columna <strong className="text-orange-400">«Pérdida por €100 de subida»</strong> indica
+           <strong className="text-white">Tabla resumen:</strong> la columna <strong className="text-orange-400">«Pérdida por €100 de subida»</strong> indica
           cuántos euros de descuento pierdes cuando tu sueldo sube 100€ dentro de la zona cliff.
         </p>
         <div className="overflow-x-auto">
@@ -227,7 +227,7 @@ function TabCurvaArt20() {
           </table>
         </div>
         <div className="mt-3 info-card text-[12px] text-[#7a8baa] leading-relaxed">
-          <strong className="text-white font-semibold">💡 Ejemplo:</strong>{' '}
+          <strong className="text-white font-semibold"> Ejemplo:</strong>{' '}
           Si la columna pone <strong className="text-red-400">175€</strong>, significa que por cada 100€ de subida bruta,
           pierdes 175€ de descuento. Tu base imponible sube 275€ (100 + 175). Al 19% de IRPF serían 52€ de impuestos
           por una subida de 100€ → <strong className="text-white">te quedas solo con ~48€ netos.</strong>
@@ -258,12 +258,12 @@ function TabEvolucionUmbrales() {
     <div>
       <div className="info-card mb-5 text-[13px] text-[#94a3b8] leading-relaxed space-y-3">
         <div>
-          <strong className="text-white font-semibold">📖 ¿Qué es esto?</strong>{' '}
+          <strong className="text-white font-semibold"> ¿Qué es esto?</strong>{' '}
           El sistema fiscal tiene 4 «líneas invisibles» que determinan cuánto IRPF pagas. Este gráfico muestra
           cómo han cambiado desde 2012.
         </div>
         <div>
-          <strong className="text-white font-semibold">📊 ¿Qué representa cada línea?</strong>
+          <strong className="text-white font-semibold"> ¿Qué representa cada línea?</strong>
           <ul className="mt-1.5 space-y-2 ml-1">
             <li className="flex items-start gap-2">
               <span className="w-3 h-3 rounded-full shrink-0 mt-0.5" style={{ background: UMBRAL_COLORS.smi }} />
@@ -284,7 +284,7 @@ function TabEvolucionUmbrales() {
           </ul>
         </div>
         <div className="border-t border-[var(--border)] pt-3">
-          <strong className="text-white font-semibold">🔍 ¿Qué buscar?</strong>{' '}
+          <strong className="text-white font-semibold"> ¿Qué buscar?</strong>{' '}
           Si el <span className="text-emerald-400 font-semibold">SMI</span> está por debajo del{' '}
           <span className="text-amber-400 font-semibold">umbral inferior</span>, los trabajadores de salario mínimo tienen el descuento máximo.
           Si el <span className="text-sky-400 font-semibold">mínimo exento</span> sube, más gente deja de pagar IRPF.
@@ -296,7 +296,7 @@ function TabEvolucionUmbrales() {
 
       {real && (
         <div className="mb-4 px-4 py-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5 text-[12px] text-emerald-300/80 leading-relaxed">
-          💡 <strong className="text-emerald-300">Vista en €2026:</strong> ahora ves el valor <em>real</em> de cada umbral, descontando la inflación.
+           <strong className="text-emerald-300">Vista en €2026:</strong> ahora ves el valor <em>real</em> de cada umbral, descontando la inflación.
           Si una línea sube, ha crecido más que los precios. Si baja, ha perdido poder adquisitivo.
           En nominal el SMI parece haber subido un ~90%, pero en real (€2026) ha subido ~52%.
         </div>
@@ -356,8 +356,8 @@ export default function GraficoMecanismos() {
     <div>
       <div className="flex gap-2.5 mb-6 flex-wrap">
         {[
-          ['art20', '📉 Curva de reducción Art.20'],
-          ['umbrales', '📊 Evolución de umbrales clave'],
+          ['art20', ' Curva de reducción Art.20'],
+          ['umbrales', ' Evolución de umbrales clave'],
         ].map(([id, label]) => (
           <button key={id} onClick={() => setTab(id)}
             className={`px-5 py-2.5 rounded-xl text-sm font-semibold border transition-all ${tab === id

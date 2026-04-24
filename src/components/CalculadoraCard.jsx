@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+﻿import { useState, useMemo } from 'react';
 import { calcularNomina, calcularTipoMarginal, ANIOS, obtenerParametros, SMI_ANUAL } from '../engine/irpf';
 import { eur, pct, num } from '../utils/format';
 
@@ -145,7 +145,7 @@ export default function CalculadoraCard({ bruto, anio, onChange, onShare, shareL
             <div className="text-[10px] text-[var(--text)] opacity-40 mt-0.5">Total c/SS: {pct(resultado.tipoEfectivoTotal * 100)}</div>
             <div className="overflow-hidden max-h-0 group-hover:max-h-20 transition-all duration-300 ease-in-out">
               <p className="text-[10px] text-[var(--accent-light)] mt-2 pt-2 border-t border-[var(--border)] leading-relaxed">
-                📖 De cada 100€ que ganas, {pct(resultado.tipoEfectivoIRPF * 100)} van al IRPF. Es la media real, no el tipo del tramo.
+                 De cada 100€ que ganas, {pct(resultado.tipoEfectivoIRPF * 100)} van al IRPF. Es la media real, no el tipo del tramo.
               </p>
             </div>
           </div>
@@ -165,11 +165,11 @@ export default function CalculadoraCard({ bruto, anio, onChange, onShare, shareL
               {pct(marginal.tipoMarginalTotal * 100)}
             </div>
             <div className="text-[10px] text-[var(--text)] opacity-40 mt-0.5">
-              {cliffZone ? '⚠ Zona cliff Art.20' : `te quedas ${pct(marginal.netoMarginal * 100)} de cada €100 extra`}
+              {cliffZone ? 'Zona cliff Art.20' : `te quedas ${pct(marginal.netoMarginal * 100)} de cada €100 extra`}
             </div>
             <div className="overflow-hidden max-h-0 group-hover:max-h-24 transition-all duration-300 ease-in-out">
               <p className="text-[10px] mt-2 pt-2 border-t border-[var(--border)] leading-relaxed" style={{ color: cliffZone ? '#fdba74' : 'var(--accent-light)' }}>
-                📖 Si te suben el sueldo 100€, {pct(marginal.tipoMarginalTotal * 100)} se los queda Hacienda+SS. Es más alto que el tipo efectivo porque se aplica solo al "siguiente euro".
+                 Si te suben el sueldo 100€, {pct(marginal.tipoMarginalTotal * 100)} se los queda Hacienda+SS. Es más alto que el tipo efectivo porque se aplica solo al "siguiente euro".
               </p>
             </div>
           </div>
@@ -186,7 +186,7 @@ export default function CalculadoraCard({ bruto, anio, onChange, onShare, shareL
           <Fila label="Cuota IRPF (tramos)" valor={eur(resultado.cuotaIntegra)} />
           <Fila label="− Mínimo personal" valor={`−${eur(resultado.cuotaMinimo)}`} c="text-amber-400" />
           {resultado.deduccionSMI > 0 && <Fila label="− Deducción SMI" valor={`−${eur(resultado.deduccionSMI)}`} c="text-amber-400" />}
-          {limiteActivo && <Fila label="↓ Límite 43% Art.85.3" valor={eur(resultado.limiteRetencion)} c="text-orange-400" />}
+          {limiteActivo && <Fila label="Límite 43% Art.85.3" valor={eur(resultado.limiteRetencion)} c="text-orange-400" />}
           <div className="divider-glow" />
           <Fila label="IRPF final" valor={`−${eur(resultado.irpfFinal)}`} c="text-red-400" bold />
           <Fila label="Salario neto" valor={eur(resultado.salarioNeto)} c="text-emerald-400" bold />
