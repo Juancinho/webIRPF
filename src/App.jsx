@@ -151,13 +151,25 @@ export default function App() {
           </div>
           <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
             <InfoCard>
-              <strong className="text-white block mb-1.5 text-[13px]">¿Qué es la base imponible?</strong>
+              <strong className="text-white block mb-1.5 text-[13px]">📊 ¿Qué es el tipo efectivo?</strong>
+              Es el porcentaje <em>real</em> de tu sueldo que va al IRPF. Si ganas 30.000€ y pagas 3.600€ de IRPF,
+              tu tipo efectivo es el 12%. No confundir con el tramo: aunque tu último euro tribute al 30%,
+              la media de todos los euros es mucho menor. Pasa el ratón sobre la tarjeta para verlo.
+            </InfoCard>
+            <InfoCard>
+              <strong className="text-white block mb-1.5 text-[13px]">⚡ ¿Y el tipo marginal?</strong>
+              Es lo que pagas por el <em>siguiente</em> euro que ganes. Si te suben 100€ el sueldo y solo te
+              llegan 58€, tu tipo marginal efectivo es 42%. Incluye IRPF + SS. Es más alto que el tipo
+              efectivo porque a tu último euro le toca el tramo más alto, no la media.
+            </InfoCard>
+            <InfoCard>
+              <strong className="text-white block mb-1.5 text-[13px]">🧮 ¿Qué es la base imponible?</strong>
               Es lo que realmente tributa. Se calcula restando al bruto: las cotizaciones SS del trabajador,
               los 2.000€ de gastos deducibles (desde 2015, Art.19 LIRPF) y la reducción por rendimientos
               del trabajo (Art.20). A esa cifra se aplica la tarifa progresiva.
             </InfoCard>
             <InfoCard>
-              <strong className="text-white block mb-1.5 text-[13px]">¿Por qué hay dos columnas?</strong>
+              <strong className="text-white block mb-1.5 text-[13px]">🏢 ¿Por qué hay dos columnas?</strong>
               El coste real para la empresa (coste laboral) incluye la SS patronal (~31,5%), que el trabajador
               normalmente no ve. Por eso un bruto de 35.000€ puede costar a la empresa más de 46.000€ y
               producir solo ~28.000€ netos.
@@ -186,23 +198,28 @@ export default function App() {
         {/* ── 3. COMPARATIVA ── */}
         <section>
           <SectionTitle n="3" title="Compara todos los años (2012–2026)"
-            sub="Activa/desactiva años. Cambia entre vista por nivel salarial y evolución temporal. Todo en €2026 (inflación descontada). Zoom con el selector inferior." />
+            sub="Tres vistas: neto por nivel salarial, tipo efectivo IRPF, y evolución temporal de tu sueldo. Todo en €2026 (inflación descontada)." />
           <div className="card p-6 lg:p-7">
             <GraficoComparativo brutoRef={bruto} anioRef={anio} />
           </div>
-          <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
             <InfoCard>
-              <strong className="text-white block mb-1.5 text-[13px]">Vista «Por nivel salarial»</strong>
-              Cada línea es un año. Con el mismo poder adquisitivo, ¿cuánto neto habrías cobrado en 2012 vs. hoy?
-              La reforma de 2015 (salto amarillo) y la ampliación Art.20 de 2019 (salto azul) son visibles a ojo.
+              <strong className="text-white block mb-1.5 text-[13px]">💶 Vista «Neto por salario»</strong>
+              Cada línea es un año. El eje X es tu salario bruto y el eje Y muestra cuánto neto cobrarías.
+              Con el mismo poder adquisitivo, ¿cuánto neto habrías cobrado en 2012 vs. hoy?
             </InfoCard>
             <InfoCard>
-              <strong className="text-white block mb-1.5 text-[13px]">Vista «Evolución por año»</strong>
+              <strong className="text-white block mb-1.5 text-[13px]">📊 Vista «Tipo efectivo»</strong>
+              Muestra el porcentaje real de tu salario que va al IRPF, para cada nivel de renta y año.
+              Las líneas más bajas = menos presión fiscal. Se ve claramente el efecto de cada reforma.
+            </InfoCard>
+            <InfoCard>
+              <strong className="text-white block mb-1.5 text-[13px]">📅 Vista «Evolución por año»</strong>
               Fija tu salario en la calculadora de arriba y ve cómo ha evolucionado tu neto real (€2026) y el
               tipo efectivo de IRPF a lo largo del tiempo. Las bandas señalan años de reforma fiscal.
             </InfoCard>
             <InfoCard>
-              <strong className="text-white block mb-1.5 text-[13px]">Botón «Umbrales {anio}»</strong>
+              <strong className="text-white block mb-1.5 text-[13px]">📌 Botón «Umbrales {anio}»</strong>
               Activa las líneas de referencia: SMI, umbral inferior del Art.20 (donde la reducción empieza
               a caer), umbral superior (donde se anula) y base máxima de cotización.
             </InfoCard>
@@ -212,18 +229,22 @@ export default function App() {
         {/* ── 4. MECANISMOS ── */}
         <section>
           <SectionTitle n="4" title="Mecanismos del sistema fiscal"
-            sub="Cómo funciona el Art.20 y cómo han evolucionado los umbrales clave desde 2012." />
+            sub="Dos gráficos interactivos: cómo funciona el descuento del Art.20 y cómo han cambiado los umbrales clave desde 2012. Todo explicado paso a paso." />
           <div className="card p-6 lg:p-7">
             <GraficoMecanismos />
           </div>
-          <div className="mt-5">
+          <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
             <InfoCard>
-              <strong className="text-white text-[13px]">Por qué esto importa.</strong>{' '}
-              La curva de la reducción Art.20 explica visualmente por qué hay trabajadores que prefieren no pedir
-              una subida: en la zona de caída (entre los dos umbrales) el tipo marginal efectivo puede ser tan alto
-              que un aumento de 1.000€ brutos produce apenas 500€ netos — o incluso menos, si otros beneficios
-              desaparecen. El gráfico de evolución de umbrales muestra hasta qué punto la política fiscal ha
-              ido ajustando (o no) estos parámetros al ritmo del SMI y de la inflación.
+              <strong className="text-white text-[13px]">📉 ¿Qué es la curva Art.20?</strong>{' '}
+              El Art.20 es un «descuento» que reduce tu base imponible. Si ganas poco, el descuento es alto
+              (pagas poco IRPF). A medida que ganas más, el descuento baja hasta desaparecer.
+              El gráfico muestra exactamente cuántos euros de descuento tienes para cada nivel de sueldo.
+            </InfoCard>
+            <InfoCard>
+              <strong className="text-white text-[13px]">📊 ¿Qué son los umbrales?</strong>{' '}
+              Son las «líneas invisibles» del sistema fiscal: el salario mínimo, el nivel a partir del cual
+              te retienen IRPF, y los dos umbrales del Art.20. Cuando se mueven, millones de nóminas cambian.
+              El gráfico muestra cómo han ido subiendo (o no) estos umbrales frente al SMI.
             </InfoCard>
           </div>
         </section>

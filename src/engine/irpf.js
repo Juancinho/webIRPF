@@ -211,7 +211,7 @@ export const DATOS_CHART = SALARIOS_CHART.map(bruto2026 => {
   return point;
 });
 
-// ── Curva de la reducción Art.20 por años clave (X = rendimiento neto previo) ──
+// ── Curva de la reducción Art.20 por años clave (X = rendimiento neto previo NOMINAL) ──
 const ANIOS_ART20 = [2012, 2015, 2019, 2023, 2024, 2026];
 export const CURVA_ART20 = Array.from({ length: 261 }, (_, i) => i * 100).map(rn => {
   const p = { rn };
@@ -220,10 +220,20 @@ export const CURVA_ART20 = Array.from({ length: 261 }, (_, i) => i * 100).map(rn
 });
 export const ANIOS_ART20_MUESTRA = ANIOS_ART20;
 
+// ── Curva Art.20 en €2026 (X = rend. neto previo en €2026, Y = reducción en €2026) ──
+export const CURVA_ART20_REAL = Array.from({ length: 261 }, (_, i) => i * 100).map(rn2026 => {
+  const p = { rn: rn2026 };
+  for (const a of ANIOS_ART20) {
+    const inf = INFLACION_A_2026[a];
+    const rnNominal = rn2026 / inf;
+    p[`red_${a}`] = Math.max(0, reduccionTrabajo(a, rnNominal)) * inf;
+  }
+  return p;
+});
+
 // ── Evolución de umbrales nominales por año ──
 export const DATOS_UMBRALES = ANIOS.map(anio => {
   const meta = getArt20Meta(anio);
-  const { tipoEmp, tipoTra } = getSSTipos(anio);
   return {
     anio,
     smi: SMI_ANUAL[anio],
@@ -232,6 +242,21 @@ export const DATOS_UMBRALES = ANIOS.map(anio => {
     art20Sup: typeof meta.uSup === 'number' ? meta.uSup : null,
     art20Max: typeof meta.rMax === 'number' ? meta.rMax : null,
     baseMax: BASE_MAX[anio],
+  };
+});
+
+// ── Evolución de umbrales en €2026 (ajustados por inflación) ──
+export const DATOS_UMBRALES_REAL = ANIOS.map(anio => {
+  const meta = getArt20Meta(anio);
+  const inf = INFLACION_A_2026[anio];
+  return {
+    anio,
+    smi: SMI_ANUAL[anio] * inf,
+    minExento: MINIMO_EXENTO[anio] * inf,
+    art20Inf: typeof meta.uInf === 'number' ? meta.uInf * inf : null,
+    art20Sup: typeof meta.uSup === 'number' ? meta.uSup * inf : null,
+    art20Max: typeof meta.rMax === 'number' ? meta.rMax * inf : null,
+    baseMax: BASE_MAX[anio] * inf,
   };
 });
 

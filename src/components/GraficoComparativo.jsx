@@ -25,22 +25,27 @@ const GRUPOS = {
 };
 
 // Tooltip para el gráfico por nivel salarial
-function TooltipSalario({ active, payload, label, ref2026Neto }) {
+function TooltipSalario({ active, payload, label, ref2026Neto, metrica }) {
   if (!active || !payload?.length) return null;
   const sorted = [...payload].sort((a, b) => b.value - a.value);
+  const isPct = metrica === 'tipo';
   return (
-    <div className="card-glass p-4 shadow-2xl text-xs min-w-[240px] max-h-96 overflow-y-auto" style={{ backdropFilter: 'blur(24px)' }}>
-      <p className="font-extrabold text-white mb-2.5 border-b border-[var(--border)] pb-2 text-[11px]">Bruto equiv.: {eur(label)}</p>
+    <div className="card-glass p-4 shadow-2xl text-xs min-w-[260px] max-h-96 overflow-y-auto" style={{ backdropFilter: 'blur(24px)' }}>
+      <p className="text-[10px] text-[#7a8baa] mb-0.5">Salario bruto equivalente (€2026)</p>
+      <p className="font-extrabold text-white mb-2.5 border-b border-[var(--border)] pb-2 text-[13px]">{eur(label)}</p>
+      <p className="text-[9px] text-[var(--accent-light)] font-semibold uppercase tracking-wider mb-1.5">
+        {isPct ? 'Tipo efectivo IRPF' : '↓ Salario neto resultante'}
+      </p>
       {sorted.map(p => {
         const anio = parseInt(p.dataKey.split('_')[1]);
-        const diff = ref2026Neto != null ? p.value - ref2026Neto : null;
+        const diff = !isPct && ref2026Neto != null ? p.value - ref2026Neto : null;
         return (
           <div key={p.dataKey} className="flex justify-between items-center py-0.5 gap-2">
             <span className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full shrink-0" style={{ background: YEAR_COLORS[anio], boxShadow: `0 0 6px ${YEAR_COLORS[anio]}40` }} />
               <span style={{ color: YEAR_COLORS[anio] }} className="font-bold w-10">{anio}</span>
             </span>
-            <span className="font-mono text-white">{eur(p.value)}</span>
+            <span className="font-mono text-white">{isPct ? `${p.value.toFixed(1)}%` : eur(p.value)}</span>
             {diff !== null && (
               <span className={`font-mono text-[10px] ${diff >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
                 {diff >= 0 ? '+' : ''}{eur(diff)}
@@ -139,9 +144,9 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
         </div>
         <div className="flex gap-2 items-center flex-wrap shrink-0">
           <div className="flex rounded-xl border border-[var(--border)] overflow-hidden text-xs">
-            {[['salario','Por nivel salarial'],['anio','Evolución por año']].map(([v, l]) => (
+            {[['salario','💶 Neto por salario'],['tipo','📊 Tipo efectivo'],['anio','📅 Evolución por año']].map(([v, l]) => (
               <button key={v} onClick={() => setVista(v)}
-                className={`px-4 py-2 font-semibold transition-all ${vista === v ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent2)] text-white' : 'text-[#94a3b8] hover:bg-[var(--surface2)]'}`}>
+                className={`px-3 py-2 font-semibold transition-all ${vista === v ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent2)] text-white' : 'text-[#94a3b8] hover:bg-[var(--surface2)]'}`}>
                 {l}
               </button>
             ))}
@@ -178,13 +183,16 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
             </button>
           </div>
 
-          <div style={{ height: 400 }}>
+          <p className="text-[10px] text-[#5a6b82] mb-2 font-medium">Eje X: salario bruto equivalente (€2026) · Eje Y: <strong className="text-[#7a8baa]">salario neto</strong> resultante (€2026)</p>
+          <div style={{ height: 420 }}>
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={DATOS_CHART} margin={{ left: 5, right: 20, top: 10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e2440" vertical={false} />
-                <XAxis dataKey="bruto" stroke="#1e2440" tick={{ fontSize:10, fill:'#4b5563' }} tickFormatter={v => `${v/1000}k€`} tickLine={false} />
-                <YAxis stroke="#1e2440" tick={{ fontSize:11, fill:'#4b5563' }} tickFormatter={v => `${(v/1000).toFixed(0)}k€`} width={50} tickLine={false} />
-                <Tooltip content={<TooltipSalario ref2026Neto={ref2026Neto} />} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#1a2040" vertical={false} />
+                <XAxis dataKey="bruto" stroke="#1a2040" tick={{ fontSize:10, fill:'#4b5563' }} tickFormatter={v => `${v/1000}k€`} tickLine={false}
+                  label={{ value: 'Bruto (€2026)', position: 'insideBottomRight', offset: -5, fill: '#4b5563', fontSize: 9 }} />
+                <YAxis stroke="#1a2040" tick={{ fontSize:11, fill:'#4b5563' }} tickFormatter={v => `${(v/1000).toFixed(0)}k€`} width={50} tickLine={false}
+                  label={{ value: 'Neto', angle: -90, position: 'insideLeft', offset: 10, fill: '#4b5563', fontSize: 9 }} />
+                <Tooltip content={<TooltipSalario ref2026Neto={ref2026Neto} metrica="neto" />} />
 
                 {mostrarUmbrales && (<>
                   {smi2026 >= 15000 && smi2026 <= 100000 && (
@@ -220,7 +228,7 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
                     dot={false} activeDot={{ r: 5, strokeWidth: 0 }}
                     isAnimationActive={aniosActivos.size <= 8} />
                 ))}
-                <Brush dataKey="bruto" height={22} stroke="#1e2440" fill="#0d1020" travellerWidth={8}
+                <Brush dataKey="bruto" height={22} stroke="#1a2040" fill="#0c0f1a" travellerWidth={8}
                   tickFormatter={v => `${Math.round(v/1000)}k€`}
                   style={{ fontSize: 10, fill: '#4b5563' }} />
               </LineChart>
@@ -228,11 +236,81 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
           </div>
 
           {/* Leyenda clicable */}
-          <div className="flex flex-wrap gap-3 mt-2">
+          <div className="flex flex-wrap gap-3 mt-3">
             {[...aniosActivos].sort((a, b) => a - b).map(a => (
               <button key={a} onClick={() => toggleAnio(a)}
-                className="flex items-center gap-1.5 text-xs hover:opacity-60 transition-opacity" style={{ color: YEAR_COLORS[a] }}>
-                <span className="w-5 h-0.5 inline-block rounded" style={{ background: YEAR_COLORS[a] }} />
+                className="flex items-center gap-1.5 text-xs font-medium hover:opacity-60 transition-opacity" style={{ color: YEAR_COLORS[a] }}>
+                <span className="w-5 h-0.5 inline-block rounded" style={{ background: YEAR_COLORS[a], boxShadow: `0 0 6px ${YEAR_COLORS[a]}30` }} />
+                {a}
+              </button>
+            ))}
+          </div>
+
+          <InsightSalario aniosActivos={aniosActivos} bruto2026={bruto2026} />
+        </>
+      )}
+
+      {/* ── VISTA TIPO EFECTIVO ── */}
+      {vista === 'tipo' && (
+        <>
+          {/* Year toggles */}
+          <div className="flex flex-wrap gap-1.5 mb-4">
+            {ANIOS.map(a => (
+              <button key={a} onClick={() => toggleAnio(a)}
+                className={`year-btn ${aniosActivos.has(a) ? 'active' : ''}`}
+                style={aniosActivos.has(a) ? { background: YEAR_COLORS[a], borderColor: YEAR_COLORS[a] } : {}}>
+                {a}
+              </button>
+            ))}
+            <div className="w-px bg-[var(--border)] mx-1" />
+            {Object.entries(GRUPOS).map(([nombre, anios]) => (
+              <button key={nombre} onClick={() => setAniosActivos(new Set(anios))} className="btn-ghost">
+                {nombre}
+              </button>
+            ))}
+            <button onClick={() => setAniosActivos(new Set(ANIOS))} className="btn-ghost hover:!border-white hover:!text-white">Todos</button>
+          </div>
+
+          <div className="info-card mb-4 text-[13px] text-[#94a3b8] leading-relaxed">
+            <strong className="text-white font-semibold">¿Qué ves aquí?</strong> El porcentaje real de tu salario que va al IRPF (tipo efectivo),
+            para cada nivel salarial y año. A mayor nivel salarial, mayor tipo efectivo — pero también se ve
+            cómo las reformas han cambiado la presión fiscal real. Las líneas más bajas significan menos IRPF.
+          </div>
+
+          <p className="text-[10px] text-[#5a6b82] mb-2 font-medium">Eje X: salario bruto equivalente (€2026) · Eje Y: <strong className="text-[#7a8baa]">tipo efectivo IRPF</strong> (%)</p>
+          <div style={{ height: 420 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={DATOS_CHART} margin={{ left: 5, right: 20, top: 10, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1a2040" vertical={false} />
+                <XAxis dataKey="bruto" stroke="#1a2040" tick={{ fontSize:10, fill:'#4b5563' }} tickFormatter={v => `${v/1000}k€`} tickLine={false}
+                  label={{ value: 'Bruto (€2026)', position: 'insideBottomRight', offset: -5, fill: '#4b5563', fontSize: 9 }} />
+                <YAxis stroke="#1a2040" tick={{ fontSize:11, fill:'#4b5563' }} tickFormatter={v => `${v}%`} width={40} tickLine={false}
+                  label={{ value: 'Tipo efectivo', angle: -90, position: 'insideLeft', offset: 5, fill: '#4b5563', fontSize: 9 }} domain={[0, 'auto']} />
+                <Tooltip content={<TooltipSalario ref2026Neto={null} metrica="tipo" />} />
+
+                {bruto2026 >= 15000 && bruto2026 <= 100000 && (
+                  <ReferenceLine x={bruto2026} stroke="#ffffff" strokeOpacity={0.12} strokeWidth={2} strokeDasharray="6 4"
+                    label={{ value:'tu sueldo', position:'insideTopRight', fill:'#64748b', fontSize:9 }} />
+                )}
+
+                {ANIOS.filter(a => aniosActivos.has(a)).map(a => (
+                  <Line key={a} type="monotone" dataKey={`irpf_${a}`}
+                    stroke={YEAR_COLORS[a]} strokeWidth={a === 2026 ? 2.5 : aniosActivos.size <= 4 ? 2 : 1.5}
+                    dot={false} activeDot={{ r: 5, strokeWidth: 0 }}
+                    isAnimationActive={aniosActivos.size <= 8} />
+                ))}
+                <Brush dataKey="bruto" height={22} stroke="#1a2040" fill="#0c0f1a" travellerWidth={8}
+                  tickFormatter={v => `${Math.round(v/1000)}k€`}
+                  style={{ fontSize: 10, fill: '#4b5563' }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="flex flex-wrap gap-3 mt-3">
+            {[...aniosActivos].sort((a, b) => a - b).map(a => (
+              <button key={a} onClick={() => toggleAnio(a)}
+                className="flex items-center gap-1.5 text-xs font-medium hover:opacity-60 transition-opacity" style={{ color: YEAR_COLORS[a] }}>
+                <span className="w-5 h-0.5 inline-block rounded" style={{ background: YEAR_COLORS[a], boxShadow: `0 0 6px ${YEAR_COLORS[a]}30` }} />
                 {a}
               </button>
             ))}
