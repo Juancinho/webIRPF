@@ -16,6 +16,16 @@ body {
   background-attachment: fixed;
 }
 
+/* Container for decorative orbs — clips them so they don't cause horizontal scroll
+   without breaking position:sticky/fixed on siblings */
+.orbs-clip {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
 :root {
   --accent:      #38bdf8;
   --accent2:     #22d3ee;
@@ -93,23 +103,47 @@ body {
   .layout-main    { grid-column: 2; }
 }
 
-/* ─── Sidebar widget ─── */
+/* ─── Sidebar widget — anchored to viewport (fixed, always visible once toggled on) ─── */
 .sidebar-widget {
-  position: sticky;
-  top: 72px;
-  max-height: calc(100vh - 88px);
-  overflow-y: auto;
-  scrollbar-width: none;
-  /* base state (hidden) */
-  opacity: 0;
-  transform: translateX(-28px) scale(0.96);
-  filter: blur(6px);
-  will-change: opacity, transform, filter;
-  transition:
-    opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 800ms cubic-bezier(0.22, 1, 0.36, 1),
-    filter 500ms cubic-bezier(0.22, 1, 0.36, 1);
+  /* Hidden by default for non-xl viewports */
+  display: none;
 }
+
+@media (min-width: 1280px) {
+  .sidebar-widget {
+    display: block;
+    position: fixed;
+    top: 72px;
+    /* center the [sidebar | main] group within the viewport — matches layout-frame at xl */
+    left: max(var(--page-pad-x),
+              calc((100vw - var(--content-max) - var(--sidebar-w) - var(--layout-gap)) / 2));
+    width: var(--sidebar-w);
+    max-height: calc(100vh - 88px);
+    overflow-y: auto;
+    scrollbar-width: none;
+    z-index: 20;
+    /* hidden state for the in/out transition */
+    opacity: 0;
+    transform: translateX(-26px) scale(0.96);
+    filter: blur(5px);
+    will-change: opacity, transform, filter;
+    transition:
+      opacity 650ms cubic-bezier(0.22, 1, 0.36, 1),
+      transform 750ms cubic-bezier(0.22, 1, 0.36, 1),
+      filter 500ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
+/* At 2xl the layout frame reserves a mirror spacer on the right, so the
+   centered group becomes wider — recompute the sidebar's left edge to
+   match that wider group. */
+@media (min-width: 1536px) {
+  .sidebar-widget {
+    left: max(var(--page-pad-x),
+              calc((100vw - var(--content-max) - 2 * var(--sidebar-w) - 2 * var(--layout-gap)) / 2));
+  }
+}
+
 .sidebar-widget::-webkit-scrollbar { display: none; }
 
 .sidebar-widget[data-visible="true"] {
@@ -118,20 +152,20 @@ body {
   filter: blur(0);
 }
 
-/* Stagger the internal sections once the sidebar becomes visible */
+/* Stagger internal sections each time sidebar becomes visible */
 .sidebar-widget[data-visible="true"] > * {
-  animation: sidebar-stagger 600ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation: sidebar-stagger 550ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
-.sidebar-widget[data-visible="true"] > *:nth-child(1) { animation-delay: 120ms; }
-.sidebar-widget[data-visible="true"] > *:nth-child(2) { animation-delay: 170ms; }
-.sidebar-widget[data-visible="true"] > *:nth-child(3) { animation-delay: 220ms; }
-.sidebar-widget[data-visible="true"] > *:nth-child(4) { animation-delay: 270ms; }
-.sidebar-widget[data-visible="true"] > *:nth-child(5) { animation-delay: 320ms; }
-.sidebar-widget[data-visible="true"] > *:nth-child(6) { animation-delay: 370ms; }
-.sidebar-widget[data-visible="true"] > *:nth-child(n+7) { animation-delay: 420ms; }
+.sidebar-widget[data-visible="true"] > *:nth-child(1) { animation-delay: 100ms; }
+.sidebar-widget[data-visible="true"] > *:nth-child(2) { animation-delay: 150ms; }
+.sidebar-widget[data-visible="true"] > *:nth-child(3) { animation-delay: 200ms; }
+.sidebar-widget[data-visible="true"] > *:nth-child(4) { animation-delay: 250ms; }
+.sidebar-widget[data-visible="true"] > *:nth-child(5) { animation-delay: 300ms; }
+.sidebar-widget[data-visible="true"] > *:nth-child(6) { animation-delay: 350ms; }
+.sidebar-widget[data-visible="true"] > *:nth-child(n+7) { animation-delay: 400ms; }
 
 @keyframes sidebar-stagger {
-  from { opacity: 0; transform: translateX(-14px); }
+  from { opacity: 0; transform: translateX(-12px); }
   to   { opacity: 1; transform: translateX(0); }
 }
 
@@ -797,13 +831,9 @@ input[type=range]:active::-webkit-slider-thumb {
   border-top: 1px solid var(--border);
 }
 
-.intro-desglose {
-  padding: 0.9rem 1.1rem;
-  border-radius: var(--radius-sm);
-  background: linear-gradient(135deg, rgba(56,189,248,0.06), rgba(34,211,238,0.025));
-  border: 1px solid rgba(56,189,248,0.15);
-  border-left: 3px solid var(--accent);
-  margin-bottom: 1.75rem;
+.intro-desglose-text {
+  margin: 0 0 1.5rem 0;
+  max-width: 70ch;
 }
 
 /* ── Timeline container — vertical line connecting pasos ── */
@@ -813,42 +843,40 @@ input[type=range]:active::-webkit-slider-thumb {
 }
 .paso-timeline > .paso-edu {
   position: relative;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1.6rem;
 }
 .paso-timeline > .paso-edu:last-of-type { margin-bottom: 0; }
 
-/* Vertical line between badges (from center of one badge to center of next) */
+/* Vertical line — runs through the badges, behind them */
 .paso-timeline > .paso-edu:not(:last-of-type)::before {
   content: '';
   position: absolute;
-  left: calc(1.1rem + 17px); /* paso padding-left + half badge width */
-  top: calc(1.1rem + 34px);  /* paso padding-top + badge height */
-  bottom: -0.75rem;
-  width: 2px;
+  left: 17px;            /* half of 34px badge width */
+  top: 38px;             /* just below badge */
+  bottom: -1.6rem;       /* extend into next paso's gap */
+  width: 1.5px;
   background: linear-gradient(to bottom,
-    rgba(56,189,248,0.22) 0%,
-    rgba(56,189,248,0.12) 40%,
-    rgba(56,189,248,0.12) 60%,
-    rgba(56,189,248,0.22) 100%);
+    rgba(56,189,248,0.20) 0%,
+    rgba(56,189,248,0.06) 50%,
+    rgba(56,189,248,0.20) 100%);
   z-index: 0;
   pointer-events: none;
 }
 
-/* ── Individual paso card ── */
+/* ── Individual paso — flat (no card background) ── */
 .paso-edu {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 1.1rem 1.25rem;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
   position: relative;
-  overflow: hidden;
-  transition: border-color 0.25s ease, transform 0.25s ease;
+  overflow: visible;
   /* staggered entrance */
   opacity: 0;
   animation: paso-appear 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 .paso-edu:hover {
-  border-color: var(--border-light);
+  border-color: transparent;
 }
 
 @keyframes paso-appear {
@@ -1188,28 +1216,6 @@ input[type=range]:active::-webkit-slider-thumb {
   font-size: 11px;
   color: #7a8baa;
   margin-top: 2px;
-}
-
-/* ── Resumen proporcional ── */
-.resumen-proporcional {
-  margin-top: 0.75rem;
-  padding: 1rem 1.25rem;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-}
-.resumen-barra {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
-@media (min-width: 640px) {
-  .resumen-barra { grid-template-columns: repeat(4, 1fr); }
-}
-.resumen-item {
-  padding: 10px 12px;
-  border: 1px solid;
-  border-radius: 10px;
 }
 
 /* mobile adjust: reduce paso-content left padding on narrow */

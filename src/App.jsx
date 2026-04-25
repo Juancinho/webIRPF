@@ -69,7 +69,6 @@ export default function App() {
     const SECTIONS = ['calc','simulador','comparativa','cuña','mecanismos','normativa'];
     const LABELS = { calc:'Calculadora', simulador:'Simulador', comparativa:'Comparativa histórica', 'cuña':'Cuña fiscal', mecanismos:'Mecanismos', normativa:'Normativa' };
 
-    // Sections TOC observer
     const obs = new IntersectionObserver(
       entries => {
         const visible = entries.filter(e => e.isIntersecting);
@@ -77,25 +76,36 @@ export default function App() {
       },
       { rootMargin: '-20% 0px -65% 0px', threshold: 0 }
     );
-
-    // Intro visibility observer — sidebar appears when intro leaves
-    const introObs = new IntersectionObserver(
-      ([entry]) => setSidebarVisible(!entry.isIntersecting),
-      { threshold: 0.1 }
-    );
-    const introEl = document.getElementById('intro');
-    if (introEl) introObs.observe(introEl);
-
     SECTIONS.forEach(id => { const el = document.getElementById(id); if (el) obs.observe(el); });
-    return () => { obs.disconnect(); introObs.disconnect(); };
+
+    /* Sidebar appears after section 1 (calculator) has fully scrolled past the top */
+    const calcEl = document.getElementById('calc');
+    let sidebarObs;
+    if (calcEl) {
+      sidebarObs = new IntersectionObserver(
+        ([entry]) => {
+          const rect = entry.boundingClientRect;
+          setSidebarVisible(!entry.isIntersecting && rect.top < 0);
+        },
+        { threshold: 0 }
+      );
+      sidebarObs.observe(calcEl);
+    }
+
+    return () => {
+      obs.disconnect();
+      sidebarObs?.disconnect();
+    };
   }, []);
 
   return (
     <div className="min-h-screen relative">
-      {/* Decorative floating orbs */}
-      <div className="float-orb" style={{ width: '400px', height: '400px', background: 'rgba(56,189,248,0.05)', top: '10%', left: '-5%' }} />
-      <div className="float-orb" style={{ width: '300px', height: '300px', background: 'rgba(14,165,233,0.04)', top: '45%', right: '-3%', animationDelay: '-7s' }} />
-      <div className="float-orb" style={{ width: '350px', height: '350px', background: 'rgba(34,211,238,0.03)', top: '75%', left: '10%', animationDelay: '-14s' }} />
+      {/* Decorative floating orbs (clipped so they never cause horizontal scroll) */}
+      <div className="orbs-clip">
+        <div className="float-orb" style={{ width: '400px', height: '400px', background: 'rgba(56,189,248,0.05)', top: '10%', left: '-5%' }} />
+        <div className="float-orb" style={{ width: '300px', height: '300px', background: 'rgba(14,165,233,0.04)', top: '45%', right: '-3%', animationDelay: '-7s' }} />
+        <div className="float-orb" style={{ width: '350px', height: '350px', background: 'rgba(34,211,238,0.03)', top: '75%', left: '10%', animationDelay: '-14s' }} />
+      </div>
 
       {/* ── HEADER ── */}
       <header className="header-blur sticky top-0 z-30">
@@ -129,53 +139,47 @@ export default function App() {
         </div>
       </header>
 
-      <div className="centered-col py-10 sm:py-12 relative z-10">
+      {/* ── CENTERED LAYOUT WITH PERSISTENT SIDEBAR ── */}
+      <div className="layout-frame pt-8 sm:pt-10 pb-16 relative z-10">
 
-        {/* ── INTRO ── */}
-        <section className="text-center pt-4 sm:pt-6">
-          <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full border mb-4 sm:mb-5 text-[10px] font-bold uppercase tracking-[0.12em]"
-            style={{ color: '#38bdf8', borderColor: 'rgba(56,189,248,0.15)', background: 'rgba(56,189,248,0.06)' }}>
-            <span className="w-1.5 h-1.5 rounded-full bg-sky-400 pulse-dot" />
-            <span className="hidden sm:inline">Radiografía interactiva del sistema fiscal español</span>
-            <span className="sm:hidden">Radiografía fiscal interactiva</span>
-          </div>
-          <h1 className="font-display text-[2rem] sm:text-5xl lg:text-6xl mb-4 sm:mb-5 leading-[1.1] px-2"
-            style={{ background: 'linear-gradient(135deg,#f0f4f8 0%,#e2e8f0 30%,#bae6fd 60%,#7dd3fc 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-            Tu sueldo bajo el<br className="hidden sm:block" /> microscopio fiscal
-          </h1>
-          <p className="text-[15px] sm:text-base lg:text-lg text-[#7a8baa] leading-relaxed max-w-[60ch] mx-auto">
-            Calcula tu nómina real, compara 15 años de reformas fiscales con la inflación descontada,
-            y descubre cómo los mecanismos ocultos del IRPF afectan a tu bolsillo.
-            Todo con datos oficiales del <strong className="text-[var(--accent-light)] font-semibold">BOE, INE y TGSS</strong>.
-          </p>
-
-          {/* Intro editorial */}
-          <p className="mt-6 sm:mt-8 text-[12.5px] sm:text-[13px] text-[#4b5563] leading-relaxed max-w-[55ch] mx-auto border-t pt-6 sm:pt-8"
-            style={{ borderColor: 'var(--border)' }}>
-            Esta herramienta calcula tu nómina con la normativa real de cada año desde 2012.
-            Todos los importes comparativos están en <strong className="text-[#64748b]">euros constantes de 2026</strong> —
-            es decir, con la inflación ya descontada — para que puedas comparar directamente sin que los números te engañen.
-            Los datos provienen del BOE, el INE y la TGSS. Los cálculos son orientativos y solo incluyen la tarifa estatal del IRPF.
-          </p>
-        </section>
-
-        {/* Sentinel — sidebar appears when this leaves viewport */}
-        <div id="intro" style={{ height: 1 }} />
-
-      </div>{/* end intro wrapper */}
-
-      {/* ── CENTERED LAYOUT WITH SIDEBAR SLOT ── */}
-      <div className="layout-frame pb-16 relative z-10">
-
-        {/* Sidebar — fades in from left when intro scrolls out */}
+        {/* Sidebar — appears after section 1, then stays visible while scrolling */}
         <aside className="layout-sidebar sidebar-widget hidden xl:block"
           data-visible={sidebarVisible}
+          aria-hidden={!sidebarVisible}
           style={{ pointerEvents: sidebarVisible ? 'auto' : 'none' }}>
           <SidebarWidget bruto={bruto} anio={anio} onChange={onChange} />
         </aside>
 
-        {/* Main content — always centered regardless of sidebar */}
+        {/* Main content — intro + sections */}
         <main className="layout-main space-y-14 sm:space-y-16 lg:space-y-20">
+
+          {/* ── INTRO ── */}
+          <section className="text-center">
+            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full border mb-4 sm:mb-5 text-[10px] font-bold uppercase tracking-[0.12em]"
+              style={{ color: '#38bdf8', borderColor: 'rgba(56,189,248,0.15)', background: 'rgba(56,189,248,0.06)' }}>
+              <span className="w-1.5 h-1.5 rounded-full bg-sky-400 pulse-dot" />
+              <span className="hidden sm:inline">Radiografía interactiva del sistema fiscal español</span>
+              <span className="sm:hidden">Radiografía fiscal interactiva</span>
+            </div>
+            <h1 className="font-display text-[2rem] sm:text-5xl lg:text-6xl mb-4 sm:mb-5 leading-[1.1] px-2"
+              style={{ background: 'linear-gradient(135deg,#f0f4f8 0%,#e2e8f0 30%,#bae6fd 60%,#7dd3fc 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+              Tu sueldo bajo el<br className="hidden sm:block" /> microscopio fiscal
+            </h1>
+            <p className="text-[15px] sm:text-base lg:text-lg text-[#7a8baa] leading-relaxed max-w-[60ch] mx-auto">
+              Calcula tu nómina real, compara 15 años de reformas fiscales con la inflación descontada,
+              y descubre cómo los mecanismos ocultos del IRPF afectan a tu bolsillo.
+              Todo con datos oficiales del <strong className="text-[var(--accent-light)] font-semibold">BOE, INE y TGSS</strong>.
+            </p>
+
+            <p className="mt-6 sm:mt-8 text-[12.5px] sm:text-[13px] text-[#4b5563] leading-relaxed max-w-[55ch] mx-auto border-t pt-6 sm:pt-8"
+              style={{ borderColor: 'var(--border)' }}>
+              Esta herramienta calcula tu nómina con la normativa real de cada año desde 2012.
+              Todos los importes comparativos están en <strong className="text-[#64748b]">euros constantes de 2026</strong> —
+              es decir, con la inflación ya descontada — para que puedas comparar directamente sin que los números te engañen.
+              Los datos provienen del BOE, el INE y la TGSS. Los cálculos son orientativos y solo incluyen la tarifa estatal del IRPF.
+            </p>
+          </section>
+
           <section id="calc">
           <SectionTitle n="1" title="Calcula tu nómina"
             sub="Elige salario y año — verás el desglose completo paso a paso: cotizaciones, reducciones, tramos IRPF y cuánto queda." />
@@ -183,11 +187,6 @@ export default function App() {
             <CalculadoraCard bruto={bruto} anio={anio} onChange={onChange}
               onShare={() => navigator.clipboard?.writeText(getShareURL())}
               shareLabel="Compartir" />
-          </div>
-
-          {/* ── Desglose educativo paso a paso ── */}
-          <div className="mt-5">
-            <DesgloseEducativo bruto={bruto} anio={anio} />
           </div>
 
           <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -215,6 +214,11 @@ export default function App() {
               normalmente no ve. Por eso un bruto de 35.000€ puede costar a la empresa más de 46.000€ y
               producir solo ~28.000€ netos.
             </InfoCard>
+          </div>
+
+          {/* ── Desglose educativo paso a paso ── */}
+          <div className="mt-6">
+            <DesgloseEducativo bruto={bruto} anio={anio} />
           </div>
           </section>
 

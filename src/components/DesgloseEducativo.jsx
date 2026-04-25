@@ -211,14 +211,11 @@ export default function DesgloseEducativo({ bruto, anio }) {
       <div className="desglose-edu-body" data-open={abierto} aria-hidden={!abierto}>
         <div className="desglose-edu px-5 sm:px-6 py-6">
 
-          {/* Intro */}
-          <div className="intro-desglose">
-            <p className="text-sm text-[#8899b4] leading-relaxed">
-              Este es el camino completo que recorre cada euro de tu salario: desde lo que le cuestas a la empresa hasta
-              lo que acaba en tu cuenta. Cada paso incluye <strong className="text-white">su fórmula exacta, su explicación
-              en lenguaje llano y el enlace a la fuente legal</strong> — calculado con la normativa real de {anio}.
-            </p>
-          </div>
+          {/* Intro — texto plano, sin caja */}
+          <p className="intro-desglose-text text-[13px] text-[#7a8baa] leading-relaxed">
+            El camino completo que recorre cada euro: desde lo que le cuestas a la empresa hasta lo que acaba en tu cuenta.
+            Cada paso lleva fórmula, explicación y fuente legal — normativa real de {anio}.
+          </p>
 
           <div className="paso-timeline">
 
@@ -485,28 +482,6 @@ export default function DesgloseEducativo({ bruto, anio }) {
               <div className="paso-final-mes">
                 {eur(r.salarioNeto / 12)}/mes (12 pagas) · {eur(r.salarioNeto / 14)}/mes (14 pagas)
               </div>
-            </div>
-          </div>
-
-          {/* Resumen proporcional */}
-          <div className="resumen-proporcional">
-            <p className="text-xs font-bold text-[#7a8baa] uppercase tracking-wider mb-3">De cada 100 € de coste laboral total:</p>
-            <div className="resumen-barra">
-              {[
-                { label: 'Neto para ti', val: r.salarioNeto, color: '#10b981' },
-                { label: 'SS Trabajador', val: r.cotTra,    color: '#f59e0b' },
-                { label: 'IRPF',          val: r.irpfFinal,  color: '#f43f5e' },
-                { label: 'SS Empresa',    val: r.cotEmp,     color: '#22d3ee' },
-              ].map(({ label, val, color }) => {
-                const pctVal = (val / r.costeLab) * 100;
-                return (
-                  <div key={label} className="resumen-item" style={{ borderColor: `${color}30`, background: `${color}08` }}>
-                    <div className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color }}>{label}</div>
-                    <div className="font-mono font-extrabold text-lg" style={{ color }}>{pctVal.toFixed(1)} €</div>
-                    <div className="text-[10px] text-[#64748b] mt-0.5">{eur(val)}/año</div>
-                  </div>
-                );
-              })}
             </div>
           </div>
         </div>
