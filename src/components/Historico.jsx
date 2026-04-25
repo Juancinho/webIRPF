@@ -47,8 +47,8 @@ function EvolucionAnual({ bruto2026 }) {
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-          <XAxis dataKey="anio" stroke="var(--text)" tick={{ fontSize: 11 }} />
-          <YAxis stroke="var(--text)" tick={{ fontSize: 11 }} tickFormatter={v => eur(v)} width={75} />
+          <XAxis dataKey="anio" stroke="var(--border)" tick={{ fontSize: 11, fill: 'var(--text-soft)' }} />
+          <YAxis stroke="var(--border)" tick={{ fontSize: 11, fill: 'var(--text-soft)' }} tickFormatter={v => eur(v)} width={75} />
           <Tooltip content={<TooltipCustom />} />
           <Legend />
           <ReferenceLine y={data[data.length - 1]?.netoActual2026} stroke={PALETTE.neto} strokeDasharray="5 5" label={{ value: '2026', position: 'right', fill: PALETTE.neto, fontSize: 11 }} />
@@ -100,8 +100,8 @@ function CurvaTipos({ anio }) {
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data} margin={{ left: 20, right: 10, top: 10, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-          <XAxis dataKey="bruto" stroke="var(--text)" tick={{ fontSize: 10 }} tickFormatter={v => `${v / 1000}k`} />
-          <YAxis stroke="var(--text)" tick={{ fontSize: 11 }} tickFormatter={v => `${(v * 100).toFixed(0)}%`} width={40} />
+          <XAxis dataKey="bruto" stroke="var(--border)" tick={{ fontSize: 10, fill: 'var(--text-soft)' }} tickFormatter={v => `${v / 1000}k`} />
+          <YAxis stroke="var(--border)" tick={{ fontSize: 11, fill: 'var(--text-soft)' }} tickFormatter={v => `${(v * 100).toFixed(0)}%`} width={40} />
           <Tooltip
             formatter={(v, name) => [`${(v * 100).toFixed(2)}%`, name]}
             labelFormatter={v => `Bruto: ${eur(v)}`}
@@ -174,8 +174,8 @@ function ComparativaDosAnios({ bruto2026 }) {
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={barData} margin={{ left: 20, right: 10 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis dataKey="concepto" tick={{ fontSize: 11, fill: 'var(--text)' }} />
-              <YAxis tick={{ fontSize: 11, fill: 'var(--text)' }} tickFormatter={v => eur(v)} width={75} />
+              <XAxis dataKey="concepto" tick={{ fontSize: 11, fill: 'var(--text-soft)' }} />
+              <YAxis tick={{ fontSize: 11, fill: 'var(--text-soft)' }} tickFormatter={v => eur(v)} width={75} />
               <Tooltip
                 formatter={v => eur(v)}
                 contentStyle={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8 }}

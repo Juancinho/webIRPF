@@ -5,15 +5,11 @@ import {
 } from 'recharts';
 import { CURVA_ART20, CURVA_ART20_REAL, ANIOS_ART20_MUESTRA, DATOS_UMBRALES, DATOS_UMBRALES_REAL, ANIOS } from '../engine/irpf';
 import { eur } from '../utils/format';
-
-const ART20_COLORS = {
-  2012: '#f87171', 2015: '#facc15', 2019: '#2dd4bf',
-  2023: '#a78bfa', 2024: '#c084fc', 2026: '#0ea5e9',
-};
+import { YEAR_COLORS as ART20_COLORS } from './GraficoComparativo';
 
 const UMBRAL_COLORS = {
-  smi: '#4ade80', minExento: '#38bdf8',
-  art20Inf: '#f59e0b', art20Sup: '#ef4444', art20Max: '#a78bfa',
+  smi: 'var(--green)', minExento: 'var(--accent)',
+  art20Inf: 'var(--yellow)', art20Sup: 'var(--red)', art20Max: '#a78bfa',
 };
 
 /* ── Toggle reutilizable nominal / real ── */
@@ -49,7 +45,7 @@ function TooltipArt20({ active, payload, label, real }) {
   return (
     <div className="card-glass p-4 shadow-2xl text-xs min-w-[260px]" style={{ backdropFilter: 'blur(24px)' }}>
       <p className="text-[10px] text-[var(--text-soft)] mb-0.5">Tu sueldo bruto − SS {real ? '(€2026)' : '(€ nominales)'}</p>
-      <p className="font-extrabold text-white mb-2 border-b border-[var(--border)] pb-2 text-[13px]">{eur(label)}</p>
+      <p className="font-extrabold text-[var(--text-h)] mb-2 border-b border-[var(--border)] pb-2 text-[13px]">{eur(label)}</p>
       <p className="text-[9px] text-[var(--accent-light)] font-semibold uppercase tracking-wider mb-1.5">
         Descuento que se resta de tu base imponible:
       </p>
@@ -61,7 +57,7 @@ function TooltipArt20({ active, payload, label, real }) {
               <span className="w-2 h-2 rounded-full shrink-0" style={{ background: ART20_COLORS[anio], boxShadow: `0 0 6px ${ART20_COLORS[anio]}40` }} />
               {anio}
             </span>
-            <span className="font-mono text-white">{p.value > 0 ? `−${eur(p.value)}` : '0 €'}</span>
+            <span className="font-mono text-[var(--text-h)]">{p.value > 0 ? `−${eur(p.value)}` : '0 €'}</span>
           </div>
         );
       })}
@@ -79,7 +75,7 @@ function TooltipUmbrales({ active, payload, label, real }) {
   };
   return (
     <div className="card-glass p-4 shadow-2xl text-xs min-w-[280px]" style={{ backdropFilter: 'blur(24px)' }}>
-      <p className="font-extrabold text-white mb-2.5 border-b border-[var(--border)] pb-2 text-[13px]">
+      <p className="font-extrabold text-[var(--text-h)] mb-2.5 border-b border-[var(--border)] pb-2 text-[13px]">
         Año {label} {real && <span className="text-emerald-400 font-normal text-[10px]">(en €2026)</span>}
       </p>
       {payload.filter(p => p.value).map(p => (
@@ -87,7 +83,7 @@ function TooltipUmbrales({ active, payload, label, real }) {
           <div className="flex justify-between gap-3">
             <span className="flex items-center gap-1.5 font-semibold" style={{ color: UMBRAL_COLORS[p.dataKey] }}>
               <span className="w-2 h-2 rounded-full shrink-0" style={{ background: UMBRAL_COLORS[p.dataKey] }} />
-              {eur(p.value)}
+              <span className="text-[var(--text-h)]">{eur(p.value)}</span>
             </span>
           </div>
           <p className="text-[10px] text-[var(--text-soft)] ml-3.5 mt-0.5">{desc[p.dataKey]}</p>

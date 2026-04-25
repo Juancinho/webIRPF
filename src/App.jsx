@@ -74,7 +74,6 @@ export default function App() {
 
   /* ── Active section tracking ── */
   const [activeSection, setActiveSection] = useState('');
-  const [sidebarVisible, setSidebarVisible] = useState(false);
 
   useEffect(() => {
     const SECTIONS = ['calc','desglose','simulador','comparativa','cuña','mecanismos','normativa'];
@@ -89,24 +88,7 @@ export default function App() {
     );
     SECTIONS.forEach(id => { const el = document.getElementById(id); if (el) obs.observe(el); });
 
-    /* Sidebar appears after section 1 (calculator) has fully scrolled past the top */
-    const calcEl = document.getElementById('calc');
-    let sidebarObs;
-    if (calcEl) {
-      sidebarObs = new IntersectionObserver(
-        ([entry]) => {
-          const rect = entry.boundingClientRect;
-          setSidebarVisible(!entry.isIntersecting && rect.top < 0);
-        },
-        { threshold: 0 }
-      );
-      sidebarObs.observe(calcEl);
-    }
-
-    return () => {
-      obs.disconnect();
-      sidebarObs?.disconnect();
-    };
+    return () => obs.disconnect();
   }, []);
 
   return (
@@ -128,11 +110,6 @@ export default function App() {
                 scope
               </span>
             </div>
-            <span className="hidden sm:inline-flex tag"
-              style={{ color: 'var(--accent)', borderColor: 'var(--accent-dim)', background: 'var(--accent-soft)' }}>
-              <span className="w-1.5 h-1.5 rounded-full pulse-dot" style={{ background: 'var(--accent)' }} />
-              España · 2012–2026
-            </span>
           </div>
           <div className="flex items-center gap-3">
             <p className="text-[11px] hidden lg:block font-medium" style={{ color: 'var(--text-soft)' }}>Solo tarifa estatal · Cálculos orientativos</p>
@@ -156,11 +133,8 @@ export default function App() {
       {/* ── CENTERED LAYOUT WITH PERSISTENT SIDEBAR ── */}
       <div className="layout-frame pt-8 sm:pt-10 pb-16 relative z-10">
 
-        {/* Sidebar — appears after section 1, then stays visible while scrolling */}
-        <aside className="layout-sidebar sidebar-widget hidden xl:block"
-          data-visible={sidebarVisible}
-          aria-hidden={!sidebarVisible}
-          style={{ pointerEvents: sidebarVisible ? 'auto' : 'none' }}>
+        {/* Sidebar — always visible on xl+ screens */}
+        <aside className="layout-sidebar sidebar-widget hidden xl:block">
           <SidebarWidget bruto={bruto} anio={anio} onChange={onChange} />
         </aside>
 

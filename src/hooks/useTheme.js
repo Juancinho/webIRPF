@@ -3,10 +3,10 @@ import { useEffect, useState } from 'react';
 const STORAGE_KEY = 'fiscal-theme';
 
 function readInitialTheme() {
-  if (typeof window === 'undefined') return 'dark';
+  if (typeof window === 'undefined') return 'light';
   const saved = localStorage.getItem(STORAGE_KEY);
   if (saved === 'dark' || saved === 'light') return saved;
-  return window.matchMedia?.('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  return 'light';
 }
 
 export function useTheme() {

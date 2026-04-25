@@ -46,6 +46,7 @@ const TIPS = {
 
 export default function SidebarWidget({ bruto, anio, onChange }) {
   const [activeId, setActiveId] = useState('calc');
+  const [configOpen, setConfigOpen] = useState(false);
 
   useEffect(() => {
     const els = SECTIONS.map(s => document.getElementById(s.id)).filter(Boolean);
@@ -73,7 +74,7 @@ export default function SidebarWidget({ bruto, anio, onChange }) {
   const tip = TIPS[activeId] || TIPS.calc;
 
   return (
-    <div className="space-y-5 pb-8">
+    <div className="space-y-4 pb-8">
 
       {/* ── TOC Navigation with progress ── */}
       <div>
@@ -105,48 +106,66 @@ export default function SidebarWidget({ bruto, anio, onChange }) {
       {/* Divider */}
       <div style={{ height: 1, background: 'var(--border)' }} />
 
-      {/* ── Controles ── */}
+      {/* ── Configurador compacto (pill) ── */}
       <div>
-        <p className="text-[9px] font-bold uppercase tracking-[0.1em] text-[var(--text-soft)] mb-3 px-1">
-          Configuración
-        </p>
-
-        {/* Bruto slider */}
-        <div className="metric-mini mb-2">
-          <div className="flex items-baseline justify-between mb-1.5">
-            <span className="metric-mini-label">Salario bruto anual</span>
-            <span className="font-mono font-bold text-[13px]" style={{ color: 'var(--accent)' }}>{eur(bruto)}</span>
+        <button
+          onClick={() => setConfigOpen(o => !o)}
+          className="config-pill"
+          aria-expanded={configOpen}
+        >
+          <div className="config-pill-values">
+            <span className="config-pill-bruto font-mono">{eur(bruto)}</span>
+            <span className="config-pill-sep">·</span>
+            <span className="config-pill-anio font-mono">{anio}</span>
           </div>
-          <input
-            type="range" min="0" max="150000" step="500"
-            value={bruto}
-            onChange={e => onChange('bruto', +e.target.value)}
-            className="w-full"
-            style={{ marginTop: 4 }}
-          />
-          <div className="flex justify-between text-[9px] text-[var(--text-soft)] mt-1 font-medium">
-            <span>0 €</span><span>75k€</span><span>150k€</span>
+          <div className="config-pill-action">
+            {configOpen ? (
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            ) : (
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            )}
           </div>
-        </div>
+        </button>
 
-        {/* Año */}
-        <div className="metric-mini">
-          <span className="metric-mini-label block mb-2">Año fiscal</span>
-          <div className="flex flex-wrap gap-1">
-            {ANIOS.map(a => (
-              <button key={a} onClick={() => onChange('anio', a)}
-                className="text-[9px] font-bold px-1.5 py-0.5 rounded-md transition-all duration-150"
-                style={anio === a ? {
-                  background: 'linear-gradient(135deg, var(--accent), var(--accent2))',
-                  color: 'var(--accent-on)',
-                  boxShadow: '0 1px 6px var(--glow-accent)',
-                } : {
-                  background: 'var(--surface3)',
-                  color: 'var(--text-soft)',
-                }}>
-                {a}
-              </button>
-            ))}
+        {/* Expanded config panel */}
+        <div className={`config-panel ${configOpen ? 'is-open' : ''}`}>
+          {/* Bruto slider */}
+          <div className="metric-mini mb-2">
+            <div className="flex items-baseline justify-between mb-1.5">
+              <span className="metric-mini-label">Salario bruto anual</span>
+              <span className="font-mono font-bold text-[13px]" style={{ color: 'var(--accent)' }}>{eur(bruto)}</span>
+            </div>
+            <input
+              type="range" min="0" max="150000" step="500"
+              value={bruto}
+              onChange={e => onChange('bruto', +e.target.value)}
+              className="w-full"
+              style={{ marginTop: 4 }}
+            />
+            <div className="flex justify-between text-[9px] text-[var(--text-soft)] mt-1 font-medium">
+              <span>0 €</span><span>75k€</span><span>150k€</span>
+            </div>
+          </div>
+
+          {/* Año */}
+          <div className="metric-mini">
+            <span className="metric-mini-label block mb-2">Año fiscal</span>
+            <div className="flex flex-wrap gap-1">
+              {ANIOS.map(a => (
+                <button key={a} onClick={() => onChange('anio', a)}
+                  className="text-[9px] font-bold px-1.5 py-0.5 rounded-md transition-all duration-150"
+                  style={anio === a ? {
+                    background: 'linear-gradient(135deg, var(--accent), var(--accent2))',
+                    color: 'var(--accent-on)',
+                    boxShadow: '0 1px 6px var(--glow-accent)',
+                  } : {
+                    background: 'var(--surface3)',
+                    color: 'var(--text-soft)',
+                  }}>
+                  {a}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -154,7 +173,7 @@ export default function SidebarWidget({ bruto, anio, onChange }) {
       {/* Divider */}
       <div style={{ height: 1, background: 'var(--border)' }} />
 
-      {/* ── Live metrics ── */}
+      {/* ── Live metrics (always visible) ── */}
       <div>
         <p className="text-[9px] font-bold uppercase tracking-[0.1em] text-[var(--text-soft)] mb-2.5 px-1">
           Resultado

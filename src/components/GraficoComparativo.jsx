@@ -10,11 +10,11 @@ import {
 import { eur } from '../utils/format';
 
 export const YEAR_COLORS = {
-  2012:'#f87171',2013:'#fb923c',2014:'#fbbf24',
-  2015:'#facc15',2016:'#a3e635',2017:'#4ade80',
-  2018:'#34d399',2019:'#2dd4bf',2020:'#38bdf8',
-  2021:'#60a5fa',2022:'#38bdf8',2023:'#22d3ee',
-  2024:'#2dd4bf',2025:'#34d399',2026:'#0ea5e9',
+  2012: '#ef4444', 2013: '#3b82f6', 2014: '#10b981',
+  2015: '#f59e0b', 2016: '#8b5cf6', 2017: '#06b6d4',
+  2018: '#f97316', 2019: '#ec4899', 2020: '#14b8a6',
+  2021: '#6366f1', 2022: '#84cc16', 2023: '#f43f5e',
+  2024: '#0ea5e9', 2025: '#d946ef', 2026: '#22d3ee',
 };
 
 const GRUPOS = {
@@ -26,16 +26,17 @@ const GRUPOS = {
 
 /* ── Custom Brush traveller handle ── */
 function BrushHandle({ x, y, width, height }) {
-  const hw = 10;
+  const hw = 12;
   return (
-    <g>
-      <rect x={x - hw / 2} y={y + 2} width={hw} height={height - 4} rx={4}
-        fill="#0f172a" stroke="#38bdf8" strokeWidth={1.5} />
-      {[-2.5, 0, 2.5].map(dy => (
+    <g style={{ cursor: 'ew-resize' }}>
+      <rect x={x - hw / 2} y={y - 2} width={hw} height={height + 4} rx={6}
+        fill="var(--surface)" stroke="var(--accent)" strokeWidth={1.5} 
+        style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }} />
+      {[-3, 0, 3].map(dy => (
         <line key={dy}
           x1={x - 2.5} y1={y + height / 2 + dy}
           x2={x + 2.5} y2={y + height / 2 + dy}
-          stroke="#38bdf8" strokeWidth={1} strokeOpacity={0.7} strokeLinecap="round" />
+          stroke="var(--accent)" strokeWidth={1.2} strokeOpacity={0.8} strokeLinecap="round" />
       ))}
     </g>
   );
@@ -49,7 +50,7 @@ function TooltipSalario({ active, payload, label, ref2026Neto, metrica }) {
   return (
     <div className="card-glass p-4 shadow-2xl text-xs min-w-[260px] max-h-96 overflow-y-auto" style={{ backdropFilter: 'blur(24px)' }}>
       <p className="text-[10px] text-[var(--text-soft)] mb-0.5">Salario bruto equivalente (€2026)</p>
-      <p className="font-extrabold text-white mb-2.5 border-b border-[var(--border)] pb-2 text-[13px]">{eur(label)}</p>
+      <p className="font-extrabold text-[var(--text-h)] mb-2.5 border-b border-[var(--border)] pb-2 text-[13px]">{eur(label)}</p>
       <p className="text-[9px] text-[var(--accent-light)] font-semibold uppercase tracking-wider mb-1.5">
         {isPct ? 'Tipo efectivo IRPF' : 'Salario neto resultante'}
       </p>
@@ -62,7 +63,7 @@ function TooltipSalario({ active, payload, label, ref2026Neto, metrica }) {
               <span className="w-2 h-2 rounded-full shrink-0" style={{ background: YEAR_COLORS[anio], boxShadow: `0 0 6px ${YEAR_COLORS[anio]}40` }} />
               <span style={{ color: YEAR_COLORS[anio] }} className="font-bold w-10">{anio}</span>
             </span>
-            <span className="font-mono text-white">{isPct ? `${p.value.toFixed(1)}%` : eur(p.value)}</span>
+            <span className="font-mono text-[var(--text-h)]">{isPct ? `${p.value.toFixed(1)}%` : eur(p.value)}</span>
             {diff !== null && (
               <span className={`font-mono text-[10px] ${diff >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
                 {diff >= 0 ? '+' : ''}{eur(diff)}
@@ -90,7 +91,7 @@ function TooltipAnio({ active, payload, label }) {
             <span className="w-2 h-2 rounded-full shrink-0" style={{ background: p.color, boxShadow: `0 0 6px ${p.color}40` }} />
             {p.name}
           </span>
-          <span className="font-mono text-white">{p.dataKey === 'neto' ? eur(p.value) : `${p.value.toFixed(1)}%`}</span>
+          <span className="font-mono text-[var(--text-h)]">{p.dataKey === 'neto' ? eur(p.value) : `${p.value.toFixed(1)}%`}</span>
         </div>
       ))}
     </div>
@@ -198,38 +199,38 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
           <p className="text-[10px] text-[#5a6b82] mb-2 font-medium">Eje X: salario bruto equivalente (€2026) · Eje Y: <strong className="text-[var(--text-soft)]">salario neto</strong> resultante (€2026)</p>
           <div style={{ height: 420 }}>
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={DATOS_CHART} margin={{ left: 5, right: 20, top: 10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1a2040" vertical={false} />
-                <XAxis dataKey="bruto" stroke="#1a2040" tick={{ fontSize:10, fill:'#4b5563' }} tickFormatter={v => `${v/1000}k€`} tickLine={false}
-                  label={{ value: 'Bruto (€2026)', position: 'insideBottomRight', offset: -5, fill: '#4b5563', fontSize: 9 }} />
-                <YAxis stroke="#1a2040" tick={{ fontSize:11, fill:'#4b5563' }} tickFormatter={v => `${(v/1000).toFixed(0)}k€`} width={50} tickLine={false}
-                  label={{ value: 'Neto', angle: -90, position: 'insideLeft', offset: 10, fill: '#4b5563', fontSize: 9 }} />
+              <LineChart data={DATOS_CHART} margin={{ left: 5, right: 20, top: 10, bottom: 40 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                <XAxis dataKey="bruto" stroke="var(--border)" tick={{ fontSize:10, fill:'var(--text-soft)' }} tickFormatter={v => `${v/1000}k€`} tickLine={false}
+                  interval={20} />
+                <YAxis stroke="var(--border)" tick={{ fontSize:11, fill:'var(--text-soft)' }} tickFormatter={v => `${(v/1000).toFixed(0)}k€`} width={50} tickLine={false}
+                  label={{ value: 'Neto', angle: -90, position: 'insideLeft', offset: 10, fill: 'var(--text-soft)', fontSize: 9 }} />
                 <Tooltip content={<TooltipSalario ref2026Neto={ref2026Neto} metrica="neto" />} />
 
                 {smi2026 >= 15000 && smi2026 <= 100000 && (
-                    <ReferenceLine x={smi2026} stroke="#f59e0b" strokeOpacity={0.6} strokeDasharray="4 2"
-                      label={{ value:`SMI ${anioRef}`, position:'insideTopLeft', fill:'#f59e0b', fontSize:9 }} />
+                    <ReferenceLine x={smi2026} stroke="var(--yellow)" strokeOpacity={0.6} strokeDasharray="4 2"
+                      label={{ value:`SMI ${anioRef}`, position:'insideTopLeft', fill:'var(--yellow)', fontSize:9 }} />
                   )}
                   {umbralInf2026 && umbralInf2026 >= 15000 && umbralInf2026 <= 100000 && (
-                    <ReferenceLine x={umbralInf2026} stroke="#38bdf8" strokeOpacity={0.55} strokeDasharray="4 2"
-                      label={{ value:'Art.20↓', position:'insideTopRight', fill:'#38bdf8', fontSize:9 }} />
+                    <ReferenceLine x={umbralInf2026} stroke="var(--accent)" strokeOpacity={0.55} strokeDasharray="4 2"
+                      label={{ value:'Art.20↓', position:'insideTopRight', fill:'var(--accent)', fontSize:9 }} />
                   )}
                   {umbralSup2026 && umbralSup2026 >= 15000 && umbralSup2026 <= 100000 && (
-                    <ReferenceLine x={umbralSup2026} stroke="#38bdf8" strokeOpacity={0.35} strokeDasharray="4 2"
-                      label={{ value:'Art.20=0', position:'insideTopRight', fill:'#38bdf8', fontSize:9 }} />
+                    <ReferenceLine x={umbralSup2026} stroke="var(--accent)" strokeOpacity={0.35} strokeDasharray="4 2"
+                      label={{ value:'Art.20=0', position:'insideTopRight', fill:'var(--accent)', fontSize:9 }} />
                   )}
                   {umbralInf2026 && umbralSup2026 && (
                     <ReferenceArea x1={Math.max(15000, umbralInf2026)} x2={Math.min(100000, umbralSup2026)}
-                      fill="#38bdf8" fillOpacity={0.05} />
+                      fill="var(--accent)" fillOpacity={0.05} />
                   )}
                   {baseMax2026 >= 15000 && baseMax2026 <= 100000 && (
-                    <ReferenceLine x={baseMax2026} stroke="#64748b" strokeOpacity={0.5} strokeDasharray="4 2"
-                      label={{ value:'Tope SS', position:'insideTopRight', fill:'#64748b', fontSize:9 }} />
+                    <ReferenceLine x={baseMax2026} stroke="var(--text-soft)" strokeOpacity={0.5} strokeDasharray="4 2"
+                      label={{ value:'Tope SS', position:'insideTopRight', fill:'var(--text-soft)', fontSize:9 }} />
                   )}
 
                 {bruto2026 >= 15000 && bruto2026 <= 100000 && (
-                  <ReferenceLine x={bruto2026} stroke="#ffffff" strokeOpacity={0.12} strokeWidth={2} strokeDasharray="6 4"
-                    label={{ value:'tu sueldo', position:'insideTopRight', fill:'#64748b', fontSize:9 }} />
+                  <ReferenceLine x={bruto2026} stroke="var(--text-h)" strokeOpacity={0.3} strokeWidth={2} strokeDasharray="6 4"
+                    label={{ value:'tu sueldo', position:'insideTopRight', fill: 'var(--text-soft)', fontSize:9 }} />
                 )}
 
                 {ANIOS.filter(a => aniosActivos.has(a)).map(a => (
@@ -238,11 +239,12 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
                     dot={false} activeDot={{ r: 5, strokeWidth: 0 }}
                     isAnimationActive={aniosActivos.size <= 8} />
                 ))}
-                <Brush dataKey="bruto" height={30}
-                  stroke="rgba(56,189,248,0.25)" fill="#080c18"
-                  travellerWidth={10} traveller={<BrushHandle />}
+                <Brush dataKey="bruto" height={34}
+                  stroke="var(--border)" fill="var(--surface2)"
+                  travellerWidth={12} traveller={<BrushHandle />}
                   tickFormatter={v => `${Math.round(v/1000)}k€`}
-                  style={{ fontSize: 9, fill: '#4b5563' }} />
+                  padding={{ top: 10 }}
+                  style={{ fontSize: 10, fill: 'var(--text-soft)', fontFamily: 'inherit' }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -281,17 +283,17 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
           <p className="text-[10px] text-[#5a6b82] mb-2 font-medium">Eje X: salario bruto equivalente (€2026) · Eje Y: <strong className="text-[var(--text-soft)]">tipo efectivo IRPF</strong> (%)</p>
           <div style={{ height: 420 }}>
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={DATOS_CHART} margin={{ left: 5, right: 20, top: 10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1a2040" vertical={false} />
-                <XAxis dataKey="bruto" stroke="#1a2040" tick={{ fontSize:10, fill:'#4b5563' }} tickFormatter={v => `${v/1000}k€`} tickLine={false}
-                  label={{ value: 'Bruto (€2026)', position: 'insideBottomRight', offset: -5, fill: '#4b5563', fontSize: 9 }} />
-                <YAxis stroke="#1a2040" tick={{ fontSize:11, fill:'#4b5563' }} tickFormatter={v => `${v}%`} width={40} tickLine={false}
-                  label={{ value: 'Tipo efectivo', angle: -90, position: 'insideLeft', offset: 5, fill: '#4b5563', fontSize: 9 }} domain={[0, 'auto']} />
+              <LineChart data={DATOS_CHART} margin={{ left: 5, right: 20, top: 10, bottom: 40 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                <XAxis dataKey="bruto" stroke="var(--border)" tick={{ fontSize:10, fill:'var(--text-soft)' }} tickFormatter={v => `${v/1000}k€`} tickLine={false}
+                  interval={20} />
+                <YAxis stroke="var(--border)" tick={{ fontSize:11, fill:'var(--text-soft)' }} tickFormatter={v => `${v}%`} width={40} tickLine={false}
+                  label={{ value: 'Tipo efectivo', angle: -90, position: 'insideLeft', offset: 5, fill: 'var(--text-soft)', fontSize: 9 }} domain={[0, 'auto']} />
                 <Tooltip content={<TooltipSalario ref2026Neto={null} metrica="tipo" />} />
 
                 {bruto2026 >= 15000 && bruto2026 <= 100000 && (
-                  <ReferenceLine x={bruto2026} stroke="#ffffff" strokeOpacity={0.12} strokeWidth={2} strokeDasharray="6 4"
-                    label={{ value:'tu sueldo', position:'insideTopRight', fill:'#64748b', fontSize:9 }} />
+                  <ReferenceLine x={bruto2026} stroke="var(--text-h)" strokeOpacity={0.3} strokeWidth={2} strokeDasharray="6 4"
+                    label={{ value:'tu sueldo', position:'insideTopRight', fill: 'var(--text-soft)', fontSize:9 }} />
                 )}
 
                 {ANIOS.filter(a => aniosActivos.has(a)).map(a => (
@@ -300,11 +302,12 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
                     dot={false} activeDot={{ r: 5, strokeWidth: 0 }}
                     isAnimationActive={aniosActivos.size <= 8} />
                 ))}
-                <Brush dataKey="bruto" height={30}
-                  stroke="rgba(56,189,248,0.25)" fill="#080c18"
-                  travellerWidth={10} traveller={<BrushHandle />}
+                <Brush dataKey="bruto" height={34}
+                  stroke="var(--border)" fill="var(--surface2)"
+                  travellerWidth={12} traveller={<BrushHandle />}
                   tickFormatter={v => `${Math.round(v/1000)}k€`}
-                  style={{ fontSize: 9, fill: '#4b5563' }} />
+                  padding={{ top: 10 }}
+                  style={{ fontSize: 10, fill: 'var(--text-soft)', fontFamily: 'inherit' }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -325,12 +328,12 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
 
           <div style={{ height: 380 }}>
             <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={dataPorAnio} margin={{ left: 5, right: 45, top: 10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e2440" vertical={false} />
-                <XAxis dataKey="anio" stroke="#1e2440" tick={{ fontSize:11, fill:'#4b5563' }} tickLine={false} />
-                <YAxis yAxisId="eur" orientation="left" stroke="#1e2440" tick={{ fontSize:11, fill:'#4b5563' }}
+              <ComposedChart data={dataPorAnio} margin={{ left: 5, right: 45, top: 10, bottom: 20 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                <XAxis dataKey="anio" stroke="var(--border)" tick={{ fontSize:11, fill:'var(--text-soft)' }} tickLine={false} />
+                <YAxis yAxisId="eur" orientation="left" stroke="var(--border)" tick={{ fontSize:11, fill:'var(--text-soft)' }}
                   tickFormatter={v => `${(v/1000).toFixed(0)}k€`} width={50} tickLine={false} />
-                <YAxis yAxisId="pct" orientation="right" stroke="#1e2440" tick={{ fontSize:11, fill:'#4b5563' }}
+                <YAxis yAxisId="pct" orientation="right" stroke="var(--border)" tick={{ fontSize:11, fill:'var(--text-soft)' }}
                   tickFormatter={v => `${v}%`} width={40} tickLine={false} domain={[0, 'auto']} />
                 <Tooltip content={<TooltipAnio />} />
                 <Legend
@@ -378,7 +381,7 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
                     <tr key={d.anio}>
                       <td className="font-bold" style={{ color: YEAR_COLORS[d.anio] }}>{d.anio}</td>
                       <td className="font-mono text-[var(--text)]">{eur(d.brutoNominal)}</td>
-                      <td className="font-mono font-bold text-white">{eur(d.neto)}</td>
+                      <td className="font-mono font-bold text-[var(--text-h)]">{eur(d.neto)}</td>
                       <td className="font-mono text-red-400">{d.irpf.toFixed(1)}%</td>
                       <td className="font-mono text-amber-400">{d.total.toFixed(1)}%</td>
                       <td className={`font-mono font-bold ${diff >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
@@ -415,12 +418,12 @@ function InsightSalario({ aniosActivos, bruto2026 }) {
   return (
     <div className="mt-4 info-card text-[13px]">
       <p className="text-[var(--text)] leading-relaxed">
-        Con <strong className="text-white font-semibold">{eur(bruto2026)}</strong> brutos equiv. (€2026), el mejor año fue{' '}
+        Con <strong className="text-[var(--text-h)] font-semibold">{eur(bruto2026)}</strong> brutos equiv. (€2026), el mejor año fue{' '}
         <strong className="font-semibold" style={{ color: YEAR_COLORS[datos.mejor.anio] }}>{datos.mejor.anio}</strong>{' '}
         ({eur(datos.mejor.val)} netos) y el peor{' '}
         <strong className="font-semibold" style={{ color: YEAR_COLORS[datos.peor.anio] }}>{datos.peor.anio}</strong>{' '}
         ({eur(datos.peor.val)} netos). Diferencia:{' '}
-        <strong className="text-white font-semibold">{eur(datos.diff)}/año · {eur(datos.diff / 12)}/mes</strong>.
+        <strong className="text-[var(--text-h)] font-semibold">{eur(datos.diff)}/año · {eur(datos.diff / 12)}/mes</strong>.
       </p>
     </div>
   );

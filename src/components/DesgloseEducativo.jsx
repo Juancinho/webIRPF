@@ -436,20 +436,57 @@ export default function DesgloseEducativo({ bruto, anio }) {
       </div>{/* end paso-timeline */}
 
       {/* Neto — Resultado final */}
-      <div className="paso-final">
-        <div className="paso-final-badge" style={{ background: 'linear-gradient(135deg, #10b981, #059669)' }}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M20 6L9 17l-5-5"/>
-          </svg>
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="paso-final-label">Salario neto anual</div>
-          <div className="paso-final-formula font-mono">
-            C − D − L = {eur(bruto)} − {eur(r.cotTra)} − {eur(r.irpfFinal)}
+      <div className="mt-12 p-10 rounded-3xl relative overflow-hidden group transition-all duration-500 hover:shadow-2xl hover:shadow-emerald-500/10 border border-[var(--border)]"
+        style={{ background: 'var(--surface2)' }}>
+        {/* Background glow effects */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 blur-[80px] rounded-full -mr-20 -mt-20" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-500/3 blur-[60px] rounded-full -ml-10 -mb-10" />
+
+        <div className="relative flex flex-col md:flex-row items-center gap-8 md:gap-12">
+          <div className="flex-1 text-center md:text-left space-y-2">
+            <h5 className="text-[11px] font-bold text-emerald-400 uppercase tracking-[0.2em] mb-3">Resultado Final</h5>
+            <div className="flex flex-col gap-1">
+              <span className="text-[var(--text-soft)] text-xs font-medium uppercase tracking-wider">Salario neto resultante</span>
+              <div className="text-5xl md:text-6xl font-black font-mono tracking-tighter" style={{ color: 'var(--text-h)' }}>
+                {eur(r.salarioNeto)}
+              </div>
+            </div>
+            
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-4 gap-y-2 mt-4 pt-4 border-t border-[var(--border)]">
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <span className="text-sm font-mono font-bold text-[var(--text-h)]">{eur(r.salarioNeto / 12)}<span className="text-[10px] text-[var(--text-soft)] font-normal ml-1">/mes (12p)</span></span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400/50" />
+                <span className="text-sm font-mono font-bold text-[var(--text-h)]">{eur(r.salarioNeto / 14)}<span className="text-[10px] text-[var(--text-soft)] font-normal ml-1">/mes (14p)</span></span>
+              </div>
+            </div>
           </div>
-          <div className="paso-final-valor font-mono">{eur(r.salarioNeto)}</div>
-          <div className="paso-final-mes">
-            {eur(r.salarioNeto / 12)}/mes (12 pagas) · {eur(r.salarioNeto / 14)}/mes (14 pagas)
+
+          <div className="hidden lg:block w-px h-24 bg-gradient-to-b from-transparent via-[var(--border)] to-transparent" />
+
+          {/* Equation summary */}
+          <div className="bg-[var(--surface3)] px-6 py-5 rounded-2xl border border-[var(--border)] md:min-w-[240px]">
+            <p className="text-[10px] font-bold text-[var(--text-soft)] uppercase tracking-wider mb-3">La cuenta final</p>
+            <div className="space-y-2.5 font-mono text-[13px]">
+              <div className="flex justify-between items-center gap-4">
+                <span className="text-[var(--text)]">Bruto (C)</span>
+                <span className="text-[var(--text-h)] font-bold">{eur(bruto)}</span>
+              </div>
+              <div className="flex justify-between items-center gap-4">
+                <span className="text-[var(--text)]">− SS Tra. (D)</span>
+                <span className="text-amber-400 font-bold">{eur(r.cotTra)}</span>
+              </div>
+              <div className="flex justify-between items-center gap-4 pb-2.5 border-b border-[var(--border)]">
+                <span className="text-[var(--text)]">− IRPF (L)</span>
+                <span className="text-red-400 font-bold">{eur(r.irpfFinal)}</span>
+              </div>
+              <div className="flex justify-between items-center gap-4 pt-1">
+                <span className="text-emerald-400 font-black">NETO</span>
+                <span className="text-emerald-400 font-black">{eur(r.salarioNeto)}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

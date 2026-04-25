@@ -279,16 +279,17 @@ html[data-theme="light"] .paso-subtitle { color: var(--text-soft); }
     overflow-y: auto;
     scrollbar-width: none;
     z-index: 20;
-    /* hidden state for the in/out transition */
-    opacity: 0;
-    transform: translateX(-26px) scale(0.96);
-    filter: blur(5px);
-    will-change: opacity, transform, filter;
-    transition:
-      opacity 650ms cubic-bezier(0.22, 1, 0.36, 1),
-      transform 750ms cubic-bezier(0.22, 1, 0.36, 1),
-      filter 500ms cubic-bezier(0.22, 1, 0.36, 1);
+    /* always visible on xl+ */
+    opacity: 1;
+    transform: none;
+    filter: none;
+    animation: sidebar-enter 650ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
   }
+}
+
+@keyframes sidebar-enter {
+  from { opacity: 0; transform: translateX(-20px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
 /* At 2xl the layout frame reserves a mirror spacer on the right, so the
@@ -302,29 +303,6 @@ html[data-theme="light"] .paso-subtitle { color: var(--text-soft); }
 }
 
 .sidebar-widget::-webkit-scrollbar { display: none; }
-
-.sidebar-widget[data-visible="true"] {
-  opacity: 1;
-  transform: translateX(0) scale(1);
-  filter: blur(0);
-}
-
-/* Stagger internal sections each time sidebar becomes visible */
-.sidebar-widget[data-visible="true"] > * {
-  animation: sidebar-stagger 550ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
-}
-.sidebar-widget[data-visible="true"] > *:nth-child(1) { animation-delay: 100ms; }
-.sidebar-widget[data-visible="true"] > *:nth-child(2) { animation-delay: 150ms; }
-.sidebar-widget[data-visible="true"] > *:nth-child(3) { animation-delay: 200ms; }
-.sidebar-widget[data-visible="true"] > *:nth-child(4) { animation-delay: 250ms; }
-.sidebar-widget[data-visible="true"] > *:nth-child(5) { animation-delay: 300ms; }
-.sidebar-widget[data-visible="true"] > *:nth-child(6) { animation-delay: 350ms; }
-.sidebar-widget[data-visible="true"] > *:nth-child(n+7) { animation-delay: 400ms; }
-
-@keyframes sidebar-stagger {
-  from { opacity: 0; transform: translateX(-12px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
 
 /* ── TOC navigation with progress bar ── */
 .toc-nav {
@@ -426,6 +404,71 @@ html[data-theme="light"] .paso-subtitle { color: var(--text-soft); }
   line-height: 1.55;
   color: var(--text);
   margin: 0;
+}
+
+/* ── Config pill (compact configurator) ── */
+.config-pill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.config-pill:hover {
+  border-color: var(--accent-dim);
+  background: var(--surface3);
+}
+.config-pill[aria-expanded="true"] {
+  border-color: var(--accent);
+  background: linear-gradient(135deg, rgba(56,189,248,0.04), rgba(34,211,238,0.02));
+}
+.config-pill-values {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.config-pill-bruto {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.config-pill-sep {
+  font-size: 11px;
+  color: var(--text-soft);
+  opacity: 0.5;
+}
+.config-pill-anio {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+.config-pill-action {
+  color: var(--text-soft);
+  transition: color 0.2s;
+}
+.config-pill:hover .config-pill-action { color: var(--accent); }
+
+/* Collapsible panel — smooth height transition */
+.config-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.3s ease;
+  opacity: 0;
+  overflow: hidden;
+}
+.config-panel.is-open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  margin-top: 8px;
+}
+.config-panel > * {
+  overflow: hidden;
 }
 
 /* ─── Metric mini card (sidebar) ─── */
@@ -734,6 +777,25 @@ input[type=range]:active::-webkit-slider-thumb {
 /* ─── Tooltip override for Recharts ─── */
 .recharts-tooltip-wrapper {
   filter: drop-shadow(var(--shadow-md));
+}
+
+/* ─── Brush styling ─── */
+.recharts-brush > rect:first-of-type {
+  rx: 8;
+  ry: 8;
+}
+.recharts-brush-slide {
+  fill: var(--accent);
+  fill-opacity: 0.12 !important;
+}
+.recharts-brush-texts {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.recharts-brush > rect:not(.recharts-brush-slide) {
+  stroke: var(--border);
+  stroke-width: 1px;
 }
 
 /* ─── FAQ accordion ─── */
