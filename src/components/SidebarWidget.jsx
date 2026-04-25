@@ -44,7 +44,7 @@ const TIPS = {
   },
 };
 
-export default function SidebarWidget({ bruto, anio, onChange }) {
+export default function SidebarWidget({ bruto, anio, onChange, onNavigate }) {
   const [activeId, setActiveId] = useState('calc');
   const [configOpen, setConfigOpen] = useState(false);
 
@@ -67,6 +67,7 @@ export default function SidebarWidget({ bruto, anio, onChange }) {
 
   const scroll = id => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    onNavigate?.();
   };
 
   const activeIdx = SECTIONS.findIndex(s => s.id === activeId);

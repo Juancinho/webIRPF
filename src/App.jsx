@@ -74,6 +74,7 @@ export default function App() {
 
   /* ── Active section tracking ── */
   const [activeSection, setActiveSection] = useState('');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const SECTIONS = ['calc', 'desglose', 'simulador', 'comparativa', 'cuña', 'mecanismos', 'normativa'];
@@ -91,6 +92,22 @@ export default function App() {
     return () => obs.disconnect();
   }, []);
 
+  /* Close mobile menu when crossing into xl (sidebar takes over) */
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1280px)');
+    const handler = e => { if (e.matches) setMobileMenuOpen(false); };
+    mq.addEventListener?.('change', handler);
+    return () => mq.removeEventListener?.('change', handler);
+  }, []);
+
+  /* Lock page scroll while mobile menu is open */
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, [mobileMenuOpen]);
+
   return (
     <div className="min-h-screen relative">
       {/* Decorative floating orbs (clipped so they never cause horizontal scroll) */}
@@ -103,7 +120,21 @@ export default function App() {
       {/* ── HEADER ── */}
       <header className="header-blur sticky top-0 z-30">
         <div className="centered-col py-3 sm:py-3.5 flex items-center justify-between gap-3 sm:gap-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
+            {/* Nav drawer button — left of logo, visible below xl (sidebar takes over at xl) */}
+            <button
+              type="button"
+              className="mobile-menu-btn xl:hidden"
+              aria-label={mobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-menu-panel"
+              onClick={() => setMobileMenuOpen(o => !o)}
+              data-open={mobileMenuOpen}
+            >
+              <span className="mobile-menu-icon">
+                <span /><span /><span />
+              </span>
+            </button>
             <div className="flex items-baseline gap-1">
               <span className="font-serif text-[22px] font-medium tracking-tight" style={{ color: 'var(--text-h)' }}>Fiscal</span>
               <span className="font-serif text-[22px] italic font-normal tracking-tight" style={{ color: 'var(--accent)' }}>
@@ -111,7 +142,7 @@ export default function App() {
               </span>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <p className="text-[11px] hidden lg:block font-medium" style={{ color: 'var(--text-soft)' }}>Solo tarifa estatal · Cálculos orientativos</p>
             {/* Active section pill — hidden on xl where sidebar shows it */}
             {activeSection && (
@@ -125,7 +156,43 @@ export default function App() {
             <ShareButton getShareURL={getShareURL} />
           </div>
         </div>
+
       </header>
+
+      {/* Nav drawer panel — outside <header> to avoid backdrop-filter containing-block issues */}
+      <div
+        id="mobile-menu-panel"
+        className="mobile-menu-panel xl:hidden"
+        data-open={mobileMenuOpen}
+        aria-hidden={!mobileMenuOpen}
+      >
+        <div className="mobile-menu-inner">
+          {/* Drawer header */}
+          <div className="flex items-center justify-between mb-4 pb-3" style={{ borderBottom: '1px solid var(--border)' }}>
+            <div className="flex items-baseline gap-1">
+              <span className="font-serif text-[18px] font-medium tracking-tight" style={{ color: 'var(--text-h)' }}>Fiscal</span>
+              <span className="font-serif text-[18px] italic font-normal tracking-tight" style={{ color: 'var(--accent)' }}>scope</span>
+            </div>
+            <button onClick={() => setMobileMenuOpen(false)} aria-label="Cerrar"
+              className="w-7 h-7 flex items-center justify-center rounded-lg transition-colors hover:bg-[var(--surface2)]"
+              style={{ color: 'var(--text-soft)' }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <path d="M18 6L6 18M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+          <SidebarWidget bruto={bruto} anio={anio} onChange={onChange}
+            onNavigate={() => setMobileMenuOpen(false)} />
+        </div>
+      </div>
+
+      {/* Backdrop for nav drawer */}
+      <div
+        className="mobile-menu-backdrop xl:hidden"
+        data-open={mobileMenuOpen}
+        onClick={() => setMobileMenuOpen(false)}
+        aria-hidden="true"
+      />
 
       {/* ── Progress dots (right edge) ── */}
       <ProgressDots />
@@ -351,18 +418,7 @@ export default function App() {
         <div className="footer-grid centered-col py-8 sm:py-10">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 text-xs mb-5 sm:mb-6 pt-5 sm:pt-6"
             style={{ color: 'var(--text-soft)' }}>
-            <div>
-              <p className="font-bold mb-2 uppercase tracking-wider text-[10px]" style={{ color: 'var(--text)' }}>Metodología</p>
-              <p className="leading-relaxed">El motor de cálculo es una traducción a JavaScript del código Python original del autor,
-                que implementa la normativa estatal (LIRPF + LGSS) año a año. Solo incluye la tarifa estatal
-                (50% del IRPF) sin deducciones autonómicas ni circunstancias personales.</p>
-            </div>
-            <div>
-              <p className="font-bold mb-2 uppercase tracking-wider text-[10px]" style={{ color: 'var(--text)' }}>Limitaciones</p>
-              <p className="leading-relaxed">Los cálculos son orientativos y no tienen valor legal. No incluyen deducciones autonómicas,
-                situaciones personales (discapacidad, familia numerosa, planes de pensiones), ni rendimientos
-                no laborales. Consulta siempre a un profesional fiscal.</p>
-            </div>
+
           </div>
           <div className="section-separator" />
           <p className="text-center text-[10px] mt-4" style={{ color: 'var(--text-soft)', opacity: 0.7 }}>

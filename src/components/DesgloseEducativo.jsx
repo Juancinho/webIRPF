@@ -350,35 +350,150 @@ export default function DesgloseEducativo({ bruto, anio }) {
               contribuyente. Los primeros {eur(irpfMinimoAnio)} no generan cuota.
             </p>
 
-            <div className="tramos-aplicados">
-              <div className="tramos-aplicados-header">Tramos que se te aplican en {anio}</div>
-              {(() => {
-                let prev = 0;
-                return p.tramos.map(([lim, tipo], i) => {
-                  const desde = prev;
-                  const limReal = lim === Infinity ? r.baseImponible : lim;
-                  const enRango = r.baseImponible > desde;
-                  const lleno = r.baseImponible >= limReal;
-                  if (!enRango) { prev = limReal; return null; }
-                  const tramoIRPFbase = lleno ? (limReal - desde) : (r.baseImponible - desde);
-                  const cuota = tramoIRPFbase * tipo;
-                  prev = limReal;
-                  return (
-                    <div key={i} className="tramo-row">
-                      <div className="tramo-rango">
-                        {lim === Infinity ? `desde ${eur(desde)}` : `${eur(desde)} – ${eur(lim)}`}
-                      </div>
-                      <div className="tramo-tipo" style={{ color: '#f43f5e' }}>{(tipo * 100).toFixed(1)} %</div>
-                      <div className="tramo-cuota">{eur(cuota)}</div>
-                    </div>
-                  );
-                });
-              })()}
-            </div>
+            {(() => {
+              const TRAMO_COLORS = ['#0ea5e9', '#06b6d4', '#10b981', '#84cc16', '#f59e0b', '#ef4444'];
+              let prev = 0;
+              const tramosData = p.tramos.map(([lim, tipo], i) => {
+                const desde = prev;
+                const ancho = lim === Infinity ? null : lim - prev;
+                const limReal = lim === Infinity ? r.baseImponible : lim;
+                const enRango = r.baseImponible > desde;
+                const lleno = r.baseImponible >= limReal;
+                const eurosEnTramo = !enRango ? 0 : (lleno ? limReal - desde : r.baseImponible - desde);
+                const cuota = eurosEnTramo * tipo;
+                const fillPct = ancho == null
+                  ? (eurosEnTramo > 0 ? 1 : 0)
+                  : ancho > 0 ? eurosEnTramo / ancho : 0;
+                prev = limReal;
+                return {
+                  desde, hasta: lim, tipo, eurosEnTramo, cuota, fillPct, enRango,
+                  color: TRAMO_COLORS[i % TRAMO_COLORS.length],
+                };
+              });
+              const tramosActivos = tramosData.filter(t => t.enRango && t.eurosEnTramo > 0);
+              const baseImp = r.baseImponible || 1;
 
+              return (
+                <div className="tramos-visual">
+                  {/* Pedagogical intro */}
+                  <p className="tramos-intro-note">
+                    El IRPF es <strong>progresivo</strong>: cada tipo solo se aplica a los euros
+                    que caen <em>dentro de esa franja</em> — no a toda tu base de{' '}
+                    <strong className="font-mono">{eur(r.baseImponible)}</strong>.
+                  </p>
+
+                  <div className="tramos-visual-header">
+                    <span className="tramos-visual-title">Distribución de tu base imponible en tramos</span>
+                    <span className="tramos-visual-base font-mono">{eur(r.baseImponible)}</span>
+                  </div>
+
+                  {/* Stacked bar — full base across active tramos */}
+                  <div className="tramos-stacked">
+                    {tramosActivos.map((t, i) => {
+                      const widthPct = (t.eurosEnTramo / baseImp) * 100;
+                      return (
+                        <div key={i} className="tramos-segment"
+                          style={{ width: `${widthPct}%`, background: `linear-gradient(180deg, ${t.color}, ${t.color}cc)` }}
+                          title={`${eur(t.eurosEnTramo)} al ${(t.tipo * 100).toFixed(1)}%`}>
+                          {widthPct > 14 && (
+                            <span className="tramos-segment-label">
+                              {eur(t.eurosEnTramo)}
+                              <small>{(t.tipo * 100).toFixed(0)}%</small>
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {/* Scale: 0€ ← bar → tu base */}
+                  <div className="tramos-scale">
+                    <span className="font-mono">0 €</span>
+                    <span className="font-mono tramos-scale-end" style={{ color: 'var(--accent)' }}>
+                      {eur(r.baseImponible)} ← tu base
+                    </span>
+                  </div>
+
+                  {/* Per-tramo detail rows */}
+                  <div className="tramos-detail">
+                    {tramosData.map((t, i) => {
+                      const rangoLabel = t.hasta === Infinity
+                        ? `desde ${eur(t.desde)}`
+                        : `${eur(t.desde)} – ${eur(t.hasta)}`;
+                      const isPartial = t.enRango && t.eurosEnTramo > 0 && t.fillPct < 0.999;
+                      return (
+                        <div key={i}>
+                          <div className={`tramo-row-v2 ${!t.enRango || t.eurosEnTramo === 0 ? 'is-empty' : ''}`}>
+                            <span className="tramo-dot" style={{ background: t.color }} />
+                            <span className="tramo-range">{rangoLabel}</span>
+                            <span className="tramo-rate" style={{ color: t.color }}>
+                              {(t.tipo * 100).toFixed(1)}%
+                            </span>
+                            <span className="tramo-fill-track">
+                              <span className="tramo-fill-bar"
+                                style={{ width: `${(t.fillPct * 100).toFixed(1)}%`, background: t.color }} />
+                            </span>
+                            {t.eurosEnTramo > 0 ? (
+                              <>
+                                <span className="tramo-eur">
+                                  <strong className="font-mono">{eur(t.eurosEnTramo)}</strong>
+                                  <small>× {(t.tipo * 100).toFixed(0)}%</small>
+                                </span>
+                                <span className="tramo-cuota-v2">
+                                  <strong className="font-mono" style={{ color: 'var(--red)' }}>{eur(t.cuota)}</strong>
+                                  <small>IRPF</small>
+                                </span>
+                              </>
+                            ) : (
+                              <span className="tramo-empty-label">no llegas a este tramo</span>
+                            )}
+                          </div>
+                          {isPartial && (
+                            <div className="tramo-partial-badge" style={{ borderColor: `${t.color}40`, background: `${t.color}10` }}>
+                              <span style={{ color: t.color }}>Tu base termina aquí</span>
+                              {' '}— solo los <strong className="font-mono">{eur(t.eurosEnTramo)}</strong> que van
+                              de <strong className="font-mono">{eur(t.desde)}</strong> hasta tu base
+                              cotizan al <strong style={{ color: t.color }}>{(t.tipo * 100).toFixed(0)}%</strong>,
+                              no todo tu salario.
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })()}
+
+            <div className="callout-info" style={{ marginTop: '0.75rem' }}>
+              <p style={{ marginBottom: '0.4rem' }}>
+                <strong>¿Por qué se resta {eur(r.cuotaMinimo)}?</strong>
+              </p>
+              <p>
+                Los {eur(irpfMinimoAnio)} del mínimo vital (Paso I) deben quedar <strong>a cero de IRPF</strong>.
+                Pero el cálculo de las franjas de arriba los incluyó en la base, así que les asignó impuesto.
+                Para anularlo, calculamos cuánto les tocó: como caen enteros en el primer tramo al {(firstTipo * 100).toFixed(0)}%,
+                su impuesto es exactamente <strong>{eur(irpfMinimoAnio)} × {(firstTipo * 100).toFixed(0)}% = {eur(r.cuotaMinimo)}</strong>.
+                Ese importe se descuenta, y esos euros quedan libres.
+              </p>
+            </div>
             <Formula>
-              J = {eur(r.cuotaIntegra)} − {eur(r.cuotaMinimo)} (mínimo × primer tramo) = <strong style={{ color: '#f43f5e' }}>{eur(r.cuotaTeorica)}</strong>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '5px 20px', alignItems: 'center' }}>
+                <span style={{ color: 'var(--text-soft)', fontWeight: 400, fontSize: '0.88em' }}>
+                  IRPF calculado sobre tu base completa ({eur(r.baseImponible)})
+                </span>
+                <span>{eur(r.cuotaIntegra)}</span>
+                <span style={{ color: 'var(--text-soft)', fontWeight: 400, fontSize: '0.88em' }}>
+                  Se anula el IRPF del mínimo vital ({eur(irpfMinimoAnio)} × {(firstTipo * 100).toFixed(0)}%)
+                </span>
+                <span style={{ color: 'var(--red)' }}>− {eur(r.cuotaMinimo)}</span>
+                <div style={{ gridColumn: '1 / -1', height: 1, background: 'var(--border)', margin: '2px 0' }} />
+                <strong>J = Cuota íntegra estatal</strong>
+                <strong style={{ color: '#f43f5e' }}>{eur(r.cuotaTeorica)}</strong>
+              </div>
             </Formula>
+            <p style={{ fontSize: 11, color: 'var(--text-soft)', marginTop: '0.4rem', fontStyle: 'italic' }}>
+              Equivale a aplicar la tarifa directamente sobre {eur(r.baseImponible)} − {eur(irpfMinimoAnio)} = {eur(r.baseImponible - irpfMinimoAnio)}.
+            </p>
             <p className="paso-ratio">
               Aquí solo está la <strong className="text-white">parte estatal</strong> (50% del IRPF total). La parte autonómica varía por
               comunidad y no se incluye en este cálculo.
