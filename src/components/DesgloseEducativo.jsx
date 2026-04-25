@@ -1,6 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { calcularNomina, obtenerParametros, getArt20Meta, SMI_ANUAL } from '../engine/irpf';
 import { eur, num } from '../utils/format';
+import { useScrollReveal } from '../hooks/useScrollReveal';
 
 /* ── Fuentes legales ────────────────────────────────────────────────── */
 const FUENTES = {
@@ -17,8 +18,9 @@ const FUENTES = {
 
 /* ── Subcomponentes visuales ──────────────────────────────────────── */
 function Paso({ letra, titulo, subtitulo, color, resultado, children }) {
+  const [ref, isVisible] = useScrollReveal({ threshold: 0.12 });
   return (
-    <div className="paso-edu">
+    <div ref={ref} className={`paso-edu ${isVisible ? 'is-revealed' : ''}`}>
       <div className="paso-header">
         <div className="paso-badge" style={{ background: `linear-gradient(135deg, ${color}, ${color}cc)`, boxShadow: `0 4px 20px ${color}30` }}>
           {letra}
@@ -153,7 +155,6 @@ function formulaDeduccionSMI(anio, bruto, deduccion) {
 
 /* ── Componente principal ─────────────────────────────────────────── */
 export default function DesgloseEducativo({ bruto, anio }) {
-  const [abierto, setAbierto] = useState(true);
 
   const r = useMemo(() => calcularNomina(bruto, anio), [bruto, anio]);
   const p = useMemo(() => obtenerParametros(anio), [anio]);
@@ -178,46 +179,14 @@ export default function DesgloseEducativo({ bruto, anio }) {
   const irpfMinimoAnio = anio <= 2014 ? 5151 : 5550;
 
   return (
-    <div className={`card desglose-edu-card ${abierto ? 'is-open' : 'is-closed'}`}>
-      {/* ── Header toggleable ── */}
-      <button onClick={() => setAbierto(a => !a)}
-        className="desglose-edu-toggle"
-        aria-expanded={abierto}>
-        <div className="flex items-center gap-3.5 min-w-0">
-          <div className="desglose-edu-icon shrink-0">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25">
-              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2M12 12h3M9 12h.01M12 16h3M9 16h.01" />
-            </svg>
-          </div>
-          <div className="min-w-0">
-            <h3 className="text-[14px] sm:text-[15px] font-extrabold text-white tracking-tight leading-tight">
-              Viaje de tu sueldo <span className="text-[var(--accent)]">— paso a paso</span>
-            </h3>
-            <p className="text-[11px] text-[#7a8baa] mt-0.5 truncate">
-              {eur(bruto)} brutos en {anio} · 12 pasos con fórmula y fuente legal
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2.5 shrink-0">
-          <span className="desglose-edu-hint hidden sm:inline">{abierto ? 'Ocultar' : 'Mostrar'}</span>
-          <div className="desglose-edu-chevron" data-open={abierto}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M6 9l6 6 6-6"/>
-            </svg>
-          </div>
-        </div>
-      </button>
+    <div className="desglose-edu">
+      {/* Intro */}
+      <p className="intro-desglose-text text-[13px] leading-relaxed" style={{ color: 'var(--text)' }}>
+        El camino completo que recorre cada euro: desde lo que le cuestas a la empresa hasta lo que acaba en tu cuenta.
+        Cada paso lleva fórmula, explicación y fuente legal — normativa real de {anio}.
+      </p>
 
-      <div className="desglose-edu-body" data-open={abierto} aria-hidden={!abierto}>
-        <div className="desglose-edu px-5 sm:px-6 py-6">
-
-          {/* Intro — texto plano, sin caja */}
-          <p className="intro-desglose-text text-[13px] text-[#7a8baa] leading-relaxed">
-            El camino completo que recorre cada euro: desde lo que le cuestas a la empresa hasta lo que acaba en tu cuenta.
-            Cada paso lleva fórmula, explicación y fuente legal — normativa real de {anio}.
-          </p>
-
-          <div className="paso-timeline">
+      <div className="paso-timeline">
 
 
           {/* A — Coste laboral */}
@@ -464,25 +433,23 @@ export default function DesgloseEducativo({ bruto, anio }) {
             <Fuente f={FUENTES.art85} />
           </Paso>
 
-          </div>{/* end paso-timeline */}
+      </div>{/* end paso-timeline */}
 
-          {/* Neto — Resultado final */}
-          <div className="paso-final">
-            <div className="paso-final-badge" style={{ background: 'linear-gradient(135deg, #10b981, #059669)' }}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20 6L9 17l-5-5"/>
-              </svg>
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="paso-final-label">Salario neto anual</div>
-              <div className="paso-final-formula font-mono">
-                C − D − L = {eur(bruto)} − {eur(r.cotTra)} − {eur(r.irpfFinal)}
-              </div>
-              <div className="paso-final-valor font-mono">{eur(r.salarioNeto)}</div>
-              <div className="paso-final-mes">
-                {eur(r.salarioNeto / 12)}/mes (12 pagas) · {eur(r.salarioNeto / 14)}/mes (14 pagas)
-              </div>
-            </div>
+      {/* Neto — Resultado final */}
+      <div className="paso-final">
+        <div className="paso-final-badge" style={{ background: 'linear-gradient(135deg, #10b981, #059669)' }}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20 6L9 17l-5-5"/>
+          </svg>
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="paso-final-label">Salario neto anual</div>
+          <div className="paso-final-formula font-mono">
+            C − D − L = {eur(bruto)} − {eur(r.cotTra)} − {eur(r.irpfFinal)}
+          </div>
+          <div className="paso-final-valor font-mono">{eur(r.salarioNeto)}</div>
+          <div className="paso-final-mes">
+            {eur(r.salarioNeto / 12)}/mes (12 pagas) · {eur(r.salarioNeto / 14)}/mes (14 pagas)
           </div>
         </div>
       </div>

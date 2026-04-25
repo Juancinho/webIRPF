@@ -14,7 +14,7 @@ export const YEAR_COLORS = {
   2015:'#facc15',2016:'#a3e635',2017:'#4ade80',
   2018:'#34d399',2019:'#2dd4bf',2020:'#38bdf8',
   2021:'#60a5fa',2022:'#38bdf8',2023:'#22d3ee',
-  2024:'#2dd4bf',2025:'#34d399',2026:'#ffffff',
+  2024:'#2dd4bf',2025:'#34d399',2026:'#0ea5e9',
 };
 
 const GRUPOS = {
@@ -334,7 +334,7 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
                   tickFormatter={v => `${v}%`} width={40} tickLine={false} domain={[0, 'auto']} />
                 <Tooltip content={<TooltipAnio />} />
                 <Legend
-                  formatter={(value) => <span style={{ fontSize: 11, color: '#94a3b8' }}>{value}</span>}
+                  formatter={(value) => <span style={{ fontSize: 11, color: 'var(--text-soft)' }}>{value}</span>}
                 />
 
                 {/* Bandas de reforma */}

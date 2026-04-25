@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, ReferenceLine, Legend
@@ -8,7 +8,7 @@ import { eur } from '../utils/format';
 
 const ART20_COLORS = {
   2012: '#f87171', 2015: '#facc15', 2019: '#2dd4bf',
-  2023: '#a78bfa', 2024: '#c084fc', 2026: '#ffffff',
+  2023: '#a78bfa', 2024: '#c084fc', 2026: '#0ea5e9',
 };
 
 const UMBRAL_COLORS = {

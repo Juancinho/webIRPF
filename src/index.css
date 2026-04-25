@@ -116,6 +116,95 @@ html[data-theme="light"] {
   --orb-opacity: 0.18;
 }
 
+/* ═══════════════════════════════════════════════════════════════════
+   LIGHT THEME — systematic overrides for hardcoded dark-mode colors
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Override Tailwind's text-white: in light mode it should map to dark ink */
+html[data-theme="light"] .text-white { color: var(--text-h) !important; }
+/* But NOT on buttons/badges with colored backgrounds */
+html[data-theme="light"] .year-btn.active { color: #ffffff !important; }
+html[data-theme="light"] .btn-primary { color: #ffffff !important; }
+html[data-theme="light"] .section-badge { color: #ffffff !important; }
+html[data-theme="light"] .paso-badge { color: #ffffff !important; }
+html[data-theme="light"] .paso-final-badge svg { stroke: #ffffff !important; }
+
+/* Hardcoded hex greys used across components → theme-aware */
+html[data-theme="light"] .text-\[\#7a8baa\] { color: var(--text-soft) !important; }
+html[data-theme="light"] .text-\[\#94a3b8\] { color: var(--text) !important; }
+html[data-theme="light"] .text-\[\#64748b\] { color: var(--text-soft) !important; }
+html[data-theme="light"] .text-\[\#b0becc\] { color: var(--text-h) !important; }
+
+/* Semantic color classes: darken for light backgrounds */
+html[data-theme="light"] .text-emerald-400,
+html[data-theme="light"] .text-emerald-400\/80 { color: #047857 !important; }
+html[data-theme="light"] .text-emerald-400\/60,
+html[data-theme="light"] .text-emerald-400\/50 { color: rgba(4,120,87,0.7) !important; }
+html[data-theme="light"] .text-emerald-400\/40 { color: rgba(4,120,87,0.55) !important; }
+html[data-theme="light"] .text-emerald-300 { color: #059669 !important; }
+html[data-theme="light"] .text-emerald-300\/80 { color: rgba(5,150,105,0.85) !important; }
+html[data-theme="light"] .text-red-400 { color: #be123c !important; }
+html[data-theme="light"] .text-red-400\/60 { color: rgba(190,18,60,0.7) !important; }
+html[data-theme="light"] .text-amber-400 { color: #92400e !important; }
+html[data-theme="light"] .text-orange-400 { color: #c2410c !important; }
+html[data-theme="light"] .text-orange-300\/80 { color: rgba(194,65,12,0.8) !important; }
+html[data-theme="light"] .text-sky-400 { color: #0369a1 !important; }
+html[data-theme="light"] .text-blue-400 { color: #1d4ed8 !important; }
+html[data-theme="light"] .text-purple-400 { color: #7e22ce !important; }
+
+/* Background tints for tags/badges: slightly more opaque in light */
+html[data-theme="light"] .bg-emerald-500\/10 { background: rgba(4,120,87,0.08) !important; }
+html[data-theme="light"] .bg-amber-500\/10 { background: rgba(146,64,14,0.08) !important; }
+html[data-theme="light"] .bg-blue-500\/10 { background: rgba(29,78,216,0.06) !important; }
+html[data-theme="light"] .bg-purple-500\/10 { background: rgba(126,34,206,0.06) !important; }
+html[data-theme="light"] .bg-orange-500\/10 { background: rgba(194,65,12,0.06) !important; }
+
+/* Tooltip / card-glass in light theme — opaque white */
+html[data-theme="light"] .card-glass {
+  background: rgba(255,255,255,0.95) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+}
+
+/* Light border/bg overrides for emerald & orange zones */
+html[data-theme="light"] .border-emerald-500\/20 { border-color: rgba(4,120,87,0.2) !important; }
+html[data-theme="light"] .bg-emerald-500\/5 { background: rgba(4,120,87,0.05) !important; }
+html[data-theme="light"] .border-orange-500\/10 { border-color: rgba(194,65,12,0.12) !important; }
+html[data-theme="light"] .border-orange-500\/20 { border-color: rgba(194,65,12,0.2) !important; }
+
+/* Hover color overrides — don't go white */
+html[data-theme="light"] .hover\:text-white:hover { color: var(--text-h) !important; }
+html[data-theme="light"] .hover\:text-blue-300:hover { color: #1d4ed8 !important; }
+html[data-theme="light"] .group-hover\:text-white:hover { color: var(--text-h) !important; }
+
+/* Progress dots — more visible in light */
+html[data-theme="light"] .progress-dot { background: #c4b99a; }
+html[data-theme="light"] .progress-dot.active { background: var(--accent); box-shadow: 0 0 8px rgba(3,105,161,0.3); }
+html[data-theme="light"] .progress-dot.passed { background: var(--accent); opacity: 0.35; }
+html[data-theme="light"] .progress-dots::before { background: #d4ccaf; }
+
+/* Sidebar tip in light */
+html[data-theme="light"] .sidebar-tip {
+  background: linear-gradient(135deg, rgba(3,105,161,0.05), rgba(14,116,144,0.03));
+  border-color: rgba(3,105,161,0.12);
+}
+
+/* Badge 'nuevo' (MEI) in light */
+html[data-theme="light"] .badge-nuevo { color: #7e22ce; background: rgba(126,34,206,0.08); border-color: rgba(126,34,206,0.2); }
+
+/* CuñaFiscal donut SVG labels */
+html[data-theme="light"] text[fill="#64748b"] { fill: var(--text-soft) !important; }
+
+/* Distribution bar text in light — keep white on colored bg */
+html[data-theme="light"] .distribution-bar .text-white\/90 { color: rgba(255,255,255,0.9) !important; }
+
+/* Data table overrides */
+html[data-theme="light"] .data-table td.text-white,
+html[data-theme="light"] .data-table td .text-white,
+html[data-theme="light"] td.font-bold.text-white { color: var(--text-h) !important; }
+
+/* Desglose step prosa */
+html[data-theme="light"] .paso-subtitle { color: var(--text-soft); }
+
 .font-mono { font-family: 'JetBrains Mono', 'Fira Code', monospace !important; }
 .font-display { font-family: 'Fraunces', 'DM Serif Display', Georgia, serif !important; font-optical-sizing: auto; letter-spacing: -0.02em; }
 .font-serif   { font-family: 'Fraunces', Georgia, serif !important; font-optical-sizing: auto; }
@@ -237,6 +326,28 @@ html[data-theme="light"] {
   to   { opacity: 1; transform: translateX(0); }
 }
 
+/* ── TOC navigation with progress bar ── */
+.toc-nav {
+  position: relative;
+  padding-left: 3px;
+}
+.toc-progress-track {
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: var(--border);
+  border-radius: 1px;
+  overflow: hidden;
+}
+.toc-progress-fill {
+  width: 100%;
+  background: linear-gradient(to bottom, var(--accent), var(--accent2));
+  border-radius: 1px;
+  transition: height 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 .toc-link {
   display: flex;
   align-items: center;
@@ -247,7 +358,7 @@ html[data-theme="light"] {
   font-weight: 500;
   color: var(--text);
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
   cursor: pointer;
   background: transparent;
   border: none;
@@ -262,6 +373,10 @@ html[data-theme="light"] {
   background: var(--surface2);
   color: var(--accent-light);
 }
+.toc-link.passed {
+  color: var(--text);
+  opacity: 0.7;
+}
 .toc-num {
   width: 18px;
   height: 18px;
@@ -274,11 +389,43 @@ html[data-theme="light"] {
   justify-content: center;
   color: var(--text);
   flex-shrink: 0;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.toc-link.active .toc-num {
-  background: rgba(56,189,248,0.15);
+.toc-num.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: var(--accent-on);
+  box-shadow: 0 2px 10px var(--glow-accent);
+  transform: scale(1.1);
+}
+.toc-num.passed {
+  background: rgba(56,189,248,0.12);
   color: var(--accent);
+}
+
+/* ── Sidebar contextual tip ── */
+.sidebar-tip {
+  display: flex;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(56,189,248,0.05), rgba(34,211,238,0.03));
+  border: 1px solid rgba(56,189,248,0.12);
+  animation: tip-enter 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes tip-enter {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.sidebar-tip-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+  line-height: 1.4;
+}
+.sidebar-tip-text {
+  font-size: 11px;
+  line-height: 1.55;
+  color: var(--text);
+  margin: 0;
 }
 
 /* ─── Metric mini card (sidebar) ─── */
@@ -664,6 +811,98 @@ input[type=range]:active::-webkit-slider-thumb {
 .animate-in-delay-2 { animation-delay: 0.2s; opacity: 0; }
 .animate-in-delay-3 { animation-delay: 0.3s; opacity: 0; }
 
+/* ── Scroll reveal (didactic progressive disclosure) ── */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.scroll-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Section transition (narrative bridge) ── */
+.section-transition {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 0.5rem 0;
+}
+.section-transition-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-light), transparent);
+}
+.section-transition-text {
+  font-size: 13px;
+  font-style: italic;
+  color: var(--text-soft);
+  text-align: center;
+  max-width: 34ch;
+  line-height: 1.5;
+  margin: 0;
+  white-space: normal;
+}
+
+/* ── Progress dots (right-edge tracker) ── */
+.progress-dots {
+  position: fixed;
+  right: 1.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  z-index: 25;
+  padding: 14px 0;
+}
+/* Connecting line behind dots */
+.progress-dots::before {
+  content: '';
+  position: absolute;
+  top: 14px;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1.5px;
+  background: var(--border);
+  z-index: -1;
+  border-radius: 1px;
+}
+@media (min-width: 1024px) {
+  .progress-dots { display: flex; }
+}
+.progress-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--border-light);
+  border: none;
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  padding: 0;
+  position: relative;
+  z-index: 1;
+}
+.progress-dot:hover {
+  background: var(--accent-light);
+  transform: scale(1.5);
+}
+.progress-dot.active {
+  width: 9px;
+  height: 9px;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--glow-accent);
+}
+.progress-dot.passed {
+  background: var(--accent);
+  opacity: 0.35;
+}
+
 /* ─── Floating gradient orbs (decorative) ─── */
 @keyframes float {
   0%, 100% { transform: translate(0, 0) rotate(0deg); }
@@ -964,7 +1203,7 @@ input[type=range]:active::-webkit-slider-thumb {
   pointer-events: none;
 }
 
-/* ── Individual paso — flat (no card background) ── */
+/* ── Individual paso — flat, scroll-revealed ── */
 .paso-edu {
   background: transparent;
   border: none;
@@ -972,29 +1211,20 @@ input[type=range]:active::-webkit-slider-thumb {
   padding: 0;
   position: relative;
   overflow: visible;
-  /* staggered entrance */
+  /* scroll-reveal initial state */
   opacity: 0;
-  animation: paso-appear 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  transform: translateY(16px);
+  transition:
+    opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.paso-edu.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
 }
 .paso-edu:hover {
   border-color: transparent;
 }
-
-@keyframes paso-appear {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* stagger delays */
-.paso-timeline > .paso-edu:nth-child(1)  { animation-delay: 60ms; }
-.paso-timeline > .paso-edu:nth-child(2)  { animation-delay: 110ms; }
-.paso-timeline > .paso-edu:nth-child(3)  { animation-delay: 160ms; }
-.paso-timeline > .paso-edu:nth-child(4)  { animation-delay: 210ms; }
-.paso-timeline > .paso-edu:nth-child(5)  { animation-delay: 260ms; }
-.paso-timeline > .paso-edu:nth-child(6)  { animation-delay: 310ms; }
-.paso-timeline > .paso-edu:nth-child(7)  { animation-delay: 340ms; }
-.paso-timeline > .paso-edu:nth-child(8)  { animation-delay: 370ms; }
-.paso-timeline > .paso-edu:nth-child(n+9){ animation-delay: 400ms; }
 
 .paso-header {
   display: flex;

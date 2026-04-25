@@ -1,15 +1,48 @@
-﻿import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { calcularNomina, calcularTipoMarginal, ANIOS } from '../engine/irpf';
 import { eur, pct } from '../utils/format';
 
 const SECTIONS = [
-  { id: 'calc', n: '1', label: 'Calculadora' },
-  { id: 'simulador', n: '2', label: 'Simulador de subida' },
-  { id: 'comparativa', n: '3', label: 'Comparativa histórica' },
-  { id: 'cuÃ±a', n: '4', label: 'Cuña fiscal' },
-  { id: 'mecanismos', n: '5', label: 'Mecanismos fiscales' },
-  { id: 'normativa', n: '6', label: 'Normativa y contexto' },
+  { id: 'calc',        n: '1', label: 'Calculadora' },
+  { id: 'desglose',    n: '2', label: 'Viaje paso a paso' },
+  { id: 'simulador',   n: '3', label: 'Simulador de subida' },
+  { id: 'comparativa', n: '4', label: 'Comparativa histórica' },
+  { id: 'cuña',        n: '5', label: 'Cuña fiscal' },
+  { id: 'mecanismos',  n: '6', label: 'Mecanismos fiscales' },
+  { id: 'normativa',   n: '7', label: 'Normativa y contexto' },
 ];
+
+/* ── Tips contextuales: cambian según la sección activa ── */
+const TIPS = {
+  calc: {
+    icon: '🎯',
+    text: 'Mueve el slider y observa cómo el tipo efectivo siempre es menor que el del tramo más alto.',
+  },
+  desglose: {
+    icon: '📖',
+    text: 'Cada paso lleva fórmula y fuente legal. Sigue el viaje del euro desde la empresa hasta tu cuenta.',
+  },
+  simulador: {
+    icon: '⚡',
+    text: '¿Sabías que en ciertos tramos, ganar más puede dejarte casi igual en neto? Es el efecto cliff del Art.20.',
+  },
+  comparativa: {
+    icon: '📊',
+    text: 'Activa «Umbrales» para ver las líneas de referencia. Cambia entre las tres vistas para distintas perspectivas.',
+  },
+  'cuña': {
+    icon: '🔍',
+    text: 'Cambia a «Vista empresa» para descubrir la SS patronal: un ~31% extra que nunca aparece en tu nómina.',
+  },
+  mecanismos: {
+    icon: '⚙️',
+    text: 'El Art.20 es la pieza oculta del sistema. Su pendiente determina los «tipos marginales fantasma».',
+  },
+  normativa: {
+    icon: '📜',
+    text: 'Cada reforma tiene su contexto político y económico. Despliega las secciones para ver los detalles.',
+  },
+};
 
 export default function SidebarWidget({ bruto, anio, onChange }) {
   const [activeId, setActiveId] = useState('calc');
@@ -35,13 +68,47 @@ export default function SidebarWidget({ bruto, anio, onChange }) {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
+  const activeIdx = SECTIONS.findIndex(s => s.id === activeId);
+  const progressPct = SECTIONS.length > 1 ? (activeIdx / (SECTIONS.length - 1)) * 100 : 0;
+  const tip = TIPS[activeId] || TIPS.calc;
+
   return (
     <div className="space-y-5 pb-8">
 
-      {/* â”€â”€ Controles â”€â”€ */}
+      {/* ── TOC Navigation with progress ── */}
+      <div>
+        <p className="text-[9px] font-bold uppercase tracking-[0.1em] text-[var(--text-soft)] mb-2 px-1">
+          Secciones
+        </p>
+        <nav className="toc-nav">
+          {/* Vertical progress track */}
+          <div className="toc-progress-track">
+            <div className="toc-progress-fill" style={{ height: `${progressPct}%` }} />
+          </div>
+
+          {SECTIONS.map((s, i) => (
+            <button key={s.id} onClick={() => scroll(s.id)}
+              className={`toc-link ${activeId === s.id ? 'active' : ''} ${i < activeIdx ? 'passed' : ''}`}>
+              <span className={`toc-num ${activeId === s.id ? 'active' : ''} ${i < activeIdx ? 'passed' : ''}`}>{s.n}</span>
+              {s.label}
+            </button>
+          ))}
+        </nav>
+      </div>
+
+      {/* ── Tip contextual ── */}
+      <div className="sidebar-tip" key={activeId}>
+        <div className="sidebar-tip-icon">{tip.icon}</div>
+        <p className="sidebar-tip-text">{tip.text}</p>
+      </div>
+
+      {/* Divider */}
+      <div style={{ height: 1, background: 'var(--border)' }} />
+
+      {/* ── Controles ── */}
       <div>
         <p className="text-[9px] font-bold uppercase tracking-[0.1em] text-[var(--text-soft)] mb-3 px-1">
-          ConfiguraciÃ³n
+          Configuración
         </p>
 
         {/* Bruto slider */}
@@ -58,11 +125,11 @@ export default function SidebarWidget({ bruto, anio, onChange }) {
             style={{ marginTop: 4 }}
           />
           <div className="flex justify-between text-[9px] text-[var(--text-soft)] mt-1 font-medium">
-            <span>0 â‚¬</span><span>75kâ‚¬</span><span>150kâ‚¬</span>
+            <span>0 €</span><span>75k€</span><span>150k€</span>
           </div>
         </div>
 
-        {/* AÃ±o */}
+        {/* Año */}
         <div className="metric-mini">
           <span className="metric-mini-label block mb-2">Año fiscal</span>
           <div className="flex flex-wrap gap-1">
@@ -87,7 +154,7 @@ export default function SidebarWidget({ bruto, anio, onChange }) {
       {/* Divider */}
       <div style={{ height: 1, background: 'var(--border)' }} />
 
-      {/* â”€â”€ Live metrics â”€â”€ */}
+      {/* ── Live metrics ── */}
       <div>
         <p className="text-[9px] font-bold uppercase tracking-[0.1em] text-[var(--text-soft)] mb-2.5 px-1">
           Resultado
@@ -145,25 +212,6 @@ export default function SidebarWidget({ bruto, anio, onChange }) {
             </span>
           </div>
         </div>
-      </div>
-
-      {/* Divider */}
-      <div style={{ height: 1, background: 'var(--border)' }} />
-
-      {/* â”€â”€ TOC Navigation â”€â”€ */}
-      <div>
-        <p className="text-[9px] font-bold uppercase tracking-[0.1em] text-[var(--text-soft)] mb-2 px-1">
-          Secciones
-        </p>
-        <nav className="space-y-0.5">
-          {SECTIONS.map(s => (
-            <button key={s.id} onClick={() => scroll(s.id)}
-              className={`toc-link ${activeId === s.id ? 'active' : ''}`}>
-              <span className="toc-num">{s.n}</span>
-              {s.label}
-            </button>
-          ))}
-        </nav>
       </div>
 
       {/* Divider */}
