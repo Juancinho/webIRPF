@@ -41,13 +41,6 @@ const HITOS = [
   },
 ];
 
-const GLOSARIO = [
-  { term: 'Base Imponible', desc: 'Es la cifra sobre la que realmente se calculan los impuestos. No es tu sueldo bruto, sino lo que queda tras restar la Seguridad Social y las reducciones legales. Es el "sueldo real" a ojos de Hacienda.' },
-  { term: 'Euros Constantes (2026)', desc: 'Es el valor del dinero ajustado a la inflación. Usar euros constantes permite comparar qué podías comprar con tu sueldo de 2012 frente al de 2026. Sin este ajuste, las comparaciones históricas son una ilusión óptica.' },
-  { term: 'Reducción vs Deducción', desc: 'Las reducciones (como el Art. 20) se restan de la base antes de aplicar el impuesto. Las deducciones (como la deducción SMI) se restan directamente del dinero que ya debes pagar. Una deducción de 100€ vale mucho más que una reducción de 100€.' },
-  { term: 'Progresividad Fría', desc: 'Ocurre cuando la inflación sube y el Gobierno no ajusta los tramos del IRPF. Tu sueldo sube para no perder poder de compra, pero ese sueldo nominal te salta a un tramo de impuestos más alto: pagas más porcentaje de IRPF por ser "más rico" solo en el papel.' }
-];
-
 const FAQS = [
   {
     q: '¿Por qué el gráfico usa "euros constantes de 2026"?',
@@ -149,7 +142,7 @@ export default function NormativaFAQ({ anioRef }) {
     <div className="space-y-12">
       {/* Línea temporal */}
       <section>
-        <h3 className="text-lg font-extrabold text-[var(--text-h)] mb-6 tracking-tight flex items-center gap-2">
+        <h3 className="text-lg font-serif font-extrabold text-[var(--text-h)] mb-6 tracking-tight flex items-center gap-2">
           <span className="w-1.5 h-6 bg-[var(--accent)] rounded-full" />
           Historia normativa año a año
         </h3>
@@ -245,28 +238,9 @@ export default function NormativaFAQ({ anioRef }) {
         </div>
       </section>
 
-      {/* Glosario Visual */}
-      <section>
-        <h3 className="text-lg font-extrabold text-[var(--text-h)] mb-6 tracking-tight flex items-center gap-2">
-          <span className="w-1.5 h-6 bg-[var(--accent)] rounded-full" />
-          Conceptos fundamentales
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {GLOSARIO.map((item, i) => (
-            <div key={i} className="p-5 rounded-2xl border border-[var(--border)] bg-[var(--surface2)] hover:border-[var(--accent-light)] transition-all duration-300">
-              <h4 className="text-[13px] font-bold text-[var(--text-h)] mb-2 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]" />
-                {item.term}
-              </h4>
-              <p className="text-[12px] text-[var(--text-soft)] leading-relaxed">{item.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* FAQ */}
       <section>
-        <h3 className="text-lg font-extrabold text-[var(--text-h)] mb-6 tracking-tight flex items-center gap-2">
+        <h3 className="text-lg font-serif font-extrabold text-[var(--text-h)] mb-6 tracking-tight flex items-center gap-2">
           <span className="w-1.5 h-6 bg-[var(--accent)] rounded-full" />
           Preguntas frecuentes
         </h3>

@@ -465,10 +465,10 @@ html[data-theme="light"] .paso-subtitle { color: var(--text-soft); }
 .config-panel.is-open {
   grid-template-rows: 1fr;
   opacity: 1;
-  margin-top: 8px;
 }
 .config-panel > * {
   overflow: hidden;
+  padding-top: 8px; /* Replacement for margin-top to avoid jump */
 }
 
 /* ─── Metric mini card (sidebar) ─── */
@@ -899,14 +899,22 @@ input[type=range]:active::-webkit-slider-thumb {
   background: linear-gradient(90deg, transparent, var(--border-light), transparent);
 }
 .section-transition-text {
-  font-size: 13px;
-  font-style: italic;
-  color: var(--text-soft);
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--text-h);
   text-align: center;
-  max-width: 34ch;
-  line-height: 1.5;
+  max-width: 45ch;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
   margin: 0;
   white-space: normal;
+}
+.section-transition-text em {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 500;
+  color: var(--accent);
 }
 
 /* ── Progress dots (right-edge tracker) ── */

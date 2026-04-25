@@ -150,10 +150,10 @@ export default function SidebarWidget({ bruto, anio, onChange }) {
           {/* Año */}
           <div className="metric-mini">
             <span className="metric-mini-label block mb-2">Año fiscal</span>
-            <div className="flex flex-wrap gap-1">
+            <div className="grid grid-cols-4 gap-1">
               {ANIOS.map(a => (
                 <button key={a} onClick={() => onChange('anio', a)}
-                  className="text-[9px] font-bold px-1.5 py-0.5 rounded-md transition-all duration-150"
+                  className="text-[9px] font-bold py-1 rounded-md transition-all duration-150 text-center"
                   style={anio === a ? {
                     background: 'linear-gradient(135deg, var(--accent), var(--accent2))',
                     color: 'var(--accent-on)',
