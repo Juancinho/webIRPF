@@ -24,6 +24,17 @@
     <meta name="twitter:description" content="Calcula tu nómina real, compara 15 años de reformas fiscales con la inflación descontada y descubre cómo el IRPF ha cambiado desde 2012." />
     <meta name="twitter:image"       content="https://TU_DOMINIO/og-image.png" />
     <meta name="twitter:image:alt"   content="FiscalScope — Radiografía del IRPF en España 2012–2026" />
+    <script>
+      // Prevent FOUC: set theme before first paint
+      (function() {
+        try {
+          var saved = localStorage.getItem('fiscal-theme');
+          var pref = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+          var theme = (saved === 'light' || saved === 'dark') ? saved : pref;
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

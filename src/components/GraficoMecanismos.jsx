@@ -27,7 +27,7 @@ function ToggleReal({ real, setReal }) {
           background: 'linear-gradient(135deg, var(--accent), var(--accent2))',
           color: 'white',
           boxShadow: '0 2px 12px rgba(56,189,248,0.25)',
-        } : { color: '#64748b' }}>
+        } : { color: 'var(--text-soft)' }}>
          € nominales
       </button>
       <button onClick={() => setReal(true)}
@@ -36,7 +36,7 @@ function ToggleReal({ real, setReal }) {
           background: 'linear-gradient(135deg, #10b981, #14b8a6)',
           color: 'white',
           boxShadow: '0 2px 12px rgba(16,185,129,0.3)',
-        } : { color: '#64748b' }}>
+        } : { color: 'var(--text-soft)' }}>
          € reales 2026
       </button>
     </div>
@@ -48,7 +48,7 @@ function TooltipArt20({ active, payload, label, real }) {
   if (!active || !payload?.length) return null;
   return (
     <div className="card-glass p-4 shadow-2xl text-xs min-w-[260px]" style={{ backdropFilter: 'blur(24px)' }}>
-      <p className="text-[10px] text-[#7a8baa] mb-0.5">Tu sueldo bruto − SS {real ? '(€2026)' : '(€ nominales)'}</p>
+      <p className="text-[10px] text-[var(--text-soft)] mb-0.5">Tu sueldo bruto − SS {real ? '(€2026)' : '(€ nominales)'}</p>
       <p className="font-extrabold text-white mb-2 border-b border-[var(--border)] pb-2 text-[13px]">{eur(label)}</p>
       <p className="text-[9px] text-[var(--accent-light)] font-semibold uppercase tracking-wider mb-1.5">
         Descuento que se resta de tu base imponible:
@@ -90,7 +90,7 @@ function TooltipUmbrales({ active, payload, label, real }) {
               {eur(p.value)}
             </span>
           </div>
-          <p className="text-[10px] text-[#7a8baa] ml-3.5 mt-0.5">{desc[p.dataKey]}</p>
+          <p className="text-[10px] text-[var(--text-soft)] ml-3.5 mt-0.5">{desc[p.dataKey]}</p>
         </div>
       ))}
     </div>
@@ -111,7 +111,7 @@ function TabCurvaArt20() {
   return (
     <div>
       {/* Explicación */}
-      <div className="info-card mb-5 text-[13px] text-[#94a3b8] leading-relaxed space-y-3">
+      <div className="info-card mb-5 text-[13px] text-[var(--text)] leading-relaxed space-y-3">
         <div>
           <strong className="text-white font-semibold"> ¿Qué es esto?</strong>{' '}
           El Art. 20 te permite restar una cantidad de tu sueldo <em>antes</em> de calcular el IRPF.
@@ -152,17 +152,17 @@ function TabCurvaArt20() {
         ))}
       </div>
 
-      <p className="text-[10px] text-[#5a6b82] mb-2 font-medium">
-        Eje X: <strong className="text-[#7a8baa]">sueldo bruto − SS</strong>{real ? ' (€2026)' : ' (€ nominales)'} ·
-        Eje Y: <strong className="text-[#7a8baa]">descuento Art.20</strong>{real ? ' (€2026)' : ' (€ nominales)'}
+      <p className="text-[10px] text-[var(--text-soft)] mb-2 font-medium">
+        Eje X: <strong className="text-[var(--text-soft)]">sueldo bruto − SS</strong>{real ? ' (€2026)' : ' (€ nominales)'} ·
+        Eje Y: <strong className="text-[var(--text-soft)]">descuento Art.20</strong>{real ? ' (€2026)' : ' (€ nominales)'}
       </p>
 
       <div style={{ height: 360 }}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ left: 5, right: 20, top: 10, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#1a2040" vertical={false} />
-            <XAxis dataKey="rn" stroke="#1a2040" tick={{ fontSize:10, fill:'#4b5563' }} tickFormatter={v => `${v/1000}k€`} tickLine={false} />
-            <YAxis stroke="#1a2040" tick={{ fontSize:11, fill:'#4b5563' }} tickFormatter={v => `${v/1000}k€`} width={50} tickLine={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+            <XAxis dataKey="rn" stroke="var(--border)" tick={{ fontSize:10, fill:'var(--text-soft)' }} tickFormatter={v => `${v/1000}k€`} tickLine={false} />
+            <YAxis stroke="var(--border)" tick={{ fontSize:11, fill:'var(--text-soft)' }} tickFormatter={v => `${v/1000}k€`} width={50} tickLine={false} />
             <Tooltip content={<TooltipArt20 real={real} />} />
             {ANIOS_ART20_MUESTRA.filter(a => aniosVis.has(a)).map(a => (
               <Line key={a} type="monotone" dataKey={`red_${a}`}
@@ -184,7 +184,7 @@ function TabCurvaArt20() {
 
       {/* Tabla */}
       <div className="mt-6">
-        <p className="text-[11px] text-[#7a8baa] mb-3 font-medium leading-relaxed">
+        <p className="text-[11px] text-[var(--text-soft)] mb-3 font-medium leading-relaxed">
            <strong className="text-white">Tabla resumen:</strong> la columna <strong className="text-orange-400">«Pérdida por €100 de subida»</strong> indica
           cuántos euros de descuento pierdes cuando tu sueldo sube 100€ dentro de la zona cliff.
         </p>
@@ -208,13 +208,13 @@ function TabCurvaArt20() {
                 return (
                   <tr key={a}>
                     <td className="font-bold" style={{ color: ART20_COLORS[a] }}>{a}</td>
-                    <td className="font-mono text-[#94a3b8]">{d?.art20Inf ? eur(d.art20Inf) : '—'}</td>
+                    <td className="font-mono text-[var(--text)]">{d?.art20Inf ? eur(d.art20Inf) : '—'}</td>
                     <td className="font-mono text-white font-bold">{d?.art20Max ? eur(d.art20Max) : '—'}</td>
-                    <td className="font-mono text-[#94a3b8]">{d?.art20Sup ? eur(d.art20Sup) : '—'}</td>
+                    <td className="font-mono text-[var(--text)]">{d?.art20Sup ? eur(d.art20Sup) : '—'}</td>
                     <td className="font-mono text-orange-400">{zona ? eur(zona) : '—'}</td>
                     <td className="font-mono">
                       {pendiente != null ? (
-                        <span className={pendiente > 1 ? 'text-red-400 font-bold' : 'text-[#94a3b8]'}>
+                        <span className={pendiente > 1 ? 'text-red-400 font-bold' : 'text-[var(--text)]'}>
                           {(pendiente * 100).toFixed(0)}€
                           {pendiente > 1 && <span className="text-[10px] text-red-400/60 ml-1">(¡más que la subida!)</span>}
                         </span>
@@ -226,13 +226,13 @@ function TabCurvaArt20() {
             </tbody>
           </table>
         </div>
-        <div className="mt-3 info-card text-[12px] text-[#7a8baa] leading-relaxed">
+        <div className="mt-3 info-card text-[12px] text-[var(--text-soft)] leading-relaxed">
           <strong className="text-white font-semibold"> Ejemplo:</strong>{' '}
           Si la columna pone <strong className="text-red-400">175€</strong>, significa que por cada 100€ de subida bruta,
           pierdes 175€ de descuento. Tu base imponible sube 275€ (100 + 175). Al 19% de IRPF serían 52€ de impuestos
           por una subida de 100€ → <strong className="text-white">te quedas solo con ~48€ netos.</strong>
         </div>
-        <p className="text-[10px] text-[#4b5563] mt-2 font-medium">Fuente: Art. 20 LIRPF; redacciones históricas — BOE</p>
+        <p className="text-[10px] text-[var(--text-soft)] mt-2 font-medium">Fuente: Art. 20 LIRPF; redacciones históricas — BOE</p>
       </div>
     </div>
   );
@@ -256,7 +256,7 @@ function TabEvolucionUmbrales() {
 
   return (
     <div>
-      <div className="info-card mb-5 text-[13px] text-[#94a3b8] leading-relaxed space-y-3">
+      <div className="info-card mb-5 text-[13px] text-[var(--text)] leading-relaxed space-y-3">
         <div>
           <strong className="text-white font-semibold"> ¿Qué es esto?</strong>{' '}
           El sistema fiscal tiene 4 «líneas invisibles» que determinan cuánto IRPF pagas. Este gráfico muestra
@@ -312,17 +312,17 @@ function TabEvolucionUmbrales() {
         ))}
       </div>
 
-      <p className="text-[10px] text-[#5a6b82] mb-2 font-medium">
-        Eje X: <strong className="text-[#7a8baa]">año</strong> ·
-        Eje Y: <strong className="text-[#7a8baa]">importe en {real ? '€ de 2026 (inflación descontada)' : '€ de cada año (nominales)'}</strong>
+      <p className="text-[10px] text-[var(--text-soft)] mb-2 font-medium">
+        Eje X: <strong className="text-[var(--text-soft)]">año</strong> ·
+        Eje Y: <strong className="text-[var(--text-soft)]">importe en {real ? '€ de 2026 (inflación descontada)' : '€ de cada año (nominales)'}</strong>
       </p>
 
       <div style={{ height: 360 }}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ left: 5, right: 20, top: 10, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#1a2040" vertical={false} />
-            <XAxis dataKey="anio" stroke="#1a2040" tick={{ fontSize:11, fill:'#4b5563' }} tickLine={false} />
-            <YAxis stroke="#1a2040" tick={{ fontSize:11, fill:'#4b5563' }} tickFormatter={v => `${v/1000}k€`} width={50} tickLine={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+            <XAxis dataKey="anio" stroke="var(--border)" tick={{ fontSize:11, fill:'var(--text-soft)' }} tickLine={false} />
+            <YAxis stroke="var(--border)" tick={{ fontSize:11, fill:'var(--text-soft)' }} tickFormatter={v => `${v/1000}k€`} width={50} tickLine={false} />
             <Tooltip content={<TooltipUmbrales real={real} />} />
             {Object.entries(labels).filter(([k]) => series.has(k)).map(([key, { label, color, dash }]) => (
               <Line key={key} type="monotone" dataKey={key}
@@ -342,7 +342,7 @@ function TabEvolucionUmbrales() {
           </span>
         ))}
       </div>
-      <p className="text-[10px] text-[#4b5563] mt-2.5 font-medium">
+      <p className="text-[10px] text-[var(--text-soft)] mt-2.5 font-medium">
         Fuentes: LIRPF arts. 20, 57, 85-86 RIRPF; Órdenes anuales de cotización SS; RDs de SMI (BOE).
       </p>
     </div>
@@ -362,7 +362,7 @@ export default function GraficoMecanismos() {
           <button key={id} onClick={() => setTab(id)}
             className={`px-5 py-2.5 rounded-xl text-sm font-semibold border transition-all ${tab === id
               ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent2)] border-transparent text-white shadow-lg shadow-sky-500/20'
-              : 'border-[var(--border)] text-[#94a3b8] hover:border-[var(--accent)] hover:text-[var(--accent-light)] hover:bg-[var(--accent-dim)]'}`}>
+              : 'border-[var(--border)] text-[var(--text)] hover:border-[var(--accent)] hover:text-[var(--accent-light)] hover:bg-[var(--accent-dim)]'}`}>
             {label}
           </button>
         ))}

@@ -48,7 +48,7 @@ function TooltipSalario({ active, payload, label, ref2026Neto, metrica }) {
   const isPct = metrica === 'tipo';
   return (
     <div className="card-glass p-4 shadow-2xl text-xs min-w-[260px] max-h-96 overflow-y-auto" style={{ backdropFilter: 'blur(24px)' }}>
-      <p className="text-[10px] text-[#7a8baa] mb-0.5">Salario bruto equivalente (€2026)</p>
+      <p className="text-[10px] text-[var(--text-soft)] mb-0.5">Salario bruto equivalente (€2026)</p>
       <p className="font-extrabold text-white mb-2.5 border-b border-[var(--border)] pb-2 text-[13px]">{eur(label)}</p>
       <p className="text-[9px] text-[var(--accent-light)] font-semibold uppercase tracking-wider mb-1.5">
         {isPct ? 'Tipo efectivo IRPF' : 'Salario neto resultante'}
@@ -154,7 +154,7 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-5">
         <div>
           <h2 className="text-xl font-extrabold text-white tracking-tight">¿Cuánto valió tu sueldo en cada año?</h2>
-          <p className="text-sm text-[#7a8baa] mt-1.5">
+          <p className="text-sm text-[var(--text-soft)] mt-1.5">
             Todo en <strong className="text-white font-semibold">euros constantes de 2026</strong> — la inflación ya está descontada (IPC dic.→dic., INE).
           </p>
         </div>
@@ -162,7 +162,7 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
           <div className="flex rounded-xl border border-[var(--border)] overflow-hidden text-xs">
             {[['salario',' Neto por salario'],['tipo',' Tipo efectivo'],['anio',' Evolución por año']].map(([v, l]) => (
               <button key={v} onClick={() => setVista(v)}
-                className={`px-3 py-2 font-semibold transition-all ${vista === v ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent2)] text-white' : 'text-[#94a3b8] hover:bg-[var(--surface2)]'}`}>
+                className={`px-3 py-2 font-semibold transition-all ${vista === v ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent2)] text-white' : 'text-[var(--text)] hover:bg-[var(--surface2)]'}`}>
                 {l}
               </button>
             ))}
@@ -195,7 +195,7 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
             <button onClick={() => setAniosActivos(new Set(ANIOS))} className="btn-ghost hover:!border-white hover:!text-white">Todos</button>
           </div>
 
-          <p className="text-[10px] text-[#5a6b82] mb-2 font-medium">Eje X: salario bruto equivalente (€2026) · Eje Y: <strong className="text-[#7a8baa]">salario neto</strong> resultante (€2026)</p>
+          <p className="text-[10px] text-[#5a6b82] mb-2 font-medium">Eje X: salario bruto equivalente (€2026) · Eje Y: <strong className="text-[var(--text-soft)]">salario neto</strong> resultante (€2026)</p>
           <div style={{ height: 420 }}>
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={DATOS_CHART} margin={{ left: 5, right: 20, top: 10, bottom: 0 }}>
@@ -272,13 +272,13 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
             <button onClick={() => setAniosActivos(new Set(ANIOS))} className="btn-ghost hover:!border-white hover:!text-white">Todos</button>
           </div>
 
-          <div className="info-card mb-4 text-[13px] text-[#94a3b8] leading-relaxed">
+          <div className="info-card mb-4 text-[13px] text-[var(--text)] leading-relaxed">
             <strong className="text-white font-semibold">¿Qué ves aquí?</strong> El porcentaje real de tu salario que va al IRPF (tipo efectivo),
             para cada nivel salarial y año. A mayor nivel salarial, mayor tipo efectivo — pero también se ve
             cómo las reformas han cambiado la presión fiscal real. Las líneas más bajas significan menos IRPF.
           </div>
 
-          <p className="text-[10px] text-[#5a6b82] mb-2 font-medium">Eje X: salario bruto equivalente (€2026) · Eje Y: <strong className="text-[#7a8baa]">tipo efectivo IRPF</strong> (%)</p>
+          <p className="text-[10px] text-[#5a6b82] mb-2 font-medium">Eje X: salario bruto equivalente (€2026) · Eje Y: <strong className="text-[var(--text-soft)]">tipo efectivo IRPF</strong> (%)</p>
           <div style={{ height: 420 }}>
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={DATOS_CHART} margin={{ left: 5, right: 20, top: 10, bottom: 0 }}>
@@ -316,7 +316,7 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
       {/* ── VISTA POR AÑO — Línea dual eje ── */}
       {vista === 'anio' && (
         <>
-          <div className="info-card mb-5 text-[13px] text-[#94a3b8] leading-relaxed">
+          <div className="info-card mb-5 text-[13px] text-[var(--text)] leading-relaxed">
             <strong className="text-white font-semibold">Cómo leer este gráfico:</strong> la línea verde (eje izquierdo) muestra el salario neto anual
             en euros constantes de 2026. Las líneas de puntos (eje derecho) muestran el tipo efectivo de IRPF y la carga total
             (IRPF + SS trabajador) en %. Las bandas verticales señalan los años de reforma fiscal.{' '}
@@ -377,7 +377,7 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
                   return (
                     <tr key={d.anio}>
                       <td className="font-bold" style={{ color: YEAR_COLORS[d.anio] }}>{d.anio}</td>
-                      <td className="font-mono text-[#94a3b8]">{eur(d.brutoNominal)}</td>
+                      <td className="font-mono text-[var(--text)]">{eur(d.brutoNominal)}</td>
                       <td className="font-mono font-bold text-white">{eur(d.neto)}</td>
                       <td className="font-mono text-red-400">{d.irpf.toFixed(1)}%</td>
                       <td className="font-mono text-amber-400">{d.total.toFixed(1)}%</td>
@@ -414,7 +414,7 @@ function InsightSalario({ aniosActivos, bruto2026 }) {
   if (!datos) return null;
   return (
     <div className="mt-4 info-card text-[13px]">
-      <p className="text-[#94a3b8] leading-relaxed">
+      <p className="text-[var(--text)] leading-relaxed">
         Con <strong className="text-white font-semibold">{eur(bruto2026)}</strong> brutos equiv. (€2026), el mejor año fue{' '}
         <strong className="font-semibold" style={{ color: YEAR_COLORS[datos.mejor.anio] }}>{datos.mejor.anio}</strong>{' '}
         ({eur(datos.mejor.val)} netos) y el peor{' '}

@@ -1,5 +1,6 @@
 import { useCallback, useState, useEffect } from 'react';
 import { useURLState } from './hooks/useURLState';
+import { useTheme } from './hooks/useTheme';
 import CalculadoraCard from './components/CalculadoraCard';
 import SimuladorSubida from './components/SimuladorSubida';
 import GraficoComparativo from './components/GraficoComparativo';
@@ -8,6 +9,7 @@ import CuñaFiscal from './components/CuñaFiscal';
 import DesgloseEducativo from './components/DesgloseEducativo';
 import NormativaFAQ from './components/NormativaFAQ';
 import SidebarWidget from './components/SidebarWidget';
+import ThemeToggle from './components/ThemeToggle';
 import './index.css';
 
 function SectionTitle({ n, title, sub }) {
@@ -15,18 +17,23 @@ function SectionTitle({ n, title, sub }) {
     <div className="flex items-start gap-4 sm:gap-5 mb-6 sm:mb-8">
       <div className="section-badge mt-0.5 shrink-0"
         style={{
-          background: 'linear-gradient(135deg,#0ea5e9,#38bdf8)',
-          boxShadow: '0 4px 24px rgba(56,189,248,0.2), 0 0 0 1px rgba(56,189,248,0.12) inset',
-          fontFamily: "'DM Serif Display', Georgia, serif",
-          fontSize: 18,
-          fontWeight: 400,
+          background: 'linear-gradient(135deg, var(--accent), var(--accent2))',
+          boxShadow: '0 4px 24px var(--glow-accent), 0 0 0 1px var(--accent-soft) inset',
+          color: 'var(--accent-on)',
+          fontFamily: "'Fraunces', 'DM Serif Display', Georgia, serif",
+          fontSize: 19,
+          fontWeight: 500,
           letterSpacing: '-0.01em',
         }}>
         {n}
       </div>
       <div className="min-w-0">
-        <h2 className="text-xl sm:text-2xl font-extrabold text-white leading-tight tracking-tight">{title}</h2>
-        {sub && <p className="text-[13px] sm:text-sm text-[#7a8baa] mt-1.5 leading-relaxed max-w-[62ch]">{sub}</p>}
+        <h2 className="font-serif text-2xl sm:text-3xl font-medium leading-tight tracking-tight"
+          style={{ color: 'var(--text-h)' }}>
+          {title}
+        </h2>
+        {sub && <p className="text-[13.5px] sm:text-[14.5px] mt-2 leading-relaxed max-w-[62ch]"
+          style={{ color: 'var(--text)' }}>{sub}</p>}
       </div>
     </div>
   );
@@ -50,8 +57,8 @@ function ShareButton({ getShareURL }) {
 
 function InfoCard({ children, accent }) {
   return (
-    <div className="info-card text-sm text-[#8899b4] leading-relaxed"
-      style={accent ? { '--accent-bar': accent } : {}}>
+    <div className="info-card text-[13.5px] leading-relaxed"
+      style={{ color: 'var(--text)', ...(accent ? { '--accent-bar': accent } : {}) }}>
       {children}
     </div>
   );
@@ -60,6 +67,7 @@ function InfoCard({ children, accent }) {
 export default function App() {
   const { bruto, anio, set, getShareURL } = useURLState();
   const onChange = useCallback((campo, valor) => set(campo, valor), [set]);
+  const { theme, toggle: toggleTheme } = useTheme();
 
   /* ── Active section tracking ── */
   const [activeSection, setActiveSection] = useState('');
@@ -102,38 +110,38 @@ export default function App() {
     <div className="min-h-screen relative">
       {/* Decorative floating orbs (clipped so they never cause horizontal scroll) */}
       <div className="orbs-clip">
-        <div className="float-orb" style={{ width: '400px', height: '400px', background: 'rgba(56,189,248,0.05)', top: '10%', left: '-5%' }} />
-        <div className="float-orb" style={{ width: '300px', height: '300px', background: 'rgba(14,165,233,0.04)', top: '45%', right: '-3%', animationDelay: '-7s' }} />
-        <div className="float-orb" style={{ width: '350px', height: '350px', background: 'rgba(34,211,238,0.03)', top: '75%', left: '10%', animationDelay: '-14s' }} />
+        <div className="float-orb" style={{ width: '400px', height: '400px', background: 'var(--accent-soft)', top: '10%', left: '-5%' }} />
+        <div className="float-orb" style={{ width: '300px', height: '300px', background: 'var(--accent-dim)', top: '45%', right: '-3%', animationDelay: '-7s' }} />
+        <div className="float-orb" style={{ width: '350px', height: '350px', background: 'var(--accent-soft)', top: '75%', left: '10%', animationDelay: '-14s' }} />
       </div>
 
       {/* ── HEADER ── */}
       <header className="header-blur sticky top-0 z-30">
         <div className="centered-col py-3 sm:py-3.5 flex items-center justify-between gap-3 sm:gap-4">
           <div className="flex items-center gap-3">
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-lg font-black text-white tracking-tight">Fiscal</span>
-              <span className="text-lg font-black tracking-tight"
-                style={{ background: 'linear-gradient(90deg,#38bdf8,#22d3ee)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-                Scope
+            <div className="flex items-baseline gap-1">
+              <span className="font-serif text-[22px] font-medium tracking-tight" style={{ color: 'var(--text-h)' }}>Fiscal</span>
+              <span className="font-serif text-[22px] italic font-normal tracking-tight" style={{ color: 'var(--accent)' }}>
+                scope
               </span>
             </div>
             <span className="hidden sm:inline-flex tag"
-              style={{ color: '#38bdf8', borderColor: 'rgba(56,189,248,0.15)', background: 'rgba(56,189,248,0.06)' }}>
-              <span className="w-1.5 h-1.5 rounded-full bg-sky-400 pulse-dot" />
+              style={{ color: 'var(--accent)', borderColor: 'var(--accent-dim)', background: 'var(--accent-soft)' }}>
+              <span className="w-1.5 h-1.5 rounded-full pulse-dot" style={{ background: 'var(--accent)' }} />
               España · 2012–2026
             </span>
           </div>
           <div className="flex items-center gap-3">
-            <p className="text-[11px] text-[#4b5563] hidden lg:block font-medium">Solo tarifa estatal · Cálculos orientativos</p>
+            <p className="text-[11px] hidden lg:block font-medium" style={{ color: 'var(--text-soft)' }}>Solo tarifa estatal · Cálculos orientativos</p>
             {/* Active section pill — hidden on xl where sidebar shows it */}
             {activeSection && (
               <span className="hidden sm:inline-flex xl:hidden items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-semibold transition-all duration-300"
-                style={{ background: 'rgba(56,189,248,0.08)', color: '#38bdf8', border: '1px solid rgba(56,189,248,0.15)' }}>
-                <span className="w-1 h-1 rounded-full bg-sky-400" />
+                style={{ background: 'var(--accent-soft)', color: 'var(--accent)', border: '1px solid var(--accent-dim)' }}>
+                <span className="w-1 h-1 rounded-full" style={{ background: 'var(--accent)' }} />
                 {activeSection}
               </span>
             )}
+            <ThemeToggle theme={theme} onToggle={toggleTheme} />
             <ShareButton getShareURL={getShareURL} />
           </div>
         </div>
@@ -155,26 +163,28 @@ export default function App() {
 
           {/* ── INTRO ── */}
           <section className="text-center">
-            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full border mb-4 sm:mb-5 text-[10px] font-bold uppercase tracking-[0.12em]"
-              style={{ color: '#38bdf8', borderColor: 'rgba(56,189,248,0.15)', background: 'rgba(56,189,248,0.06)' }}>
-              <span className="w-1.5 h-1.5 rounded-full bg-sky-400 pulse-dot" />
+            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full border mb-5 sm:mb-6 text-[10px] font-bold uppercase tracking-[0.12em]"
+              style={{ color: 'var(--accent)', borderColor: 'var(--accent-dim)', background: 'var(--accent-soft)' }}>
+              <span className="w-1.5 h-1.5 rounded-full pulse-dot" style={{ background: 'var(--accent)' }} />
               <span className="hidden sm:inline">Radiografía interactiva del sistema fiscal español</span>
               <span className="sm:hidden">Radiografía fiscal interactiva</span>
             </div>
-            <h1 className="font-display text-[2rem] sm:text-5xl lg:text-6xl mb-4 sm:mb-5 leading-[1.1] px-2"
-              style={{ background: 'linear-gradient(135deg,#f0f4f8 0%,#e2e8f0 30%,#bae6fd 60%,#7dd3fc 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-              Tu sueldo bajo el<br className="hidden sm:block" /> microscopio fiscal
+            <h1 className="font-display text-[2.25rem] sm:text-[3.25rem] lg:text-[4rem] mb-5 sm:mb-6 leading-[1.05] px-2"
+              style={{ color: 'var(--text-h)', fontWeight: 500 }}>
+              Tu sueldo bajo el<br className="hidden sm:block" />{' '}
+              <span className="italic" style={{ color: 'var(--accent)', fontWeight: 400 }}>microscopio fiscal</span>
             </h1>
-            <p className="text-[15px] sm:text-base lg:text-lg text-[#7a8baa] leading-relaxed max-w-[60ch] mx-auto">
+            <p className="text-[15px] sm:text-[16.5px] lg:text-[17.5px] leading-relaxed max-w-[58ch] mx-auto"
+              style={{ color: 'var(--text)' }}>
               Calcula tu nómina real, compara 15 años de reformas fiscales con la inflación descontada,
               y descubre cómo los mecanismos ocultos del IRPF afectan a tu bolsillo.
-              Todo con datos oficiales del <strong className="text-[var(--accent-light)] font-semibold">BOE, INE y TGSS</strong>.
+              Todo con datos oficiales del <strong style={{ color: 'var(--text-h)', fontWeight: 600 }}>BOE, INE y TGSS</strong>.
             </p>
 
-            <p className="mt-6 sm:mt-8 text-[12.5px] sm:text-[13px] text-[#4b5563] leading-relaxed max-w-[55ch] mx-auto border-t pt-6 sm:pt-8"
-              style={{ borderColor: 'var(--border)' }}>
+            <p className="mt-7 sm:mt-9 text-[12.5px] sm:text-[13px] leading-relaxed max-w-[55ch] mx-auto border-t pt-6 sm:pt-8"
+              style={{ borderColor: 'var(--border)', color: 'var(--text-soft)' }}>
               Esta herramienta calcula tu nómina con la normativa real de cada año desde 2012.
-              Todos los importes comparativos están en <strong className="text-[#64748b]">euros constantes de 2026</strong> —
+              Todos los importes comparativos están en <strong style={{ color: 'var(--text)' }}>euros constantes de 2026</strong> —
               es decir, con la inflación ya descontada — para que puedas comparar directamente sin que los números te engañen.
               Los datos provienen del BOE, el INE y la TGSS. Los cálculos son orientativos y solo incluyen la tarifa estatal del IRPF.
             </p>
@@ -327,22 +337,23 @@ export default function App() {
 
       <footer className="relative mt-10 sm:mt-12">
         <div className="footer-grid centered-col py-8 sm:py-10">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 text-xs text-[#5a6b82] mb-5 sm:mb-6 pt-5 sm:pt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 text-xs mb-5 sm:mb-6 pt-5 sm:pt-6"
+            style={{ color: 'var(--text-soft)' }}>
             <div>
-              <p className="font-bold text-[#8899b4] mb-2 uppercase tracking-wider text-[10px]">Metodología</p>
+              <p className="font-bold mb-2 uppercase tracking-wider text-[10px]" style={{ color: 'var(--text)' }}>Metodología</p>
               <p className="leading-relaxed">El motor de cálculo es una traducción a JavaScript del código Python original del autor,
               que implementa la normativa estatal (LIRPF + LGSS) año a año. Solo incluye la tarifa estatal
               (50% del IRPF) sin deducciones autonómicas ni circunstancias personales.</p>
             </div>
             <div>
-              <p className="font-bold text-[#8899b4] mb-2 uppercase tracking-wider text-[10px]">Limitaciones</p>
+              <p className="font-bold mb-2 uppercase tracking-wider text-[10px]" style={{ color: 'var(--text)' }}>Limitaciones</p>
               <p className="leading-relaxed">Los cálculos son orientativos y no tienen valor legal. No incluyen deducciones autonómicas,
               situaciones personales (discapacidad, familia numerosa, planes de pensiones), ni rendimientos
               no laborales. Consulta siempre a un profesional fiscal.</p>
             </div>
           </div>
           <div className="section-separator" />
-          <p className="text-center text-[10px] text-[#374151] mt-4">
+          <p className="text-center text-[10px] mt-4" style={{ color: 'var(--text-soft)', opacity: 0.7 }}>
             FiscalScope · Datos IPC: INE (dic.→dic.) · Parámetros: LIRPF, LGSS, Órdenes anuales SS · BOE
           </p>
         </div>
