@@ -107,25 +107,93 @@ function TabCurvaArt20() {
   return (
     <div>
       {/* Explicación */}
-      <div className="info-card mb-5 text-[13px] text-[var(--text)] leading-relaxed space-y-3">
-        <div>
-          <strong className="text-white font-semibold"> ¿Qué es esto?</strong>{' '}
-          El Art. 20 te permite restar una cantidad de tu sueldo <em>antes</em> de calcular el IRPF.
-          Es un «descuento» que reduce tu base imponible — cuanto más alto, menos impuestos pagas.
+      <div className="mb-5 space-y-2.5 text-[13px] text-[var(--text)] leading-relaxed">
+
+        {/* Bloque 1: Qué muestra */}
+        <div className="info-card space-y-1.5">
+          <strong className="text-white font-semibold"> ¿Qué muestra este gráfico?</strong>
+          <p>
+            El Art. 20 te deja restar euros de tu renta <em>antes</em> de que Hacienda calcule tu IRPF.
+            Es como si una parte de tu sueldo no existiera a efectos fiscales.{' '}
+            <strong className="text-white">Cuanto mayor el descuento, menos pagas.</strong>
+          </p>
+          <p>
+            El gráfico muestra ese descuento según tu sueldo. <strong className="text-white">Cada línea es un año</strong> — puedes ver cómo ha cambiado la generosidad del sistema desde 2012 hasta hoy.
+          </p>
         </div>
-        <div>
-          <strong className="text-white font-semibold"> Ejes del gráfico:</strong>
-          <ul className="mt-1.5 space-y-1 ml-4 list-disc">
-            <li><strong className="text-white">→ Horizontal:</strong> tu sueldo bruto menos la Seguridad Social</li>
-            <li><strong className="text-white">↑ Vertical:</strong> euros que se descuentan de tu base imponible</li>
-            <li><strong className="text-white">Cada línea</strong> = un año. Más alta y ancha = más protección fiscal</li>
+
+        {/* Bloque 2: Cómo leer los ejes */}
+        <div className="info-card space-y-2">
+          <strong className="text-white font-semibold"> Cómo encontrarte en el gráfico</strong>
+          <div className="flex gap-3 mt-1">
+            <div className="flex-1 rounded-xl p-2.5 text-[12px]" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
+              <div className="text-[var(--accent-light)] font-bold mb-1">→ Eje horizontal</div>
+              <div>Tu sueldo bruto anual <strong className="text-white">menos lo que cotizas a la SS</strong> (~6,35%).</div>
+              <div className="mt-1 text-[var(--text-soft)] text-[11px]">Ejemplo: cobras 20.000€ brutos → pagas ~1.270€ de SS → eje X = 18.730€</div>
+            </div>
+            <div className="flex-1 rounded-xl p-2.5 text-[12px]" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
+              <div className="text-[var(--accent-light)] font-bold mb-1">↑ Eje vertical</div>
+              <div>Euros que <strong className="text-white">Hacienda descuenta de tu renta</strong> antes de aplicarte el tipo impositivo.</div>
+              <div className="mt-1 text-[var(--text-soft)] text-[11px]">Si vale 5.000€ → tributas como si ganaras 5.000€ menos de lo que realmente ganas.</div>
+            </div>
+          </div>
+          <p className="text-[12px] text-[var(--text-soft)]">
+            Localiza tu posición en el eje horizontal → sube hasta la línea del año que te interesa → el valor vertical es tu descuento.
+          </p>
+        </div>
+
+        {/* Bloque 3: Las tres zonas */}
+        <div className="info-card space-y-2">
+          <strong className="text-white font-semibold"> Las tres zonas de la curva</strong>
+          <div className="space-y-2 mt-1">
+            <div className="flex items-start gap-3 p-2.5 rounded-xl" style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)' }}>
+              <div className="shrink-0 mt-0.5 text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-400">PLANA</div>
+              <div className="text-[12px]">
+                <strong className="text-emerald-400">Descuento máximo y constante</strong> — aunque ganes algo más, el descuento no baja.
+                Es la zona de mejor trato fiscal. <em>Aquí una subida de sueldo se traduce directamente en más neto.</em>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 p-2.5 rounded-xl" style={{ background: 'rgba(251,146,60,0.08)', border: '1px solid rgba(251,146,60,0.2)' }}>
+              <div className="shrink-0 mt-0.5 text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-orange-500/20 text-orange-400">CLIFF</div>
+              <div className="text-[12px]">
+                <strong className="text-orange-400">La línea cae en picado</strong> — cada euro que sube tu sueldo reduce el descuento.
+                Tu base imponible crece <em>más rápido</em> que tu sueldo.{' '}
+                <strong className="text-white">De €100 brutos pueden llegarte solo €40-60 netos.</strong>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 p-2.5 rounded-xl" style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.2)' }}>
+              <div className="shrink-0 mt-0.5 text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-red-500/20 text-red-400">CERO</div>
+              <div className="text-[12px]">
+                <strong className="text-red-400">Descuento agotado</strong> — ya no hay alivio fiscal del Art.20.
+                A partir de aquí el IRPF se aplica sobre tu renta íntegra, sin ningún descuento adicional.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bloque 4: Comparar líneas entre años */}
+        <div className="info-card space-y-1.5">
+          <strong className="text-white font-semibold"> ¿Qué significa que una línea esté más alta o más ancha?</strong>
+          <ul className="mt-1 space-y-1.5 text-[12px]">
+            <li className="flex items-start gap-2">
+              <span className="text-white font-bold shrink-0">↑ Más alta</span>
+              <span>el descuento máximo es mayor → pagas menos IRPF en esa zona.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-white font-bold shrink-0">↔ Más ancha</span>
+              <span>la zona plana llega a sueldos más altos → más gente disfruta del descuento máximo.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-white font-bold shrink-0"> Cliff más a la derecha</span>
+              <span>la zona de riesgo empieza más tarde → menos trabajadores quedan expuestos.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-orange-400 font-bold shrink-0"> Caída más pronunciada</span>
+              <span>el efecto cliff es más severo → de €100 brutos te llegan menos netos dentro de esa bajada.</span>
+            </li>
           </ul>
         </div>
-        <div className="border-t border-[var(--border)] pt-3">
-          <strong className="text-orange-400 font-semibold">Zona cliff:</strong>{' '}
-          donde la línea baja en picado. Si te suben el sueldo 100€ ahí, pierdes parte del descuento
-          y tu base imponible sube <em>más</em> de 100€. Puedes pagar más impuestos que lo que recibes de subida.
-        </div>
+
       </div>
 
       <ToggleReal real={real} setReal={setReal} />
@@ -181,8 +249,9 @@ function TabCurvaArt20() {
       {/* Tabla */}
       <div className="mt-6">
         <p className="text-[11px] text-[var(--text-soft)] mb-3 font-medium leading-relaxed">
-           <strong className="text-white">Tabla resumen:</strong> la columna <strong className="text-orange-400">«Pérdida por €100 de subida»</strong> indica
-          cuántos euros de descuento pierdes cuando tu sueldo sube 100€ dentro de la zona cliff.
+           <strong className="text-white">Tabla resumen:</strong> la última columna muestra el efecto real de cobrar €100 más en la zona cliff.
+          Pierdes parte del descuento Art.20, lo que infla tu base imponible — y al final <strong className="text-orange-400">de €100 brutos
+          solo te llegan unos pocos euros netos.</strong> Compara con fuera del cliff: sin ese efecto, €100 brutos → ~€81 netos (al 19% IRPF).
         </p>
         <div className="overflow-x-auto">
           <table className="data-table w-full">
@@ -193,7 +262,7 @@ function TabCurvaArt20() {
                 <th>Descuento máx. (€)</th>
                 <th>Descuento = 0 desde…</th>
                 <th>Ancho zona cliff</th>
-                <th>Pérdida por €100 de subida</th>
+                <th>De €100 brutos de subida… ¿cuánto llega al bolsillo?</th>
               </tr>
             </thead>
             <tbody>
@@ -201,6 +270,10 @@ function TabCurvaArt20() {
                 const d = DATOS_UMBRALES.find(x => x.anio === a);
                 const zona = d && d.art20Inf && d.art20Sup ? d.art20Sup - d.art20Inf : null;
                 const pendiente = d && d.art20Max && zona ? d.art20Max / zona : null;
+                const descuentoPerdido = pendiente != null ? Math.round(pendiente * 100) : null;
+                const baseExtra = descuentoPerdido != null ? 100 + descuentoPerdido : null;
+                const netos = baseExtra != null ? Math.round(100 - baseExtra * 0.19) : null;
+                const netosColor = netos == null ? '' : netos > 75 ? 'text-emerald-400' : netos > 60 ? 'text-amber-300' : netos > 45 ? 'text-orange-400' : 'text-red-400';
                 return (
                   <tr key={a}>
                     <td className="font-bold" style={{ color: ART20_COLORS[a] }}>{a}</td>
@@ -209,11 +282,21 @@ function TabCurvaArt20() {
                     <td className="font-mono text-[var(--text)]">{d?.art20Sup ? eur(d.art20Sup) : '—'}</td>
                     <td className="font-mono text-orange-400">{zona ? eur(zona) : '—'}</td>
                     <td className="font-mono">
-                      {pendiente != null ? (
-                        <span className={pendiente > 1 ? 'text-red-400 font-bold' : 'text-[var(--text)]'}>
-                          {(pendiente * 100).toFixed(0)}€
-                          {pendiente > 1 && <span className="text-[10px] text-red-400/60 ml-1">(¡más que la subida!)</span>}
-                        </span>
+                      {netos != null ? (
+                        <div>
+                          <span className={`text-[15px] font-extrabold ${netosColor}`}>
+                            ~{netos}€ netos
+                          </span>
+                          <div className="text-[10px] text-[var(--text-soft)] mt-0.5 leading-tight">
+                            base sube +{baseExtra}€ → {baseExtra}×19% = {Math.round(baseExtra * 0.19)}€ IRPF
+                          </div>
+                          <div className="text-[10px] text-[var(--text-soft)] leading-tight">
+                            (pierdes {descuentoPerdido}€ de descuento Art.20)
+                          </div>
+                          {pendiente > 1 && (
+                            <div className="text-[10px] text-red-400/80 font-semibold mt-0.5"> cliff muy severo</div>
+                          )}
+                        </div>
                       ) : '—'}
                     </td>
                   </tr>
@@ -222,11 +305,21 @@ function TabCurvaArt20() {
             </tbody>
           </table>
         </div>
-        <div className="mt-3 info-card text-[12px] text-[var(--text-soft)] leading-relaxed">
-          <strong className="text-white font-semibold"> Ejemplo:</strong>{' '}
-          Si la columna pone <strong className="text-red-400">175€</strong>, significa que por cada 100€ de subida bruta,
-          pierdes 175€ de descuento. Tu base imponible sube 275€ (100 + 175). Al 19% de IRPF serían 52€ de impuestos
-          por una subida de 100€ → <strong className="text-white">te quedas solo con ~48€ netos.</strong>
+        <div className="mt-3 info-card text-[12px] text-[var(--text-soft)] leading-relaxed space-y-2">
+          <div>
+            <strong className="text-white font-semibold"> Fuera del cliff</strong>{' '}
+            (sueldo normal, sin zona de riesgo): €100 brutos → base sube €100 → €19 de IRPF →{' '}
+            <strong className="text-emerald-400">~€81 netos.</strong>
+          </div>
+          <div>
+            <strong className="text-white font-semibold"> Dentro del cliff</strong>{' '}
+            (ejemplo con descuento perdido de €175): €100 brutos → base sube €275 → €52 de IRPF →{' '}
+            <strong className="text-red-400">~€48 netos.</strong>{' '}
+            Perder €33 por el efecto cliff aunque te suban el sueldo.
+          </div>
+          <div className="text-[11px] text-[var(--text-soft)]/60 border-t border-[var(--border)] pt-2">
+            Estimación con tipo marginal del 19% (1.er tramo IRPF, el habitual en esta franja salarial). Resultado orientativo; la cifra exacta depende de tu situación personal.
+          </div>
         </div>
         <p className="text-[10px] text-[var(--text-soft)] mt-2 font-medium">Fuente: Art. 20 LIRPF; redacciones históricas — BOE</p>
       </div>
