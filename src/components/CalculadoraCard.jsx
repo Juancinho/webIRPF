@@ -1,13 +1,16 @@
 ﻿import { useState, useMemo } from 'react';
-import { calcularNomina, calcularTipoMarginal, ANIOS, obtenerParametros, SMI_ANUAL } from '../engine/irpf';
+import { calcularNomina, calcularTipoMarginal, ANIOS, obtenerParametros, SMI_ANUAL, DEFAULT_OPTS } from '../engine/irpf';
 import { eur, pct, num } from '../utils/format';
+import ConfigPanel from './ConfigPanel';
 
-const TRAMO_COLORS = ['#38bdf8','#22d3ee','#2dd4bf','#34d399','#a3e635','#fbbf24'];
+const TRAMO_COLORS = ['#d4a853','#c9956b','#34d399','#fbbf24','#fb923c','#f87171'];
 
-export default function CalculadoraCard({ bruto, anio, onChange, onShare, shareLabel }) {
+export default function CalculadoraCard({ bruto, anio, onChange, onShare, shareLabel, opts: optsProp, onOptsChange }) {
   const [pagas, setPagas] = useState(12);
-  const resultado = useMemo(() => calcularNomina(bruto, anio), [bruto, anio]);
-  const marginal  = useMemo(() => calcularTipoMarginal(bruto, anio), [bruto, anio]);
+  const [configOpen, setConfigOpen] = useState(false);
+  const opts = optsProp || DEFAULT_OPTS;
+  const resultado = useMemo(() => calcularNomina(bruto, anio, opts), [bruto, anio, opts]);
+  const marginal  = useMemo(() => calcularTipoMarginal(bruto, anio, opts), [bruto, anio, opts]);
   const params    = useMemo(() => obtenerParametros(anio), [anio]);
   const smi = SMI_ANUAL[anio];
   const vecesSMI = bruto > 0 && smi > 0 ? bruto / smi : 0;
@@ -82,7 +85,24 @@ export default function CalculadoraCard({ bruto, anio, onChange, onShare, shareL
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
             {shareLabel || 'Compartir'}
           </button>
+          {onOptsChange && (
+            <button onClick={() => setConfigOpen(o => !o)}
+              className="btn-ghost flex items-center gap-1.5 ml-auto"
+              style={configOpen ? { color: 'var(--accent)' } : {}}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
+              Perfil fiscal
+            </button>
+          )}
         </div>
+
+        {/* Config panel expandible */}
+        {onOptsChange && (
+          <div className={`config-panel ${configOpen ? 'is-open' : ''}`} style={{ marginTop: configOpen ? 0 : undefined }}>
+            <div>
+              <ConfigPanel opts={opts} onChange={onOptsChange} anio={anio} compact />
+            </div>
+          </div>
+        )}
 
         {/* Barra visual neto/SS/IRPF */}
         {bruto > 0 && (
@@ -118,19 +138,19 @@ export default function CalculadoraCard({ bruto, anio, onChange, onShare, shareL
           {/* Neto principal */}
           <div className="metric-card col-span-2"
             style={{
-              background: 'linear-gradient(135deg, rgba(16,185,129,0.08), rgba(16,185,129,0.03))',
-              borderColor: 'rgba(16,185,129,0.15)',
+              background: 'linear-gradient(135deg, rgba(52,211,153,0.06), rgba(52,211,153,0.02))',
+              borderColor: 'rgba(52,211,153,0.18)',
             }}>
-            <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ background: 'linear-gradient(90deg, #10b981, #059669)' }} />
+            <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ background: 'linear-gradient(90deg, #34d399, #10b981)' }} />
             <div className="flex justify-between items-start">
               <div>
-                <div className="text-[10px] text-emerald-400/80 font-bold uppercase tracking-wider mb-1.5">Salario neto anual</div>
-                <div className="text-3xl font-black text-emerald-400 font-mono tracking-tight">{eur(resultado.salarioNeto)}</div>
+                <div className="text-[10px] text-[#34d399]/80 font-bold uppercase tracking-wider mb-1.5">Salario neto anual</div>
+                <div className="text-3xl font-black text-[#34d399] font-mono tracking-tight">{eur(resultado.salarioNeto)}</div>
               </div>
               <div className="text-right">
-                <div className="text-[10px] text-emerald-400/50 font-medium mb-1">{pagaLabel}</div>
-                <div className="text-xl font-bold text-emerald-400 font-mono">{eur(pagaDisplay)}</div>
-                <div className="text-[10px] text-emerald-400/40 font-medium">por paga</div>
+                <div className="text-[10px] text-[#34d399]/50 font-medium mb-1">{pagaLabel}</div>
+                <div className="text-xl font-bold text-[#34d399] font-mono">{eur(pagaDisplay)}</div>
+                <div className="text-[10px] text-[#34d399]/40 font-medium">por paga</div>
               </div>
             </div>
           </div>
@@ -178,13 +198,17 @@ export default function CalculadoraCard({ bruto, anio, onChange, onShare, shareL
         {/* Desglose */}
         <div className="space-y-0.5 text-sm">
           <Fila label="Salario bruto" valor={eur(bruto)} bold />
-          <Fila label="− SS trabajador" valor={`−${eur(resultado.cotTra)}`} c="text-amber-400" sub={pct(resultado.cotTra/bruto*100)} />
-          {params.gastosFijos > 0 && <Fila label="− Gastos fijos Art.19" valor={`−${eur(params.gastosFijos)}`} c="text-amber-400" />}
-          <Fila label="− Reducción Art.20" valor={`−${eur(resultado.redTrabajo)}`} c="text-amber-400" />
+          {opts.regimen === 'autonomo'
+            ? <Fila label="− Cuota SS autónomo" valor={`−${eur(resultado.cotTra)}`} c="text-amber-400" sub={pct(resultado.cotTra/bruto*100)} />
+            : <Fila label="− SS trabajador" valor={`−${eur(resultado.cotTra)}`} c="text-amber-400" sub={pct(resultado.cotTra/bruto*100)} />
+          }
+          {params.gastosFijos > 0 && opts.regimen !== 'autonomo' && <Fila label="− Gastos fijos Art.19" valor={`−${eur(params.gastosFijos)}`} c="text-amber-400" />}
+          {opts.regimen === 'autonomo' && resultado.gastosFijos > 0 && <Fila label="− Gastos difícil justif. (5%)" valor={`−${eur(resultado.gastosFijos)}`} c="text-amber-400" />}
+          {opts.regimen !== 'autonomo' && <Fila label="− Reducción Art.20" valor={`−${eur(resultado.redTrabajo)}`} c="text-amber-400" />}
           <div className="divider-glow" />
           <Fila label="Base imponible" valor={eur(resultado.baseImponible)} bold />
           <Fila label="Cuota IRPF (tramos)" valor={eur(resultado.cuotaIntegra)} />
-          <Fila label="− Mínimo personal" valor={`−${eur(resultado.cuotaMinimo)}`} c="text-amber-400" />
+          <Fila label="− Mínimo pers./familiar" valor={`−${eur(resultado.cuotaMinimo)}`} c="text-amber-400" />
           {resultado.deduccionSMI > 0 && <Fila label="− Deducción SMI" valor={`−${eur(resultado.deduccionSMI)}`} c="text-amber-400" />}
           {limiteActivo && <Fila label="Límite 43% Art.85.3" valor={eur(resultado.limiteRetencion)} c="text-orange-400" />}
           <div className="divider-glow" />

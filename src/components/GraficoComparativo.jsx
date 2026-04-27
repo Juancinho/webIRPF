@@ -10,11 +10,21 @@ import {
 import { eur } from '../utils/format';
 
 export const YEAR_COLORS = {
-  2012: '#ef4444', 2013: '#3b82f6', 2014: '#10b981',
-  2015: '#f59e0b', 2016: '#8b5cf6', 2017: '#06b6d4',
-  2018: '#f97316', 2019: '#ec4899', 2020: '#14b8a6',
-  2021: '#6366f1', 2022: '#84cc16', 2023: '#f43f5e',
-  2024: '#0ea5e9', 2025: '#d946ef', 2026: '#22d3ee',
+  2012: '#ef4444',  // rojo intenso
+  2013: '#3b82f6',  // azul vivo
+  2014: '#22c55e',  // verde brillante
+  2015: '#f59e0b',  // ámbar
+  2016: '#a855f7',  // púrpura
+  2017: '#06b6d4',  // cian
+  2018: '#f97316',  // naranja
+  2019: '#ec4899',  // rosa fuerte
+  2020: '#14b8a6',  // teal
+  2021: '#6366f1',  // índigo
+  2022: '#84cc16',  // lima
+  2023: '#f43f5e',  // rosa-rojizo
+  2024: '#0ea5e9',  // azul cielo
+  2025: '#d946ef',  // fucsia
+  2026: '#eab308',  // amarillo dorado
 };
 
 const GRUPOS = {
@@ -48,10 +58,16 @@ function TooltipSalario({ active, payload, label, ref2026Neto, metrica }) {
   const sorted = [...payload].sort((a, b) => b.value - a.value);
   const isPct = metrica === 'tipo';
   return (
-    <div className="card-glass p-4 shadow-2xl text-xs min-w-[260px] max-h-96 overflow-y-auto" style={{ backdropFilter: 'blur(24px)' }}>
-      <p className="text-[10px] text-[var(--text-soft)] mb-0.5">Salario bruto equivalente (€2026)</p>
-      <p className="font-extrabold text-[var(--text-h)] mb-2.5 border-b border-[var(--border)] pb-2 text-[13px]">{eur(label)}</p>
-      <p className="text-[9px] text-[var(--accent-light)] font-semibold uppercase tracking-wider mb-1.5">
+    <div className="p-4 text-xs min-w-[280px] max-h-96 overflow-y-auto rounded-2xl border border-[var(--border)]"
+      style={{
+        background: 'linear-gradient(135deg, rgba(12,12,14,0.92), rgba(20,20,22,0.88))',
+        backdropFilter: 'blur(32px) saturate(150%)',
+        WebkitBackdropFilter: 'blur(32px) saturate(150%)',
+        boxShadow: '0 16px 48px rgba(0,0,0,0.35), 0 0 0 1px rgba(212,168,83,0.08) inset'
+      }}>
+      <p className="text-[10px] text-[var(--text-soft)] mb-0.5 uppercase tracking-wider font-semibold">Salario bruto equivalente (€2026)</p>
+      <p className="font-extrabold text-[var(--text-h)] mb-3 border-b border-[var(--border)] pb-2 text-[14px] font-mono tracking-tight">{eur(label)}</p>
+      <p className="text-[9px] text-[var(--accent)] font-bold uppercase tracking-wider mb-2">
         {isPct ? 'Tipo efectivo IRPF' : 'Salario neto resultante'}
       </p>
       {sorted.map(p => {
@@ -60,10 +76,10 @@ function TooltipSalario({ active, payload, label, ref2026Neto, metrica }) {
         return (
           <div key={p.dataKey} className="flex justify-between items-center py-0.5 gap-2">
             <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full shrink-0" style={{ background: YEAR_COLORS[anio], boxShadow: `0 0 6px ${YEAR_COLORS[anio]}40` }} />
+              <span className="w-2.5 h-2.5 rounded-full shrink-0 ring-2 ring-offset-1 ring-offset-[var(--surface)]" style={{ background: YEAR_COLORS[anio], boxShadow: `0 0 8px ${YEAR_COLORS[anio]}60`, ringColor: `${YEAR_COLORS[anio]}40` }} />
               <span style={{ color: YEAR_COLORS[anio] }} className="font-bold w-10">{anio}</span>
             </span>
-            <span className="font-mono text-[var(--text-h)]">{isPct ? `${p.value.toFixed(1)}%` : eur(p.value)}</span>
+            <span className="font-mono text-[var(--text-h)] font-semibold">{isPct ? `${p.value.toFixed(1)}%` : eur(p.value)}</span>
             {diff !== null && (
               <span className={`font-mono text-[10px] ${diff >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
                 {diff >= 0 ? '+' : ''}{eur(diff)}
@@ -81,17 +97,23 @@ function TooltipAnio({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   const reform = REFORMA_ANIOS.find(r => r.anio === label);
   return (
-    <div className="card-glass p-4 shadow-2xl text-xs min-w-[220px]" style={{ backdropFilter: 'blur(24px)' }}>
-      <p className="font-extrabold pb-2 mb-2 border-b border-[var(--border)] text-[11px]" style={{ color: YEAR_COLORS[label] }}>
+    <div className="p-4 text-xs min-w-[240px] rounded-2xl border border-[var(--border)]"
+      style={{
+        background: 'linear-gradient(135deg, rgba(12,12,14,0.92), rgba(20,20,22,0.88))',
+        backdropFilter: 'blur(32px) saturate(150%)',
+        WebkitBackdropFilter: 'blur(32px) saturate(150%)',
+        boxShadow: '0 16px 48px rgba(0,0,0,0.35), 0 0 0 1px rgba(212,168,83,0.08) inset'
+      }}>
+      <p className="font-extrabold pb-2 mb-2 border-b border-[var(--border)] text-[11px] uppercase tracking-wider" style={{ color: YEAR_COLORS[label] }}>
         {label}{reform ? ` · ${reform.label}` : ''}
       </p>
       {payload.map(p => (
         <div key={p.name} className="flex justify-between gap-4 py-0.5">
           <span className="flex items-center gap-1.5" style={{ color: p.color }}>
-            <span className="w-2 h-2 rounded-full shrink-0" style={{ background: p.color, boxShadow: `0 0 6px ${p.color}40` }} />
+            <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: p.color, boxShadow: `0 0 8px ${p.color}60` }} />
             {p.name}
           </span>
-          <span className="font-mono text-[var(--text-h)]">{p.dataKey === 'neto' ? eur(p.value) : `${p.value.toFixed(1)}%`}</span>
+          <span className="font-mono text-[var(--text-h)] font-semibold">{p.dataKey === 'neto' ? eur(p.value) : `${p.value.toFixed(1)}%`}</span>
         </div>
       ))}
     </div>
@@ -164,13 +186,24 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
       </div>
 
       {/* ── CONTROLES UNIFICADOS ── */}
-      <div className="p-6 rounded-2xl bg-[var(--surface2)] border border-[var(--border)]">
+      <div className="p-6 rounded-2xl border border-[var(--border)]"
+        style={{
+          background: 'linear-gradient(135deg, color-mix(in srgb, var(--surface2) 90%, transparent), color-mix(in srgb, var(--surface3) 75%, transparent))',
+          backdropFilter: 'blur(16px) saturate(130%)',
+          WebkitBackdropFilter: 'blur(16px) saturate(130%)',
+          boxShadow: 'var(--shadow-sm)'
+        }}>
         <p className="text-[10px] font-bold text-[var(--text-soft)] uppercase tracking-wider mb-4">Selecciona los años para comparar</p>
         <div className="flex flex-wrap gap-1.5">
           {ANIOS.map(a => (
             <button key={a} onClick={() => toggleAnio(a)}
               className={`year-btn ${aniosActivos.has(a) ? 'active' : ''}`}
-              style={aniosActivos.has(a) ? { background: YEAR_COLORS[a], borderColor: YEAR_COLORS[a] } : {}}>
+              style={aniosActivos.has(a) ? {
+                background: YEAR_COLORS[a],
+                borderColor: YEAR_COLORS[a],
+                boxShadow: `0 2px 12px ${YEAR_COLORS[a]}40, 0 0 0 1px ${YEAR_COLORS[a]}30`,
+                color: '#fff'
+              } : {}}>
               {a}
             </button>
           ))}
@@ -180,15 +213,21 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
               {nombre}
             </button>
           ))}
-          <button onClick={() => setAniosActivos(new Set(ANIOS))} className="btn-ghost !py-1 !px-2.5 !text-[10px] hover:!border-white hover:!text-white">Todos</button>
+          <button onClick={() => setAniosActivos(new Set(ANIOS))} className="btn-ghost !py-1 !px-2.5 !text-[10px] hover:!border-[var(--text-h)] hover:!text-[var(--text-h)]">Todos</button>
         </div>
       </div>
 
       {/* ── HISTORIA 1: EL NETO REAL ── */}
-      <section className="space-y-6">
+      <section className="space-y-6 p-6 rounded-2xl border border-[var(--border)]"
+        style={{
+          background: 'linear-gradient(135deg, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--surface2) 80%, transparent))',
+          backdropFilter: 'blur(12px) saturate(120%)',
+          WebkitBackdropFilter: 'blur(12px) saturate(120%)',
+          boxShadow: 'var(--shadow-sm)'
+        }}>
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span className="w-2.5 h-2.5 rounded-full ring-2 ring-offset-1 ring-offset-[var(--surface)]" style={{ background: '#34d399', boxShadow: '0 0 8px #34d39960' }} />
             <h3 className="text-lg font-serif font-bold text-[var(--text-h)]">1. Salario neto por nivel de renta</h3>
           </div>
           <p className="text-[13px] text-[var(--text-soft)] leading-relaxed max-w-[85ch]">
@@ -243,10 +282,16 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
       </section>
 
       {/* ── HISTORIA 2: EL TIPO EFECTIVO ── */}
-      <section className="space-y-6">
+      <section className="space-y-6 p-6 rounded-2xl border border-[var(--border)]"
+        style={{
+          background: 'linear-gradient(135deg, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--surface2) 80%, transparent))',
+          backdropFilter: 'blur(12px) saturate(120%)',
+          WebkitBackdropFilter: 'blur(12px) saturate(120%)',
+          boxShadow: 'var(--shadow-sm)'
+        }}>
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <span className="w-2 h-2 rounded-full bg-red-500" />
+            <span className="w-2.5 h-2.5 rounded-full ring-2 ring-offset-1 ring-offset-[var(--surface)]" style={{ background: '#fb7185', boxShadow: '0 0 8px #fb718560' }} />
             <h3 className="text-lg font-serif font-bold text-[var(--text-h)]">2. Carga fiscal real (Tipo Efectivo)</h3>
           </div>
           <p className="text-[13px] text-[var(--text-soft)] leading-relaxed max-w-[85ch]">
@@ -290,10 +335,16 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
       </section>
 
       {/* ── HISTORIA 3: EVOLUCIÓN TEMPORAL ── */}
-      <section className="space-y-6">
+      <section className="space-y-6 p-6 rounded-2xl border border-[var(--border)]"
+        style={{
+          background: 'linear-gradient(135deg, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--surface2) 80%, transparent))',
+          backdropFilter: 'blur(12px) saturate(120%)',
+          WebkitBackdropFilter: 'blur(12px) saturate(120%)',
+          boxShadow: 'var(--shadow-sm)'
+        }}>
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <span className="w-2 h-2 rounded-full bg-blue-500" />
+            <span className="w-2.5 h-2.5 rounded-full ring-2 ring-offset-1 ring-offset-[var(--surface)]" style={{ background: '#0ea5e9', boxShadow: '0 0 8px #0ea5e960' }} />
             <h3 className="text-lg font-serif font-bold text-[var(--text-h)]">3. Tu evolución histórica personal</h3>
           </div>
           <p className="text-[13px] text-[var(--text-soft)] leading-relaxed max-w-[85ch]">
@@ -334,10 +385,16 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
         </div>
 
         {/* Tabla compacta */}
-        <div className="overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--surface)]">
+        <div className="overflow-x-auto rounded-2xl border border-[var(--border)]"
+          style={{
+            background: 'linear-gradient(135deg, color-mix(in srgb, var(--surface) 90%, transparent), color-mix(in srgb, var(--surface2) 78%, transparent))',
+            backdropFilter: 'blur(12px) saturate(120%)',
+            WebkitBackdropFilter: 'blur(12px) saturate(120%)',
+            boxShadow: 'var(--shadow-sm)'
+          }}>
           <table className="data-table w-full">
             <thead>
-              <tr className="bg-[var(--surface2)]">
+              <tr style={{ background: 'color-mix(in srgb, var(--surface2) 80%, transparent)' }}>
                 {['Año', 'Bruto nominal', 'Neto (€2026)', 'Tipo IRPF', 'Carga (IRPF+SS Tra.)', '∆ vs 2026'].map(h => (
                   <th key={h} className="text-[10px] uppercase tracking-wider text-[var(--text-soft)] px-4 py-3">{h}</th>
                 ))}
@@ -398,8 +455,14 @@ function InsightTipo({ aniosActivos, bruto2026 }) {
   const isExentoTanto19Como26 = datos.v2019 === 0 && datos.v2026 === 0;
 
   return (
-    <div className="p-5 rounded-2xl border border-[var(--border)] bg-[var(--surface2)] text-[13px] relative overflow-hidden space-y-3">
-      <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-500" />
+    <div className="p-5 rounded-2xl border border-[var(--border)] text-[13px] relative overflow-hidden space-y-3"
+      style={{
+        background: 'linear-gradient(135deg, color-mix(in srgb, var(--surface2) 88%, transparent), color-mix(in srgb, var(--surface3) 72%, transparent))',
+        backdropFilter: 'blur(16px) saturate(130%)',
+        WebkitBackdropFilter: 'blur(16px) saturate(130%)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.15), 0 0 0 1px rgba(251,113,133,0.08) inset'
+      }}>
+      <div className="absolute left-0 top-0 bottom-0 w-1" style={{ background: 'linear-gradient(to bottom, #fb7185, #f43f5e)' }} />
       <p className="text-[var(--text)] leading-relaxed">
         Para tu nivel de renta, la menor <strong>carga fiscal individual</strong> ocurrió en{' '}
         <strong className="font-semibold" style={{ color: YEAR_COLORS[datos.mejor.anio] }}>{datos.mejor.anio}</strong>{' '}
@@ -447,8 +510,14 @@ function InsightSalario({ aniosActivos, bruto2026 }) {
 
   if (!datos) return null;
   return (
-    <div className="p-5 rounded-2xl border border-[var(--border)] bg-[var(--surface2)] text-[13px] relative overflow-hidden space-y-3">
-      <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500" />
+    <div className="p-5 rounded-2xl border border-[var(--border)] text-[13px] relative overflow-hidden space-y-3"
+      style={{
+        background: 'linear-gradient(135deg, color-mix(in srgb, var(--surface2) 88%, transparent), color-mix(in srgb, var(--surface3) 72%, transparent))',
+        backdropFilter: 'blur(16px) saturate(130%)',
+        WebkitBackdropFilter: 'blur(16px) saturate(130%)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.15), 0 0 0 1px rgba(52,211,153,0.08) inset'
+      }}>
+      <div className="absolute left-0 top-0 bottom-0 w-1" style={{ background: 'linear-gradient(to bottom, #34d399, #10b981)' }} />
       <p className="text-[var(--text)] leading-relaxed">
         Con <strong className="text-[var(--text-h)] font-semibold">{eur(bruto2026)}</strong> brutos equiv., el mejor año fue{' '}
         <strong className="font-semibold" style={{ color: YEAR_COLORS[datos.mejor.anio] }}>{datos.mejor.anio}</strong>{' '}

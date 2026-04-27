@@ -75,11 +75,11 @@ export default function SidebarWidget({ bruto, anio, onChange, onNavigate }) {
   const tip = TIPS[activeId] || TIPS.calc;
 
   return (
-    <div className="space-y-4 pb-8">
+    <div className="space-y-5 pb-8">
 
       {/* ── TOC Navigation with progress ── */}
       <div>
-        <p className="text-[9px] font-bold uppercase tracking-[0.1em] text-[var(--text-soft)] mb-2 px-1">
+        <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--text-soft)] mb-2.5 px-1">
           Secciones
         </p>
         <nav className="toc-nav">
@@ -115,9 +115,9 @@ export default function SidebarWidget({ bruto, anio, onChange, onNavigate }) {
           aria-expanded={configOpen}
         >
           <div className="config-pill-values">
-            <span className="config-pill-bruto font-mono">{eur(bruto)}</span>
+            <span className="config-pill-bruto">{eur(bruto)}</span>
             <span className="config-pill-sep">·</span>
-            <span className="config-pill-anio font-mono">{anio}</span>
+            <span className="config-pill-anio">{anio}</span>
           </div>
           <div className="config-pill-action">
             {configOpen ? (
@@ -131,8 +131,8 @@ export default function SidebarWidget({ bruto, anio, onChange, onNavigate }) {
         {/* Expanded config panel */}
         <div className={`config-panel ${configOpen ? 'is-open' : ''}`}>
           {/* Bruto slider */}
-          <div className="metric-mini mb-2">
-            <div className="flex items-baseline justify-between mb-1.5">
+          <div className="metric-mini mb-2.5">
+            <div className="flex items-baseline justify-between mb-2">
               <span className="metric-mini-label">Salario bruto anual</span>
               <span className="font-mono font-bold text-[13px]" style={{ color: 'var(--accent)' }}>{eur(bruto)}</span>
             </div>
@@ -143,22 +143,22 @@ export default function SidebarWidget({ bruto, anio, onChange, onNavigate }) {
               className="w-full"
               style={{ marginTop: 4 }}
             />
-            <div className="flex justify-between text-[9px] text-[var(--text-soft)] mt-1 font-medium">
+            <div className="flex justify-between text-[9px] text-[var(--text-soft)] mt-1.5 font-medium">
               <span>0 €</span><span>75k€</span><span>150k€</span>
             </div>
           </div>
 
           {/* Año */}
           <div className="metric-mini">
-            <span className="metric-mini-label block mb-2">Año fiscal</span>
-            <div className="grid grid-cols-4 gap-1">
+            <span className="metric-mini-label block mb-2.5">Año fiscal</span>
+            <div className="grid grid-cols-4 gap-1.5">
               {ANIOS.map(a => (
                 <button key={a} onClick={() => onChange('anio', a)}
-                  className="text-[9px] font-bold py-1 rounded-md transition-all duration-150 text-center"
+                  className="text-[9px] font-bold py-1.5 rounded-lg transition-all duration-150 text-center"
                   style={anio === a ? {
                     background: 'linear-gradient(135deg, var(--accent), var(--accent2))',
                     color: 'var(--accent-on)',
-                    boxShadow: '0 1px 6px var(--glow-accent)',
+                    boxShadow: '0 1px 8px var(--glow-accent)',
                   } : {
                     background: 'var(--surface3)',
                     color: 'var(--text-soft)',
@@ -176,21 +176,21 @@ export default function SidebarWidget({ bruto, anio, onChange, onNavigate }) {
 
       {/* ── Live metrics (always visible) ── */}
       <div>
-        <p className="text-[9px] font-bold uppercase tracking-[0.1em] text-[var(--text-soft)] mb-2.5 px-1">
+        <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--text-soft)] mb-3 px-1">
           Resultado
         </p>
 
         {/* Neto */}
-        <div className="metric-mini mb-2">
+        <div className="metric-mini mb-2.5">
           <div className="metric-mini-label">Neto anual</div>
           <div className="metric-mini-value">{eur(r.salarioNeto)}</div>
-          <div className="mt-1.5 h-1 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
+          <div className="mt-2 h-1 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
             <div className="h-full rounded-full transition-all duration-300" style={{
               width: `${bruto > 0 ? (r.salarioNeto / bruto * 100).toFixed(0) : 0}%`,
               background: 'linear-gradient(90deg, var(--accent2), var(--accent))'
             }} />
           </div>
-          <div className="flex justify-between mt-1">
+          <div className="flex justify-between mt-1.5">
             <span className="text-[9px] text-[var(--text-soft)]">del bruto</span>
             <span className="text-[9px] font-mono" style={{ color: 'var(--accent)' }}>
               {bruto > 0 ? (r.salarioNeto / bruto * 100).toFixed(1) : 0}%
@@ -199,7 +199,7 @@ export default function SidebarWidget({ bruto, anio, onChange, onNavigate }) {
         </div>
 
         {/* Tipos */}
-        <div className="grid grid-cols-2 gap-2 mb-2">
+        <div className="grid grid-cols-2 gap-2.5 mb-2.5">
           <div className="metric-mini">
             <div className="metric-mini-label">T. efectivo</div>
             <div className="metric-mini-value" style={{ color: 'var(--red)' }}>
@@ -223,11 +223,11 @@ export default function SidebarWidget({ bruto, anio, onChange, onNavigate }) {
             <span className="metric-mini-value">{eur(r.irpfFinal + r.cotTra)}</span>
             <span className="text-[9px] font-mono text-[var(--text-soft)]">{pct(r.tipoEfectivoTotal * 100)}</span>
           </div>
-          <div className="flex gap-1 mt-1.5">
-            <span className="text-[9px] px-1.5 py-0.5 rounded" style={{ background: 'var(--glow-red)', color: 'var(--red)' }}>
+          <div className="flex gap-1.5 mt-2">
+            <span className="text-[9px] px-2 py-0.5 rounded-md" style={{ background: 'var(--glow-red)', color: 'var(--red)' }}>
               IRPF {eur(r.irpfFinal)}
             </span>
-            <span className="text-[9px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(245,158,11,0.12)', color: 'var(--yellow)' }}>
+            <span className="text-[9px] px-2 py-0.5 rounded-md" style={{ background: 'rgba(245,158,11,0.10)', color: 'var(--yellow)' }}>
               SS {eur(r.cotTra)}
             </span>
           </div>

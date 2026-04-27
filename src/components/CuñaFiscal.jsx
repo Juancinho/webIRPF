@@ -5,7 +5,7 @@ import { eur } from '../utils/format';
 
 /* ── Paleta de segmentos ── */
 const SEG = {
-  neto:     { color: '#22d3ee', label: 'Salario neto',        desc: 'Lo que recibes en tu cuenta' },
+  neto:     { color: '#d4a853', label: 'Salario neto',        desc: 'Lo que recibes en tu cuenta' },
   irpf:     { color: '#f43f5e', label: 'IRPF retenido',       desc: 'Lo que va a Hacienda' },
   ssTra:    { color: '#f59e0b', label: 'SS trabajador',        desc: 'Tu cotización a la Seguridad Social' },
   ssEmp:    { color: '#6366f1', label: 'SS empresa',           desc: 'Lo que paga la empresa extra (tú no lo ves)' },
@@ -82,12 +82,17 @@ export default function CuñaFiscal({ bruto, anio }) {
         </div>
         {/* Toggle vista */}
         <div className="inline-flex items-center rounded-2xl p-1 shrink-0"
-          style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
+          style={{
+            background: 'linear-gradient(135deg, color-mix(in srgb, var(--surface2) 88%, transparent), color-mix(in srgb, var(--surface3) 72%, transparent))',
+            border: '1px solid var(--border)',
+            backdropFilter: 'blur(12px) saturate(130%)',
+            WebkitBackdropFilter: 'blur(12px) saturate(130%)',
+          }}>
           <button onClick={() => setVista('trabajador')}
             className="px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-300"
             style={vista === 'trabajador' ? {
               background: 'linear-gradient(135deg, var(--accent), var(--accent2))',
-              color: 'white', boxShadow: '0 2px 12px rgba(56,189,248,0.25)',
+              color: 'white', boxShadow: '0 2px 16px rgba(212,168,83,0.30)',
             } : { color: 'var(--text-soft)' }}>
              Perspectiva trabajador
           </button>
@@ -95,7 +100,7 @@ export default function CuñaFiscal({ bruto, anio }) {
             className="px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-300"
             style={vista === 'empresa' ? {
               background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-              color: 'white', boxShadow: '0 2px 12px rgba(99,102,241,0.25)',
+              color: 'white', boxShadow: '0 2px 16px rgba(99,102,241,0.30)',
             } : { color: 'var(--text-soft)' }}>
              Coste real empresa
           </button>
@@ -166,8 +171,10 @@ export default function CuñaFiscal({ bruto, anio }) {
               <div key={d.name}
                 className="rounded-xl p-3.5 border transition-all duration-200 cursor-default"
                 style={{
-                  background: hover === i ? `${d.fill}0d` : 'var(--surface2)',
+                  background: hover === i ? `${d.fill}0d` : 'linear-gradient(135deg, color-mix(in srgb, var(--surface2) 90%, transparent), color-mix(in srgb, var(--surface3) 70%, transparent))',
                   borderColor: hover === i ? `${d.fill}40` : 'var(--border)',
+                  backdropFilter: 'blur(8px) saturate(120%)',
+                  WebkitBackdropFilter: 'blur(8px) saturate(120%)',
                 }}
                 onMouseEnter={() => setHover(i)}
                 onMouseLeave={() => setHover(null)}>
@@ -193,7 +200,13 @@ export default function CuñaFiscal({ bruto, anio }) {
 
           {/* Resumen total */}
           <div className="rounded-xl p-3.5 border mt-2"
-            style={{ background: 'var(--surface3)', borderColor: 'var(--border-light)' }}>
+            style={{
+              background: 'linear-gradient(135deg, color-mix(in srgb, var(--surface3) 85%, transparent), color-mix(in srgb, var(--surface2) 70%, transparent))',
+              borderColor: 'var(--border-light)',
+              backdropFilter: 'blur(12px) saturate(130%)',
+              WebkitBackdropFilter: 'blur(12px) saturate(130%)',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.10)'
+            }}>
             <div className="flex justify-between items-center text-xs">
               <span className="text-[var(--text-soft)] font-semibold uppercase tracking-wider">
                 {vista === 'trabajador' ? 'Sueldo bruto contractual' : 'Coste laboral total empresa'}
@@ -201,7 +214,7 @@ export default function CuñaFiscal({ bruto, anio }) {
               <span className="font-mono font-black text-[var(--text-h)] text-[14px]">{eur(total)}</span>
             </div>
             <div className="mt-2 flex gap-2 flex-wrap">
-              <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(34,211,238,0.1)', color: '#22d3ee' }}>
+              <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(212,168,83,0.1)', color: '#d4a853' }}>
                 Neto: {pctNeto}%
               </span>
               <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(244,63,94,0.1)', color: '#f43f5e' }}>

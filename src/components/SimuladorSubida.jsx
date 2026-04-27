@@ -105,17 +105,18 @@ export default function SimuladorSubida({ bruto, anio }) {
       <div className="p-5 sm:p-6 lg:p-7">
         {/* Neto antes / después */}
         <div className="grid grid-cols-2 gap-3 mb-6">
-          <div className="metric-card" style={{ background: 'var(--surface2)', borderColor: 'var(--border)' }}>
+          <div className="metric-card"
+            style={{ background: 'linear-gradient(135deg, color-mix(in srgb, var(--surface2) 90%, transparent), color-mix(in srgb, var(--surface3) 70%, transparent))', borderColor: 'var(--border)' }}>
             <div className="text-[10px] text-[var(--text)] font-medium mb-1">Neto actual</div>
             <div className="text-xl font-black font-mono text-[var(--text-h)]">{eur(actual.salarioNeto)}</div>
             <div className="text-[10px] text-[var(--text)] opacity-40 mt-1">{eur(actual.salarioNeto / 12)}/mes</div>
           </div>
           <div className="metric-card"
-            style={{ background: 'rgba(16,185,129,0.06)', borderColor: 'rgba(16,185,129,0.15)' }}>
-            <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ background: 'linear-gradient(90deg, #10b981, #059669)' }} />
-            <div className="text-[10px] text-emerald-400/80 font-medium mb-1">Neto nuevo</div>
-            <div className="text-xl font-black font-mono text-emerald-400">{eur(nuevo.salarioNeto)}</div>
-            <div className="text-[10px] text-emerald-400/50 mt-1">{eur(nuevo.salarioNeto / 12)}/mes</div>
+            style={{ background: 'linear-gradient(135deg, rgba(52,211,153,0.06), rgba(52,211,153,0.02))', borderColor: 'rgba(52,211,153,0.18)' }}>
+            <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ background: 'linear-gradient(90deg, #34d399, #10b981)' }} />
+            <div className="text-[10px] text-[#34d399]/80 font-medium mb-1">Neto nuevo</div>
+            <div className="text-xl font-black font-mono text-[#34d399]">{eur(nuevo.salarioNeto)}</div>
+            <div className="text-[10px] text-[#34d399]/50 mt-1">{eur(nuevo.salarioNeto / 12)}/mes</div>
           </div>
         </div>
 
@@ -123,12 +124,12 @@ export default function SimuladorSubida({ bruto, anio }) {
         {incremento > 0 && (
           <>
             <div className="metric-card mb-4"
-              style={{ background: 'var(--surface2)', borderColor: 'var(--border)' }}>
+              style={{ background: 'linear-gradient(135deg, color-mix(in srgb, var(--surface2) 90%, transparent), color-mix(in srgb, var(--surface3) 70%, transparent))', borderColor: 'var(--border)' }}>
               <div className="flex justify-between items-start">
                 <div>
                   <div className="text-[10px] text-[var(--text)] font-medium mb-1.5">Ganancia neta real</div>
-                  <div className="text-2xl font-black font-mono text-emerald-400 tracking-tight">+{eur(difNeto)}<span className="text-base text-emerald-400/60 ml-1">/año</span></div>
-                  <div className="text-sm text-emerald-400/60 mt-1 font-mono">+{eur(difNeto / 12)}/mes</div>
+                  <div className="text-2xl font-black font-mono text-[#34d399] tracking-tight">+{eur(difNeto)}<span className="text-base text-[#34d399]/60 ml-1">/año</span></div>
+                  <div className="text-sm text-[#34d399]/60 mt-1 font-mono">+{eur(difNeto / 12)}/mes</div>
                 </div>
                 <div className="text-right">
                   <div className="text-[10px] text-[var(--text)] font-medium mb-1">De {eur(incremento)} de subida</div>
@@ -141,8 +142,8 @@ export default function SimuladorSubida({ bruto, anio }) {
             {/* Tipo marginal */}
             <div className={`metric-card ${alertaCliff ? '' : ''}`}
               style={{
-                background: alertaCliff ? 'rgba(249,115,22,0.08)' : 'var(--surface2)',
-                borderColor: alertaCliff ? 'rgba(249,115,22,0.2)' : 'var(--border)',
+                background: alertaCliff ? 'linear-gradient(135deg, rgba(249,115,22,0.08), rgba(249,115,22,0.03))' : 'linear-gradient(135deg, color-mix(in srgb, var(--surface2) 90%, transparent), color-mix(in srgb, var(--surface3) 70%, transparent))',
+                borderColor: alertaCliff ? 'rgba(249,115,22,0.22)' : 'var(--border)',
               }}>
               {alertaCliff && <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ background: 'linear-gradient(90deg, #f97316, #ea580c)' }} />}
               <div className="flex items-start justify-between gap-3">

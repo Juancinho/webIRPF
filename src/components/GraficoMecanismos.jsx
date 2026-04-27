@@ -9,7 +9,7 @@ import { YEAR_COLORS as ART20_COLORS } from './GraficoComparativo';
 
 const UMBRAL_COLORS = {
   smi: 'var(--green)', minExento: 'var(--accent)',
-  art20Inf: 'var(--yellow)', art20Sup: 'var(--red)', art20Max: '#a78bfa',
+  art20Inf: 'var(--yellow)', art20Sup: 'var(--red)', art20Max: '#c9956b',
 };
 
 /* ── Toggle reutilizable nominal / real ── */
@@ -360,7 +360,7 @@ function TabEvolucionUmbrales() {
             </li>
             <li className="flex items-start gap-2">
               <span className="w-3 h-3 rounded-full shrink-0 mt-0.5" style={{ background: UMBRAL_COLORS.minExento }} />
-              <div><strong className="text-sky-400">Mínimo exento de retención</strong> — si tu sueldo bruto es menor que esta cifra, <strong className="text-white">NO te retienen IRPF</strong> en nómina. Tu sueldo neto = bruto − Seguridad Social.</div>
+              <div><strong className="text-[#d4a853]">Mínimo exento de retención</strong> — si tu sueldo bruto es menor que esta cifra, <strong className="text-white">NO te retienen IRPF</strong> en nómina. Tu sueldo neto = bruto − Seguridad Social.</div>
             </li>
             <li className="flex items-start gap-2">
               <span className="w-3 h-3 rounded-full shrink-0 mt-0.5" style={{ background: UMBRAL_COLORS.art20Inf }} />
@@ -376,7 +376,7 @@ function TabEvolucionUmbrales() {
           <strong className="text-white font-semibold"> ¿Qué buscar?</strong>{' '}
           Si el <span className="text-emerald-400 font-semibold">SMI</span> está por debajo del{' '}
           <span className="text-amber-400 font-semibold">umbral inferior</span>, los trabajadores de salario mínimo tienen el descuento máximo.
-          Si el <span className="text-sky-400 font-semibold">mínimo exento</span> sube, más gente deja de pagar IRPF.
+          Si el <span className="text-[#d4a853] font-semibold">mínimo exento</span> sube, más gente deja de pagar IRPF.
           La distancia entre <span className="text-amber-400">amarillo</span> y <span className="text-red-400">rojo</span> es la «zona cliff».
         </div>
       </div>
@@ -450,7 +450,7 @@ export default function GraficoMecanismos() {
         ].map(([id, label]) => (
           <button key={id} onClick={() => setTab(id)}
             className={`px-5 py-2.5 rounded-xl text-sm font-semibold border transition-all ${tab === id
-              ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent2)] border-transparent text-white shadow-lg shadow-sky-500/20'
+              ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent2)] border-transparent text-white shadow-lg shadow-indigo-500/20'
               : 'border-[var(--border)] text-[var(--text)] hover:border-[var(--accent)] hover:text-[var(--accent-light)] hover:bg-[var(--accent-dim)]'}`}>
             {label}
           </button>

@@ -191,14 +191,14 @@ export default function DesgloseEducativo({ bruto, anio }) {
 
           {/* A — Coste laboral */}
           <Paso letra="A" titulo="Coste laboral total" subtitulo="Lo que tu empresa paga de verdad por ti"
-            color="#22d3ee" resultado={r.costeLab}>
+            color="#d4a853" resultado={r.costeLab}>
             <p className="paso-prosa">
               Es el desembolso total de la empresa para tenerte contratado. Suma tu salario bruto (C) y las cotizaciones
               sociales que la empresa paga por encima de tu sueldo (B). Tú nunca ves este dinero en tu cuenta,
               pero forma parte del coste real de tu trabajo.
             </p>
             <Formula>
-              A = C + B = {eur(bruto)} + {eur(r.cotEmp)} = <strong style={{ color: '#22d3ee' }}>{eur(r.costeLab)}</strong>
+              A = C + B = {eur(bruto)} + {eur(r.cotEmp)} = <strong style={{ color: '#d4a853' }}>{eur(r.costeLab)}</strong>
             </Formula>
             <p className="paso-ratio">
               De cada 100 € que le cuestas a tu empresa, tú ves {((r.salarioNeto / r.costeLab) * 100).toFixed(1)} € netos.
@@ -228,7 +228,7 @@ export default function DesgloseEducativo({ bruto, anio }) {
 
           {/* C — Salario bruto */}
           <Paso letra="C" titulo="Salario bruto anual" subtitulo="La cifra que aparece en tu contrato"
-            color="#38bdf8" resultado={bruto}>
+            color="#c9956b" resultado={bruto}>
             <p className="paso-prosa">
               Es la cantidad pactada en tu contrato antes de cualquier descuento. En 14 pagas equivale a{' '}
               <strong className="text-white">{eur(bruto / 14)}/mes</strong>; en 12 pagas, <strong className="text-white">{eur(bruto / 12)}/mes</strong>.
@@ -256,13 +256,13 @@ export default function DesgloseEducativo({ bruto, anio }) {
 
           {/* E — Rendimiento del trabajo */}
           <Paso letra="E" titulo="Rendimiento íntegro del trabajo" subtitulo="Tu bruto después de la SS trabajador"
-            color="#38bdf8" resultado={r.rnPrevio}>
+            color="#c9956b" resultado={r.rnPrevio}>
             <p className="paso-prosa">
               Es la base a partir de la cual se aplican las deducciones del IRPF. Es tu salario bruto menos
               únicamente las cotizaciones a la Seguridad Social que pagas tú.
             </p>
             <Formula>
-              E = C − D = {eur(bruto)} − {eur(r.cotTra)} = <strong style={{ color: '#38bdf8' }}>{eur(r.rnPrevio)}</strong>
+              E = C − D = {eur(bruto)} − {eur(r.cotTra)} = <strong style={{ color: '#c9956b' }}>{eur(r.rnPrevio)}</strong>
             </Formula>
           </Paso>
 
@@ -314,7 +314,7 @@ export default function DesgloseEducativo({ bruto, anio }) {
 
           {/* H — Base imponible */}
           <Paso letra="H" titulo="Base imponible" subtitulo="La cifra sobre la que Hacienda calcula el IRPF"
-            color="#38bdf8" resultado={r.baseImponible}>
+            color="#c9956b" resultado={r.baseImponible}>
             <p className="paso-prosa">
               Es la cifra que realmente tributa. Se obtiene restando al bruto todas las deducciones previas:
               la SS trabajador, los 2.000 € de gastos fijos {aplicaF ? '' : '(no aplicable en este año)'} y la reducción del Art.20.
@@ -322,7 +322,7 @@ export default function DesgloseEducativo({ bruto, anio }) {
             <Formula>
               H = C − D {aplicaF ? `− F` : ''} − G
               <br />
-              H = {eur(bruto)} − {eur(r.cotTra)} {aplicaF ? `− ${eur(2000)} ` : ''}− {eur(r.redTrabajo)} = <strong style={{ color: '#38bdf8' }}>{eur(r.baseImponible)}</strong>
+              H = {eur(bruto)} − {eur(r.cotTra)} {aplicaF ? `− ${eur(2000)} ` : ''}− {eur(r.redTrabajo)} = <strong style={{ color: '#c9956b' }}>{eur(r.baseImponible)}</strong>
             </Formula>
             <p className="paso-ratio">
               Eso significa que tributas sobre <strong className="text-white">{((r.baseImponible / bruto) * 100).toFixed(1)} %</strong> de tu bruto.

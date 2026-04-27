@@ -1,6 +1,7 @@
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useState } from 'react';
 import { useURLState } from './hooks/useURLState';
 import { useTheme } from './hooks/useTheme';
+import { DEFAULT_OPTS } from './engine/irpf';
 import CalculadoraCard from './components/CalculadoraCard';
 import SimuladorSubida from './components/SimuladorSubida';
 import GraficoComparativo from './components/GraficoComparativo';
@@ -8,36 +9,64 @@ import GraficoMecanismos from './components/GraficoMecanismos';
 import CuñaFiscal from './components/CuñaFiscal';
 import DesgloseEducativo from './components/DesgloseEducativo';
 import NormativaFAQ from './components/NormativaFAQ';
-import SidebarWidget from './components/SidebarWidget';
+import CurvaIRPF from './components/CurvaIRPF';
+import DistribucionSalarial from './components/DistribucionSalarial';
+import OCDEComparativa from './components/OCDEComparativa';
+import DeudaPublica from './components/DeudaPublica';
+import CronologiaTimeline from './components/CronologiaTimeline';
 import ThemeToggle from './components/ThemeToggle';
 import ScrollReveal from './components/ScrollReveal';
-import SectionTransition from './components/SectionTransition';
-import ProgressDots from './components/ProgressDots';
 import './index.css';
 
-function SectionTitle({ n, title, sub }) {
+const SECCIONES = [
+  {
+    id: 'calc',
+    n: '1',
+    label: 'Tu nómina',
+    desc: 'Calculadora IRPF + SS',
+    tagline: 'Calcula tu salario neto paso a paso',
+  },
+  {
+    id: 'comparativa',
+    n: '2',
+    label: 'Histórico',
+    desc: '2012–2026 comparado',
+    tagline: 'Cómo han cambiado los tipos en 15 años',
+  },
+  {
+    id: 'distribucion',
+    n: '3',
+    label: 'Distribución',
+    desc: 'Tu posición en España',
+    tagline: '¿En qué percentil estás dentro de la escala salarial?',
+  },
+  {
+    id: 'internacional',
+    n: '4',
+    label: 'OCDE',
+    desc: 'Cuña fiscal mundial',
+    tagline: 'España frente a los demás países de la OCDE',
+  },
+  {
+    id: 'sistema',
+    n: '5',
+    label: 'El sistema',
+    desc: 'Cuña, mecanismos, deuda',
+    tagline: 'Los mecanismos ocultos que deciden lo que pagas',
+  },
+  {
+    id: 'normativa',
+    n: '6',
+    label: 'Normativa',
+    desc: 'Reformas y ley',
+    tagline: 'Cronología de reformas y fuentes legales',
+  },
+];
+
+function InfoCard({ children }) {
   return (
-    <div className="flex items-start gap-4 sm:gap-5 mb-6 sm:mb-8">
-      <div className="section-badge mt-0.5 shrink-0"
-        style={{
-          background: 'linear-gradient(135deg, var(--accent), var(--accent2))',
-          boxShadow: '0 4px 24px var(--glow-accent), 0 0 0 1px var(--accent-soft) inset',
-          color: 'var(--accent-on)',
-          fontFamily: "'Fraunces', 'DM Serif Display', Georgia, serif",
-          fontSize: 19,
-          fontWeight: 500,
-          letterSpacing: '-0.01em',
-        }}>
-        {n}
-      </div>
-      <div className="min-w-0">
-        <h2 className="font-serif text-2xl sm:text-3xl font-medium leading-tight tracking-tight"
-          style={{ color: 'var(--text-h)' }}>
-          {title}
-        </h2>
-        {sub && <p className="text-[13.5px] sm:text-[14.5px] mt-2 leading-relaxed max-w-[62ch]"
-          style={{ color: 'var(--text)' }}>{sub}</p>}
-      </div>
+    <div className="info-card text-[13.5px] leading-relaxed" style={{ color: 'var(--text)' }}>
+      {children}
     </div>
   );
 }
@@ -46,23 +75,30 @@ function ShareButton({ getShareURL }) {
   const handleShare = async () => {
     const url = getShareURL();
     try {
-      if (navigator.share) await navigator.share({ title: 'IRPF 2012–2026', url });
+      if (navigator.share) await navigator.share({ title: 'FiscalScope', url });
       else await navigator.clipboard.writeText(url);
     } catch { }
   };
   return (
-    <button onClick={handleShare} className="btn-ghost flex items-center gap-1.5">
-      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><line x1="8.59" y1="13.51" x2="15.42" y2="17.49" /><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" /></svg>
+    <button onClick={handleShare} className="btn-ghost flex items-center gap-1.5 text-[12px]">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+      </svg>
       Compartir
     </button>
   );
 }
 
-function InfoCard({ children, accent }) {
+function SectionHeading({ tagline, children }) {
   return (
-    <div className="info-card text-[13.5px] leading-relaxed"
-      style={{ color: 'var(--text)', ...(accent ? { '--accent-bar': accent } : {}) }}>
-      {children}
+    <div className="mb-8 sm:mb-10">
+      {tagline && (
+        <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--accent)] mb-2">{tagline}</p>
+      )}
+      <h2 className="font-display text-[1.6rem] sm:text-[2rem] lg:text-[2.4rem] leading-[1.1] tracking-tight text-[var(--text-h)]">
+        {children}
+      </h2>
     </div>
   );
 }
@@ -72,360 +108,283 @@ export default function App() {
   const onChange = useCallback((campo, valor) => set(campo, valor), [set]);
   const { theme, toggle: toggleTheme } = useTheme();
 
-  /* ── Active section tracking ── */
-  const [activeSection, setActiveSection] = useState('');
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeId, setActiveId] = useState('calc');
+  const [opts, setOpts] = useState(DEFAULT_OPTS);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
-  useEffect(() => {
-    const SECTIONS = ['calc', 'desglose', 'simulador', 'comparativa', 'cuña', 'mecanismos', 'normativa'];
-    const LABELS = { calc: 'Calculadora', desglose: 'Viaje paso a paso', simulador: 'Simulador', comparativa: 'Comparativa histórica', 'cuña': 'Cuña fiscal', mecanismos: 'Mecanismos', normativa: 'Normativa' };
+  const seccion = SECCIONES.find(s => s.id === activeId);
 
-    const obs = new IntersectionObserver(
-      entries => {
-        const visible = entries.filter(e => e.isIntersecting);
-        if (visible.length) setActiveSection(LABELS[visible[0].target.id] || '');
-      },
-      { rootMargin: '-20% 0px -65% 0px', threshold: 0 }
-    );
-    SECTIONS.forEach(id => { const el = document.getElementById(id); if (el) obs.observe(el); });
-
-    return () => obs.disconnect();
-  }, []);
-
-  /* Close mobile menu when crossing into xl (sidebar takes over) */
-  useEffect(() => {
-    const mq = window.matchMedia('(min-width: 1280px)');
-    const handler = e => { if (e.matches) setMobileMenuOpen(false); };
-    mq.addEventListener?.('change', handler);
-    return () => mq.removeEventListener?.('change', handler);
-  }, []);
-
-  /* Lock page scroll while mobile menu is open */
-  useEffect(() => {
-    if (!mobileMenuOpen) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = prev; };
-  }, [mobileMenuOpen]);
+  const navTo = id => {
+    setActiveId(id);
+    setMobileNavOpen(false);
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  };
 
   return (
-    <div className="min-h-screen relative">
-      {/* Decorative floating orbs (clipped so they never cause horizontal scroll) */}
-      <div className="orbs-clip">
-        <div className="float-orb" style={{ width: '400px', height: '400px', background: 'var(--accent-soft)', top: '10%', left: '-5%' }} />
-        <div className="float-orb" style={{ width: '300px', height: '300px', background: 'var(--accent-dim)', top: '45%', right: '-3%', animationDelay: '-7s' }} />
-        <div className="float-orb" style={{ width: '350px', height: '350px', background: 'var(--accent-soft)', top: '75%', left: '10%', animationDelay: '-14s' }} />
-      </div>
+    <div className="app-root">
 
-      {/* ── HEADER ── */}
-      <header className="header-blur sticky top-0 z-30">
-        <div className="centered-col py-3 sm:py-3.5 flex items-center justify-between gap-3 sm:gap-4">
-          <div className="flex items-center gap-2.5">
-            {/* Nav drawer button — left of logo, visible below xl (sidebar takes over at xl) */}
-            <button
-              type="button"
-              className="mobile-menu-btn xl:hidden"
-              aria-label={mobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
-              aria-expanded={mobileMenuOpen}
-              aria-controls="mobile-menu-panel"
-              onClick={() => setMobileMenuOpen(o => !o)}
-              data-open={mobileMenuOpen}
-            >
-              <span className="mobile-menu-icon">
-                <span /><span /><span />
-              </span>
-            </button>
-            <div className="flex items-baseline gap-1">
-              <span className="font-serif text-[22px] font-medium tracking-tight" style={{ color: 'var(--text-h)' }}>Fiscal</span>
-              <span className="font-serif text-[22px] italic font-normal tracking-tight" style={{ color: 'var(--accent)' }}>
-                scope
-              </span>
-            </div>
+      {/* ═══════════════ FIXED HEADER ═══════════════ */}
+      <header className="app-header">
+        <div className="app-header-inner">
+          {/* Logo */}
+          <div className="flex items-baseline gap-1">
+            <span className="logo-mark" style={{ color: 'var(--text-h)', fontSize: 22 }}>Fiscal</span>
+            <span className="logo-mark-accent" style={{ color: 'var(--accent)', fontSize: 22 }}>scope</span>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3">
-            <p className="text-[11px] hidden lg:block font-medium" style={{ color: 'var(--text-soft)' }}>Solo tarifa estatal · Cálculos orientativos</p>
-            {/* Active section pill — hidden on xl where sidebar shows it */}
-            {activeSection && (
-              <span className="hidden sm:inline-flex xl:hidden items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-semibold transition-all duration-300"
-                style={{ background: 'var(--accent-soft)', color: 'var(--accent)', border: '1px solid var(--accent-dim)' }}>
-                <span className="w-1 h-1 rounded-full" style={{ background: 'var(--accent)' }} />
-                {activeSection}
-              </span>
-            )}
+
+          {/* Right controls */}
+          <div className="flex items-center gap-2">
+            <span className="hidden sm:block text-[11px] text-[var(--text-soft)]">Solo tarifa estatal · Orientativo</span>
             <ThemeToggle theme={theme} onToggle={toggleTheme} />
             <ShareButton getShareURL={getShareURL} />
-          </div>
-        </div>
-
-      </header>
-
-      {/* Nav drawer panel — outside <header> to avoid backdrop-filter containing-block issues */}
-      <div
-        id="mobile-menu-panel"
-        className="mobile-menu-panel xl:hidden"
-        data-open={mobileMenuOpen}
-        aria-hidden={!mobileMenuOpen}
-      >
-        <div className="mobile-menu-inner">
-          {/* Drawer header */}
-          <div className="flex items-center justify-between mb-4 pb-3" style={{ borderBottom: '1px solid var(--border)' }}>
-            <div className="flex items-baseline gap-1">
-              <span className="font-serif text-[18px] font-medium tracking-tight" style={{ color: 'var(--text-h)' }}>Fiscal</span>
-              <span className="font-serif text-[18px] italic font-normal tracking-tight" style={{ color: 'var(--accent)' }}>scope</span>
-            </div>
-            <button onClick={() => setMobileMenuOpen(false)} aria-label="Cerrar"
-              className="w-7 h-7 flex items-center justify-center rounded-lg transition-colors hover:bg-[var(--surface2)]"
-              style={{ color: 'var(--text-soft)' }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                <path d="M18 6L6 18M6 6l12 12"/>
+            {/* Mobile nav trigger */}
+            <button
+              className="lg:hidden w-8 h-8 flex items-center justify-center rounded-lg border border-[var(--border)] ml-1"
+              style={{ background: 'var(--surface2)', color: 'var(--text)' }}
+              onClick={() => setMobileNavOpen(o => !o)}
+              aria-label="Secciones"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <line x1="3" y1="12" x2="21" y2="12"/>
+                <line x1="3" y1="18" x2="21" y2="18"/>
               </svg>
             </button>
           </div>
-          <SidebarWidget bruto={bruto} anio={anio} onChange={onChange}
-            onNavigate={() => setMobileMenuOpen(false)} />
         </div>
-      </div>
 
-      {/* Backdrop for nav drawer */}
-      <div
-        className="mobile-menu-backdrop xl:hidden"
-        data-open={mobileMenuOpen}
-        onClick={() => setMobileMenuOpen(false)}
-        aria-hidden="true"
-      />
+        {/* Mobile section pills — visible below header on small screens */}
+        <div className={`mobile-sec-pills lg:hidden ${mobileNavOpen ? 'open' : ''}`}>
+          {SECCIONES.map(s => (
+            <button key={s.id} onClick={() => navTo(s.id)}
+              className={`mobile-sec-pill ${activeId === s.id ? 'active' : ''}`}>
+              <span className="mobile-sec-num">{s.n}</span>
+              {s.label}
+            </button>
+          ))}
+        </div>
+      </header>
 
-      {/* ── Progress dots (right edge) ── */}
-      <ProgressDots />
-
-      {/* ── CENTERED LAYOUT WITH PERSISTENT SIDEBAR ── */}
-      <div className="layout-frame pt-8 sm:pt-10 pb-16 relative z-10">
-
-        {/* Sidebar — always visible on xl+ screens */}
-        <aside className="layout-sidebar sidebar-widget hidden xl:block">
-          <SidebarWidget bruto={bruto} anio={anio} onChange={onChange} />
-        </aside>
-
-        {/* Main content — intro + sections */}
-        <main className="layout-main space-y-14 sm:space-y-16 lg:space-y-20">
-
-          {/* ── INTRO ── */}
-          <section className="text-center">
-            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full border mb-5 sm:mb-6 text-[10px] font-bold uppercase tracking-[0.12em]"
-              style={{ color: 'var(--accent)', borderColor: 'var(--accent-dim)', background: 'var(--accent-soft)' }}>
-              <span className="w-1.5 h-1.5 rounded-full pulse-dot" style={{ background: 'var(--accent)' }} />
-              <span className="hidden sm:inline">Radiografía interactiva del sistema fiscal español</span>
-              <span className="sm:hidden">Radiografía fiscal interactiva</span>
-            </div>
-            <h1 className="font-display text-[2.25rem] sm:text-[3.25rem] lg:text-[4rem] mb-5 sm:mb-6 leading-[1.05] px-2"
-              style={{ color: 'var(--text-h)', fontWeight: 500 }}>
-              Tu sueldo bajo el<br className="hidden sm:block" />{' '}
-              <span className="italic" style={{ color: 'var(--accent)', fontWeight: 400 }}>microscopio fiscal</span>
-            </h1>
-            <p className="text-[15px] sm:text-[16.5px] lg:text-[17.5px] leading-relaxed max-w-[58ch] mx-auto"
-              style={{ color: 'var(--text)' }}>
-              Calcula tu nómina real, compara 15 años de reformas fiscales con la inflación descontada,
-              y descubre cómo los mecanismos ocultos del IRPF afectan a tu bolsillo.
-              Todo con datos oficiales del <strong style={{ color: 'var(--text-h)', fontWeight: 600 }}>BOE, INE y TGSS</strong>.
-            </p>
-
-            <p className="mt-7 sm:mt-9 text-[12.5px] sm:text-[13px] leading-relaxed max-w-[55ch] mx-auto border-t pt-6 sm:pt-8"
-              style={{ borderColor: 'var(--border)', color: 'var(--text-soft)' }}>
-              Esta herramienta calcula tu nómina con la normativa real de cada año desde 2012.
-              Todos los importes comparativos están en <strong style={{ color: 'var(--text)' }}>euros constantes de 2026</strong> —
-              es decir, con la inflación ya descontada — para que puedas comparar directamente sin que los números te engañen.
-              Los datos provienen del BOE, el INE y la TGSS. Los cálculos son orientativos y solo incluyen la tarifa estatal del IRPF.
-            </p>
-          </section>
-
-          {/* ── 1. CALCULADORA ── */}
-          <section id="calc">
-            <SectionTitle n="1" title="Calcula tu nómina"
-              sub="Elige salario y año — verás el desglose completo paso a paso: cotizaciones, reducciones, tramos IRPF y cuánto queda." />
-            <div className="card overflow-hidden">
-              <CalculadoraCard bruto={bruto} anio={anio} onChange={onChange}
-                onShare={() => navigator.clipboard?.writeText(getShareURL())}
-                shareLabel="Compartir" />
-            </div>
-
-            <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <ScrollReveal delay={0}>
-                <InfoCard>
-                  <strong className="text-white block mb-1.5 text-[13px]"> ¿Qué es el tipo efectivo?</strong>
-                  Es el porcentaje <em>real</em> de tu sueldo que va al IRPF. Si ganas 30.000€ y pagas 3.600€ de IRPF,
-                  tu tipo efectivo es el 12%. No confundir con el tramo: aunque tu último euro tribute al 30%,
-                  la media de todos los euros es mucho menor. Pasa el ratón sobre la tarjeta para verlo.
-                </InfoCard>
-              </ScrollReveal>
-              <ScrollReveal delay={100}>
-                <InfoCard>
-                  <strong className="text-white block mb-1.5 text-[13px]"> ¿Y el tipo marginal?</strong>
-                  Es lo que pagas por el <em>siguiente</em> euro que ganes. Si te suben 100€ el sueldo y solo te
-                  llegan 58€, tu tipo marginal efectivo es 42%. Incluye IRPF + SS. Es más alto que el tipo
-                  efectivo porque a tu último euro le toca el tramo más alto, no la media.
-                </InfoCard>
-              </ScrollReveal>
-              <ScrollReveal delay={200}>
-                <InfoCard>
-                  <strong className="text-white block mb-1.5 text-[13px]"> ¿Qué es la base imponible?</strong>
-                  Es lo que realmente tributa. Se calcula restando al bruto: las cotizaciones SS del trabajador,
-                  los 2.000€ de gastos deducibles (desde 2015, Art.19 LIRPF) y la reducción por rendimientos
-                  del trabajo (Art.20). A esa cifra se aplica la tarifa progresiva.
-                </InfoCard>
-              </ScrollReveal>
-              <ScrollReveal delay={300}>
-                <InfoCard>
-                  <strong className="text-white block mb-1.5 text-[13px]"> ¿Por qué hay dos columnas?</strong>
-                  El coste real para la empresa (coste laboral) incluye la SS patronal (~31,5%), que el trabajador
-                  normalmente no ve. Por eso un bruto de 35.000€ puede costar a la empresa más de 46.000€ y
-                  producir solo ~28.000€ netos.
-                </InfoCard>
-              </ScrollReveal>
-            </div>
-          </section>
-
-          {/* ── Transition 1→2 ── */}
-          <SectionTransition>
-            Ya conoces el resultado. Ahora, descubre el <em>viaje</em> que recorre cada euro.
-          </SectionTransition>
-
-          {/* ── 2. DESGLOSE EDUCATIVO (paso a paso) ── */}
-          <section id="desglose">
-            <SectionTitle n="2" title="El viaje de tu sueldo"
-              sub={`De los ${new Intl.NumberFormat('es-ES').format(bruto)} € brutos que pone tu contrato, cada euro pasa por 12 pasos con fórmula y fuente legal hasta convertirse en neto.`} />
-            <div className="card p-5 sm:p-6 lg:p-7 overflow-hidden">
-              <DesgloseEducativo bruto={bruto} anio={anio} />
-            </div>
-          </section>
-
-          {/* ── Transition 2→3 ── */}
-          <SectionTransition>
-            Entendido el sistema, veamos qué pasa cuando <em>te suben</em> el sueldo.
-          </SectionTransition>
-
-          {/* ── 3. SIMULADOR ── */}
-          <section id="simulador">
-            <SectionTitle n="3" title="Simula una subida salarial"
-              sub="De cada 100€ de aumento, ¿cuánto ves realmente en neto? El tipo marginal real puede sorprenderte." />
-            <div className="card overflow-hidden">
-              <SimuladorSubida bruto={bruto} anio={anio} />
-            </div>
-            <div className="mt-5">
-              <ScrollReveal>
-                <InfoCard>
-                  <strong className="text-white text-[13px]">El efecto «cliff» del Art.20.</strong>{' '}
-                  En ciertos tramos de salario (alrededor del umbral inferior del Art.20), ganar un euro más de bruto puede
-                  aumentar tu IRPF más que proporcionalmente, porque cada euro extra también reduce la deducción Art.20.
-                  El tipo marginal efectivo puede superar el 50% incluso en rentas bajas. Esto es lo que economistas
-                  llaman una <em>trampa de actividad</em>: el sistema puede desincentivartrabajarhoras extra o cambiar de empleo.
-                </InfoCard>
-              </ScrollReveal>
-            </div>
-          </section>
-
-          {/* ── Transition 3→4 ── */}
-          <SectionTransition>
-            ¿Era mejor antes? Compara <em>15 años</em> de reformas fiscales.
-          </SectionTransition>
-
-          {/* ── 4. COMPARATIVA ── */}
-          <section id="comparativa">
-            <SectionTitle n="4" title="Compara todos los años (2012–2026)"
-              sub="Tres vistas: neto por nivel salarial, tipo efectivo IRPF, y evolución temporal de tu sueldo. Todo en €2026 (inflación descontada)." />
-            <div className="card p-5 sm:p-6 lg:p-7">
-              <GraficoComparativo brutoRef={bruto} anioRef={anio} />
-            </div>
-
-          </section>
-
-          {/* ── Transition 4→5 ── */}
-          <SectionTransition>
-            De cada euro que le cuestas a tu empresa, ¿cuánto <em>llega a tu bolsillo</em>?
-          </SectionTransition>
-
-          {/* ── 5. CUÑA FISCAL ── */}
-          <section id="cuña">
-            <SectionTitle n="5" title="Cuña fiscal"
-              sub="Cómo se distribuye cada euro de tu sueldo entre tú, Hacienda y la Seguridad Social. Cambia entre la perspectiva del trabajador y el coste real para la empresa." />
-            <div className="card p-5 sm:p-6 lg:p-7">
-              <CuñaFiscal bruto={bruto} anio={anio} />
-            </div>
-            <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <ScrollReveal delay={0}>
-                <InfoCard>
-                  <strong className="text-white text-[13px]"> Perspectiva trabajador</strong>{' '}
-                  Muestra tu bruto dividido en tres: el neto que recibes, el IRPF retenido y tu cuota
-                  de Seguridad Social. La suma de los tres siempre es exactamente tu salario bruto.
-                </InfoCard>
-              </ScrollReveal>
-              <ScrollReveal delay={100}>
-                <InfoCard>
-                  <strong className="text-white text-[13px]"> Perspectiva empresa</strong>{' '}
-                  Añade la SS patronal (~31,5%), que la empresa paga encima de tu bruto y que tú nunca
-                  ves. Revela el coste laboral real y cuánto de ese total llega efectivamente a tu cuenta.
-                </InfoCard>
-              </ScrollReveal>
-            </div>
-          </section>
-
-          {/* ── Transition 5→6 ── */}
-          <SectionTransition>
-            Bajo el capó: los <em>mecanismos ocultos</em> que deciden cuánto pagas.
-          </SectionTransition>
-
-          {/* ── 6. MECANISMOS ── */}
-          <section id="mecanismos">
-            <SectionTitle n="6" title="Mecanismos del sistema fiscal"
-              sub="Dos gráficos interactivos: cómo funciona el descuento del Art.20 y cómo han cambiado los umbrales clave desde 2012. Todo explicado paso a paso." />
-            <div className="card p-5 sm:p-6 lg:p-7">
-              <GraficoMecanismos />
-            </div>
-            <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <ScrollReveal delay={0}>
-                <InfoCard>
-                  <strong className="text-white text-[13px]"> ¿Qué es la curva Art.20?</strong>{' '}
-                  El Art.20 es un «descuento» que reduce tu base imponible. Si ganas poco, el descuento es alto
-                  (pagas poco IRPF). A medida que ganas más, el descuento baja hasta desaparecer.
-                  El gráfico muestra exactamente cuántos euros de descuento tienes para cada nivel de sueldo.
-                </InfoCard>
-              </ScrollReveal>
-              <ScrollReveal delay={100}>
-                <InfoCard>
-                  <strong className="text-white text-[13px]"> ¿Qué son los umbrales?</strong>{' '}
-                  Son las «líneas invisibles» del sistema fiscal: el salario mínimo, el nivel a partir del cual
-                  te retienen IRPF, y los dos umbrales del Art.20. Cuando se mueven, millones de nóminas cambian.
-                  El gráfico muestra cómo han ido subiendo (o no) estos umbrales frente al SMI.
-                </InfoCard>
-              </ScrollReveal>
-            </div>
-          </section>
-
-          {/* ── Transition 6→7 ── */}
-          <SectionTransition>
-            El contexto completo: <em>normativa, historia</em> y fuentes legales.
-          </SectionTransition>
-
-          {/* ── 7. NORMATIVA ── */}
-          <section id="normativa">
-            <SectionTitle n="7" title="Normativa y contexto"
-              sub="Historia de cada reforma, parámetros técnicos, conceptos clave y fuentes legales verificables." />
-            <NormativaFAQ anioRef={anio} />
-          </section>
-
-        </main>{/* end main */}
-      </div>{/* end layout-frame */}
-
-      <footer className="relative mt-10 sm:mt-12">
-        <div className="footer-grid centered-col py-8 sm:py-10">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 text-xs mb-5 sm:mb-6 pt-5 sm:pt-6"
-            style={{ color: 'var(--text-soft)' }}>
-
+      {/* ═══════════════ SIDEBAR NAV ═══════════════ */}
+      <nav className="side-nav" aria-label="Secciones">
+        <div className="side-nav-inner">
+          {/* Brief intro above nav */}
+          <div className="px-4 pt-5 pb-3 mb-1 border-b border-[var(--border)]" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+            <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--text-soft)] mb-0.5">Radiografía fiscal</p>
+            <p className="text-[10.5px] text-[var(--text-soft)] leading-snug opacity-70">España 2012–2026</p>
           </div>
-          <div className="section-separator" />
-          <p className="text-center text-[10px] mt-4" style={{ color: 'var(--text-soft)', opacity: 0.7 }}>
-            FiscalScope · Datos IPC: INE (dic.→dic.) · Parámetros: LIRPF, LGSS, Órdenes anuales SS · BOE
-          </p>
+
+          <div className="px-2 py-3 space-y-0.5">
+            {SECCIONES.map(s => (
+              <button key={s.id} onClick={() => navTo(s.id)}
+                className={`side-nav-item ${activeId === s.id ? 'active' : ''}`}>
+                <span className="side-nav-num">{s.n}</span>
+                <div className="min-w-0">
+                  <p className="side-nav-title">{s.label}</p>
+                  <p className="side-nav-desc">{s.desc}</p>
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
-      </footer>
+      </nav>
+
+      {/* ═══════════════ MAIN CONTENT ═══════════════ */}
+      <main className="app-main">
+        <div className="app-content">
+
+          {/* ═══ Calculadora ═══ */}
+          {activeId === 'calc' && (
+            <div className="space-y-10">
+              {/* Intro hero — only on first section */}
+              <div className="pt-2 pb-2">
+                <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--accent)] mb-3">Radiografía interactiva</p>
+                <h1 className="font-display text-[2rem] sm:text-[2.6rem] lg:text-[3.2rem] leading-[1.08] tracking-tight mb-4"
+                  style={{ color: 'var(--text-h)', fontWeight: 600 }}>
+                  Tu sueldo bajo el{' '}
+                  <em style={{ color: 'var(--accent)', fontWeight: 400 }}>microscopio fiscal</em>
+                </h1>
+                <p className="text-[14.5px] sm:text-[15.5px] leading-relaxed max-w-[52ch] text-[var(--text)]">
+                  IRPF + SS calculados con la normativa real de cada año desde 2012.
+                  Datos del <strong className="text-[var(--text-h)]">BOE, INE y TGSS</strong>.
+                </p>
+              </div>
+
+              <div className="card overflow-hidden">
+                <CalculadoraCard
+                  bruto={bruto} anio={anio} onChange={onChange}
+                  onShare={() => navigator.clipboard?.writeText(getShareURL())}
+                  shareLabel="Compartir"
+                  opts={opts}
+                  onOptsChange={setOpts}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <ScrollReveal delay={0}><InfoCard>
+                  <strong className="text-white block mb-1 text-[13px]">Tipo efectivo</strong>
+                  El porcentaje <em>real</em> de tu sueldo que va al IRPF. Si ganas 30.000€ y pagas 3.600€ de IRPF, tu tipo efectivo es 12% — no el tipo del tramo más alto.
+                </InfoCard></ScrollReveal>
+                <ScrollReveal delay={80}><InfoCard>
+                  <strong className="text-white block mb-1 text-[13px]">Tipo marginal</strong>
+                  Lo que pagas por el <em>siguiente</em> euro. Si te suben 100€ y llegan 58€, tu tipo marginal efectivo es 42%. Siempre mayor que el tipo efectivo.
+                </InfoCard></ScrollReveal>
+                <ScrollReveal delay={160}><InfoCard>
+                  <strong className="text-white block mb-1 text-[13px]">Base imponible</strong>
+                  Lo que tributa: bruto − SS − 2.000€ gastos Art.19 − reducción Art.20. La tarifa progresiva se aplica sobre esta cifra, no sobre el bruto.
+                </InfoCard></ScrollReveal>
+                <ScrollReveal delay={240}><InfoCard>
+                  <strong className="text-white block mb-1 text-[13px]">Coste laboral</strong>
+                  La empresa paga ~31,5% extra en SS patronal que tú nunca ves. Un bruto de 35.000€ cuesta más de 46.000€ a la empresa.
+                </InfoCard></ScrollReveal>
+              </div>
+
+              <div>
+                <SectionHeading tagline="Paso a paso">El viaje de tu sueldo</SectionHeading>
+                <div className="card p-5 sm:p-6 overflow-hidden">
+                  <DesgloseEducativo bruto={bruto} anio={anio} />
+                </div>
+              </div>
+
+              <div>
+                <SectionHeading tagline="Simulador de subida">¿Cuánto ves de cada 100€ de aumento?</SectionHeading>
+                <div className="card overflow-hidden">
+                  <SimuladorSubida bruto={bruto} anio={anio} />
+                </div>
+                <div className="mt-5">
+                  <ScrollReveal><InfoCard>
+                    <strong className="text-white text-[13px]">El efecto «cliff» del Art.20</strong>{' '}
+                    En ciertos tramos, ganar un euro extra puede disparar el IRPF más que proporcionalmente porque también reduce la deducción Art.20. El tipo marginal puede superar el 50% en rentas medias — una <em>trampa de actividad</em>.
+                  </InfoCard></ScrollReveal>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ═══ Histórico ═══ */}
+          {activeId === 'comparativa' && (
+            <div className="space-y-10">
+              <SectionHeading tagline="Comparativa 2012–2026">15 años de reformas fiscales</SectionHeading>
+
+              <div className="card p-5 sm:p-6">
+                <GraficoComparativo brutoRef={bruto} anioRef={anio} />
+              </div>
+
+              <div>
+                <h3 className="font-display text-[1.4rem] sm:text-[1.7rem] leading-tight tracking-tight text-[var(--text-h)] mb-1">
+                  Curvas de tipos por año
+                </h3>
+                <p className="text-[13px] text-[var(--text)] mb-6">¿Qué año pagabas más según tu nivel salarial? Ajuste por IPC incluido.</p>
+                <div className="card p-5 sm:p-6">
+                  <CurvaIRPF bruto={bruto} anio={anio} opts={opts} />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ═══ Distribución ═══ */}
+          {activeId === 'distribucion' && (
+            <div>
+              <SectionHeading tagline="Distribución salarial">¿Dónde estás en la escala social?</SectionHeading>
+              <DistribucionSalarial bruto={bruto} anio={anio} />
+            </div>
+          )}
+
+          {/* ═══ OCDE ═══ */}
+          {activeId === 'internacional' && (
+            <div>
+              <SectionHeading tagline="Comparativa OCDE">España frente al mundo</SectionHeading>
+              <OCDEComparativa bruto={bruto} anio={anio} />
+            </div>
+          )}
+
+          {/* ═══ Sistema ═══ */}
+          {activeId === 'sistema' && (
+            <div className="space-y-12">
+              <div>
+                <SectionHeading tagline="Cuña fiscal">Cuánto de tu sueldo nunca llega a tu cuenta</SectionHeading>
+                <div className="card p-5 sm:p-6">
+                  <CuñaFiscal bruto={bruto} anio={anio} />
+                </div>
+              </div>
+
+              <div>
+                <h3 className="font-display text-[1.4rem] sm:text-[1.7rem] leading-tight tracking-tight text-[var(--text-h)] mb-1">
+                  Mecanismos ocultos
+                </h3>
+                <p className="text-[13px] text-[var(--text)] mb-6">Art.20, umbrales clave y cómo han evolucionado desde 2012.</p>
+                <div className="card p-5 sm:p-6">
+                  <GraficoMecanismos />
+                </div>
+              </div>
+
+              <DeudaPublica bruto={bruto} anio={anio} />
+            </div>
+          )}
+
+          {/* ═══ Normativa ═══ */}
+          {activeId === 'normativa' && (
+            <div className="space-y-12">
+              <SectionHeading tagline="Cronología de reformas">15 años de cambios fiscales</SectionHeading>
+              <CronologiaTimeline />
+
+              <div>
+                <h3 className="font-display text-[1.4rem] sm:text-[1.7rem] leading-tight tracking-tight text-[var(--text-h)] mb-6">
+                  Parámetros y conceptos legales
+                </h3>
+                <NormativaFAQ anioRef={anio} />
+              </div>
+            </div>
+          )}
+
+          {/* Siguiente sección */}
+          {(() => {
+            const idx = SECCIONES.findIndex(s => s.id === activeId);
+            const next = SECCIONES[idx + 1];
+            if (!next) return null;
+            return (
+              <div className="mt-16 pt-8 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+                <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--text-soft)] mb-3">Siguiente</p>
+                <button onClick={() => navTo(next.id)} className="group flex items-center gap-4 text-left">
+                  <span className="side-nav-num" style={{ width: 36, height: 36, borderRadius: 10, fontSize: 14 }}>{next.n}</span>
+                  <div>
+                    <p className="font-display text-[1.1rem] text-[var(--text-h)] group-hover:text-[var(--accent)] transition-colors">{next.label}</p>
+                    <p className="text-[12px] text-[var(--text-soft)]">{next.tagline}</p>
+                  </div>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+                    className="ml-2 text-[var(--text-soft)] group-hover:text-[var(--accent)] group-hover:translate-x-1 transition-all">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                  </svg>
+                </button>
+              </div>
+            );
+          })()}
+
+        </div>{/* end app-content */}
+
+        {/* Footer */}
+        <footer className="border-t mt-16 py-10" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+          <div className="app-content">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+              <div>
+                <div className="flex items-baseline gap-1 mb-1.5">
+                  <span className="logo-mark" style={{ color: 'var(--text-h)', fontSize: 18 }}>Fiscal</span>
+                  <span className="logo-mark-accent" style={{ color: 'var(--accent)', fontSize: 18 }}>scope</span>
+                </div>
+                <p className="text-[11px] text-[var(--text-soft)] max-w-[28ch] leading-relaxed">
+                  Herramienta independiente · Sin afiliación política
+                </p>
+              </div>
+              <div className="text-right space-y-1">
+                <p className="text-[10px] text-[var(--text-soft)] opacity-70">IPC: INE · Parámetros: LIRPF, LGSS, BOE · Cuña: OCDE Taxing Wages 2026</p>
+                <p className="text-[10px] text-[var(--text-soft)] opacity-45">FiscalScope · 2012–2026</p>
+              </div>
+            </div>
+          </div>
+        </footer>
+
+      </main>{/* end app-main */}
+
     </div>
   );
 }
