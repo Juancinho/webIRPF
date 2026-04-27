@@ -186,7 +186,10 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
       </div>
 
       {/* ── CONTROLES UNIFICADOS ── */}
-      <div className="pb-6">
+      <div className="liquid-glass !sticky z-40 p-4 sm:p-5 mb-12" style={{
+        top: 'calc(var(--header-h) + 1rem)',
+        boxShadow: '0 12px 32px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05)'
+      }}>
         <p className="text-[10px] font-bold text-[var(--text-soft)] uppercase tracking-wider mb-4">Selecciona los años para comparar</p>
         <div className="flex flex-wrap gap-1.5">
           {ANIOS.map(a => (
@@ -278,15 +281,20 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
               <span className="w-2.5 h-2.5 rounded-full ring-2 ring-offset-1 ring-offset-[var(--surface)]" style={{ background: '#fb7185', boxShadow: '0 0 8px #fb718560' }} />
               <h3 className="font-display text-[1.5rem] tracking-tight text-[var(--text-h)]">2. Carga fiscal real (<em className="text-[var(--accent)]">Tipo Efectivo</em>)</h3>
             </div>
-            
-            <div className="flex items-center bg-[var(--surface2)] rounded-lg p-1 border border-[var(--border)]">
-              <button onClick={() => setModoTipo('real')} className={`px-3 py-1 text-[11px] font-bold uppercase tracking-wider rounded-md transition-all ${modoTipo === 'real' ? 'bg-[var(--accent)] text-white shadow-sm' : 'text-[var(--text-soft)] hover:text-[var(--text-h)]'}`}>Real (€2026)</button>
-              <button onClick={() => setModoTipo('nominal')} className={`px-3 py-1 text-[11px] font-bold uppercase tracking-wider rounded-md transition-all ${modoTipo === 'nominal' ? 'bg-[var(--accent)] text-white shadow-sm' : 'text-[var(--text-soft)] hover:text-[var(--text-h)]'}`}>Nominal</button>
+
+            <div className="flex items-center p-1 rounded-xl border border-[var(--border)] shrink-0" style={{
+              background: 'color-mix(in srgb, var(--surface2) 60%, transparent)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)'
+            }}>
+              <button onClick={() => setModoTipo('real')} className={`px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-lg transition-all ${modoTipo === 'real' ? 'bg-[var(--accent)] shadow-sm' : 'text-[var(--text-soft)] hover:text-[var(--text-h)] hover:bg-[var(--surface3)]'}`} style={modoTipo === 'real' ? { color: '#ffffff' } : {}}>Real (€2026)</button>
+              <button onClick={() => setModoTipo('nominal')} className={`px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-lg transition-all ${modoTipo === 'nominal' ? 'bg-[var(--accent)] shadow-sm' : 'text-[var(--text-soft)] hover:text-[var(--text-h)] hover:bg-[var(--surface3)]'}`} style={modoTipo === 'nominal' ? { color: '#ffffff' } : {}}>Nominal</button>
             </div>
           </div>
           <p className="text-[13px] text-[var(--text-soft)] leading-relaxed max-w-[85ch]">
-            Aquí visualizamos la intensidad del impuesto: qué porcentaje exacto de cada euro ganado se queda Hacienda. 
-            Usa el selector para ver los datos en términos <strong className="text-[var(--text-h)]">Reales</strong> (comparando salarios con el mismo poder adquisitivo) 
+            Aquí visualizamos la intensidad del impuesto: qué porcentaje exacto de cada euro ganado se queda Hacienda.
+            Usa el selector para ver los datos en términos <strong className="text-[var(--text-h)]">Reales</strong> (comparando salarios con el mismo poder adquisitivo)
             o <strong className="text-[var(--text-h)]">Nominales</strong> (salario bruto tal cual era en ese año, sin ajustar por IPC).
             Observa cómo las curvas se cruzan: una reforma puede beneficiar a las rentas bajas pero penalizar a las medias.
           </p>

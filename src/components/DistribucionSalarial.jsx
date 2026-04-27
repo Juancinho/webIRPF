@@ -393,9 +393,14 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
               </h3>
             </div>
             
-            <div className="flex items-center bg-[var(--surface2)] rounded-lg p-1 border border-[var(--border)] shrink-0 self-start sm:self-auto">
-              <button onClick={() => setModoEvolucion('real')} className={`px-3 py-1 text-[11px] font-bold uppercase tracking-wider rounded-md transition-all ${modoEvolucion === 'real' ? 'bg-[var(--accent)] text-white shadow-sm' : 'text-[var(--text-soft)] hover:text-[var(--text-h)]'}`}>Real (€2026)</button>
-              <button onClick={() => setModoEvolucion('nominal')} className={`px-3 py-1 text-[11px] font-bold uppercase tracking-wider rounded-md transition-all ${modoEvolucion === 'nominal' ? 'bg-[var(--accent)] text-white shadow-sm' : 'text-[var(--text-soft)] hover:text-[var(--text-h)]'}`}>Nominal</button>
+            <div className="flex items-center p-1 rounded-xl border border-[var(--border)] shrink-0 self-start sm:self-auto" style={{
+              background: 'color-mix(in srgb, var(--surface2) 60%, transparent)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)'
+            }}>
+              <button onClick={() => setModoEvolucion('real')} className={`px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-lg transition-all ${modoEvolucion === 'real' ? 'bg-[var(--accent)] shadow-sm' : 'text-[var(--text-soft)] hover:text-[var(--text-h)] hover:bg-[var(--surface3)]'}`} style={modoEvolucion === 'real' ? { color: '#ffffff' } : {}}>Real (€2026)</button>
+              <button onClick={() => setModoEvolucion('nominal')} className={`px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-lg transition-all ${modoEvolucion === 'nominal' ? 'bg-[var(--accent)] shadow-sm' : 'text-[var(--text-soft)] hover:text-[var(--text-h)] hover:bg-[var(--surface3)]'}`} style={modoEvolucion === 'nominal' ? { color: '#ffffff' } : {}}>Nominal</button>
             </div>
           </div>
           
