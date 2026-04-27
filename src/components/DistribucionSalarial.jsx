@@ -117,11 +117,11 @@ function StatsStrip({ dist, salario, anio, color }) {
   ];
   const pctl = percentilDe(salario, anio);
   return (
-    <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mt-4 pt-4 border-t" style={{ borderColor: 'var(--border)' }}>
+    <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mt-4 pt-4 border-t relative z-10" style={{ borderColor: 'var(--border)' }}>
       {items.map(({ label, value }) => {
         const isBelow = salario > 0 && salario > value;
         return (
-          <div key={label} className="text-center">
+          <div key={label} className="text-center rounded-xl py-2 px-1 transition-all duration-300 hover:bg-[var(--surface3)]">
             <p className="text-[9px] font-bold uppercase tracking-wider mb-1"
               style={{ color: isBelow ? color : 'var(--text-soft)' }}>
               {label}
@@ -192,24 +192,27 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
     <div className="space-y-8">
 
       {/* ── Intro + concepto ── */}
-      <div className="space-y-3">
+      <div className="space-y-3 relative">
         <p className="text-[13.5px] text-[var(--text)] leading-relaxed max-w-3xl">
           La <strong className="text-[var(--text-h)]">distribución salarial</strong> muestra cuántos trabajadores ganan cada cantidad. El eje X es el salario bruto anual; la altura de la curva refleja cuántas personas están en ese nivel. Tu marcador rojo indica dónde te sitúas.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div className="card p-4">
+          <div className="dist-glass-panel p-4">
+            <div className="glass-reflection" />
             <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--accent)] mb-1">¿Qué es el percentil?</p>
             <p className="text-[12px] text-[var(--text)] leading-relaxed">
               Si estás en el <strong className="text-[var(--text-h)]">percentil 60</strong>, ganas más que el 60% de los asalariados a tiempo completo en España.
             </p>
           </div>
-          <div className="card p-4">
+          <div className="dist-glass-panel p-4">
+            <div className="glass-reflection" />
             <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--yellow)] mb-1">Progresividad en frío</p>
             <p className="text-[12px] text-[var(--text)] leading-relaxed">
               Si tu salario sube exactamente con el IPC, tu poder adquisitivo no mejora — pero <strong className="text-[var(--text-h)]">caes en la escala relativa</strong> si el resto sube más.
             </p>
           </div>
-          <div className="card p-4">
+          <div className="dist-glass-panel p-4">
+            <div className="glass-reflection" />
             <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--red)] mb-1">El doble castigo</p>
             <p className="text-[12px] text-[var(--text)] leading-relaxed">
               Con IPC: pagas más IRPF (progresividad nominal) <em>y</em> desciendes en la distribución relativa. Dos golpes simultáneos.
@@ -219,7 +222,7 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
       </div>
 
       {/* ── Panel de control ── */}
-      <div className="card p-5 space-y-5">
+      <div className="liquid-glass p-5 space-y-5">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--text-soft)] mb-2">
@@ -273,9 +276,9 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
       </div>
 
       {/* ── Resultado principal ── */}
-      <div className="card p-5 sm:p-6" style={{
-        background: `linear-gradient(135deg, var(--surface2), color-mix(in srgb, ${tono.color} 5%, var(--surface2)))`,
-        borderColor: `color-mix(in srgb, ${tono.color} 25%, var(--border))`,
+      <div className="liquid-glass p-5 sm:p-6" style={{
+        background: `linear-gradient(180deg, rgba(255,255,255,0.05) 0%, transparent 35%), linear-gradient(135deg, color-mix(in srgb, var(--surface2) 80%, transparent), color-mix(in srgb, ${tono.color} 8%, transparent))`,
+        borderColor: `color-mix(in srgb, ${tono.color} 30%, var(--glass-border))`,
       }}>
         <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-soft)] mb-3">
           Resultado — {anioOrigen} → {anioDestino}
@@ -328,98 +331,112 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
       </div>
 
       {/* ── Curva año origen ── */}
-      <div className="card p-5 sm:p-6">
-        <div className="flex items-center justify-between mb-1">
+      <div className="dist-glass-panel p-5 sm:p-6 relative">
+        <div className="glass-reflection" />
+        <div className="glass-orb glass-orb--red" style={{ width: 200, height: 200, top: -40, right: -40, opacity: 0.15 }} />
+        <div className="flex items-center justify-between mb-1 relative z-10">
           <div>
             <span className="inline-block w-3 h-3 rounded-full mr-2" style={{ background: 'var(--red)', verticalAlign: 'middle' }} />
             <span className="text-[13px] font-bold text-[var(--text-h)]">Distribución salarial en {anioOrigen}</span>
           </div>
-          <span className="font-mono text-[12px] font-bold px-3 py-1 rounded-full"
-            style={{ background: 'var(--glow-red)', color: 'var(--red)', border: '1px solid rgba(251,113,133,0.2)' }}>
+          <span className="dist-glass-badge"
+            style={{ background: 'color-mix(in srgb, var(--red) 12%, transparent)', color: 'var(--red)', borderColor: 'color-mix(in srgb, var(--red) 25%, transparent)' }}>
             P{escenario.percentilOrigen.toFixed(1)} · {eur(salarioBase)}
           </span>
         </div>
-        <p className="text-[11.5px] text-[var(--text-soft)] mb-4">
+        <p className="text-[11.5px] text-[var(--text-soft)] mb-4 relative z-10">
           La línea roja marca tu salario. Los valores coloreados en la tabla son percentiles que superas.
         </p>
 
         {escenario.distOrigen && (
-          <BellCurve
-            datos={curvaOrigen}
-            salarioMarcado={salarioBase}
-            dist={escenario.distOrigen}
-            color="var(--red)"
-            anio={anioOrigen}
-          />
+          <div className="relative z-10">
+            <BellCurve
+              datos={curvaOrigen}
+              salarioMarcado={salarioBase}
+              dist={escenario.distOrigen}
+              color="var(--red)"
+              anio={anioOrigen}
+            />
+          </div>
         )}
 
         <StatsStrip dist={escenario.distOrigen} salario={salarioBase} anio={anioOrigen} color="var(--red)" />
       </div>
 
       {/* ── Curva año destino ── */}
-      <div className="card p-5 sm:p-6">
-        <div className="flex items-center justify-between mb-1">
+      <div className="dist-glass-panel p-5 sm:p-6 relative">
+        <div className="glass-reflection" />
+        <div className="glass-orb glass-orb--accent" style={{ width: 220, height: 220, top: -50, right: -30, opacity: 0.12 }} />
+        <div className="flex items-center justify-between mb-1 relative z-10">
           <div>
             <span className="inline-block w-3 h-3 rounded-full mr-2" style={{ background: 'var(--accent)', verticalAlign: 'middle' }} />
             <span className="text-[13px] font-bold text-[var(--text-h)]">Distribución salarial en {anioDestino}</span>
           </div>
-          <span className="font-mono text-[12px] font-bold px-3 py-1 rounded-full"
-            style={{ background: 'var(--accent-soft)', color: 'var(--accent)', border: '1px solid var(--accent-dim)' }}>
+          <span className="dist-glass-badge"
+            style={{ background: 'var(--accent-soft)', color: 'var(--accent)', borderColor: 'var(--accent-dim)' }}>
             P{escenario.percentilDestino.toFixed(1)} · {eur(escenario.salarioEquivDestino)}
           </span>
         </div>
-        <p className="text-[11.5px] text-[var(--text-soft)] mb-4">
+        <p className="text-[11.5px] text-[var(--text-soft)] mb-4 relative z-10">
           Salario equivalente al tuyo ajustado por IPC ({((escenario.factor - 1) * 100).toFixed(0)}% acumulado). Misma capacidad de compra, posición diferente.
         </p>
 
         {escenario.distDestino && (
-          <BellCurve
-            datos={curvaDestino}
-            salarioMarcado={escenario.salarioEquivDestino}
-            dist={escenario.distDestino}
-            color="var(--accent)"
-            anio={anioDestino}
-          />
+          <div className="relative z-10">
+            <BellCurve
+              datos={curvaDestino}
+              salarioMarcado={escenario.salarioEquivDestino}
+              dist={escenario.distDestino}
+              color="var(--accent)"
+              anio={anioDestino}
+            />
+          </div>
         )}
 
         <StatsStrip dist={escenario.distDestino} salario={escenario.salarioEquivDestino} anio={anioDestino} color="var(--accent)" />
       </div>
 
       {/* ── Evolución histórica ── */}
-      <div className="card p-5 sm:p-6">
-        <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--text-soft)] mb-1">Evolución histórica</p>
-        <h3 className="font-display text-[1.2rem] sm:text-[1.4rem] text-[var(--text-h)] mb-1">
-          Salarios nominales 2012–2026
-        </h3>
-        <p className="text-[12px] text-[var(--text)] mb-5 max-w-2xl">
-          P25, mediana, media y P75 en euros corrientes de cada año. El gap entre media y mediana revela la asimetría de la distribución: los salarios altos tiran de la media hacia arriba.
-        </p>
-        <ResponsiveContainer width="100%" height={320}>
-          <ComposedChart data={datosHist} margin={{ top: 8, right: 16, left: 0, bottom: 8 }}>
-            <CartesianGrid strokeDasharray="2 4" stroke="var(--border)" />
-            <XAxis dataKey="anio" tick={{ fontSize: 10, fill: 'var(--text-soft)', fontFamily: 'monospace' }} />
-            <YAxis tick={{ fontSize: 10, fill: 'var(--text-soft)', fontFamily: 'monospace' }}
-              tickFormatter={v => `${(v / 1000).toFixed(0)}k`} width={42} />
-            <Tooltip
-              contentStyle={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, fontSize: 12 }}
-              formatter={(v, n) => [eur(v), n]} />
-            <Bar dataKey="p25" name="P25" fill="var(--accent)" fillOpacity={0.18} />
-            <Line type="monotone" dataKey="p50" name="Mediana (P50)" stroke="var(--accent)" strokeWidth={2.5}
-              dot={{ r: 3, fill: 'var(--accent)' }} />
-            <Line type="monotone" dataKey="media" name="Media" stroke="var(--yellow)" strokeWidth={1.5}
-              dot={false} strokeDasharray="5 3" />
-            <Line type="monotone" dataKey="p75" name="P75" stroke="var(--text-soft)" strokeWidth={1.5}
-              dot={false} strokeDasharray="3 2" />
-            {[anioOrigen, anioDestino].map(a => (
-              <ReferenceLine key={a} x={a} stroke="var(--border-light)" strokeDasharray="3 2" />
-            ))}
-          </ComposedChart>
-        </ResponsiveContainer>
+      <div className="dist-glass-panel p-5 sm:p-6 relative">
+        <div className="glass-reflection" />
+        <div className="glass-orb glass-orb--accent" style={{ width: 180, height: 180, bottom: -30, left: -30, opacity: 0.10 }} />
+        <div className="relative z-10">
+          <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--text-soft)] mb-1">Evolución histórica</p>
+          <h3 className="font-display text-[1.2rem] sm:text-[1.4rem] text-[var(--text-h)] mb-1">
+            Salarios nominales 2012–2026
+          </h3>
+          <p className="text-[12px] text-[var(--text)] mb-5 max-w-2xl">
+            P25, mediana, media y P75 en euros corrientes de cada año. El gap entre media y mediana revela la asimetría de la distribución: los salarios altos tiran de la media hacia arriba.
+          </p>
+          <ResponsiveContainer width="100%" height={320}>
+            <ComposedChart data={datosHist} margin={{ top: 8, right: 16, left: 0, bottom: 8 }}>
+              <CartesianGrid strokeDasharray="2 4" stroke="var(--border)" />
+              <XAxis dataKey="anio" tick={{ fontSize: 10, fill: 'var(--text-soft)', fontFamily: 'monospace' }} />
+              <YAxis tick={{ fontSize: 10, fill: 'var(--text-soft)', fontFamily: 'monospace' }}
+                tickFormatter={v => `${(v / 1000).toFixed(0)}k`} width={42} />
+              <Tooltip
+                contentStyle={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, fontSize: 12 }}
+                formatter={(v, n) => [eur(v), n]} />
+              <Bar dataKey="p25" name="P25" fill="var(--accent)" fillOpacity={0.18} />
+              <Line type="monotone" dataKey="p50" name="Mediana (P50)" stroke="var(--accent)" strokeWidth={2.5}
+                dot={{ r: 3, fill: 'var(--accent)' }} />
+              <Line type="monotone" dataKey="media" name="Media" stroke="var(--yellow)" strokeWidth={1.5}
+                dot={false} strokeDasharray="5 3" />
+              <Line type="monotone" dataKey="p75" name="P75" stroke="var(--text-soft)" strokeWidth={1.5}
+                dot={false} strokeDasharray="3 2" />
+              {[anioOrigen, anioDestino].map(a => (
+                <ReferenceLine key={a} x={a} stroke="var(--border-light)" strokeDasharray="3 2" />
+              ))}
+            </ComposedChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
       {/* ── Fuente y metodología ── */}
-      <div className="card p-5 space-y-4">
-        <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--text-soft)]">Fuente y metodología</p>
+      <div className="dist-glass-panel p-5 space-y-4 relative">
+        <div className="glass-reflection" />
+        <div className="relative z-10">
+          <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--text-soft)]">Fuente y metodología</p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-[12px] text-[var(--text)] leading-relaxed">
           <div className="space-y-2">
@@ -455,6 +472,7 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
           <p className="text-[var(--text-soft)]">
             El INE publica los datos con aproximadamente 2 años de retraso. Los últimos datos disponibles al cierre de esta herramienta corresponden al ejercicio 2023.
           </p>
+        </div>
         </div>
       </div>
 

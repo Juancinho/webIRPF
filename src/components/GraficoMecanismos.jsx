@@ -450,8 +450,9 @@ export default function GraficoMecanismos() {
         ].map(([id, label]) => (
           <button key={id} onClick={() => setTab(id)}
             className={`px-5 py-2.5 rounded-xl text-sm font-semibold border transition-all ${tab === id
-              ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent2)] border-transparent text-white shadow-lg shadow-indigo-500/20'
-              : 'border-[var(--border)] text-[var(--text)] hover:border-[var(--accent)] hover:text-[var(--accent-light)] hover:bg-[var(--accent-dim)]'}`}>
+              ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent2)] border-transparent shadow-lg shadow-indigo-500/20'
+              : 'border-[var(--border)] text-[var(--text)] hover:border-[var(--accent)] hover:text-[var(--accent-light)] hover:bg-[var(--accent-dim)]'}`}
+            style={tab === id ? { color: '#fff' } : {}}>
             {label}
           </button>
         ))}

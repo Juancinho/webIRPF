@@ -174,7 +174,9 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
       {/* ── HEADER ── */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-serif font-black text-[var(--text-h)] tracking-tight">Crónica de 15 años de impuestos</h2>
+          <h2 className="font-display text-[1.8rem] sm:text-[2.2rem] lg:text-[2.8rem] leading-[1.08] tracking-tight text-[var(--text-h)]">
+            Crónica de <em className="text-[var(--accent)]">15 años</em> de impuestos
+          </h2>
           <p className="text-sm text-[var(--text-soft)] mt-1.5 max-w-[60ch]">
             Un recorrido visual por la evolución del IRPF en España. Todo ajustado a <strong className="text-[var(--text-h)] font-semibold">euros de 2026</strong> para eliminar el ruido de la inflación y ver el valor real de tu sueldo.
           </p>
@@ -186,13 +188,7 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
       </div>
 
       {/* ── CONTROLES UNIFICADOS ── */}
-      <div className="p-6 rounded-2xl border border-[var(--border)]"
-        style={{
-          background: 'linear-gradient(135deg, color-mix(in srgb, var(--surface2) 90%, transparent), color-mix(in srgb, var(--surface3) 75%, transparent))',
-          backdropFilter: 'blur(16px) saturate(130%)',
-          WebkitBackdropFilter: 'blur(16px) saturate(130%)',
-          boxShadow: 'var(--shadow-sm)'
-        }}>
+      <div className="pb-6">
         <p className="text-[10px] font-bold text-[var(--text-soft)] uppercase tracking-wider mb-4">Selecciona los años para comparar</p>
         <div className="flex flex-wrap gap-1.5">
           {ANIOS.map(a => (
@@ -218,13 +214,7 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
       </div>
 
       {/* ── HISTORIA 1: EL NETO REAL ── */}
-      <section className="space-y-6 p-6 rounded-2xl border border-[var(--border)]"
-        style={{
-          background: 'linear-gradient(135deg, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--surface2) 80%, transparent))',
-          backdropFilter: 'blur(12px) saturate(120%)',
-          WebkitBackdropFilter: 'blur(12px) saturate(120%)',
-          boxShadow: 'var(--shadow-sm)'
-        }}>
+      <section className="space-y-6 pt-6 border-t border-[var(--border)]">
         <div>
           <div className="flex items-center gap-2 mb-2">
             <span className="w-2.5 h-2.5 rounded-full ring-2 ring-offset-1 ring-offset-[var(--surface)]" style={{ background: '#34d399', boxShadow: '0 0 8px #34d39960' }} />

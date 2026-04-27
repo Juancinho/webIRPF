@@ -45,6 +45,23 @@ export default function OCDEComparativa({ bruto = 35000, anio = 2026 }) {
 
   const irpfTuyo = useMemo(() => calcularNomina(bruto, anio), [bruto, anio]);
 
+  const miCuña = useMemo(() => {
+    const r = irpfTuyo;
+    const total = r.costeLab || 1;
+    return {
+      neto: r.salarioNeto,
+      irpf: r.irpfFinal,
+      ssTra: r.cotTra,
+      ssEmp: r.cotEmp,
+      costeLab: total,
+      netoPct: ((r.salarioNeto / total) * 100).toFixed(1),
+      irpfPct: ((r.irpfFinal / total) * 100).toFixed(1),
+      ssTraPct: ((r.cotTra / total) * 100).toFixed(1),
+      ssEmpPct: ((r.cotEmp / total) * 100).toFixed(1),
+      totalPct: (((total - r.salarioNeto) / total) * 100).toFixed(1),
+    };
+  }, [irpfTuyo]);
+
   const CustomTooltip = ({ active, payload, label }) => {
     if (!active || !payload?.length) return null;
     const fila = datos.find(d => d.pais === label);
@@ -126,6 +143,56 @@ export default function OCDEComparativa({ bruto = 35000, anio = 2026 }) {
         <p className="text-[11px] text-[var(--text-soft)] mt-2">
           Cada barra es el 100% del coste laboral total (empresa). Verde = neto que llega al trabajador. España destaca por la alta cotización empresarial (23,4%) — el mayor componente oculto de la cuña.
         </p>
+      </div>
+
+      {/* Tu cuña fiscal personal */}
+      <div className="liquid-glass p-5 sm:p-6 relative">
+        <div className="glass-reflection" />
+        <div className="relative z-10">
+          <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--accent)] mb-1">Tu situación personal</p>
+          <h3 className="text-base font-bold text-[var(--text-h)] mb-3">
+            Tu cuña fiscal a {eur(bruto)} en {anio}
+          </h3>
+          <p className="text-[12px] text-[var(--text)] leading-relaxed mb-5 max-w-3xl">
+            La <strong className="text-[var(--text-h)]">cuña fiscal</strong> es la diferencia entre lo que <strong className="text-[var(--text-h)]">cuestas a tu empresa</strong> ({eur(miCuña.costeLab)}) y lo que <strong className="text-[var(--text-h)]">recibes en neto</strong> ({eur(miCuña.neto)}). Incluye IRPF, tu cotización a la Seguridad Social y la cotización empresarial — este último componente es dinero que la empresa paga por ti pero que nunca pasa por tu cuenta.
+          </p>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+            {[
+              ['Neto que recibes', miCuña.netoPct, eur(miCuña.neto), 'var(--green)', 'De cada €100 de coste laboral'],
+              ['IRPF retenido', miCuña.irpfPct, eur(miCuña.irpf), 'var(--red)', 'Impuesto sobre la renta'],
+              ['SS trabajador', miCuña.ssTraPct, eur(miCuña.ssTra), 'var(--yellow)', 'Tu cotización obligatoria'],
+              ['SS empresa', miCuña.ssEmpPct, eur(miCuña.ssEmp), 'var(--accent)', 'El componente oculto'],
+            ].map(([label, pctVal, val, color, sub]) => (
+              <div key={label} className="dist-glass-panel p-3.5 text-center relative">
+                <div className="glass-reflection" />
+                <div className="relative z-10">
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-[var(--text-soft)] mb-1">{label}</p>
+                  <p className="text-xl font-black font-mono" style={{ color }}>{pctVal}%</p>
+                  <p className="text-[11px] text-[var(--text)] mt-0.5">{val}</p>
+                  <p className="text-[10px] text-[var(--text-soft)] mt-1 leading-tight">{sub}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="rounded-xl p-4 border relative overflow-hidden" style={{
+            borderColor: parseFloat(miCuña.totalPct) > parseFloat(ESPANA.total) ? 'rgba(251,113,133,0.25)' : 'rgba(52,211,153,0.25)',
+            background: parseFloat(miCuña.totalPct) > parseFloat(ESPANA.total) ? 'var(--glow-red)' : 'var(--glow-green)',
+          }}>
+            <p className="text-[13px] font-medium text-[var(--text-h)] leading-relaxed relative z-10">
+              Tu cuña fiscal total es del <strong className="font-mono" style={{ color: parseFloat(miCuña.totalPct) > parseFloat(ESPANA.total) ? 'var(--red)' : 'var(--green)' }}>{miCuña.totalPct}%</strong>
+              {' '}— es decir, de cada {eur(10000)} que cuestas a tu empresa, solo recibes {eur(Math.round(miCuña.netoPct * 100))}.
+              {parseFloat(miCuña.totalPct) > parseFloat(ESPANA.total)
+                ? ` Está por encima de la media española (${ESPANA.total}%) y de la media OCDE (${MEDIA_OCDE?.total}%).`
+                : ` Está por debajo de la media española (${ESPANA.total}%) y de la media OCDE (${MEDIA_OCDE?.total}%).`}
+            </p>
+          </div>
+
+          <p className="text-[11px] text-[var(--text-soft)] mt-3 leading-relaxed">
+            <strong>Nota:</strong> los datos de la OCDE se calculan para un trabajador soltero sin hijos al <em>salario medio</em> de cada país. Tu cuña personal varía según tu nivel salarial y situación familiar. Si ganas menos de la media, tu IRPF será proporcionalmente menor; si ganas más, será mayor.
+          </p>
+        </div>
       </div>
 
       {/* Simulador "si viviera en..." */}

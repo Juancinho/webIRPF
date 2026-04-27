@@ -76,7 +76,8 @@ export default function CalculadoraCard({ bruto, anio, onChange, onShare, shareL
           <div className="flex rounded-xl border border-[var(--border)] overflow-hidden text-xs">
             {[12, 14].map(n => (
               <button key={n} onClick={() => setPagas(n)}
-                className={`px-4 py-2 font-semibold transition-all ${pagas === n ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent2)] text-white' : 'text-[var(--text)] hover:bg-[var(--surface2)]'}`}>
+                className={`px-4 py-2 font-semibold transition-all ${pagas === n ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent2)]' : 'text-[var(--text)] hover:bg-[var(--surface2)]'}`}
+                style={pagas === n ? { color: '#fff' } : {}}>
                 {n} pagas
               </button>
             ))}

@@ -96,7 +96,7 @@ function SectionHeading({ tagline, children }) {
       {tagline && (
         <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--accent)] mb-2">{tagline}</p>
       )}
-      <h2 className="font-display text-[1.6rem] sm:text-[2rem] lg:text-[2.4rem] leading-[1.1] tracking-tight text-[var(--text-h)]">
+      <h2 className="font-display text-[1.8rem] sm:text-[2.4rem] lg:text-[3rem] leading-[1.06] tracking-tight text-[var(--text-h)]">
         {children}
       </h2>
     </div>
@@ -210,7 +210,7 @@ export default function App() {
                 </p>
               </div>
 
-              <div className="card overflow-hidden">
+              <div className="liquid-glass overflow-hidden">
                 <CalculadoraCard
                   bruto={bruto} anio={anio} onChange={onChange}
                   onShare={() => navigator.clipboard?.writeText(getShareURL())}
@@ -222,38 +222,38 @@ export default function App() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <ScrollReveal delay={0}><InfoCard>
-                  <strong className="text-white block mb-1 text-[13px]">Tipo efectivo</strong>
+                  <strong className="text-[var(--text-h)] block mb-1 text-[13px]">Tipo efectivo</strong>
                   El porcentaje <em>real</em> de tu sueldo que va al IRPF. Si ganas 30.000€ y pagas 3.600€ de IRPF, tu tipo efectivo es 12% — no el tipo del tramo más alto.
                 </InfoCard></ScrollReveal>
                 <ScrollReveal delay={80}><InfoCard>
-                  <strong className="text-white block mb-1 text-[13px]">Tipo marginal</strong>
+                  <strong className="text-[var(--text-h)] block mb-1 text-[13px]">Tipo marginal</strong>
                   Lo que pagas por el <em>siguiente</em> euro. Si te suben 100€ y llegan 58€, tu tipo marginal efectivo es 42%. Siempre mayor que el tipo efectivo.
                 </InfoCard></ScrollReveal>
                 <ScrollReveal delay={160}><InfoCard>
-                  <strong className="text-white block mb-1 text-[13px]">Base imponible</strong>
+                  <strong className="text-[var(--text-h)] block mb-1 text-[13px]">Base imponible</strong>
                   Lo que tributa: bruto − SS − 2.000€ gastos Art.19 − reducción Art.20. La tarifa progresiva se aplica sobre esta cifra, no sobre el bruto.
                 </InfoCard></ScrollReveal>
                 <ScrollReveal delay={240}><InfoCard>
-                  <strong className="text-white block mb-1 text-[13px]">Coste laboral</strong>
+                  <strong className="text-[var(--text-h)] block mb-1 text-[13px]">Coste laboral</strong>
                   La empresa paga ~31,5% extra en SS patronal que tú nunca ves. Un bruto de 35.000€ cuesta más de 46.000€ a la empresa.
                 </InfoCard></ScrollReveal>
               </div>
 
               <div>
-                <SectionHeading tagline="Paso a paso">El viaje de tu sueldo</SectionHeading>
-                <div className="card p-5 sm:p-6 overflow-hidden">
+                <SectionHeading tagline="Paso a paso">El viaje de tu <em className="text-[var(--accent)]">sueldo</em></SectionHeading>
+                <div className="liquid-glass p-5 sm:p-6 overflow-hidden">
                   <DesgloseEducativo bruto={bruto} anio={anio} />
                 </div>
               </div>
 
               <div>
-                <SectionHeading tagline="Simulador de subida">¿Cuánto ves de cada 100€ de aumento?</SectionHeading>
-                <div className="card overflow-hidden">
+                <SectionHeading tagline="Simulador de subida">¿Cuánto ves de cada <em className="text-[var(--accent)]">100€</em> de aumento?</SectionHeading>
+                <div className="liquid-glass overflow-hidden">
                   <SimuladorSubida bruto={bruto} anio={anio} />
                 </div>
                 <div className="mt-5">
                   <ScrollReveal><InfoCard>
-                    <strong className="text-white text-[13px]">El efecto «cliff» del Art.20</strong>{' '}
+                    <strong className="text-[var(--text-h)] text-[13px]">El efecto «cliff» del Art.20</strong>{' '}
                     En ciertos tramos, ganar un euro extra puede disparar el IRPF más que proporcionalmente porque también reduce la deducción Art.20. El tipo marginal puede superar el 50% en rentas medias — una <em>trampa de actividad</em>.
                   </InfoCard></ScrollReveal>
                 </div>
@@ -264,18 +264,15 @@ export default function App() {
           {/* ═══ Histórico ═══ */}
           {activeId === 'comparativa' && (
             <div className="space-y-10">
-              <SectionHeading tagline="Comparativa 2012–2026">15 años de reformas fiscales</SectionHeading>
+              <SectionHeading tagline="Comparativa 2012–2026">15 años de <em className="text-[var(--accent)]">reformas fiscales</em></SectionHeading>
 
-              <div className="card p-5 sm:p-6">
+              <div className="liquid-glass p-5 sm:p-6">
                 <GraficoComparativo brutoRef={bruto} anioRef={anio} />
               </div>
 
               <div>
-                <h3 className="font-display text-[1.4rem] sm:text-[1.7rem] leading-tight tracking-tight text-[var(--text-h)] mb-1">
-                  Curvas de tipos por año
-                </h3>
-                <p className="text-[13px] text-[var(--text)] mb-6">¿Qué año pagabas más según tu nivel salarial? Ajuste por IPC incluido.</p>
-                <div className="card p-5 sm:p-6">
+                <SectionHeading tagline="Curvas de tipos">¿Qué año <em className="text-[var(--accent)]">pagabas más</em> según tu nivel salarial?</SectionHeading>
+                <div className="liquid-glass p-5 sm:p-6">
                   <CurvaIRPF bruto={bruto} anio={anio} opts={opts} />
                 </div>
               </div>
@@ -302,18 +299,15 @@ export default function App() {
           {activeId === 'sistema' && (
             <div className="space-y-12">
               <div>
-                <SectionHeading tagline="Cuña fiscal">Cuánto de tu sueldo nunca llega a tu cuenta</SectionHeading>
-                <div className="card p-5 sm:p-6">
+                <SectionHeading tagline="Cuña fiscal">Cuánto de tu sueldo <em className="text-[var(--accent)]">nunca llega</em> a tu cuenta</SectionHeading>
+                <div className="liquid-glass p-5 sm:p-6">
                   <CuñaFiscal bruto={bruto} anio={anio} />
                 </div>
               </div>
 
               <div>
-                <h3 className="font-display text-[1.4rem] sm:text-[1.7rem] leading-tight tracking-tight text-[var(--text-h)] mb-1">
-                  Mecanismos ocultos
-                </h3>
-                <p className="text-[13px] text-[var(--text)] mb-6">Art.20, umbrales clave y cómo han evolucionado desde 2012.</p>
-                <div className="card p-5 sm:p-6">
+                <SectionHeading tagline="Mecanismos ocultos">Art.20, umbrales y las <em className="text-[var(--accent)]">trampas</em> del sistema</SectionHeading>
+                <div className="liquid-glass p-5 sm:p-6">
                   <GraficoMecanismos />
                 </div>
               </div>
