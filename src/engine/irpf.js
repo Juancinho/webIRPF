@@ -392,6 +392,19 @@ export const DATOS_CHART = SALARIOS_CHART.map(bruto2026 => {
   return point;
 });
 
+export const DATOS_CHART_NOMINAL = SALARIOS_CHART.map(bruto => {
+  const point = { bruto };
+  for (const anio of ANIOS) {
+    const n = calcularNomina(bruto, anio);
+    const marg = calcularTipoMarginal(bruto, anio);
+    point[`neto_${anio}`]     = Math.round(n.salarioNeto);
+    point[`irpf_${anio}`]     = parseFloat((n.tipoEfectivoIRPF * 100).toFixed(2));
+    point[`total_${anio}`]    = parseFloat((n.tipoEfectivoTotal * 100).toFixed(2));
+    point[`marginal_${anio}`] = parseFloat((marg.tipoMarginalTotal * 100).toFixed(2));
+  }
+  return point;
+});
+
 const ANIOS_ART20 = [2012, 2015, 2019, 2023, 2024, 2026];
 export const CURVA_ART20 = Array.from({ length: 261 }, (_, i) => i * 100).map(rn => {
   const p = { rn };

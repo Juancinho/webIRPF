@@ -266,23 +266,14 @@ export default function App() {
             <div className="space-y-10">
               <SectionHeading tagline="Comparativa 2012–2026">15 años de <em className="text-[var(--accent)]">reformas fiscales</em></SectionHeading>
 
-              <div className="liquid-glass p-5 sm:p-6">
-                <GraficoComparativo brutoRef={bruto} anioRef={anio} />
-              </div>
-
-              <div>
-                <SectionHeading tagline="Curvas de tipos">¿Qué año <em className="text-[var(--accent)]">pagabas más</em> según tu nivel salarial?</SectionHeading>
-                <div className="liquid-glass p-5 sm:p-6">
-                  <CurvaIRPF bruto={bruto} anio={anio} opts={opts} />
-                </div>
-              </div>
+              <GraficoComparativo brutoRef={bruto} anioRef={anio} />
             </div>
           )}
 
           {/* ═══ Distribución ═══ */}
           {activeId === 'distribucion' && (
             <div>
-              <SectionHeading tagline="Distribución salarial">¿Dónde estás en la escala social?</SectionHeading>
+              <SectionHeading tagline="Distribución salarial">¿Dónde estás en la <em className="text-[var(--accent)]">escala social</em>?</SectionHeading>
               <DistribucionSalarial bruto={bruto} anio={anio} />
             </div>
           )}

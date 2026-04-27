@@ -4,7 +4,7 @@ import {
   ResponsiveContainer, ReferenceLine, ReferenceArea, Legend, Brush
 } from 'recharts';
 import {
-  ANIOS, DATOS_CHART, INFLACION_A_2026, calcularNomina, obtenerParametros,
+  ANIOS, DATOS_CHART, DATOS_CHART_NOMINAL, INFLACION_A_2026, calcularNomina, obtenerParametros,
   SMI_ANUAL, REFORMA_ANIOS
 } from '../engine/irpf';
 import { eur } from '../utils/format';
@@ -60,10 +60,10 @@ function TooltipSalario({ active, payload, label, ref2026Neto, metrica }) {
   return (
     <div className="p-4 text-xs min-w-[280px] max-h-96 overflow-y-auto rounded-2xl border border-[var(--border)]"
       style={{
-        background: 'linear-gradient(135deg, rgba(12,12,14,0.92), rgba(20,20,22,0.88))',
+        background: 'linear-gradient(135deg, color-mix(in srgb, var(--surface) 96%, transparent), color-mix(in srgb, var(--surface2) 90%, transparent))',
         backdropFilter: 'blur(32px) saturate(150%)',
         WebkitBackdropFilter: 'blur(32px) saturate(150%)',
-        boxShadow: '0 16px 48px rgba(0,0,0,0.35), 0 0 0 1px rgba(212,168,83,0.08) inset'
+        boxShadow: '0 16px 48px rgba(0,0,0,0.2), 0 0 0 1px var(--border) inset'
       }}>
       <p className="text-[10px] text-[var(--text-soft)] mb-0.5 uppercase tracking-wider font-semibold">Salario bruto equivalente (€2026)</p>
       <p className="font-extrabold text-[var(--text-h)] mb-3 border-b border-[var(--border)] pb-2 text-[14px] font-mono tracking-tight">{eur(label)}</p>
@@ -99,10 +99,10 @@ function TooltipAnio({ active, payload, label }) {
   return (
     <div className="p-4 text-xs min-w-[240px] rounded-2xl border border-[var(--border)]"
       style={{
-        background: 'linear-gradient(135deg, rgba(12,12,14,0.92), rgba(20,20,22,0.88))',
+        background: 'linear-gradient(135deg, color-mix(in srgb, var(--surface) 96%, transparent), color-mix(in srgb, var(--surface2) 90%, transparent))',
         backdropFilter: 'blur(32px) saturate(150%)',
         WebkitBackdropFilter: 'blur(32px) saturate(150%)',
-        boxShadow: '0 16px 48px rgba(0,0,0,0.35), 0 0 0 1px rgba(212,168,83,0.08) inset'
+        boxShadow: '0 16px 48px rgba(0,0,0,0.2), 0 0 0 1px var(--border) inset'
       }}>
       <p className="font-extrabold pb-2 mb-2 border-b border-[var(--border)] text-[11px] uppercase tracking-wider" style={{ color: YEAR_COLORS[label] }}>
         {label}{reform ? ` · ${reform.label}` : ''}
@@ -138,6 +138,7 @@ function exportCSV(aniosActivos) {
 
 export default function GraficoComparativo({ brutoRef, anioRef }) {
   const [aniosActivos, setAniosActivos] = useState(new Set([2012, 2015, 2019, 2023, 2026]));
+  const [modoTipo, setModoTipo] = useState('real');
 
   const toggleAnio = useCallback(a => setAniosActivos(prev => {
     const next = new Set(prev);
@@ -174,10 +175,7 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
       {/* ── HEADER ── */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div>
-          <h2 className="font-display text-[1.8rem] sm:text-[2.2rem] lg:text-[2.8rem] leading-[1.08] tracking-tight text-[var(--text-h)]">
-            Crónica de <em className="text-[var(--accent)]">15 años</em> de impuestos
-          </h2>
-          <p className="text-sm text-[var(--text-soft)] mt-1.5 max-w-[60ch]">
+          <p className="text-sm text-[var(--text-soft)] max-w-[60ch]">
             Un recorrido visual por la evolución del IRPF en España. Todo ajustado a <strong className="text-[var(--text-h)] font-semibold">euros de 2026</strong> para eliminar el ruido de la inflación y ver el valor real de tu sueldo.
           </p>
         </div>
@@ -214,20 +212,21 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
       </div>
 
       {/* ── HISTORIA 1: EL NETO REAL ── */}
-      <section className="space-y-6 pt-6 border-t border-[var(--border)]">
+      <section className="space-y-6 pt-8 mt-8 border-t border-[var(--border)]">
         <div>
           <div className="flex items-center gap-2 mb-2">
             <span className="w-2.5 h-2.5 rounded-full ring-2 ring-offset-1 ring-offset-[var(--surface)]" style={{ background: '#34d399', boxShadow: '0 0 8px #34d39960' }} />
-            <h3 className="text-lg font-serif font-bold text-[var(--text-h)]">1. Salario neto por nivel de renta</h3>
+            <h3 className="font-display text-[1.5rem] tracking-tight text-[var(--text-h)]">1. Salario neto por <em className="text-[var(--accent)]">nivel de renta</em></h3>
           </div>
           <p className="text-[13px] text-[var(--text-soft)] leading-relaxed max-w-[85ch]">
-            ¿Cuánto dinero llega realmente a tu bolsillo tras impuestos? En este gráfico, cada línea representa la normativa de un año diferente.
-            El eje horizontal indica tu sueldo bruto, mientras que el eje vertical muestra el neto resultante.
-            Al estar todo ajustado a la inflación, puedes comparar: ¿era más "valioso" un sueldo de 30.000€ en 2015 o en 2026?
+            ¿Cuánto dinero llega realmente a tu bolsillo tras impuestos? En este gráfico visualizamos la evolución del sueldo neto.
+            El eje horizontal representa el salario bruto anual equivalente (ajustado a la inflación de 2026), y el eje vertical muestra
+            el neto que te quedaría aplicando las reglas y cotizaciones de cada año seleccionado.
+            Así puedes ver de forma directa si, manteniendo el mismo poder adquisitivo, las distintas reformas te han dejado más o menos dinero.
           </p>
         </div>
 
-        <div style={{ height: 420 }}>
+        <div className="liquid-glass p-4 sm:p-5" style={{ height: 420 }}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={DATOS_CHART} margin={{ left: 5, right: 20, top: 10, bottom: 40 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
@@ -272,29 +271,30 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
       </section>
 
       {/* ── HISTORIA 2: EL TIPO EFECTIVO ── */}
-      <section className="space-y-6 p-6 rounded-2xl border border-[var(--border)]"
-        style={{
-          background: 'linear-gradient(135deg, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--surface2) 80%, transparent))',
-          backdropFilter: 'blur(12px) saturate(120%)',
-          WebkitBackdropFilter: 'blur(12px) saturate(120%)',
-          boxShadow: 'var(--shadow-sm)'
-        }}>
+      <section className="space-y-6 pt-8 mt-8 border-t border-[var(--border)]">
         <div>
-          <div className="flex items-center gap-2 mb-2">
-            <span className="w-2.5 h-2.5 rounded-full ring-2 ring-offset-1 ring-offset-[var(--surface)]" style={{ background: '#fb7185', boxShadow: '0 0 8px #fb718560' }} />
-            <h3 className="text-lg font-serif font-bold text-[var(--text-h)]">2. Carga fiscal real (Tipo Efectivo)</h3>
+          <div className="flex items-center justify-between gap-4 flex-wrap mb-2">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full ring-2 ring-offset-1 ring-offset-[var(--surface)]" style={{ background: '#fb7185', boxShadow: '0 0 8px #fb718560' }} />
+              <h3 className="font-display text-[1.5rem] tracking-tight text-[var(--text-h)]">2. Carga fiscal real (<em className="text-[var(--accent)]">Tipo Efectivo</em>)</h3>
+            </div>
+            
+            <div className="flex items-center bg-[var(--surface2)] rounded-lg p-1 border border-[var(--border)]">
+              <button onClick={() => setModoTipo('real')} className={`px-3 py-1 text-[11px] font-bold uppercase tracking-wider rounded-md transition-all ${modoTipo === 'real' ? 'bg-[var(--accent)] text-white shadow-sm' : 'text-[var(--text-soft)] hover:text-[var(--text-h)]'}`}>Real (€2026)</button>
+              <button onClick={() => setModoTipo('nominal')} className={`px-3 py-1 text-[11px] font-bold uppercase tracking-wider rounded-md transition-all ${modoTipo === 'nominal' ? 'bg-[var(--accent)] text-white shadow-sm' : 'text-[var(--text-soft)] hover:text-[var(--text-h)]'}`}>Nominal</button>
+            </div>
           </div>
           <p className="text-[13px] text-[var(--text-soft)] leading-relaxed max-w-[85ch]">
-            Aquí visualizamos la intensidad del impuesto: qué porcentaje exacto de cada euro ganado se queda Hacienda.
-            Una línea más baja indica un año con menor <strong className="text-[var(--text)]">carga fiscal individual</strong> para ese nivel de ingresos.
-            Es el mapa definitivo para ver qué reformas bajaron los impuestos y cuáles los subieron.
+            Aquí visualizamos la intensidad del impuesto: qué porcentaje exacto de cada euro ganado se queda Hacienda. 
+            Usa el selector para ver los datos en términos <strong className="text-[var(--text-h)]">Reales</strong> (comparando salarios con el mismo poder adquisitivo) 
+            o <strong className="text-[var(--text-h)]">Nominales</strong> (salario bruto tal cual era en ese año, sin ajustar por IPC).
             Observa cómo las curvas se cruzan: una reforma puede beneficiar a las rentas bajas pero penalizar a las medias.
           </p>
         </div>
 
-        <div style={{ height: 420 }}>
+        <div className="liquid-glass p-4 sm:p-5" style={{ height: 420 }}>
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={DATOS_CHART} margin={{ left: 5, right: 20, top: 10, bottom: 40 }}>
+            <LineChart data={modoTipo === 'real' ? DATOS_CHART : DATOS_CHART_NOMINAL} margin={{ left: 5, right: 20, top: 10, bottom: 40 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
               <XAxis dataKey="bruto" stroke="var(--border)" tick={{ fontSize: 10, fill: 'var(--text-soft)' }} tickFormatter={v => `${v / 1000}k€`} tickLine={false} interval={20} />
               <YAxis stroke="var(--border)" tick={{ fontSize: 11, fill: 'var(--text-soft)' }} tickFormatter={v => `${v}%`} width={40} tickLine={false}
@@ -321,21 +321,15 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
             </LineChart>
           </ResponsiveContainer>
         </div>
-        <InsightTipo aniosActivos={aniosActivos} bruto2026={bruto2026} />
+        <InsightTipo aniosActivos={aniosActivos} bruto2026={bruto2026} modoTipo={modoTipo} />
       </section>
 
       {/* ── HISTORIA 3: EVOLUCIÓN TEMPORAL ── */}
-      <section className="space-y-6 p-6 rounded-2xl border border-[var(--border)]"
-        style={{
-          background: 'linear-gradient(135deg, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--surface2) 80%, transparent))',
-          backdropFilter: 'blur(12px) saturate(120%)',
-          WebkitBackdropFilter: 'blur(12px) saturate(120%)',
-          boxShadow: 'var(--shadow-sm)'
-        }}>
+      <section className="space-y-6 pt-8 mt-8 border-t border-[var(--border)]">
         <div>
           <div className="flex items-center gap-2 mb-2">
             <span className="w-2.5 h-2.5 rounded-full ring-2 ring-offset-1 ring-offset-[var(--surface)]" style={{ background: '#0ea5e9', boxShadow: '0 0 8px #0ea5e960' }} />
-            <h3 className="text-lg font-serif font-bold text-[var(--text-h)]">3. Tu evolución histórica personal</h3>
+            <h3 className="font-display text-[1.5rem] tracking-tight text-[var(--text-h)]">3. Tu evolución histórica <em className="text-[var(--accent)]">personal</em></h3>
           </div>
           <p className="text-[13px] text-[var(--text-soft)] leading-relaxed max-w-[85ch]">
             Este gráfico personaliza la historia para ti. Tomamos el sueldo que has indicado en la calculadora y trazamos su valor real a través de los últimos 15 años.
@@ -344,7 +338,7 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
           </p>
         </div>
 
-        <div style={{ height: 380 }}>
+        <div className="liquid-glass p-4 sm:p-5" style={{ height: 380 }}>
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={dataPorAnio} margin={{ left: 5, right: 45, top: 10, bottom: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
@@ -375,13 +369,7 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
         </div>
 
         {/* Tabla compacta */}
-        <div className="overflow-x-auto rounded-2xl border border-[var(--border)]"
-          style={{
-            background: 'linear-gradient(135deg, color-mix(in srgb, var(--surface) 90%, transparent), color-mix(in srgb, var(--surface2) 78%, transparent))',
-            backdropFilter: 'blur(12px) saturate(120%)',
-            WebkitBackdropFilter: 'blur(12px) saturate(120%)',
-            boxShadow: 'var(--shadow-sm)'
-          }}>
+        <div className="liquid-glass overflow-x-auto">
           <table className="data-table w-full">
             <thead>
               <tr style={{ background: 'color-mix(in srgb, var(--surface2) 80%, transparent)' }}>
@@ -420,10 +408,11 @@ function DotConColor({ cx, cy, payload }) {
   return <circle cx={cx} cy={cy} r={4} fill={YEAR_COLORS[payload.anio] || '#fff'} stroke="none" />;
 }
 
-function InsightTipo({ aniosActivos, bruto2026 }) {
+function InsightTipo({ aniosActivos, bruto2026, modoTipo }) {
   const datos = useMemo(() => {
     if (bruto2026 < 1000) return null;
-    const fila = DATOS_CHART.find(d => d.bruto >= bruto2026) || DATOS_CHART[DATOS_CHART.length - 1];
+    const arrayUsar = modoTipo === 'real' ? DATOS_CHART : DATOS_CHART_NOMINAL;
+    const fila = arrayUsar.find(d => d.bruto >= bruto2026) || arrayUsar[arrayUsar.length - 1];
     const vals = [...aniosActivos].map(a => ({ anio: a, val: fila[`irpf_${a}`] }));
     const sorted = [...vals].sort((a, b) => a.val - b.val);
 

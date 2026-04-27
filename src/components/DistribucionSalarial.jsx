@@ -1,105 +1,59 @@
 import { useState, useMemo } from 'react';
 import {
-  ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid,
+  ComposedChart, Bar, Line, Area, XAxis, YAxis, CartesianGrid,
   Tooltip, ReferenceLine, ResponsiveContainer,
 } from 'recharts';
 import {
   ANIOS, DISTRIBUCION_SALARIAL, percentilDe, densidadLogNormal,
-  inflacionAcumulada,
+  inflacionAcumulada, INFLACION_A_2026
 } from '../engine/irpf';
 import { eur } from '../utils/format';
 
-// ─── Bell curve SVG ──────────────────────────────────────────────────────────
-// viewBox 300×100 + wrapper aspectRatio 2.8:1 → x/y scale ≈ 1.07 (sin distorsión notable)
-function BellCurve({ datos, salarioMarcado, dist, color = 'var(--accent)', anio }) {
-  const maxSalario = 80000;
-  const X = s => Math.min(300, (s / maxSalario) * 300);
-  const maxD = Math.max(...datos.map(p => p.densidad), 0.000001);
-  const Y = h => 86 - (h / maxD) * 68;
-
-  const areaPath = datos.length > 0
-    ? `M ${X(datos[0].salario).toFixed(1)},86 ` +
-      datos.map(p => `L ${X(p.salario).toFixed(1)},${Y(p.densidad).toFixed(1)}`).join(' ') +
-      ` L ${X(datos[datos.length - 1].salario).toFixed(1)},86 Z`
-    : '';
-
-  const marcaX = X(Math.min(salarioMarcado, maxSalario));
-  const ejeX = [0, 10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000];
-
-  const percentiles = [
-    { v: dist?.p10, label: 'P10', short: '10' },
-    { v: dist?.p25, label: 'P25', short: '25' },
-    { v: dist?.p50, label: 'P50', short: '50' },
-    { v: dist?.p75, label: 'P75', short: '75' },
-    { v: dist?.p90, label: 'P90', short: '90' },
-  ].filter(p => p.v > 0 && p.v <= maxSalario);
-
-  // density at salary marker
-  const closest = datos.reduce((best, p) =>
-    Math.abs(p.salario - salarioMarcado) < Math.abs(best.salario - salarioMarcado) ? p : best,
-    datos[0] || { salario: 0, densidad: 0 }
+function TooltipDensidad({ active, payload, label, anio, color }) {
+  if (!active || !payload || !payload.length) return null;
+  const salario = label;
+  const percentil = percentilDe(salario, anio);
+  return (
+    <div className="p-3 rounded-xl border border-[var(--border)]" style={{ background: 'var(--surface)', boxShadow: '0 8px 24px rgba(0,0,0,0.2)' }}>
+      <p className="text-[10px] uppercase tracking-wider text-[var(--text-soft)] font-bold mb-1">Renta Bruta</p>
+      <p className="text-[14px] font-mono font-bold mb-2" style={{ color }}>{eur(salario)}</p>
+      <div className="border-t border-[var(--border)] pt-2 mt-2">
+        <p className="text-[10px] uppercase tracking-wider text-[var(--text-soft)] font-bold mb-1">Percentil estimado</p>
+        <p className="text-[14px] font-mono font-bold text-[var(--text-h)]">P{percentil.toFixed(1)}</p>
+      </div>
+    </div>
   );
-  const markerY = salarioMarcado > 0 && salarioMarcado <= maxSalario
-    ? Y(closest.densidad).toFixed(1)
-    : '50';
+}
+
+function BellCurve({ datos, salarioMarcado, dist, color = 'var(--accent)', anio }) {
+  const percentiles = [
+    { v: dist?.p10, label: 'P10' },
+    { v: dist?.p25, label: 'P25' },
+    { v: dist?.p50, label: 'P50' },
+    { v: dist?.p75, label: 'P75' },
+    { v: dist?.p90, label: 'P90' },
+  ].filter(p => p.v > 0 && p.v <= 80000);
 
   return (
-    <div style={{ width: '100%', aspectRatio: '2.8/1', minHeight: 120 }}>
-      <svg viewBox="0 0 300 100" preserveAspectRatio="none"
-        style={{ width: '100%', height: '100%', display: 'block' }}>
-
-        {/* Soft grid */}
-        {ejeX.map(v => (
-          <line key={v} x1={X(v).toFixed(1)} y1="8" x2={X(v).toFixed(1)} y2="86"
-            stroke="var(--border)" strokeWidth="0.25" />
-        ))}
-
-        {/* Percentile reference lines */}
-        {percentiles.map(({ v, label }) => (
-          <g key={label}>
-            <line x1={X(v).toFixed(1)} y1="8" x2={X(v).toFixed(1)} y2="86"
-              stroke="var(--border-light)" strokeWidth="0.6" strokeDasharray="2 2" />
-            <rect x={X(v) - 8} y="2" width="16" height="8" rx="1.5"
-              fill="var(--surface3)" fillOpacity="0.95" />
-            <text x={X(v).toFixed(1)} y="8.5" textAnchor="middle"
-              style={{ fontSize: '4.2px', fill: 'var(--text-soft)', fontFamily: 'monospace', fontWeight: 700 }}>
-              P{label.replace('P','')}
-            </text>
-          </g>
-        ))}
-
-        {/* Density fill */}
-        <path d={areaPath} fill={color} fillOpacity="0.12"
-          stroke={color} strokeWidth="0.8" strokeLinejoin="round" />
-
-        {/* Salary marker */}
-        {salarioMarcado > 0 && salarioMarcado <= maxSalario && (
-          <>
-            <line x1={marcaX.toFixed(1)} y1="8" x2={marcaX.toFixed(1)} y2="86"
-              stroke={color} strokeWidth="1.2" />
-            <circle cx={marcaX.toFixed(1)} cy={markerY} r="3"
-              fill={color} stroke="var(--bg)" strokeWidth="1" />
-            {/* Salary label above marker */}
-            <rect x={Math.min(marcaX - 20, 260)} y="11" width="40" height="8" rx="2"
-              fill={color} fillOpacity="0.18" />
-            <text x={Math.min(marcaX, 280).toFixed(1)} y="17.5" textAnchor="middle"
-              style={{ fontSize: '4px', fill: color, fontFamily: 'monospace', fontWeight: 700 }}>
-              {(salarioMarcado / 1000).toFixed(0)}k €
-            </text>
-          </>
-        )}
-
-        {/* Baseline */}
-        <line x1="0" y1="86" x2="300" y2="86" stroke="var(--border)" strokeWidth="0.5" />
-
-        {/* X axis labels */}
-        {[10000, 20000, 30000, 40000, 50000, 60000, 70000].map(v => (
-          <text key={v} x={X(v).toFixed(1)} y="96" textAnchor="middle"
-            style={{ fontSize: '4px', fill: 'var(--text-soft)', fontFamily: 'monospace' }}>
-            {v / 1000}k
-          </text>
-        ))}
-      </svg>
+    <div style={{ height: 180, width: '100%', marginTop: 24 }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <ComposedChart data={datos} margin={{ top: 15, right: 15, left: 15, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" opacity={0.5} />
+          <XAxis dataKey="salario" type="number" domain={[0, 80000]} tick={{ fontSize: 10, fill: 'var(--text-soft)', fontFamily: 'monospace' }} tickFormatter={v => `${v/1000}k`} tickCount={9} stroke="var(--border)" />
+          <YAxis hide domain={[0, 'dataMax']} />
+          <Tooltip content={<TooltipDensidad anio={anio} color={color} />} cursor={{ stroke: 'var(--border)', strokeWidth: 1, strokeDasharray: '4 4' }} />
+          
+          <Area type="monotone" dataKey="densidad" fill={color} stroke={color} strokeWidth={2} fillOpacity={0.12} isAnimationActive={false} />
+          
+          {percentiles.map(p => (
+            <ReferenceLine key={p.label} x={p.v} stroke="var(--border-light)" strokeDasharray="2 4" label={{ value: p.label, position: 'insideTop', fill: 'var(--text-soft)', fontSize: 10, fontWeight: 'bold' }} />
+          ))}
+          
+          {salarioMarcado > 0 && salarioMarcado <= 80000 && (
+            <ReferenceLine x={salarioMarcado} stroke={color} strokeWidth={1.5} />
+          )}
+        </ComposedChart>
+      </ResponsiveContainer>
     </div>
   );
 }
@@ -142,6 +96,7 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
   const [anioOrigen, setAnioOrigen] = useState(2018);
   const [anioDestino, setAnioDestino] = useState(anioRef || 2026);
   const [salarioBase, setSalarioBase] = useState(bruto || 25000);
+  const [modoEvolucion, setModoEvolucion] = useState('nominal');
 
   const escenario = useMemo(() => {
     const factor = inflacionAcumulada(anioOrigen, anioDestino);
@@ -173,13 +128,26 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
     return arr;
   }, [anioDestino]);
 
-  const datosHist = ANIOS.map(a => ({
-    anio: a,
-    p50: DISTRIBUCION_SALARIAL[a].p50,
-    media: DISTRIBUCION_SALARIAL[a].media,
-    p25: DISTRIBUCION_SALARIAL[a].p25,
-    p75: DISTRIBUCION_SALARIAL[a].p75,
-  }));
+  const datosHist = useMemo(() => {
+    return ANIOS.map(a => {
+      const factor = modoEvolucion === 'real' ? INFLACION_A_2026[a] : 1;
+      return {
+        anio: a,
+        p50: DISTRIBUCION_SALARIAL[a].p50 * factor,
+        media: DISTRIBUCION_SALARIAL[a].media * factor,
+        p25: DISTRIBUCION_SALARIAL[a].p25 * factor,
+        p75: DISTRIBUCION_SALARIAL[a].p75 * factor,
+      };
+    });
+  }, [modoEvolucion]);
+
+  const evolucionText = useMemo(() => {
+    const p50Ini = datosHist[0].p50;
+    const p50Fin = datosHist[datosHist.length - 1].p50;
+    const diff = p50Fin - p50Ini;
+    const termino = modoEvolucion === 'real' ? 'reales (descontando la inflación)' : 'nominales (sin ajustar por inflación)';
+    return `Desde 2012 hasta 2026, la mediana salarial (P50) en términos ${termino} ha ${diff >= 0 ? 'subido' : 'bajado'} ${eur(Math.abs(diff))}. ${modoEvolucion === 'real' ? (diff < 0 ? 'Esto significa que el poder adquisitivo del trabajador medio se ha reducido.' : 'Esto indica una ligera mejora real en el poder adquisitivo del trabajador medio.') : 'Gran parte de esta aparente subida se debe simplemente al aumento del coste de la vida (inflación).'}`;
+  }, [datosHist, modoEvolucion]);
 
   const tono = (() => {
     if (saltoPercentil < -8) return { color: 'var(--red)',    titulo: 'Caída clara de posición', icono: '↓↓' };
@@ -276,56 +244,72 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
       </div>
 
       {/* ── Resultado principal ── */}
-      <div className="liquid-glass p-5 sm:p-6" style={{
-        background: `linear-gradient(180deg, rgba(255,255,255,0.05) 0%, transparent 35%), linear-gradient(135deg, color-mix(in srgb, var(--surface2) 80%, transparent), color-mix(in srgb, ${tono.color} 8%, transparent))`,
-        borderColor: `color-mix(in srgb, ${tono.color} 30%, var(--glass-border))`,
+      <div className="p-5 sm:p-6 rounded-2xl border border-[var(--border)] relative overflow-hidden" style={{
+        background: `linear-gradient(135deg, color-mix(in srgb, var(--surface2) 88%, transparent), color-mix(in srgb, var(--surface3) 72%, transparent))`,
+        backdropFilter: 'blur(16px) saturate(130%)',
+        WebkitBackdropFilter: 'blur(16px) saturate(130%)',
+        boxShadow: `0 8px 32px rgba(0,0,0,0.15), 0 0 0 1px color-mix(in srgb, ${tono.color} 15%, transparent) inset`
       }}>
-        <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-soft)] mb-3">
-          Resultado — {anioOrigen} → {anioDestino}
-        </p>
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
-          <div className="flex items-center gap-4 flex-wrap">
-            <div className="text-center">
-              <p className="text-[10px] uppercase tracking-wider mb-1" style={{ color: 'var(--red)' }}>En {anioOrigen}</p>
-              <p className="text-[2.2rem] font-black font-mono leading-none" style={{ color: 'var(--red)' }}>
-                P{escenario.percentilOrigen.toFixed(0)}
+        <div className="absolute left-0 top-0 bottom-0 w-1.5" style={{ background: `linear-gradient(to bottom, ${tono.color}, color-mix(in srgb, ${tono.color} 50%, transparent))` }} />
+        <div className="glass-reflection" />
+        
+        <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6 lg:gap-8 relative z-10">
+          <div className="flex-1 space-y-4">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.15em] mb-1" style={{ color: tono.color }}>
+                Veredicto · {anioOrigen} → {anioDestino}
               </p>
-              <p className="text-[11px] text-[var(--text-soft)] mt-0.5">{eur(salarioBase)}</p>
+              <h3 className="font-display text-[1.6rem] leading-tight text-[var(--text-h)]">
+                {tono.titulo}
+              </h3>
             </div>
-
-            <div className="flex flex-col items-center gap-1 px-2">
-              <div className="text-[1.5rem]" style={{ color: tono.color }}>{tono.icono}</div>
-              <div className="font-display text-[1.1rem] font-bold" style={{ color: tono.color }}>
-                {saltoPercentil > 0 ? '+' : ''}{saltoPercentil.toFixed(1)} pp
-              </div>
-              <p className="text-[10px] text-[var(--text-soft)] text-center leading-tight max-w-[80px]">{tono.titulo}</p>
-            </div>
-
-            <div className="text-center">
-              <p className="text-[10px] uppercase tracking-wider mb-1" style={{ color: 'var(--accent)' }}>En {anioDestino}</p>
-              <p className="text-[2.2rem] font-black font-mono leading-none" style={{ color: 'var(--accent)' }}>
-                P{escenario.percentilDestino.toFixed(0)}
-              </p>
-              <p className="text-[11px] text-[var(--text-soft)] mt-0.5">{eur(escenario.salarioEquivDestino)} (equiv. IPC)</p>
-            </div>
+            
+            <p className="text-[13.5px] text-[var(--text)] leading-relaxed">
+              {saltoPercentil < -3 ? (
+                <>
+                  Si mantuviste tu poder adquisitivo (tu sueldo creció un <strong className="text-[var(--text-h)]">{((escenario.factor - 1) * 100).toFixed(0)}%</strong> con el IPC), 
+                  la realidad es que <strong style={{ color: 'var(--red)' }}>te has empobrecido en términos relativos</strong>. 
+                  Como los salarios del resto de España crecieron aún más, has bajado del percentil <strong className="font-mono text-[var(--text-h)]">{escenario.percentilOrigen.toFixed(0)}</strong> al <strong className="font-mono text-[var(--text-h)]">{escenario.percentilDestino.toFixed(0)}</strong>. 
+                  Pagas impuestos de "renta alta" siendo, comparativamente, más pobre que en {anioOrigen}.
+                </>
+              ) : saltoPercentil > 3 ? (
+                <>
+                  Has <strong style={{ color: 'var(--green)' }}>mejorado tu posición</strong> en la sociedad. Tu salario (incluso ajustado por la inflación del {((escenario.factor - 1) * 100).toFixed(0)}%) 
+                  ha crecido más rápido que el de la mayoría de españoles. Has saltado del percentil <strong className="font-mono text-[var(--text-h)]">{escenario.percentilOrigen.toFixed(0)}</strong> al <strong className="font-mono text-[var(--text-h)]">{escenario.percentilDestino.toFixed(0)}</strong>.
+                </>
+              ) : (
+                <>
+                  Tu posición en la escala salarial se mantiene <strong className="text-[var(--text-h)]">completamente estable</strong>. 
+                  El aumento del coste de la vida (IPC acumulado del {((escenario.factor - 1) * 100).toFixed(0)}%) y la evolución de los sueldos en España 
+                  han ido de la mano en tu nivel de ingresos. Sigues rodeado por el mismo porcentaje de población.
+                </>
+              )}
+            </p>
           </div>
 
-          <div className="flex-1 text-[12.5px] text-[var(--text)] leading-relaxed">
-            {saltoPercentil < -3 ? (
-              <>
-                Aunque tu salario <strong className="text-[var(--text-h)]">creció con la inflación</strong> ({(escenario.factor - 1) * 100 > 0 ? '+' : ''}{((escenario.factor - 1) * 100).toFixed(0)}%),
-                el conjunto de la escala salarial creció más. Pagas impuestos de renta media pero, en términos relativos, eres más pobre que en {anioOrigen}.
-              </>
-            ) : saltoPercentil > 3 ? (
-              <>
-                Tu salario <strong className="text-[var(--text-h)]">creció por encima de la inflación</strong> y de la mediana salarial. Subiste en la escala relativa — cada vez más inusual.
-              </>
-            ) : (
-              <>
-                Tu posición en la escala salarial se mantiene estable entre {anioOrigen} y {anioDestino}.
-                El IPC acumulado ({((escenario.factor - 1) * 100).toFixed(0)}%) y la evolución salarial se compensan.
-              </>
-            )}
+          <div className="flex items-center gap-3 bg-[var(--surface)]/50 p-4 rounded-xl border border-[var(--border)] min-w-[280px] justify-center">
+            <div className="text-center">
+              <p className="text-[10px] uppercase tracking-wider mb-1 font-semibold" style={{ color: 'var(--red)' }}>{anioOrigen}</p>
+              <p className="text-[2.5rem] font-black font-mono leading-none" style={{ color: 'var(--red)' }}>
+                P{escenario.percentilOrigen.toFixed(0)}
+              </p>
+              <p className="text-[11px] text-[var(--text-soft)] mt-1">{eur(salarioBase)}</p>
+            </div>
+
+            <div className="flex flex-col items-center px-4 shrink-0">
+              <div className="text-[1.8rem] mb-1" style={{ color: tono.color }}>{tono.icono}</div>
+              <div className="font-mono text-[13px] font-bold px-2 py-0.5 rounded-full" style={{ background: `color-mix(in srgb, ${tono.color} 15%, transparent)`, color: tono.color }}>
+                {saltoPercentil > 0 ? '+' : ''}{saltoPercentil.toFixed(1)} pp
+              </div>
+            </div>
+
+            <div className="text-center">
+              <p className="text-[10px] uppercase tracking-wider mb-1 font-semibold" style={{ color: 'var(--accent)' }}>{anioDestino}</p>
+              <p className="text-[2.5rem] font-black font-mono leading-none" style={{ color: 'var(--accent)' }}>
+                P{escenario.percentilDestino.toFixed(0)}
+              </p>
+              <p className="text-[11px] text-[var(--text-soft)] mt-1">{eur(escenario.salarioEquivDestino)}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -401,12 +385,22 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
         <div className="glass-reflection" />
         <div className="glass-orb glass-orb--accent" style={{ width: 180, height: 180, bottom: -30, left: -30, opacity: 0.10 }} />
         <div className="relative z-10">
-          <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--text-soft)] mb-1">Evolución histórica</p>
-          <h3 className="font-display text-[1.2rem] sm:text-[1.4rem] text-[var(--text-h)] mb-1">
-            Salarios nominales 2012–2026
-          </h3>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2 gap-4">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--text-soft)] mb-1">Evolución histórica</p>
+              <h3 className="font-display text-[1.2rem] sm:text-[1.4rem] text-[var(--text-h)] leading-tight">
+                Salarios de la población 2012–2026
+              </h3>
+            </div>
+            
+            <div className="flex items-center bg-[var(--surface2)] rounded-lg p-1 border border-[var(--border)] shrink-0 self-start sm:self-auto">
+              <button onClick={() => setModoEvolucion('real')} className={`px-3 py-1 text-[11px] font-bold uppercase tracking-wider rounded-md transition-all ${modoEvolucion === 'real' ? 'bg-[var(--accent)] text-white shadow-sm' : 'text-[var(--text-soft)] hover:text-[var(--text-h)]'}`}>Real (€2026)</button>
+              <button onClick={() => setModoEvolucion('nominal')} className={`px-3 py-1 text-[11px] font-bold uppercase tracking-wider rounded-md transition-all ${modoEvolucion === 'nominal' ? 'bg-[var(--accent)] text-white shadow-sm' : 'text-[var(--text-soft)] hover:text-[var(--text-h)]'}`}>Nominal</button>
+            </div>
+          </div>
+          
           <p className="text-[12px] text-[var(--text)] mb-5 max-w-2xl">
-            P25, mediana, media y P75 en euros corrientes de cada año. El gap entre media y mediana revela la asimetría de la distribución: los salarios altos tiran de la media hacia arriba.
+            P25, mediana, media y P75. El gap entre media y mediana revela la asimetría de la distribución: los salarios altos tiran de la media hacia arriba.
           </p>
           <ResponsiveContainer width="100%" height={320}>
             <ComposedChart data={datosHist} margin={{ top: 8, right: 16, left: 0, bottom: 8 }}>
@@ -415,7 +409,9 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
               <YAxis tick={{ fontSize: 10, fill: 'var(--text-soft)', fontFamily: 'monospace' }}
                 tickFormatter={v => `${(v / 1000).toFixed(0)}k`} width={42} />
               <Tooltip
-                contentStyle={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, fontSize: 12 }}
+                contentStyle={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, fontSize: 12, color: 'var(--text-h)' }}
+                itemStyle={{ color: 'var(--text-h)' }}
+                labelStyle={{ color: 'var(--text-soft)', marginBottom: 4 }}
                 formatter={(v, n) => [eur(v), n]} />
               <Bar dataKey="p25" name="P25" fill="var(--accent)" fillOpacity={0.18} />
               <Line type="monotone" dataKey="p50" name="Mediana (P50)" stroke="var(--accent)" strokeWidth={2.5}
@@ -429,6 +425,13 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
               ))}
             </ComposedChart>
           </ResponsiveContainer>
+          
+          <div className="mt-4 p-4 rounded-xl border border-[var(--border)]" style={{ background: 'color-mix(in srgb, var(--surface2) 50%, transparent)' }}>
+            <p className="text-[12px] text-[var(--text-h)] leading-relaxed">
+              <span className="inline-block w-2 h-2 rounded-full mr-2" style={{ background: 'var(--accent)' }} />
+              {evolucionText}
+            </p>
+          </div>
         </div>
       </div>
 
