@@ -5,15 +5,15 @@ import { useScrollReveal } from '../hooks/useScrollReveal';
 
 /* ── Fuentes legales ────────────────────────────────────────────────── */
 const FUENTES = {
-  tgss:      { label: 'TGSS — Bases y tipos de cotización', url: 'https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/CotizacionRecaudacionTrabajadores/36537' },
-  tgss2019:  { label: 'TGSS — Cotización 2019 (Wayback Machine)', url: 'https://web.archive.org/web/20190223131030/https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/CotizacionRecaudacionTrabajadores/36537' },
-  art19:     { label: 'BOE — LIRPF Art.19.2.f', url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764&p=20260321&tn=1#a19' },
-  art20:     { label: 'BOE — LIRPF Art.20 (redacción vigente)', url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764&p=20260321&tn=1#a20' },
-  art20_2019:{ label: 'BOE — Art.20 redacción 2019 (Ley 26/2014)', url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2018-9268#ar-59' },
-  art57:     { label: 'BOE — LIRPF Art.57 (mínimo contribuyente)', url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764&p=20260321&tn=1#a57' },
-  art85:     { label: 'BOE — RIRPF Art.85.3 (límite 43%)', url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2007-6820' },
-  deduSMI:   { label: 'AEAT — Deducción por obtención de rendimientos del trabajo', url: 'https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c18-cuota-liquida-resultante-autoliquidacion/deducciones-cuota-liquida-total/deduccion-obtencion-rendimientos-trabajo.html' },
-  ine:       { label: 'INE — Variación del IPC', url: 'https://www.ine.es/varipc/' },
+  tgss: { label: 'TGSS — Bases y tipos de cotización', url: 'https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/CotizacionRecaudacionTrabajadores/36537' },
+  tgss2019: { label: 'TGSS — Cotización 2019 (Wayback Machine)', url: 'https://web.archive.org/web/20190223131030/https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/CotizacionRecaudacionTrabajadores/36537' },
+  art19: { label: 'BOE — LIRPF Art.19.2.f', url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764&p=20260321&tn=1#a19' },
+  art20: { label: 'BOE — LIRPF Art.20 (redacción vigente)', url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764&p=20260321&tn=1#a20' },
+  art20_2019: { label: 'BOE — Art.20 redacción 2019 (Ley 26/2014)', url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2018-9268#ar-59' },
+  art57: { label: 'BOE — LIRPF Art.57 (mínimo contribuyente)', url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764&p=20260321&tn=1#a57' },
+  art85: { label: 'BOE — RIRPF Art.85.3 (límite 43%)', url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2007-6820' },
+  deduSMI: { label: 'AEAT — Deducción por obtención de rendimientos del trabajo', url: 'https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c18-cuota-liquida-resultante-autoliquidacion/deducciones-cuota-liquida-total/deduccion-obtencion-rendimientos-trabajo.html' },
+  ine: { label: 'INE — Variación del IPC', url: 'https://www.ine.es/varipc/' },
 };
 
 /* ── Subcomponentes visuales ──────────────────────────────────────── */
@@ -48,7 +48,7 @@ function Fuente({ f }) {
   return (
     <a href={f.url} target="_blank" rel="noopener noreferrer" className="fuente-link">
       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-        <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/>
+        <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" />
       </svg>
       {f.label}
     </a>
@@ -87,10 +87,10 @@ function TablaConceptos({ conceptos, total }) {
 function conceptosSSEmpresa(anio, mei) {
   const base = [
     { c: 'Contingencias Comunes', t: 23.60 },
-    { c: 'Desempleo',             t: 5.50  },
-    { c: 'FOGASA',                t: 0.20  },
-    { c: 'Formación Profesional', t: 0.60  },
-    { c: 'Accidentes y EP',       t: 1.50  },
+    { c: 'Desempleo', t: 5.50 },
+    { c: 'FOGASA', t: 0.20 },
+    { c: 'Formación Profesional', t: 0.60 },
+    { c: 'Accidentes y EP', t: 1.50 },
   ];
   if (anio >= 2023) base.push({ c: 'MEI (Mec. Equidad Intergeneracional)', t: mei[0] * 100, nuevo: true });
   return base;
@@ -99,7 +99,7 @@ function conceptosSSEmpresa(anio, mei) {
 function conceptosSSTrabajador(anio, mei) {
   const base = [
     { c: 'Contingencias Comunes', t: 4.70 },
-    { c: 'Desempleo',             t: 1.55 },
+    { c: 'Desempleo', t: 1.55 },
     { c: 'Formación Profesional', t: 0.10 },
   ];
   if (anio >= 2023) base.push({ c: 'MEI (Mec. Equidad Intergeneracional)', t: mei[1] * 100, nuevo: true });
@@ -154,24 +154,24 @@ function formulaDeduccionSMI(anio, bruto, deduccion) {
 }
 
 /* ── Componente principal ─────────────────────────────────────────── */
-export default function DesgloseEducativo({ bruto, anio }) {
+export default function DesgloseEducativo({ bruto, anio, opts = {} }) {
 
-  const r = useMemo(() => calcularNomina(bruto, anio), [bruto, anio]);
+  const r = useMemo(() => calcularNomina(bruto, anio, opts), [bruto, anio, opts]);
   const p = useMemo(() => obtenerParametros(anio), [anio]);
   const meta20 = getArt20Meta(anio);
 
   if (bruto <= 0) return null;
 
   const conceptosEmp = conceptosSSEmpresa(anio, p.mei);
-  const totalEmp     = conceptosEmp.reduce((s, x) => s + x.t, 0);
+  const totalEmp = conceptosEmp.reduce((s, x) => s + x.t, 0);
   const conceptosTra = conceptosSSTrabajador(anio, p.mei);
-  const totalTra     = conceptosTra.reduce((s, x) => s + x.t, 0);
+  const totalTra = conceptosTra.reduce((s, x) => s + x.t, 0);
 
   const art20info = formulaArt20(anio, r.rnPrevio, r.redTrabajo);
   const deduSMIinfo = formulaDeduccionSMI(anio, bruto, r.deduccionSMI);
   const aplicaDeduSMI = anio >= 2025 && r.deduccionSMI > 0;
-  const aplicaF       = anio >= 2015;
-  const aplicaLimite  = r.limiteRetencion < r.cuotaSMI && r.cuotaSMI > 0;
+  const aplicaF = anio >= 2015;
+  const aplicaLimite = r.limiteRetencion < r.cuotaSMI && r.cuotaSMI > 0;
 
   // Primer tramo, para la explicación J
   const firstTipo = p.tramos[0][1];
@@ -189,364 +189,395 @@ export default function DesgloseEducativo({ bruto, anio }) {
       <div className="paso-timeline">
 
 
-          {/* A — Coste laboral */}
-          <Paso letra="A" titulo="Coste laboral total" subtitulo="Lo que tu empresa paga de verdad por ti"
-            color="#d4a853" resultado={r.costeLab}>
+        {/* A — Coste laboral */}
+        <Paso letra="A" titulo="Coste laboral total" subtitulo="Lo que tu empresa paga de verdad por ti"
+          color="#d4a853" resultado={r.costeLab}>
+          <p className="paso-prosa">
+            Es el desembolso total de la empresa para tenerte contratado. Suma tu salario bruto (C) y las cotizaciones
+            sociales que la empresa paga por encima de tu sueldo (B). Tú nunca ves este dinero en tu cuenta,
+            pero forma parte del coste real de tu trabajo.
+          </p>
+          <Formula>
+            A = C + B = {eur(bruto)} + {eur(r.cotEmp)} = <strong style={{ color: '#d4a853' }}>{eur(r.costeLab)}</strong>
+          </Formula>
+          <p className="paso-ratio">
+            De cada 100 € que le cuestas a tu empresa, tú ves {((r.salarioNeto / r.costeLab) * 100).toFixed(1)} € netos.
+          </p>
+        </Paso>
+
+        {/* B — SS Empresa */}
+        <Paso letra="B" titulo="Cotización SS Empresa" subtitulo="Lo que tu empresa paga a la Seguridad Social"
+          color="#f59e0b" resultado={r.cotEmp}>
+          <p className="paso-prosa">
+            La empresa cotiza por ti a la Seguridad Social sumando varios conceptos (contingencias comunes, desempleo,
+            FOGASA, formación, accidentes de trabajo…). Desde 2023 se añade el <strong className="text-white">MEI</strong>
+            {' '}(Mecanismo de Equidad Intergeneracional) como refuerzo del sistema de pensiones.
+          </p>
+          <TablaConceptos conceptos={conceptosEmp} total={totalEmp} />
+          <Formula>
+            B = {eur(Math.min(bruto, p.baseMax))} × {(totalEmp / 100).toFixed(4)} = <strong style={{ color: '#f59e0b' }}>{eur(r.cotEmp)}</strong>
+          </Formula>
+          {bruto > p.baseMax && (
+            <div className="callout-info">
+              ⓘ Tu salario supera la base máxima de cotización ({eur(p.baseMax)}). A partir de ese punto,
+              la SS se cotiza sobre el tope, no sobre todo el bruto.
+            </div>
+          )}
+          <Fuente f={anio === 2019 ? FUENTES.tgss2019 : FUENTES.tgss} />
+        </Paso>
+
+        {/* C — Salario bruto */}
+        <Paso letra="C" titulo="Salario bruto anual" subtitulo="La cifra que aparece en tu contrato"
+          color="#c9956b" resultado={bruto}>
+          <p className="paso-prosa">
+            Es la cantidad pactada en tu contrato antes de cualquier descuento. En 14 pagas equivale a{' '}
+            <strong className="text-white">{eur(bruto / 14)}/mes</strong>; en 12 pagas, <strong className="text-white">{eur(bruto / 12)}/mes</strong>.
+            Todo lo que viene a continuación son ajustes sobre esta cantidad.
+          </p>
+          <Formula>C = {eur(bruto)}</Formula>
+          <p className="paso-ratio">
+            Relación con el SMI {anio} ({eur(SMI_ANUAL[anio])}): <strong className="text-white">{(bruto / SMI_ANUAL[anio]).toFixed(2)} × SMI</strong>.
+          </p>
+        </Paso>
+
+        {/* D — SS Trabajador */}
+        <Paso letra="D" titulo="Cotización SS Trabajador" subtitulo="El descuento directo sobre tu bruto"
+          color="#f59e0b" resultado={r.cotTra}>
+          <p className="paso-prosa">
+            Es la parte que la SS te descuenta a ti directamente. Aparece en tu nómina como «Cotización a la Seguridad Social».
+            Financia tus futuras prestaciones (paro, pensión, baja por enfermedad...). En 2023 se añadió el MEI trabajador.
+          </p>
+          <TablaConceptos conceptos={conceptosTra} total={totalTra} />
+          <Formula>
+            D = {eur(Math.min(bruto, p.baseMax))} × {(totalTra / 100).toFixed(4)} = <strong style={{ color: '#f59e0b' }}>{eur(r.cotTra)}</strong>
+          </Formula>
+          <Fuente f={anio === 2019 ? FUENTES.tgss2019 : FUENTES.tgss} />
+        </Paso>
+
+        {/* E — Rendimiento del trabajo */}
+        <Paso letra="E" titulo="Rendimiento íntegro del trabajo" subtitulo="Tu bruto después de la SS trabajador"
+          color="#c9956b" resultado={r.rnPrevio}>
+          <p className="paso-prosa">
+            Es la base a partir de la cual se aplican las deducciones del IRPF. Es tu salario bruto menos
+            únicamente las cotizaciones a la Seguridad Social que pagas tú.
+          </p>
+          <Formula>
+            E = C − D = {eur(bruto)} − {eur(r.cotTra)} = <strong style={{ color: '#c9956b' }}>{eur(r.rnPrevio)}</strong>
+          </Formula>
+        </Paso>
+
+        {/* F — Deducción general Art.19 */}
+        {aplicaF ? (
+          <Paso letra="F" titulo="Deducción general Art. 19.2.f" subtitulo="Gastos fijos deducibles — 2.000 €"
+            color="#10b981" resultado={2000}>
             <p className="paso-prosa">
-              Es el desembolso total de la empresa para tenerte contratado. Suma tu salario bruto (C) y las cotizaciones
-              sociales que la empresa paga por encima de tu sueldo (B). Tú nunca ves este dinero en tu cuenta,
-              pero forma parte del coste real de tu trabajo.
+              Es una cantidad <strong className="text-white">fija de 2.000 €</strong> que todos los asalariados pueden restar
+              de su rendimiento del trabajo para cubrir los gastos implícitos de ir a trabajar (transporte, ropa, herramientas…).
+              Se introdujo con la reforma de 2015 y <strong className="text-white">lleva congelada desde entonces</strong>,
+              por lo que pierde valor real cada año por la inflación.
             </p>
-            <Formula>
-              A = C + B = {eur(bruto)} + {eur(r.cotEmp)} = <strong style={{ color: '#d4a853' }}>{eur(r.costeLab)}</strong>
-            </Formula>
-            <p className="paso-ratio">
-              De cada 100 € que le cuestas a tu empresa, tú ves {((r.salarioNeto / r.costeLab) * 100).toFixed(1)} € netos.
+            <Formula>F = 2.000 € (cantidad fija por ley)</Formula>
+            <Fuente f={FUENTES.art19} />
+          </Paso>
+        ) : (
+          <Paso letra="F" titulo="Deducción general Art. 19.2.f" subtitulo="No aplicable antes de 2015"
+            color="#4b5563">
+            <p className="paso-prosa">
+              La deducción fija de 2.000 € por gastos profesionales se introdujo con la reforma fiscal de 2015
+              (Ley 26/2014). En <strong className="text-white">{anio}</strong> aún no existía.
             </p>
           </Paso>
+        )}
 
-          {/* B — SS Empresa */}
-          <Paso letra="B" titulo="Cotización SS Empresa" subtitulo="Lo que tu empresa paga a la Seguridad Social"
-            color="#f59e0b" resultado={r.cotEmp}>
-            <p className="paso-prosa">
-              La empresa cotiza por ti a la Seguridad Social sumando varios conceptos (contingencias comunes, desempleo,
-              FOGASA, formación, accidentes de trabajo…). Desde 2023 se añade el <strong className="text-white">MEI</strong>
-              {' '}(Mecanismo de Equidad Intergeneracional) como refuerzo del sistema de pensiones.
-            </p>
-            <TablaConceptos conceptos={conceptosEmp} total={totalEmp} />
-            <Formula>
-              B = {eur(Math.min(bruto, p.baseMax))} × {(totalEmp / 100).toFixed(4)} = <strong style={{ color: '#f59e0b' }}>{eur(r.cotEmp)}</strong>
-            </Formula>
-            {bruto > p.baseMax && (
-              <div className="callout-info">
-                ⓘ Tu salario supera la base máxima de cotización ({eur(p.baseMax)}). A partir de ese punto,
-                la SS se cotiza sobre el tope, no sobre todo el bruto.
+        {/* G — Reducción Art.20 */}
+        <Paso letra="G" titulo="Reducción por rendimientos del trabajo Art. 20"
+          subtitulo="El descuento decreciente — la palanca protectora para rentas bajas"
+          color="#10b981" resultado={r.redTrabajo}>
+          <p className="paso-prosa">
+            Esta es la <strong className="text-white">pieza clave del sistema</strong>: un descuento que reduce tu base imponible.
+            Si ganas poco, el descuento es alto (incluso puedes quedar exento de IRPF). A medida que sube el salario,
+            el descuento va cayendo hasta anularse.
+          </p>
+          {meta20.uInf != null && (
+            <div className="paso-umbrales">
+              <div><span>Umbral inferior</span><strong>{eur(meta20.uInf)}</strong></div>
+              <div><span>Reducción máxima</span><strong>{eur(meta20.rMax)}</strong></div>
+              <div><span>Umbral superior</span><strong>{eur(meta20.uSup)}</strong></div>
+            </div>
+          )}
+          <div className="paso-zona">
+            Tu rendimiento (E = {eur(r.rnPrevio)}) está en la <strong>{art20info.zona}</strong> del Art.20 para {anio}.
+          </div>
+          <Formula>{art20info.formula}</Formula>
+          <Fuente f={anio <= 2019 ? FUENTES.art20_2019 : FUENTES.art20} />
+        </Paso>
+
+        {/* H — Base imponible */}
+        <Paso letra="H" titulo="Base imponible" subtitulo="La cifra sobre la que Hacienda calcula el IRPF"
+          color="#c9956b" resultado={r.baseImponible}>
+          <p className="paso-prosa">
+            Es la cifra que realmente tributa. Se obtiene restando al bruto todas las deducciones previas:
+            la SS trabajador, los 2.000 € de gastos fijos {aplicaF ? '' : '(no aplicable en este año)'} y la reducción del Art.20.
+          </p>
+          <Formula>
+            H = C − D {aplicaF ? `− F` : ''} − G
+            <br />
+            H = {eur(bruto)} − {eur(r.cotTra)} {aplicaF ? `− ${eur(2000)} ` : ''}− {eur(r.redTrabajo)} = <strong style={{ color: '#c9956b' }}>{eur(r.baseImponible)}</strong>
+          </Formula>
+          <p className="paso-ratio">
+            Eso significa que tributas sobre <strong className="text-white">{((r.baseImponible / bruto) * 100).toFixed(1)} %</strong> de tu bruto.
+            El resto queda «protegido» por las deducciones.
+          </p>
+        </Paso>
+
+        {/* I — Mínimo contribuyente */}
+        <Paso letra="I" titulo="Mínimo personal y familiar Art. 57-61" subtitulo="La renta vital que no tributa"
+          color="#10b981" resultado={r.minimoPersonalYFamiliar}>
+          <p className="paso-prosa">
+            La ley considera que una cantidad básica es la renta mínima necesaria para vivir, y por tanto queda libre de IRPF.
+            Para un contribuyente general son <strong className="text-white">{eur(r.minimoPersonal)}</strong>.
+            A esto se le suma el mínimo familiar según tus circunstancias (hijos o ascendientes a cargo).
+          </p>
+
+          {r.minimoFamiliar > 0 && (
+            <div className="mt-4 mb-4 bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl text-[12.5px] text-emerald-100">
+              <div className="font-bold text-emerald-400 mb-2 uppercase tracking-wider text-[10px]">Tu situación personal y familiar</div>
+              <div className="flex justify-between items-center py-1.5 border-b border-emerald-500/10">
+                <span>Mínimo personal base</span>
+                <span className="font-mono">{eur(r.minimoPersonal)}</span>
               </div>
-            )}
-            <Fuente f={anio === 2019 ? FUENTES.tgss2019 : FUENTES.tgss} />
-          </Paso>
+              {opts.nHijos > 0 && (
+                <div className="flex justify-between items-center py-1.5 border-b border-emerald-500/10">
+                  <span>Hijos a cargo ({opts.nHijos}) {opts.nHijosMenores3 > 0 ? `[${opts.nHijosMenores3} < 3 años]` : ''}</span>
+                  <span className="font-mono text-emerald-400">+{eur(r.minimoFamiliar - (opts.nAscendientes * 1150))}</span>
+                </div>
+              )}
+              {opts.nAscendientes > 0 && (
+                <div className="flex justify-between items-center py-1.5 border-b border-emerald-500/10">
+                  <span>Ascendientes a cargo ({opts.nAscendientes})</span>
+                  <span className="font-mono text-emerald-400">+{eur(opts.nAscendientes * 1150)}</span>
+                </div>
+              )}
+              <div className="flex justify-between items-center pt-2 mt-1 font-bold">
+                <span className="text-emerald-300">Total libre de impuestos (Mínimo vital)</span>
+                <span className="font-mono text-emerald-300">{eur(r.minimoPersonalYFamiliar)}</span>
+              </div>
+            </div>
+          )}
 
-          {/* C — Salario bruto */}
-          <Paso letra="C" titulo="Salario bruto anual" subtitulo="La cifra que aparece en tu contrato"
-            color="#c9956b" resultado={bruto}>
+          <Formula>
+            {r.minimoFamiliar > 0
+              ? `I = ${eur(r.minimoPersonal)} (base) + ${eur(r.minimoFamiliar)} (familiar) = ${eur(r.minimoPersonalYFamiliar)}`
+              : `I = ${eur(r.minimoPersonal)} (persona sin circunstancias especiales)`}
+          </Formula>
+          <Fuente f={FUENTES.art57} />
+        </Paso>
+
+        {/* J — Cuota íntegra */}
+        <Paso letra="J" titulo="Cuota íntegra por tramos" subtitulo="Aplicación de la tarifa progresiva estatal"
+          color="#f43f5e" resultado={r.cuotaTeorica}>
+          <p className="paso-prosa">
+            Se aplica la tarifa progresiva del IRPF <strong className="text-white">solo a la parte de la base que supera el mínimo</strong> del
+            contribuyente. Los primeros {eur(r.minimoPersonalYFamiliar)} no generan cuota.
+          </p>
+
+          {(() => {
+            const TRAMO_COLORS = ['#0ea5e9', '#06b6d4', '#10b981', '#84cc16', '#f59e0b', '#ef4444'];
+            let prev = 0;
+            const tramosData = p.tramos.map(([lim, tipo], i) => {
+              const desde = prev;
+              const ancho = lim === Infinity ? null : lim - prev;
+              const limReal = lim === Infinity ? r.baseImponible : lim;
+              const enRango = r.baseImponible > desde;
+              const lleno = r.baseImponible >= limReal;
+              const eurosEnTramo = !enRango ? 0 : (lleno ? limReal - desde : r.baseImponible - desde);
+              const cuota = eurosEnTramo * tipo;
+              const fillPct = ancho == null
+                ? (eurosEnTramo > 0 ? 1 : 0)
+                : ancho > 0 ? eurosEnTramo / ancho : 0;
+              prev = limReal;
+              return {
+                desde, hasta: lim, tipo, eurosEnTramo, cuota, fillPct, enRango,
+                color: TRAMO_COLORS[i % TRAMO_COLORS.length],
+              };
+            });
+            const tramosActivos = tramosData.filter(t => t.enRango && t.eurosEnTramo > 0);
+            const baseImp = r.baseImponible || 1;
+
+            return (
+              <div className="tramos-visual">
+                {/* Pedagogical intro */}
+                <p className="tramos-intro-note">
+                  El IRPF es <strong>progresivo</strong>: cada tipo solo se aplica a los euros
+                  que caen <em>dentro de esa franja</em> — no a toda tu base de{' '}
+                  <strong className="font-mono">{eur(r.baseImponible)}</strong>.
+                </p>
+
+                <div className="tramos-visual-header">
+                  <span className="tramos-visual-title">Distribución de tu base imponible en tramos</span>
+                  <span className="tramos-visual-base font-mono">{eur(r.baseImponible)}</span>
+                </div>
+
+                {/* Stacked bar — full base across active tramos */}
+                <div className="tramos-stacked">
+                  {tramosActivos.map((t, i) => {
+                    const widthPct = (t.eurosEnTramo / baseImp) * 100;
+                    return (
+                      <div key={i} className="tramos-segment"
+                        style={{ width: `${widthPct}%`, background: `linear-gradient(180deg, ${t.color}, ${t.color}cc)` }}
+                        title={`${eur(t.eurosEnTramo)} al ${(t.tipo * 100).toFixed(1)}%`}>
+                        {widthPct > 14 && (
+                          <span className="tramos-segment-label">
+                            {eur(t.eurosEnTramo)}
+                            <small>{(t.tipo * 100).toFixed(0)}%</small>
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+                {/* Scale: 0€ ← bar → tu base */}
+                <div className="tramos-scale">
+                  <span className="font-mono">0 €</span>
+                  <span className="font-mono tramos-scale-end" style={{ color: 'var(--accent)' }}>
+                    {eur(r.baseImponible)} ← tu base
+                  </span>
+                </div>
+
+                {/* Per-tramo detail rows */}
+                <div className="tramos-detail">
+                  {tramosData.map((t, i) => {
+                    const rangoLabel = t.hasta === Infinity
+                      ? `desde ${eur(t.desde)}`
+                      : `${eur(t.desde)} – ${eur(t.hasta)}`;
+                    const isPartial = t.enRango && t.eurosEnTramo > 0 && t.fillPct < 0.999;
+                    return (
+                      <div key={i}>
+                        <div className={`tramo-row-v2 ${!t.enRango || t.eurosEnTramo === 0 ? 'is-empty' : ''}`}>
+                          <span className="tramo-dot" style={{ background: t.color }} />
+                          <span className="tramo-range">{rangoLabel}</span>
+                          <span className="tramo-rate" style={{ color: t.color }}>
+                            {(t.tipo * 100).toFixed(1)}%
+                          </span>
+                          <span className="tramo-fill-track">
+                            <span className="tramo-fill-bar"
+                              style={{ width: `${(t.fillPct * 100).toFixed(1)}%`, background: t.color }} />
+                          </span>
+                          {t.eurosEnTramo > 0 ? (
+                            <>
+                              <span className="tramo-eur">
+                                <strong className="font-mono">{eur(t.eurosEnTramo)}</strong>
+                                <small>× {(t.tipo * 100).toFixed(0)}%</small>
+                              </span>
+                              <span className="tramo-cuota-v2">
+                                <strong className="font-mono" style={{ color: 'var(--red)' }}>{eur(t.cuota)}</strong>
+                                <small>IRPF</small>
+                              </span>
+                            </>
+                          ) : (
+                            <span className="tramo-empty-label">no llegas a este tramo</span>
+                          )}
+                        </div>
+                        {isPartial && (
+                          <div className="tramo-partial-badge" style={{ borderColor: `${t.color}40`, background: `${t.color}10` }}>
+                            <span style={{ color: t.color }}>Tu base termina aquí</span>
+                            {' '}— solo los <strong className="font-mono">{eur(t.eurosEnTramo)}</strong> que van
+                            de <strong className="font-mono">{eur(t.desde)}</strong> hasta tu base
+                            cotizan al <strong style={{ color: t.color }}>{(t.tipo * 100).toFixed(0)}%</strong>,
+                            no todo tu salario.
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
+
+          <div className="callout-info" style={{ marginTop: '0.75rem' }}>
+            <p style={{ marginBottom: '0.4rem' }}>
+              <strong>¿Por qué se resta {eur(r.cuotaMinimo)}?</strong>
+            </p>
+            <p>
+              Los {eur(r.minimoPersonalYFamiliar)} del mínimo vital (Paso I) deben quedar <strong>a cero de IRPF</strong>.
+              Pero el cálculo de las franjas de arriba los incluyó en la base, así que les asignó impuesto.
+              Para anularlo, calculamos el IRPF correspondiente a esos {eur(r.minimoPersonalYFamiliar)} pasándolos por los tramos:
+              eso da exactamente <strong>{eur(r.cuotaMinimo)}</strong>.
+              Ese importe se descuenta, y esos euros quedan libres.
+            </p>
+          </div>
+          <Formula>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '5px 20px', alignItems: 'center' }}>
+              <span style={{ color: 'var(--text-soft)', fontWeight: 400, fontSize: '0.88em' }}>
+                IRPF calculado sobre tu base completa ({eur(r.baseImponible)})
+              </span>
+              <span>{eur(r.cuotaIntegra)}</span>
+              <span style={{ color: 'var(--text-soft)', fontWeight: 400, fontSize: '0.88em' }}>
+                Se anula el IRPF del mínimo vital de {eur(r.minimoPersonalYFamiliar)}
+              </span>
+              <span style={{ color: 'var(--red)' }}>− {eur(r.cuotaMinimo)}</span>
+              <div style={{ gridColumn: '1 / -1', height: 1, background: 'var(--border)', margin: '2px 0' }} />
+              <strong>J = Cuota íntegra estatal</strong>
+              <strong style={{ color: '#f43f5e' }}>{eur(r.cuotaTeorica)}</strong>
+            </div>
+          </Formula>
+          <p style={{ fontSize: 11, color: 'var(--text-soft)', marginTop: '0.4rem', fontStyle: 'italic' }}>
+            Equivale a aplicar la tarifa directamente sobre {eur(r.baseImponible)} − {eur(r.minimoPersonalYFamiliar)} = {eur(Math.max(0, r.baseImponible - r.minimoPersonalYFamiliar))}.
+          </p>
+          <p className="paso-ratio">
+            Aquí solo está la <strong className="text-white">parte estatal</strong> (50% del IRPF total). La parte autonómica varía por
+            comunidad y no se incluye en este cálculo.
+          </p>
+        </Paso>
+
+        {/* K — Deducción SMI (solo 2025+) */}
+        {deduSMIinfo.activo ? (
+          <Paso letra="K" titulo="Deducción por obtención de rendimientos del trabajo"
+            subtitulo="La «deducción SMI» — un descuento extra para salarios cercanos al mínimo"
+            color="#10b981" resultado={r.deduccionSMI}>
             <p className="paso-prosa">
-              Es la cantidad pactada en tu contrato antes de cualquier descuento. En 14 pagas equivale a{' '}
-              <strong className="text-white">{eur(bruto / 14)}/mes</strong>; en 12 pagas, <strong className="text-white">{eur(bruto / 12)}/mes</strong>.
-              Todo lo que viene a continuación son ajustes sobre esta cantidad.
+              Desde 2025 existe una <strong className="text-white">deducción adicional</strong> sobre la cuota del IRPF
+              para salarios en el entorno del SMI. Se resta directamente del impuesto, no de la base. Es una
+              «rebaja» de última hora para no penalizar a los que ganan poco.
             </p>
-            <Formula>C = {eur(bruto)}</Formula>
-            <p className="paso-ratio">
-              Relación con el SMI {anio} ({eur(SMI_ANUAL[anio])}): <strong className="text-white">{(bruto / SMI_ANUAL[anio]).toFixed(2)} × SMI</strong>.
-            </p>
+            <Formula>{deduSMIinfo.formula}</Formula>
+            <Fuente f={FUENTES.deduSMI} />
           </Paso>
-
-          {/* D — SS Trabajador */}
-          <Paso letra="D" titulo="Cotización SS Trabajador" subtitulo="El descuento directo sobre tu bruto"
-            color="#f59e0b" resultado={r.cotTra}>
-            <p className="paso-prosa">
-              Es la parte que la SS te descuenta a ti directamente. Aparece en tu nómina como «Cotización a la Seguridad Social».
-              Financia tus futuras prestaciones (paro, pensión, baja por enfermedad...). En 2023 se añadió el MEI trabajador.
-            </p>
-            <TablaConceptos conceptos={conceptosTra} total={totalTra} />
-            <Formula>
-              D = {eur(Math.min(bruto, p.baseMax))} × {(totalTra / 100).toFixed(4)} = <strong style={{ color: '#f59e0b' }}>{eur(r.cotTra)}</strong>
-            </Formula>
-            <Fuente f={anio === 2019 ? FUENTES.tgss2019 : FUENTES.tgss} />
-          </Paso>
-
-          {/* E — Rendimiento del trabajo */}
-          <Paso letra="E" titulo="Rendimiento íntegro del trabajo" subtitulo="Tu bruto después de la SS trabajador"
-            color="#c9956b" resultado={r.rnPrevio}>
-            <p className="paso-prosa">
-              Es la base a partir de la cual se aplican las deducciones del IRPF. Es tu salario bruto menos
-              únicamente las cotizaciones a la Seguridad Social que pagas tú.
-            </p>
-            <Formula>
-              E = C − D = {eur(bruto)} − {eur(r.cotTra)} = <strong style={{ color: '#c9956b' }}>{eur(r.rnPrevio)}</strong>
-            </Formula>
-          </Paso>
-
-          {/* F — Deducción general Art.19 */}
-          {aplicaF ? (
-            <Paso letra="F" titulo="Deducción general Art. 19.2.f" subtitulo="Gastos fijos deducibles — 2.000 €"
-              color="#10b981" resultado={2000}>
-              <p className="paso-prosa">
-                Es una cantidad <strong className="text-white">fija de 2.000 €</strong> que todos los asalariados pueden restar
-                de su rendimiento del trabajo para cubrir los gastos implícitos de ir a trabajar (transporte, ropa, herramientas…).
-                Se introdujo con la reforma de 2015 y <strong className="text-white">lleva congelada desde entonces</strong>,
-                por lo que pierde valor real cada año por la inflación.
-              </p>
-              <Formula>F = 2.000 € (cantidad fija por ley)</Formula>
-              <Fuente f={FUENTES.art19} />
-            </Paso>
-          ) : (
-            <Paso letra="F" titulo="Deducción general Art. 19.2.f" subtitulo="No aplicable antes de 2015"
+        ) : (
+          anio >= 2025 && (
+            <Paso letra="K" titulo="Deducción por obtención de rendimientos del trabajo"
+              subtitulo="No aplicable a tu nivel de salario"
               color="#4b5563">
               <p className="paso-prosa">
-                La deducción fija de 2.000 € por gastos profesionales se introdujo con la reforma fiscal de 2015
-                (Ley 26/2014). En <strong className="text-white">{anio}</strong> aún no existía.
+                Tu rendimiento ({eur(r.rnPrevio)}) está fuera del rango que permite esta deducción
+                ({anio === 2026 ? 'tramo decreciente desde 17.094 €' : 'entre 16.576 € y 18.276 €'}). Solo se aplica a salarios muy cercanos al SMI.
               </p>
             </Paso>
-          )}
+          )
+        )}
 
-          {/* G — Reducción Art.20 */}
-          <Paso letra="G" titulo="Reducción por rendimientos del trabajo Art. 20"
-            subtitulo="El descuento decreciente — la palanca protectora para rentas bajas"
-            color="#10b981" resultado={r.redTrabajo}>
-            <p className="paso-prosa">
-              Esta es la <strong className="text-white">pieza clave del sistema</strong>: un descuento que reduce tu base imponible.
-              Si ganas poco, el descuento es alto (incluso puedes quedar exento de IRPF). A medida que sube el salario,
-              el descuento va cayendo hasta anularse.
-            </p>
-            {meta20.uInf != null && (
-              <div className="paso-umbrales">
-                <div><span>Umbral inferior</span><strong>{eur(meta20.uInf)}</strong></div>
-                <div><span>Reducción máxima</span><strong>{eur(meta20.rMax)}</strong></div>
-                <div><span>Umbral superior</span><strong>{eur(meta20.uSup)}</strong></div>
-              </div>
-            )}
-            <div className="paso-zona">
-              Tu rendimiento (E = {eur(r.rnPrevio)}) está en la <strong>{art20info.zona}</strong> del Art.20 para {anio}.
+        {/* L — IRPF final */}
+        <Paso letra="L" titulo="IRPF final" subtitulo="Lo que realmente te retiene Hacienda"
+          color="#f43f5e" resultado={r.irpfFinal}>
+          <p className="paso-prosa">
+            Es el IRPF efectivo que se retiene en tu nómina. Resulta de restar la deducción K (si aplica) a la
+            cuota teórica J, y aplicar el <strong className="text-white">límite del 43%</strong> que protege los salarios
+            bajos (Art. 85.3 RIRPF): la retención nunca puede superar el 43% del exceso sobre el mínimo exento de retención.
+          </p>
+          <Formula>
+            L = J − K = {eur(r.cuotaTeorica)} − {eur(r.deduccionSMI)} = <strong style={{ color: '#f43f5e' }}>{eur(r.cuotaSMI)}</strong>
+            {aplicaLimite && <>
+              <br />↓ Límite 43% activo: L = {eur(r.limiteRetencion)}
+            </>}
+          </Formula>
+          {aplicaLimite && (
+            <div className="callout-info" style={{ borderColor: 'rgba(249,115,22,0.3)', background: 'rgba(249,115,22,0.07)' }}>
+              ⚠️ Se activa el límite protector del Art. 85.3. Sin él tu retención sería más alta.
             </div>
-            <Formula>{art20info.formula}</Formula>
-            <Fuente f={anio <= 2019 ? FUENTES.art20_2019 : FUENTES.art20} />
-          </Paso>
-
-          {/* H — Base imponible */}
-          <Paso letra="H" titulo="Base imponible" subtitulo="La cifra sobre la que Hacienda calcula el IRPF"
-            color="#c9956b" resultado={r.baseImponible}>
-            <p className="paso-prosa">
-              Es la cifra que realmente tributa. Se obtiene restando al bruto todas las deducciones previas:
-              la SS trabajador, los 2.000 € de gastos fijos {aplicaF ? '' : '(no aplicable en este año)'} y la reducción del Art.20.
-            </p>
-            <Formula>
-              H = C − D {aplicaF ? `− F` : ''} − G
-              <br />
-              H = {eur(bruto)} − {eur(r.cotTra)} {aplicaF ? `− ${eur(2000)} ` : ''}− {eur(r.redTrabajo)} = <strong style={{ color: '#c9956b' }}>{eur(r.baseImponible)}</strong>
-            </Formula>
-            <p className="paso-ratio">
-              Eso significa que tributas sobre <strong className="text-white">{((r.baseImponible / bruto) * 100).toFixed(1)} %</strong> de tu bruto.
-              El resto queda «protegido» por las deducciones.
-            </p>
-          </Paso>
-
-          {/* I — Mínimo contribuyente */}
-          <Paso letra="I" titulo="Mínimo del contribuyente Art. 57" subtitulo="La renta vital que no tributa"
-            color="#10b981" resultado={irpfMinimoAnio}>
-            <p className="paso-prosa">
-              La ley considera que <strong className="text-white">{eur(irpfMinimoAnio)}</strong> son la renta mínima
-              necesaria para vivir, y por tanto no tributan. Para un contribuyente sin circunstancias especiales
-              (sin discapacidad, sin descendientes, sin edad avanzada) es una cantidad fija.
-            </p>
-            <Formula>I = {eur(irpfMinimoAnio)} (persona sin circunstancias especiales)</Formula>
-            <Fuente f={FUENTES.art57} />
-          </Paso>
-
-          {/* J — Cuota íntegra */}
-          <Paso letra="J" titulo="Cuota íntegra por tramos" subtitulo="Aplicación de la tarifa progresiva estatal"
-            color="#f43f5e" resultado={r.cuotaTeorica}>
-            <p className="paso-prosa">
-              Se aplica la tarifa progresiva del IRPF <strong className="text-white">solo a la parte de la base que supera el mínimo</strong> del
-              contribuyente. Los primeros {eur(irpfMinimoAnio)} no generan cuota.
-            </p>
-
-            {(() => {
-              const TRAMO_COLORS = ['#0ea5e9', '#06b6d4', '#10b981', '#84cc16', '#f59e0b', '#ef4444'];
-              let prev = 0;
-              const tramosData = p.tramos.map(([lim, tipo], i) => {
-                const desde = prev;
-                const ancho = lim === Infinity ? null : lim - prev;
-                const limReal = lim === Infinity ? r.baseImponible : lim;
-                const enRango = r.baseImponible > desde;
-                const lleno = r.baseImponible >= limReal;
-                const eurosEnTramo = !enRango ? 0 : (lleno ? limReal - desde : r.baseImponible - desde);
-                const cuota = eurosEnTramo * tipo;
-                const fillPct = ancho == null
-                  ? (eurosEnTramo > 0 ? 1 : 0)
-                  : ancho > 0 ? eurosEnTramo / ancho : 0;
-                prev = limReal;
-                return {
-                  desde, hasta: lim, tipo, eurosEnTramo, cuota, fillPct, enRango,
-                  color: TRAMO_COLORS[i % TRAMO_COLORS.length],
-                };
-              });
-              const tramosActivos = tramosData.filter(t => t.enRango && t.eurosEnTramo > 0);
-              const baseImp = r.baseImponible || 1;
-
-              return (
-                <div className="tramos-visual">
-                  {/* Pedagogical intro */}
-                  <p className="tramos-intro-note">
-                    El IRPF es <strong>progresivo</strong>: cada tipo solo se aplica a los euros
-                    que caen <em>dentro de esa franja</em> — no a toda tu base de{' '}
-                    <strong className="font-mono">{eur(r.baseImponible)}</strong>.
-                  </p>
-
-                  <div className="tramos-visual-header">
-                    <span className="tramos-visual-title">Distribución de tu base imponible en tramos</span>
-                    <span className="tramos-visual-base font-mono">{eur(r.baseImponible)}</span>
-                  </div>
-
-                  {/* Stacked bar — full base across active tramos */}
-                  <div className="tramos-stacked">
-                    {tramosActivos.map((t, i) => {
-                      const widthPct = (t.eurosEnTramo / baseImp) * 100;
-                      return (
-                        <div key={i} className="tramos-segment"
-                          style={{ width: `${widthPct}%`, background: `linear-gradient(180deg, ${t.color}, ${t.color}cc)` }}
-                          title={`${eur(t.eurosEnTramo)} al ${(t.tipo * 100).toFixed(1)}%`}>
-                          {widthPct > 14 && (
-                            <span className="tramos-segment-label">
-                              {eur(t.eurosEnTramo)}
-                              <small>{(t.tipo * 100).toFixed(0)}%</small>
-                            </span>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                  {/* Scale: 0€ ← bar → tu base */}
-                  <div className="tramos-scale">
-                    <span className="font-mono">0 €</span>
-                    <span className="font-mono tramos-scale-end" style={{ color: 'var(--accent)' }}>
-                      {eur(r.baseImponible)} ← tu base
-                    </span>
-                  </div>
-
-                  {/* Per-tramo detail rows */}
-                  <div className="tramos-detail">
-                    {tramosData.map((t, i) => {
-                      const rangoLabel = t.hasta === Infinity
-                        ? `desde ${eur(t.desde)}`
-                        : `${eur(t.desde)} – ${eur(t.hasta)}`;
-                      const isPartial = t.enRango && t.eurosEnTramo > 0 && t.fillPct < 0.999;
-                      return (
-                        <div key={i}>
-                          <div className={`tramo-row-v2 ${!t.enRango || t.eurosEnTramo === 0 ? 'is-empty' : ''}`}>
-                            <span className="tramo-dot" style={{ background: t.color }} />
-                            <span className="tramo-range">{rangoLabel}</span>
-                            <span className="tramo-rate" style={{ color: t.color }}>
-                              {(t.tipo * 100).toFixed(1)}%
-                            </span>
-                            <span className="tramo-fill-track">
-                              <span className="tramo-fill-bar"
-                                style={{ width: `${(t.fillPct * 100).toFixed(1)}%`, background: t.color }} />
-                            </span>
-                            {t.eurosEnTramo > 0 ? (
-                              <>
-                                <span className="tramo-eur">
-                                  <strong className="font-mono">{eur(t.eurosEnTramo)}</strong>
-                                  <small>× {(t.tipo * 100).toFixed(0)}%</small>
-                                </span>
-                                <span className="tramo-cuota-v2">
-                                  <strong className="font-mono" style={{ color: 'var(--red)' }}>{eur(t.cuota)}</strong>
-                                  <small>IRPF</small>
-                                </span>
-                              </>
-                            ) : (
-                              <span className="tramo-empty-label">no llegas a este tramo</span>
-                            )}
-                          </div>
-                          {isPartial && (
-                            <div className="tramo-partial-badge" style={{ borderColor: `${t.color}40`, background: `${t.color}10` }}>
-                              <span style={{ color: t.color }}>Tu base termina aquí</span>
-                              {' '}— solo los <strong className="font-mono">{eur(t.eurosEnTramo)}</strong> que van
-                              de <strong className="font-mono">{eur(t.desde)}</strong> hasta tu base
-                              cotizan al <strong style={{ color: t.color }}>{(t.tipo * 100).toFixed(0)}%</strong>,
-                              no todo tu salario.
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })()}
-
-            <div className="callout-info" style={{ marginTop: '0.75rem' }}>
-              <p style={{ marginBottom: '0.4rem' }}>
-                <strong>¿Por qué se resta {eur(r.cuotaMinimo)}?</strong>
-              </p>
-              <p>
-                Los {eur(irpfMinimoAnio)} del mínimo vital (Paso I) deben quedar <strong>a cero de IRPF</strong>.
-                Pero el cálculo de las franjas de arriba los incluyó en la base, así que les asignó impuesto.
-                Para anularlo, calculamos cuánto les tocó: como caen enteros en el primer tramo al {(firstTipo * 100).toFixed(0)}%,
-                su impuesto es exactamente <strong>{eur(irpfMinimoAnio)} × {(firstTipo * 100).toFixed(0)}% = {eur(r.cuotaMinimo)}</strong>.
-                Ese importe se descuenta, y esos euros quedan libres.
-              </p>
-            </div>
-            <Formula>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '5px 20px', alignItems: 'center' }}>
-                <span style={{ color: 'var(--text-soft)', fontWeight: 400, fontSize: '0.88em' }}>
-                  IRPF calculado sobre tu base completa ({eur(r.baseImponible)})
-                </span>
-                <span>{eur(r.cuotaIntegra)}</span>
-                <span style={{ color: 'var(--text-soft)', fontWeight: 400, fontSize: '0.88em' }}>
-                  Se anula el IRPF del mínimo vital ({eur(irpfMinimoAnio)} × {(firstTipo * 100).toFixed(0)}%)
-                </span>
-                <span style={{ color: 'var(--red)' }}>− {eur(r.cuotaMinimo)}</span>
-                <div style={{ gridColumn: '1 / -1', height: 1, background: 'var(--border)', margin: '2px 0' }} />
-                <strong>J = Cuota íntegra estatal</strong>
-                <strong style={{ color: '#f43f5e' }}>{eur(r.cuotaTeorica)}</strong>
-              </div>
-            </Formula>
-            <p style={{ fontSize: 11, color: 'var(--text-soft)', marginTop: '0.4rem', fontStyle: 'italic' }}>
-              Equivale a aplicar la tarifa directamente sobre {eur(r.baseImponible)} − {eur(irpfMinimoAnio)} = {eur(r.baseImponible - irpfMinimoAnio)}.
-            </p>
-            <p className="paso-ratio">
-              Aquí solo está la <strong className="text-white">parte estatal</strong> (50% del IRPF total). La parte autonómica varía por
-              comunidad y no se incluye en este cálculo.
-            </p>
-          </Paso>
-
-          {/* K — Deducción SMI (solo 2025+) */}
-          {deduSMIinfo.activo ? (
-            <Paso letra="K" titulo="Deducción por obtención de rendimientos del trabajo"
-              subtitulo="La «deducción SMI» — un descuento extra para salarios cercanos al mínimo"
-              color="#10b981" resultado={r.deduccionSMI}>
-              <p className="paso-prosa">
-                Desde 2025 existe una <strong className="text-white">deducción adicional</strong> sobre la cuota del IRPF
-                para salarios en el entorno del SMI. Se resta directamente del impuesto, no de la base. Es una
-                «rebaja» de última hora para no penalizar a los que ganan poco.
-              </p>
-              <Formula>{deduSMIinfo.formula}</Formula>
-              <Fuente f={FUENTES.deduSMI} />
-            </Paso>
-          ) : (
-            anio >= 2025 && (
-              <Paso letra="K" titulo="Deducción por obtención de rendimientos del trabajo"
-                subtitulo="No aplicable a tu nivel de salario"
-                color="#4b5563">
-                <p className="paso-prosa">
-                  Tu rendimiento ({eur(r.rnPrevio)}) está fuera del rango que permite esta deducción
-                  ({anio === 2026 ? 'tramo decreciente desde 17.094 €' : 'entre 16.576 € y 18.276 €'}). Solo se aplica a salarios muy cercanos al SMI.
-                </p>
-              </Paso>
-            )
           )}
-
-          {/* L — IRPF final */}
-          <Paso letra="L" titulo="IRPF final" subtitulo="Lo que realmente te retiene Hacienda"
-            color="#f43f5e" resultado={r.irpfFinal}>
-            <p className="paso-prosa">
-              Es el IRPF efectivo que se retiene en tu nómina. Resulta de restar la deducción K (si aplica) a la
-              cuota teórica J, y aplicar el <strong className="text-white">límite del 43%</strong> que protege los salarios
-              bajos (Art. 85.3 RIRPF): la retención nunca puede superar el 43% del exceso sobre el mínimo exento de retención.
-            </p>
-            <Formula>
-              L = J − K = {eur(r.cuotaTeorica)} − {eur(r.deduccionSMI)} = <strong style={{ color: '#f43f5e' }}>{eur(r.cuotaSMI)}</strong>
-              {aplicaLimite && <>
-                <br />↓ Límite 43% activo: L = {eur(r.limiteRetencion)}
-              </>}
-            </Formula>
-            {aplicaLimite && (
-              <div className="callout-info" style={{ borderColor: 'rgba(249,115,22,0.3)', background: 'rgba(249,115,22,0.07)' }}>
-                ⚠️ Se activa el límite protector del Art. 85.3. Sin él tu retención sería más alta.
-              </div>
-            )}
-            <Fuente f={FUENTES.art85} />
-          </Paso>
+          <Fuente f={FUENTES.art85} />
+        </Paso>
 
       </div>{/* end paso-timeline */}
 
@@ -566,7 +597,7 @@ export default function DesgloseEducativo({ bruto, anio }) {
                 {eur(r.salarioNeto)}
               </div>
             </div>
-            
+
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-4 gap-y-2 mt-4 pt-4 border-t border-[var(--border)]">
               <div className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />

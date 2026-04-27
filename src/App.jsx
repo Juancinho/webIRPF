@@ -82,8 +82,8 @@ function ShareButton({ getShareURL }) {
   return (
     <button onClick={handleShare} className="btn-ghost flex items-center gap-1.5 text-[12px]">
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
-        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+        <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
+        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" /><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
       </svg>
       Compartir
     </button>
@@ -145,9 +145,9 @@ export default function App() {
               aria-label="Secciones"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                <line x1="3" y1="6" x2="21" y2="6"/>
-                <line x1="3" y1="12" x2="21" y2="12"/>
-                <line x1="3" y1="18" x2="21" y2="18"/>
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="18" x2="21" y2="18" />
               </svg>
             </button>
           </div>
@@ -242,7 +242,7 @@ export default function App() {
               <div>
                 <SectionHeading tagline="Paso a paso">El viaje de tu <em className="text-[var(--accent)]">sueldo</em></SectionHeading>
                 <div className="liquid-glass p-5 sm:p-6 overflow-hidden">
-                  <DesgloseEducativo bruto={bruto} anio={anio} />
+                  <DesgloseEducativo bruto={bruto} anio={anio} opts={opts} />
                 </div>
               </div>
 
@@ -338,7 +338,7 @@ export default function App() {
                   </div>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
                     className="ml-2 text-[var(--text-soft)] group-hover:text-[var(--accent)] group-hover:translate-x-1 transition-all">
-                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                    <path d="M5 12h14M12 5l7 7-7 7" />
                   </svg>
                 </button>
               </div>

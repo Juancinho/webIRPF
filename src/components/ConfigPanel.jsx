@@ -68,29 +68,6 @@ export default function ConfigPanel({ opts, onChange, anio, compact = false }) {
         )}
       </div>
 
-      {/* CCAA */}
-      <div className="config-section">
-        <span className="config-label">Comunidad autónoma</span>
-        <select
-          className="config-select"
-          value={opts.ccaa}
-          onChange={e => set('ccaa', e.target.value)}
-        >
-          {Object.entries(REGIONES).map(([k, r]) => (
-            <option key={k} value={k}>{r.name}</option>
-          ))}
-        </select>
-        {isForal && (
-          <p className="config-note config-note--warn">
-            Régimen foral: se aplica escala estándar como aproximación.
-          </p>
-        )}
-        {anio < 2024 && opts.ccaa !== 'default' && !isForal && (
-          <p className="config-note">
-            Divergencias autonómicas no modeladas antes de 2024. Se aplica escala estándar para {anio}.
-          </p>
-        )}
-      </div>
 
       {/* Tributación */}
       <div className="config-section">
