@@ -24,7 +24,7 @@ function ToggleReal({ real, setReal }) {
           color: 'white',
           boxShadow: '0 2px 12px rgba(56,189,248,0.25)',
         } : { color: 'var(--text-soft)' }}>
-         € nominales
+        € nominales
       </button>
       <button onClick={() => setReal(true)}
         className="relative px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-300"
@@ -33,7 +33,7 @@ function ToggleReal({ real, setReal }) {
           color: 'white',
           boxShadow: '0 2px 12px rgba(16,185,129,0.3)',
         } : { color: 'var(--text-soft)' }}>
-         € reales 2026
+        € reales 2026
       </button>
     </div>
   );
@@ -200,7 +200,7 @@ function TabCurvaArt20() {
 
       {real && (
         <div className="mb-4 px-4 py-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5 text-[12px] text-emerald-300/80 leading-relaxed">
-           <strong className="text-emerald-300">Vista en €2026:</strong> ahora puedes comparar directamente entre años.
+          <strong className="text-emerald-300">Vista en €2026:</strong> ahora puedes comparar directamente entre años.
           Si dos líneas coinciden, el descuento tiene el mismo valor <em>real</em>. Si la de 2026 está por encima de la de 2012,
           el descuento ha crecido más que la inflación.
         </div>
@@ -225,8 +225,8 @@ function TabCurvaArt20() {
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ left: 5, right: 20, top: 10, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-            <XAxis dataKey="rn" stroke="var(--border)" tick={{ fontSize:10, fill:'var(--text-soft)' }} tickFormatter={v => `${v/1000}k€`} tickLine={false} />
-            <YAxis stroke="var(--border)" tick={{ fontSize:11, fill:'var(--text-soft)' }} tickFormatter={v => `${v/1000}k€`} width={50} tickLine={false} />
+            <XAxis dataKey="rn" stroke="var(--border)" tick={{ fontSize: 10, fill: 'var(--text-soft)' }} tickFormatter={v => `${v / 1000}k€`} tickLine={false} />
+            <YAxis stroke="var(--border)" tick={{ fontSize: 11, fill: 'var(--text-soft)' }} tickFormatter={v => `${v / 1000}k€`} width={50} tickLine={false} />
             <Tooltip content={<TooltipArt20 real={real} />} />
             {ANIOS_ART20_MUESTRA.filter(a => aniosVis.has(a)).map(a => (
               <Line key={a} type="monotone" dataKey={`red_${a}`}
@@ -249,9 +249,9 @@ function TabCurvaArt20() {
       {/* Tabla */}
       <div className="mt-6">
         <p className="text-[11px] text-[var(--text-soft)] mb-3 font-medium leading-relaxed">
-           <strong className="text-white">Tabla resumen:</strong> la última columna muestra el efecto real de cobrar €100 más en la zona cliff.
+          <strong className="text-white">Tabla resumen:</strong> la última columna muestra el efecto real de cobrar €100 más en la zona cliff.
           Pierdes parte del descuento Art.20, lo que infla tu base imponible — y al final <strong className="text-orange-400">de €100 brutos
-          solo te llegan unos pocos euros netos.</strong> Compara con fuera del cliff: sin ese efecto, €100 brutos → ~€81 netos (al 19% IRPF).
+            solo te llegan unos pocos euros netos.</strong> Compara con fuera del cliff: sin ese efecto, €100 brutos → ~€81 netos (al 19% IRPF).
         </p>
         <div className="overflow-x-auto">
           <table className="data-table w-full">
@@ -331,16 +331,16 @@ function TabCurvaArt20() {
 /*  TAB 2 — Evolución de umbrales                            */
 /* ══════════════════════════════════════════════════════════ */
 function TabEvolucionUmbrales() {
-  const [series, setSeries] = useState(new Set(['smi','minExento','art20Inf','art20Sup']));
+  const [series, setSeries] = useState(new Set(['smi', 'minExento', 'art20Inf', 'art20Sup']));
   const [real, setReal] = useState(false);
   const toggle = s => setSeries(prev => { const next = new Set(prev); if (next.has(s)) { if (next.size > 1) next.delete(s); } else next.add(s); return next; });
   const data = real ? DATOS_UMBRALES_REAL : DATOS_UMBRALES;
 
   const labels = {
-    smi:      { label:'SMI anual',            color: UMBRAL_COLORS.smi,      dash: '' },
-    minExento:{ label:'Mín. exento retención', color: UMBRAL_COLORS.minExento, dash: '6 3' },
-    art20Inf: { label:'Art.20 — umbral inf.',  color: UMBRAL_COLORS.art20Inf, dash: '4 2' },
-    art20Sup: { label:'Art.20 — umbral sup.',  color: UMBRAL_COLORS.art20Sup, dash: '3 3' },
+    smi: { label: 'SMI anual', color: UMBRAL_COLORS.smi, dash: '' },
+    minExento: { label: 'Mín. exento retención', color: UMBRAL_COLORS.minExento, dash: '6 3' },
+    art20Inf: { label: 'Art.20 — umbral inf.', color: UMBRAL_COLORS.art20Inf, dash: '4 2' },
+    art20Sup: { label: 'Art.20 — umbral sup.', color: UMBRAL_COLORS.art20Sup, dash: '3 3' },
   };
 
   return (
@@ -385,7 +385,7 @@ function TabEvolucionUmbrales() {
 
       {real && (
         <div className="mb-4 px-4 py-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5 text-[12px] text-emerald-300/80 leading-relaxed">
-           <strong className="text-emerald-300">Vista en €2026:</strong> ahora ves el valor <em>real</em> de cada umbral, descontando la inflación.
+          <strong className="text-emerald-300">Vista en €2026:</strong> ahora ves el valor <em>real</em> de cada umbral, descontando la inflación.
           Si una línea sube, ha crecido más que los precios. Si baja, ha perdido poder adquisitivo.
           En nominal el SMI parece haber subido un ~90%, pero en real (€2026) ha subido ~52%.
         </div>
@@ -410,13 +410,13 @@ function TabEvolucionUmbrales() {
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ left: 5, right: 20, top: 10, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-            <XAxis dataKey="anio" stroke="var(--border)" tick={{ fontSize:11, fill:'var(--text-soft)' }} tickLine={false} />
-            <YAxis stroke="var(--border)" tick={{ fontSize:11, fill:'var(--text-soft)' }} tickFormatter={v => `${v/1000}k€`} width={50} tickLine={false} />
+            <XAxis dataKey="anio" stroke="var(--border)" tick={{ fontSize: 11, fill: 'var(--text-soft)' }} tickLine={false} />
+            <YAxis stroke="var(--border)" tick={{ fontSize: 11, fill: 'var(--text-soft)' }} tickFormatter={v => `${v / 1000}k€`} width={50} tickLine={false} />
             <Tooltip content={<TooltipUmbrales real={real} />} />
             {Object.entries(labels).filter(([k]) => series.has(k)).map(([key, { label, color, dash }]) => (
               <Line key={key} type="monotone" dataKey={key}
                 stroke={color} strokeWidth={2} strokeDasharray={dash}
-                dot={{ r:3, fill:color, strokeWidth:0 }} activeDot={{ r:5, strokeWidth:0 }}
+                dot={{ r: 3, fill: color, strokeWidth: 0 }} activeDot={{ r: 5, strokeWidth: 0 }}
                 name={label} isAnimationActive={false} connectNulls={false} />
             ))}
           </LineChart>
@@ -457,7 +457,7 @@ export default function GraficoMecanismos() {
           </button>
         ))}
       </div>
-      {tab === 'art20'    && <TabCurvaArt20 />}
+      {tab === 'art20' && <TabCurvaArt20 />}
       {tab === 'umbrales' && <TabEvolucionUmbrales />}
     </div>
   );

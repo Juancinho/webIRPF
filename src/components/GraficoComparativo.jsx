@@ -139,6 +139,7 @@ function exportCSV(aniosActivos) {
 export default function GraficoComparativo({ brutoRef, anioRef }) {
   const [aniosActivos, setAniosActivos] = useState(new Set([2012, 2015, 2019, 2023, 2026]));
   const [modoTipo, setModoTipo] = useState('real');
+  const [mostrarControles, setMostrarControles] = useState(true);
 
   const toggleAnio = useCallback(a => setAniosActivos(prev => {
     const next = new Set(prev);
@@ -186,32 +187,46 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
       </div>
 
       {/* ── CONTROLES UNIFICADOS ── */}
-      <div className="liquid-glass !sticky z-40 p-4 sm:p-5 mb-12" style={{
+      <div className="liquid-glass !sticky z-40 mb-12" style={{
         top: 'calc(var(--header-h) + 1rem)',
-        boxShadow: '0 12px 32px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05)'
+        boxShadow: '0 12px 32px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05)',
+        padding: mostrarControles ? '1rem 1.25rem' : '0.5rem 1rem',
+        transition: 'padding 0.3s cubic-bezier(0.22, 1, 0.36, 1)'
       }}>
-        <p className="text-[10px] font-bold text-[var(--text-soft)] uppercase tracking-wider mb-4">Selecciona los años para comparar</p>
-        <div className="flex flex-wrap gap-1.5">
-          {ANIOS.map(a => (
-            <button key={a} onClick={() => toggleAnio(a)}
-              className={`year-btn ${aniosActivos.has(a) ? 'active' : ''}`}
-              style={aniosActivos.has(a) ? {
-                background: YEAR_COLORS[a],
-                borderColor: YEAR_COLORS[a],
-                boxShadow: `0 2px 12px ${YEAR_COLORS[a]}40, 0 0 0 1px ${YEAR_COLORS[a]}30`,
-                color: '#fff'
-              } : {}}>
-              {a}
-            </button>
-          ))}
-          <div className="w-px bg-[var(--border)] mx-2 h-6 self-center" />
-          {Object.entries(GRUPOS).map(([nombre, anios]) => (
-            <button key={nombre} onClick={() => setAniosActivos(new Set(anios))} className="btn-ghost !py-1 !px-2.5 !text-[10px]">
-              {nombre}
-            </button>
-          ))}
-          <button onClick={() => setAniosActivos(new Set(ANIOS))} className="btn-ghost !py-1 !px-2.5 !text-[10px] hover:!border-[var(--text-h)] hover:!text-[var(--text-h)]">Todos</button>
+        <div className={`flex justify-between items-center ${mostrarControles ? 'mb-4' : ''}`}>
+          <p className="text-[10px] font-bold text-[var(--text-soft)] uppercase tracking-wider m-0">Selecciona los años para comparar</p>
+          <button onClick={() => setMostrarControles(!mostrarControles)} className="text-[10px] font-bold text-[var(--accent)] hover:text-[var(--accent-light)] uppercase tracking-wider transition-colors flex items-center gap-1">
+            {mostrarControles ? (
+              <>Ocultar <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="18 15 12 9 6 15" /></svg></>
+            ) : (
+              <>Mostrar <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9" /></svg></>
+            )}
+          </button>
         </div>
+        
+        {mostrarControles && (
+          <div className="flex flex-wrap gap-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
+            {ANIOS.map(a => (
+              <button key={a} onClick={() => toggleAnio(a)}
+                className={`year-btn ${aniosActivos.has(a) ? 'active' : ''}`}
+                style={aniosActivos.has(a) ? {
+                  background: YEAR_COLORS[a],
+                  borderColor: YEAR_COLORS[a],
+                  boxShadow: `0 2px 12px ${YEAR_COLORS[a]}40, 0 0 0 1px ${YEAR_COLORS[a]}30`,
+                  color: '#fff'
+                } : {}}>
+                {a}
+              </button>
+            ))}
+            <div className="w-px bg-[var(--border)] mx-2 h-6 self-center" />
+            {Object.entries(GRUPOS).map(([nombre, anios]) => (
+              <button key={nombre} onClick={() => setAniosActivos(new Set(anios))} className="btn-ghost !py-1 !px-2.5 !text-[10px]">
+                {nombre}
+              </button>
+            ))}
+            <button onClick={() => setAniosActivos(new Set(ANIOS))} className="btn-ghost !py-1 !px-2.5 !text-[10px] hover:!border-[var(--text-h)] hover:!text-[var(--text-h)]">Todos</button>
+          </div>
+        )}
       </div>
 
       {/* ── HISTORIA 1: EL NETO REAL ── */}
