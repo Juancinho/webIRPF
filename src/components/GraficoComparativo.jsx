@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import {
   ComposedChart, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, ReferenceLine, ReferenceArea, Legend, Brush
+  ResponsiveContainer, ReferenceLine, ReferenceArea, Legend
 } from 'recharts';
 import {
   ANIOS, DATOS_CHART, DATOS_CHART_NOMINAL, INFLACION_A_2026, calcularNomina, obtenerParametros,
@@ -9,6 +9,7 @@ import {
 } from '../engine/irpf';
 import { eur } from '../utils/format';
 import { YEAR_COLORS } from '../constants/yearColors';
+import FigureZoom from './FigureZoom';
 
 const GRUPOS = {
   'Años clave': [2012, 2015, 2019, 2023, 2026],
@@ -16,24 +17,6 @@ const GRUPOS = {
   'Reforma 2015': [2015, 2016, 2017],
   '2019+': [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026],
 };
-
-/* ── Custom Brush traveller handle ── */
-function BrushHandle({ x, y, height }) {
-  const hw = 12;
-  return (
-    <g style={{ cursor: 'ew-resize' }}>
-      <rect x={x - hw / 2} y={y - 2} width={hw} height={height + 4} rx={6}
-        fill="var(--surface)" stroke="var(--accent)" strokeWidth={1.5}
-        style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }} />
-      {[-3, 0, 3].map(dy => (
-        <line key={dy}
-          x1={x - 2.5} y1={y + height / 2 + dy}
-          x2={x + 2.5} y2={y + height / 2 + dy}
-          stroke="var(--accent)" strokeWidth={1.2} strokeOpacity={0.8} strokeLinecap="round" />
-      ))}
-    </g>
-  );
-}
 
 // Tooltip para el gráfico por nivel salarial
 function TooltipSalario({ active, payload, label, ref2026Neto, metrica }) {
@@ -151,6 +134,9 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
   }), [bruto2026]);
 
   const neto2026 = dataPorAnio.find(d => d.anio === 2026)?.neto || 0;
+  const neto2012 = dataPorAnio.find(d => d.anio === 2012)?.neto || 0;
+  const cambioNeto = neto2026 - neto2012;
+  const cambioNetoPct = neto2012 ? (cambioNeto / neto2012) * 100 : 0;
 
   return (
     <div className="space-y-16">
@@ -165,6 +151,24 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" /></svg>
           Exportar CSV
         </button>
+      </div>
+
+      <div className="historical-opening" aria-label="Comparación del salario neto equivalente entre 2012 y 2026">
+        <div>
+          <span>2012</span>
+          <strong>{eur(neto2012)}</strong>
+          <small>neto real · €2026</small>
+        </div>
+        <div className="historical-opening__change">
+          <span>{cambioNeto >= 0 ? 'GANANCIA REAL' : 'PÉRDIDA REAL'}</span>
+          <strong>{cambioNeto >= 0 ? '+' : '−'}{eur(Math.abs(cambioNeto))}</strong>
+          <small>{cambioNetoPct >= 0 ? '+' : '−'}{Math.abs(cambioNetoPct).toFixed(1)}%</small>
+        </div>
+        <div>
+          <span>2026</span>
+          <strong>{eur(neto2026)}</strong>
+          <small>mismo poder adquisitivo</small>
+        </div>
       </div>
 
       {/* ── CONTROLES UNIFICADOS ── */}
@@ -190,12 +194,8 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
             {ANIOS.map(a => (
               <button key={a} onClick={() => toggleAnio(a)}
                 className={`year-btn ${aniosActivos.has(a) ? 'active' : ''}`}
-                style={aniosActivos.has(a) ? {
-                  background: YEAR_COLORS[a],
-                  borderColor: YEAR_COLORS[a],
-                  boxShadow: `0 2px 12px ${YEAR_COLORS[a]}40, 0 0 0 1px ${YEAR_COLORS[a]}30`,
-                  color: '#fff'
-                } : {}}>
+                style={{ '--year-color': YEAR_COLORS[a] }}
+                aria-pressed={aniosActivos.has(a)}>
                 {a}
               </button>
             ))}
@@ -214,7 +214,7 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
       <section className="space-y-6 pt-8 mt-8 border-t border-[var(--border)]">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <span className="w-2.5 h-2.5 rounded-full ring-2 ring-offset-1 ring-offset-[var(--surface)]" style={{ background: '#34d399', boxShadow: '0 0 8px #34d39960' }} />
+            <span className="w-2.5 h-2.5 rounded-full" style={{ background: 'var(--ink)' }} />
             <h3 className="font-display text-[1.5rem] tracking-tight text-[var(--text-h)]">1. Salario neto por <em className="text-[var(--accent)]">nivel de renta</em></h3>
           </div>
           <p className="text-[13px] text-[var(--text-soft)] leading-relaxed max-w-[85ch]">
@@ -225,11 +225,12 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
           </p>
         </div>
 
-        <div className="liquid-glass p-4 sm:p-5" style={{ height: 420 }}>
+        <FigureZoom label="Salario neto por nivel de renta" minWidth={720}>
+        <div className="history-plot" style={{ height: 420 }}>
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={DATOS_CHART} margin={{ left: 5, right: 20, top: 10, bottom: 40 }}>
+            <LineChart data={DATOS_CHART} margin={{ left: 5, right: 20, top: 10, bottom: 18 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-              <XAxis dataKey="bruto" stroke="var(--border)" tick={{ fontSize: 10, fill: 'var(--text-soft)' }} tickFormatter={v => `${v / 1000}k€`} tickLine={false} interval={20} />
+              <XAxis dataKey="bruto" type="number" domain={['dataMin', 'dataMax']} tickCount={5} stroke="var(--border)" tick={{ fontSize: 10, fill: 'var(--text-soft)' }} tickFormatter={v => `${v / 1000}k€`} tickLine={false} />
               <YAxis stroke="var(--border)" tick={{ fontSize: 11, fill: 'var(--text-soft)' }} tickFormatter={v => `${(v / 1000).toFixed(0)}k€`} width={50} tickLine={false}
                 label={{ value: 'Neto (€2026)', angle: -90, position: 'insideLeft', offset: 10, fill: 'var(--text-soft)', fontSize: 9 }} />
               <Tooltip content={<TooltipSalario ref2026Neto={neto2026} metrica="neto" />} />
@@ -255,17 +256,13 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
                 <Line key={a} type="monotone" dataKey={`neto_${a}`}
                   stroke={YEAR_COLORS[a]} strokeWidth={a === 2026 ? 2.5 : aniosActivos.size <= 4 ? 2 : 1.5}
                   dot={false} activeDot={{ r: 5, strokeWidth: 0 }}
-                  isAnimationActive={aniosActivos.size <= 8} />
+                  isAnimationActive={false} />
               ))}
-              <Brush dataKey="bruto" height={34}
-                stroke="var(--border)" fill="var(--surface2)"
-                travellerWidth={12} traveller={<BrushHandle />}
-                tickFormatter={v => `${Math.round(v / 1000)}k€`}
-                padding={{ top: 10 }}
-                style={{ fontSize: 10, fill: 'var(--text-soft)', fontFamily: 'inherit' }} />
             </LineChart>
           </ResponsiveContainer>
         </div>
+        </FigureZoom>
+        <p className="source-line">FUENTE · CÁLCULO FISCALSCOPE · LIRPF, LGSS E IPC INE · EUROS CONSTANTES DE 2026</p>
         <InsightSalario aniosActivos={aniosActivos} bruto2026={bruto2026} />
       </section>
 
@@ -274,7 +271,7 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
         <div>
           <div className="flex items-center justify-between gap-4 flex-wrap mb-2">
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full ring-2 ring-offset-1 ring-offset-[var(--surface)]" style={{ background: '#fb7185', boxShadow: '0 0 8px #fb718560' }} />
+              <span className="w-2.5 h-2.5 rounded-full" style={{ background: 'var(--signal)' }} />
               <h3 className="font-display text-[1.5rem] tracking-tight text-[var(--text-h)]">2. Carga fiscal real (<em className="text-[var(--accent)]">Tipo Efectivo</em>)</h3>
             </div>
 
@@ -291,11 +288,12 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
           </p>
         </div>
 
-        <div className="liquid-glass p-4 sm:p-5" style={{ height: 420 }}>
+        <FigureZoom label="Tipo efectivo por nivel de renta" minWidth={720}>
+        <div className="history-plot" style={{ height: 420 }}>
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={modoTipo === 'real' ? DATOS_CHART : DATOS_CHART_NOMINAL} margin={{ left: 5, right: 20, top: 10, bottom: 40 }}>
+            <LineChart data={modoTipo === 'real' ? DATOS_CHART : DATOS_CHART_NOMINAL} margin={{ left: 5, right: 20, top: 10, bottom: 18 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-              <XAxis dataKey="bruto" stroke="var(--border)" tick={{ fontSize: 10, fill: 'var(--text-soft)' }} tickFormatter={v => `${v / 1000}k€`} tickLine={false} interval={20} />
+              <XAxis dataKey="bruto" type="number" domain={['dataMin', 'dataMax']} tickCount={5} stroke="var(--border)" tick={{ fontSize: 10, fill: 'var(--text-soft)' }} tickFormatter={v => `${v / 1000}k€`} tickLine={false} />
               <YAxis stroke="var(--border)" tick={{ fontSize: 11, fill: 'var(--text-soft)' }} tickFormatter={v => `${v}%`} width={40} tickLine={false}
                 label={{ value: 'Tipo efectivo', angle: -90, position: 'insideLeft', offset: 5, fill: 'var(--text-soft)', fontSize: 9 }} domain={[0, 'auto']} />
               <Tooltip content={<TooltipSalario ref2026Neto={null} metrica="tipo" />} />
@@ -309,17 +307,13 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
                 <Line key={a} type="monotone" dataKey={`irpf_${a}`}
                   stroke={YEAR_COLORS[a]} strokeWidth={a === 2026 ? 2.5 : aniosActivos.size <= 4 ? 2 : 1.5}
                   dot={false} activeDot={{ r: 5, strokeWidth: 0 }}
-                  isAnimationActive={aniosActivos.size <= 8} />
+                  isAnimationActive={false} />
               ))}
-              <Brush dataKey="bruto" height={34}
-                stroke="var(--border)" fill="var(--surface2)"
-                travellerWidth={12} traveller={<BrushHandle />}
-                tickFormatter={v => `${Math.round(v / 1000)}k€`}
-                padding={{ top: 10 }}
-                style={{ fontSize: 10, fill: 'var(--text-soft)', fontFamily: 'inherit' }} />
             </LineChart>
           </ResponsiveContainer>
         </div>
+        </FigureZoom>
+        <p className="source-line">FUENTE · CÁLCULO FISCALSCOPE · ESCALAS IRPF Y COTIZACIONES DEL EJERCICIO</p>
         <InsightTipo aniosActivos={aniosActivos} bruto2026={bruto2026} modoTipo={modoTipo} />
       </section>
 
@@ -327,7 +321,7 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
       <section className="space-y-6 pt-8 mt-8 border-t border-[var(--border)]">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <span className="w-2.5 h-2.5 rounded-full ring-2 ring-offset-1 ring-offset-[var(--surface)]" style={{ background: '#0ea5e9', boxShadow: '0 0 8px #0ea5e960' }} />
+            <span className="w-2.5 h-2.5 rounded-full" style={{ background: 'var(--ink-2)' }} />
             <h3 className="font-display text-[1.5rem] tracking-tight text-[var(--text-h)]">3. Tu evolución histórica <em className="text-[var(--accent)]">personal</em></h3>
           </div>
           <p className="text-[13px] text-[var(--text-soft)] leading-relaxed max-w-[85ch]">
@@ -337,7 +331,8 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
           </p>
         </div>
 
-        <div className="liquid-glass p-4 sm:p-5" style={{ height: 380 }}>
+        <FigureZoom label="Evolución histórica personal" minWidth={720}>
+        <div className="history-plot" style={{ height: 380 }}>
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={dataPorAnio} margin={{ left: 5, right: 45, top: 10, bottom: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
@@ -354,18 +349,19 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
                 <ReferenceArea key={r.anio} yAxisId="eur" x1={r.anio} x2={r.anio + 0.5} fill={r.color} fillOpacity={0.08} />
               ))}
 
-              <Line yAxisId="eur" type="monotone" dataKey="neto" stroke="#10b981" strokeWidth={2.5}
+              <Line yAxisId="eur" type="monotone" dataKey="neto" stroke="var(--ink)" strokeWidth={2.5}
                 dot={(props) => <DotConColor {...props} data={dataPorAnio} />}
-                activeDot={{ r: 6, strokeWidth: 0 }} name="Neto (€2026)" />
-              <Line yAxisId="pct" type="monotone" dataKey="irpf" stroke="#ef4444" strokeWidth={2}
-                strokeDasharray="7 3" dot={{ r: 3, fill: '#ef4444', strokeWidth: 0 }}
-                activeDot={{ r: 5, strokeWidth: 0 }} name="Tipo IRPF (%)" />
-              <Line yAxisId="pct" type="monotone" dataKey="total" stroke="#f59e0b" strokeWidth={2}
-                strokeDasharray="3 3" dot={{ r: 3, fill: '#f59e0b', strokeWidth: 0 }}
-                activeDot={{ r: 5, strokeWidth: 0 }} name="Carga total (IRPF + SS Trabajador) (%)" />
+                activeDot={{ r: 6, strokeWidth: 0 }} name="Neto (€2026)" isAnimationActive={false} />
+              <Line yAxisId="pct" type="monotone" dataKey="irpf" stroke="var(--signal)" strokeWidth={2}
+                strokeDasharray="7 3" dot={{ r: 3, fill: 'var(--signal)', strokeWidth: 0 }}
+                activeDot={{ r: 5, strokeWidth: 0 }} name="Tipo IRPF (%)" isAnimationActive={false} />
+              <Line yAxisId="pct" type="monotone" dataKey="total" stroke="var(--muted)" strokeWidth={2}
+                strokeDasharray="3 3" dot={{ r: 3, fill: 'var(--muted)', strokeWidth: 0 }}
+                activeDot={{ r: 5, strokeWidth: 0 }} name="Carga total (IRPF + SS Trabajador) (%)" isAnimationActive={false} />
             </ComposedChart>
           </ResponsiveContainer>
         </div>
+        </FigureZoom>
 
         {/* Tabla compacta */}
         <div className="liquid-glass overflow-x-auto">

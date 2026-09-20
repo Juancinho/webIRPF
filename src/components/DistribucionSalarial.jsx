@@ -9,6 +9,7 @@ import {
   CRECIMIENTO_PROYECCION_SALARIAL
 } from '../engine/irpf';
 import { eur } from '../utils/format';
+import FigureZoom from './FigureZoom';
 
 function TooltipDensidad({ active, payload, label, anio, color }) {
   if (!active || !payload || !payload.length) return null;
@@ -36,6 +37,7 @@ function BellCurve({ datos, salarioMarcado, dist, color = 'var(--accent)', anio 
   ].filter(p => p.v > 0 && p.v <= 80000);
 
   return (
+    <FigureZoom label={`Distribución salarial ${anio}`} minWidth={620}>
     <div style={{ height: 180, width: '100%', marginTop: 24 }}>
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart data={datos} margin={{ top: 15, right: 15, left: 15, bottom: 0 }}>
@@ -56,6 +58,7 @@ function BellCurve({ datos, salarioMarcado, dist, color = 'var(--accent)', anio 
         </ComposedChart>
       </ResponsiveContainer>
     </div>
+    </FigureZoom>
   );
 }
 
@@ -172,7 +175,7 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
       {/* ── Intro + concepto ── */}
       <div className="space-y-3 relative">
         <p className="text-[13.5px] text-[var(--text)] leading-relaxed max-w-3xl">
-          La <strong className="text-[var(--text-h)]">distribución salarial</strong> muestra cuántos trabajadores ganan cada cantidad. El eje X es el salario bruto anual; la altura de la curva refleja cuántas personas están en ese nivel. Tu marcador rojo indica dónde te sitúas.
+          La <strong className="text-[var(--text-h)]">distribución salarial</strong> muestra cuántos trabajadores ganan cada cantidad. El eje X es el salario bruto anual; la altura de la curva refleja cuántas personas están en ese nivel. El marcador vertical indica dónde te sitúas.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="dist-glass-panel p-4">
@@ -204,7 +207,7 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--text-soft)] mb-2">
-              Año de origen · <span style={{ color: 'var(--red)' }}>rojo</span>
+              Año de origen · <span style={{ color: 'var(--ink)' }}>tinta</span>
             </p>
             <div className="flex flex-wrap gap-1.5">
               {ANIOS.map(a => (
@@ -212,7 +215,7 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
                   disabled={a === anioDestino}
                   className={`year-btn ${anioOrigen === a ? 'active' : ''}`}
                   style={{
-                    ...(anioOrigen === a ? { background: 'var(--red)', boxShadow: '0 2px 10px var(--glow-red)' } : {}),
+                    ...(anioOrigen === a ? { background: 'var(--ink)' } : {}),
                     ...(a === anioDestino ? { opacity: 0.25, cursor: 'not-allowed' } : {}),
                   }}>
                   {a}{a > ULTIMO_ANIO_SALARIAL_OFICIAL && <sup className="ml-0.5 text-[7px]" title="Estimación propia">e</sup>}
@@ -222,7 +225,7 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
           </div>
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--text-soft)] mb-2">
-              Año de comparación · <span style={{ color: 'var(--accent)' }}>azul</span>
+              Año de comparación · <span style={{ color: 'var(--signal)' }}>señal</span>
             </p>
             <div className="flex flex-wrap gap-1.5">
               {ANIOS.map(a => (
@@ -230,7 +233,7 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
                   disabled={a === anioOrigen}
                   className={`year-btn ${anioDestino === a ? 'active' : ''}`}
                   style={{
-                    ...(anioDestino === a ? { background: 'linear-gradient(135deg,var(--accent),var(--accent2))', boxShadow: '0 2px 10px var(--glow-accent)' } : {}),
+                    ...(anioDestino === a ? { background: 'var(--signal)' } : {}),
                     ...(a === anioOrigen ? { opacity: 0.25, cursor: 'not-allowed' } : {}),
                   }}>
                   {a}{a > ULTIMO_ANIO_SALARIAL_OFICIAL && <sup className="ml-0.5 text-[7px]" title="Estimación propia">e</sup>}
@@ -292,8 +295,8 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
 
           <div className="inset-panel flex items-center gap-3 p-4 border min-w-[280px] justify-center">
             <div className="text-center">
-              <p className="text-[10px] uppercase tracking-wider mb-1 font-semibold" style={{ color: 'var(--red)' }}>{anioOrigen}</p>
-              <p className="text-[2.5rem] font-black font-mono leading-none" style={{ color: 'var(--red)' }}>
+              <p className="text-[10px] uppercase tracking-wider mb-1 font-semibold" style={{ color: 'var(--ink)' }}>{anioOrigen}</p>
+              <p className="text-[2.5rem] font-black font-mono leading-none" style={{ color: 'var(--ink)' }}>
                 P{escenario.percentilOrigen.toFixed(0)}
               </p>
               <p className="text-[11px] text-[var(--text-soft)] mt-1">{eur(salarioBase)}</p>
@@ -323,12 +326,12 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
         <div className="glass-orb glass-orb--red" style={{ width: 200, height: 200, top: -40, right: -40, opacity: 0.15 }} />
         <div className="flex items-center justify-between mb-1 relative z-10">
           <div>
-            <span className="inline-block w-3 h-3 rounded-full mr-2" style={{ background: 'var(--red)', verticalAlign: 'middle' }} />
+            <span className="inline-block w-3 h-3 rounded-full mr-2" style={{ background: 'var(--ink)', verticalAlign: 'middle' }} />
             <span className="text-[13px] font-bold text-[var(--text-h)]">Distribución salarial en {anioOrigen}</span>
             <MarcaEstimacion anio={anioOrigen} />
           </div>
           <span className="dist-glass-badge"
-            style={{ background: 'color-mix(in srgb, var(--red) 12%, transparent)', color: 'var(--red)', borderColor: 'color-mix(in srgb, var(--red) 25%, transparent)' }}>
+            style={{ background: 'color-mix(in srgb, var(--ink) 8%, transparent)', color: 'var(--ink)', borderColor: 'color-mix(in srgb, var(--ink) 20%, transparent)' }}>
             P{escenario.percentilOrigen.toFixed(1)} · {eur(salarioBase)}
           </span>
         </div>
@@ -342,13 +345,13 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
               datos={curvaOrigen}
               salarioMarcado={salarioBase}
               dist={escenario.distOrigen}
-              color="var(--red)"
+              color="var(--ink)"
               anio={anioOrigen}
             />
           </div>
         )}
 
-        <StatsStrip dist={escenario.distOrigen} salario={salarioBase} color="var(--red)" />
+        <StatsStrip dist={escenario.distOrigen} salario={salarioBase} color="var(--ink)" />
       </div>
 
       {/* ── Curva año destino ── */}
@@ -407,7 +410,9 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
           <p className="text-[12px] text-[var(--text)] mb-5 max-w-2xl">
             P25, mediana, media y P75. El gap entre media y mediana revela la asimetría de la distribución: los salarios altos tiran de la media hacia arriba.
           </p>
-          <ResponsiveContainer width="100%" height={320}>
+          <FigureZoom label="Evolución de percentiles salariales" minWidth={680}>
+          <div style={{ height: 320 }}>
+          <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={datosHist} margin={{ top: 8, right: 16, left: 0, bottom: 8 }}>
               <CartesianGrid strokeDasharray="2 4" stroke="var(--border)" />
               <XAxis dataKey="anio" tick={{ fontSize: 10, fill: 'var(--text-soft)', fontFamily: 'monospace' }} />
@@ -421,7 +426,7 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
               <Bar dataKey="p25" name="P25" fill="var(--accent)" fillOpacity={0.18} />
               <Line type="monotone" dataKey="p50" name="Mediana (P50)" stroke="var(--accent)" strokeWidth={2.5}
                 dot={{ r: 3, fill: 'var(--accent)' }} />
-              <Line type="monotone" dataKey="media" name="Media" stroke="var(--yellow)" strokeWidth={1.5}
+              <Line type="monotone" dataKey="media" name="Media" stroke="var(--muted)" strokeWidth={1.5}
                 dot={false} strokeDasharray="5 3" />
               <Line type="monotone" dataKey="p75" name="P75" stroke="var(--text-soft)" strokeWidth={1.5}
                 dot={false} strokeDasharray="3 2" />
@@ -430,6 +435,8 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
               ))}
             </ComposedChart>
           </ResponsiveContainer>
+          </div>
+          </FigureZoom>
           
           <div className="mt-4 p-4 rounded-xl border border-[var(--border)]" style={{ background: 'color-mix(in srgb, var(--surface2) 50%, transparent)' }}>
             <p className="text-[12px] text-[var(--text-h)] leading-relaxed">

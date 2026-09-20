@@ -6,10 +6,11 @@ import {
 import { CURVA_ART20, CURVA_ART20_REAL, ANIOS_ART20_MUESTRA, DATOS_UMBRALES, DATOS_UMBRALES_REAL } from '../engine/irpf';
 import { eur } from '../utils/format';
 import { YEAR_COLORS as ART20_COLORS } from '../constants/yearColors';
+import FigureZoom from './FigureZoom';
 
 const UMBRAL_COLORS = {
-  smi: 'var(--green)', minExento: 'var(--accent)',
-  art20Inf: 'var(--yellow)', art20Sup: 'var(--red)', art20Max: '#c9956b',
+  smi: 'var(--ink)', minExento: 'var(--signal)',
+  art20Inf: 'var(--ink-2)', art20Sup: 'var(--muted)', art20Max: 'var(--faint)',
 };
 
 /* ── Toggle reutilizable nominal / real ── */
@@ -210,7 +211,13 @@ function TabCurvaArt20() {
         Eje Y: <strong className="text-[var(--text-soft)]">descuento Art.20</strong>{real ? ' (€2026)' : ' (€ nominales)'}
       </p>
 
-      <div style={{ height: 360 }}>
+      <FigureZoom label="Curvas históricas de la reducción del artículo 20" minWidth={720}>
+      <div className="mechanism-plot" style={{ height: 360 }}>
+        <div className="mechanism-plot__annotations" aria-hidden="true">
+          <span className="is-plateau">PLANA<small>descuento máximo</small></span>
+          <span className="is-cliff">CLIFF<small>la reducción desaparece</small></span>
+          <span className="is-zero">CERO<small>sin alivio Art.20</small></span>
+        </div>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ left: 5, right: 20, top: 10, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
@@ -225,6 +232,7 @@ function TabCurvaArt20() {
           </LineChart>
         </ResponsiveContainer>
       </div>
+      </FigureZoom>
 
       <div className="flex flex-wrap gap-4 mt-3">
         {ANIOS_ART20_MUESTRA.filter(a => aniosVis.has(a)).map(a => (
@@ -349,7 +357,7 @@ function TabEvolucionUmbrales() {
             </li>
             <li className="flex items-start gap-2">
               <span className="w-3 h-3 rounded-full shrink-0 mt-0.5" style={{ background: UMBRAL_COLORS.minExento }} />
-              <div><strong className="text-[#d4a853]">Mínimo exento de retención</strong> — si tu sueldo bruto es menor que esta cifra, <strong className="text-white">NO te retienen IRPF</strong> en nómina. Tu sueldo neto = bruto − Seguridad Social.</div>
+              <div><strong className="text-[var(--signal)]">Mínimo exento de retención</strong> — si tu sueldo bruto es menor que esta cifra, <strong className="text-[var(--ink)]">NO te retienen IRPF</strong> en nómina. Tu sueldo neto = bruto − Seguridad Social.</div>
             </li>
             <li className="flex items-start gap-2">
               <span className="w-3 h-3 rounded-full shrink-0 mt-0.5" style={{ background: UMBRAL_COLORS.art20Inf }} />
@@ -365,7 +373,7 @@ function TabEvolucionUmbrales() {
           <strong className="text-white font-semibold"> ¿Qué buscar?</strong>{' '}
           Si el <span className="text-emerald-400 font-semibold">SMI</span> está por debajo del{' '}
           <span className="text-amber-400 font-semibold">umbral inferior</span>, los trabajadores de salario mínimo tienen el descuento máximo.
-          Si el <span className="text-[#d4a853] font-semibold">mínimo exento</span> sube, más gente deja de pagar IRPF.
+          Si el <span className="text-[var(--signal)] font-semibold">mínimo exento</span> sube, más gente deja de pagar IRPF.
           La distancia entre <span className="text-amber-400">amarillo</span> y <span className="text-red-400">rojo</span> es la «zona cliff».
         </div>
       </div>
@@ -395,6 +403,7 @@ function TabEvolucionUmbrales() {
         Eje Y: <strong className="text-[var(--text-soft)]">importe en {real ? '€ de 2026 (inflación descontada)' : '€ de cada año (nominales)'}</strong>
       </p>
 
+      <FigureZoom label="Evolución histórica de los umbrales fiscales" minWidth={720}>
       <div style={{ height: 360 }}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ left: 5, right: 20, top: 10, bottom: 0 }}>
@@ -411,6 +420,7 @@ function TabEvolucionUmbrales() {
           </LineChart>
         </ResponsiveContainer>
       </div>
+      </FigureZoom>
 
       <div className="flex flex-wrap gap-4 mt-3">
         {Object.entries(labels).filter(([k]) => series.has(k)).map(([key, { label, color, dash }]) => (

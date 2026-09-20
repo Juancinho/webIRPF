@@ -10,6 +10,7 @@ import {
   calcularNomina,
 } from '../engine/irpf';
 import { eur } from '../utils/format';
+import FigureZoom from './FigureZoom';
 
 const ESPANA = CUNA_OCDE_2025.find(p => p.code === 'ES');
 const MEDIA_OCDE = CUNA_OCDE_2025.find(p => p.code === 'OECD');
@@ -26,14 +27,12 @@ const datos = CUNA_OCDE_2025.map(p => ({
   'Cot. trabajador': p.cotTrab,
   'Cot. empresa': p.cotEmp,
   total: p.total,
-  esp: p.esp,
-  media: p.media,
 })).sort((a, b) => b.total - a.total);
 
-const COLOR_NETO = '#34d399';
-const COLOR_IRPF = '#fb7185';
-const COLOR_TRAB = '#fbbf24';
-const COLOR_EMP = '#818cf8';
+const COLOR_NETO = 'var(--ink)';
+const COLOR_IRPF = 'var(--ink-2)';
+const COLOR_TRAB = 'var(--muted)';
+const COLOR_EMP = 'var(--faint)';
 
 function ComparativaTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
@@ -41,7 +40,7 @@ function ComparativaTooltip({ active, payload, label }) {
   return (
     <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 14px', fontSize: 12 }}>
       <p className="font-bold text-[var(--text-h)] mb-1">
-        {label}{fila?.esp ? ' 🇪🇸' : ''}{fila?.media ? ' (media)' : ''}
+        {label}{fila?.code === 'ES' ? ' 🇪🇸' : ''}{fila?.code === 'OECD' ? ' (media)' : ''}
       </p>
       <p style={{ color: 'var(--red)' }}>Cuña total: <strong>{fila?.total}%</strong></p>
       {payload.map((item) => (
@@ -93,10 +92,10 @@ export default function OCDEComparativa({ bruto = 35000, anio = 2026, opts }) {
       {/* Métricas rápidas España */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          ['Cuña total', `${ESPANA.total}%`, 'del coste laboral', 'var(--red)'],
-          ['Impuesto renta', `${ESPANA.irpf}%`, 'del coste laboral', 'var(--yellow)'],
-          ['Cot. trabajador', `${ESPANA.cotTrab}%`, 'del coste laboral', 'var(--accent)'],
-          ['Cot. empresa', `${ESPANA.cotEmp}%`, 'incluye payroll taxes', 'var(--text-soft)'],
+          ['Cuña total', `${ESPANA.total}%`, 'del coste laboral', 'var(--signal)'],
+          ['Impuesto renta', `${ESPANA.irpf}%`, 'del coste laboral', 'var(--ink)'],
+          ['Cot. trabajador', `${ESPANA.cotTrab}%`, 'del coste laboral', 'var(--ink-2)'],
+          ['Cot. empresa', `${ESPANA.cotEmp}%`, 'incluye payroll taxes', 'var(--muted)'],
         ].map(([label, value, sub, color]) => (
           <div key={label} className="card p-4">
             <div className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-soft)] mb-1">{label}</div>
@@ -112,7 +111,9 @@ export default function OCDEComparativa({ bruto = 35000, anio = 2026, opts }) {
         <h3 className="text-base font-bold text-[var(--text-h)] mb-4">
           Los 38 países OCDE · desglose del coste laboral en 2025
         </h3>
-        <ResponsiveContainer width="100%" height={Math.max(520, datos.length * 28)}>
+        <FigureZoom label="Composición del coste laboral en 38 países" minWidth={760}>
+        <div style={{ height: Math.max(520, datos.length * 28) }}>
+        <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={datos}
             layout="vertical"
@@ -127,22 +128,24 @@ export default function OCDEComparativa({ bruto = 35000, anio = 2026, opts }) {
                 const d = datos.find(dd => dd.pais === payload.value);
                 return (
                   <text x={x} y={y} dy={4} textAnchor="end"
-                    style={{ fontSize: 11, fontWeight: d?.esp ? 700 : 400, fill: d?.esp ? 'var(--red)' : d?.media ? 'var(--text-soft)' : 'var(--text)' }}>
-                    {payload.value}{d?.esp ? ` · ${d.total.toFixed(1).replace('.', ',')}% 🇪🇸` : ''}
+                    style={{ fontSize: 11, fontWeight: d?.code === 'ES' ? 700 : 400, fill: d?.code === 'ES' ? 'var(--signal)' : d?.code === 'OECD' ? 'var(--muted)' : 'var(--text)' }}>
+                    {payload.value}{d?.code === 'ES' ? ` · ${d.total.toFixed(1).replace('.', ',')}% 🇪🇸` : ''}
                   </text>
                 );
               }}
             />
             <Tooltip content={<ComparativaTooltip />} />
             <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
-            <Bar dataKey="Neto" stackId="a" fill={COLOR_NETO} />
-            <Bar dataKey="Impuesto renta" stackId="a" fill={COLOR_IRPF} />
-            <Bar dataKey="Cot. trabajador" stackId="a" fill={COLOR_TRAB} />
-            <Bar dataKey="Cot. empresa" stackId="a" fill={COLOR_EMP} />
+            <Bar dataKey="Neto" stackId="a" fill={COLOR_NETO} isAnimationActive={false} />
+            <Bar dataKey="Impuesto renta" stackId="a" fill={COLOR_IRPF} isAnimationActive={false} />
+            <Bar dataKey="Cot. trabajador" stackId="a" fill={COLOR_TRAB} isAnimationActive={false} />
+            <Bar dataKey="Cot. empresa" stackId="a" fill={COLOR_EMP} isAnimationActive={false} />
           </BarChart>
         </ResponsiveContainer>
+        </div>
+        </FigureZoom>
         <p className="text-[11px] text-[var(--text-soft)] mt-2">
-          Cada barra representa el coste laboral total. Verde = neto; rosa = impuesto personal; amarillo = cotización del trabajador; violeta = cotización e impuestos sobre nóminas del empleador. Los componentes pueden diferir una décima del total por redondeo de la OCDE.
+          Cada barra representa el coste laboral total. Negro = neto; gris oscuro = impuesto personal; gris medio = cotización del trabajador; gris claro = cotización e impuestos sobre nóminas del empleador. Los componentes pueden diferir una décima del total por redondeo de la OCDE.
         </p>
         <p className="source-inline mt-2">
           Fuente exacta: <a href={CUNA_OCDE_META.fuente} target="_blank" rel="noreferrer">OCDE, tabla 1.2</a>. Unidad: porcentaje del coste laboral.

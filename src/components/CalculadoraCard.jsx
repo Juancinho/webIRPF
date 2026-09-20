@@ -3,8 +3,8 @@ import { calcularNomina, calcularTipoMarginal, ANIOS, obtenerParametros, SMI_ANU
 import { eur, pct, num } from '../utils/format';
 import ConfigPanel from './ConfigPanel';
 import ConceptDetails from './ConceptDetails';
-
-const TRAMO_COLORS = ['#d4a853','#c9956b','#34d399','#fbbf24','#fb923c','#f87171'];
+import FiscalBreakdown from './FiscalBreakdown';
+import BracketChart from './BracketChart';
 
 export default function CalculadoraCard({ bruto, anio, onChange, onShare, shareLabel, opts: optsProp, onOptsChange }) {
   const [pagas, setPagas] = useState(12);
@@ -29,24 +29,22 @@ export default function CalculadoraCard({ bruto, anio, onChange, onShare, shareL
   const marginalNetoPor100 = marginal.netoMarginal * 100;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
+    <div className="calculator-layout">
       {/* ── Controles ── */}
-      <div className="p-5 sm:p-6 lg:p-7 border-b lg:border-b-0 lg:border-r border-[var(--border)]">
+      <div className="calculator-controls">
 
         {/* Salario slider */}
         <div className="mb-7">
-          <div className="flex items-baseline justify-between mb-2">
-            <label className="text-[10px] font-bold text-[var(--text)] uppercase tracking-[0.1em]">Salario bruto anual</label>
-            <div className="flex items-center gap-2">
-              <input type="text" value={num(bruto)}
+          <label className="calculator-label" htmlFor="salary-input">Salario bruto anual</label>
+          <div className="salary-input-row">
+              <input id="salary-input" type="text" inputMode="numeric" value={num(bruto)}
                 onChange={e => { const v = parseInt(e.target.value.replace(/\D/g,''),10); if (!isNaN(v)) onChange('bruto', Math.min(200000, Math.max(0, v))); }}
-                className="input-field w-28" />
-              <span className="text-[var(--text)] font-semibold text-sm">€</span>
-            </div>
+                className="salary-input" aria-describedby="salary-range-note" />
+              <span>€</span>
           </div>
           <input type="range" min="0" max="150000" step="500" value={bruto}
-            onChange={e => onChange('bruto', +e.target.value)} className="w-full mt-1" />
-          <div className="flex justify-between text-[10px] text-[var(--text)] mt-1.5 opacity-40 font-medium">
+            onChange={e => onChange('bruto', +e.target.value)} className="salary-range" aria-label="Salario bruto anual" />
+          <div id="salary-range-note" className="range-scale">
             <span>0 €</span><span>75.000 €</span><span>150.000 €</span>
           </div>
 
@@ -56,23 +54,23 @@ export default function CalculadoraCard({ bruto, anio, onChange, onShare, shareL
               <span className="text-xs text-[var(--text)]">
                 SMI {anio}: <strong className="text-[var(--text-h)]">{eur(smi)}</strong>
               </span>
-              <span className={`tag ${vecesSMI < 1.2 ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : vecesSMI < 2 ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'bg-purple-500/10 text-purple-400 border-purple-500/20'}`}>
+              <span className="salary-annotation">
                 {vecesSMI.toFixed(2)}× SMI
               </span>
-              {noPagaIRPF && <span className="tag bg-emerald-500/10 text-emerald-400 border-emerald-500/20">✓ Sin IRPF</span>}
-              {limiteActivo && <span className="tag bg-orange-500/10 text-orange-400 border-orange-500/20">Límite 43% activo</span>}
+              {noPagaIRPF && <span className="salary-annotation">Sin IRPF</span>}
+              {limiteActivo && <span className="salary-annotation salary-annotation--signal">Límite 43% activo</span>}
             </div>
           )}
         </div>
 
         {/* Año */}
         <div className="mb-6">
-          <label className="text-[10px] font-bold text-[var(--text)] uppercase tracking-[0.1em] block mb-2.5">Año fiscal</label>
-          <div className="flex flex-wrap gap-1.5">
+          <label className="calculator-label">Año fiscal</label>
+          <div className="year-timeline" role="group" aria-label="Año fiscal">
             {ANIOS.map(a => (
               <button key={a} onClick={() => onChange('anio', a)}
                 className={`year-btn ${anio === a ? 'active' : ''}`}
-                style={anio === a ? { background: 'linear-gradient(135deg, var(--accent), var(--accent2))', boxShadow: '0 2px 12px rgba(56,189,248,0.25)' } : {}}>
+                aria-pressed={anio === a}>
                 {a}
               </button>
             ))}
@@ -111,51 +109,34 @@ export default function CalculadoraCard({ bruto, anio, onChange, onShare, shareL
           </div>
         )}
 
-        {/* Barra visual neto/SS/IRPF */}
+        {/* Descomposición contable: un bloque = un punto porcentual */}
         {bruto > 0 && (
-          <div className="mt-6">
-            <div className="distribution-bar" style={{ height: '12px' }}>
-              {[
-                [resultado.salarioNeto / bruto * 100, '#10b981', '#059669', 'Neto'],
-                [resultado.cotTra / bruto * 100, '#f59e0b', '#d97706', 'SS'],
-                [resultado.irpfFinal / bruto * 100, '#ef4444', '#dc2626', 'IRPF'],
-              ].map(([w, c1, c2, label]) => (
-                <div key={label} className="flex items-center justify-center text-[9px] font-bold text-white/90 transition-all duration-700"
-                  style={{ width: `${Math.max(0, w)}%`, background: `linear-gradient(90deg,${c1},${c2})`, borderRadius: '999px' }}>
-                  {w > 12 ? `${w.toFixed(0)}%` : ''}
-                </div>
-              ))}
-            </div>
-            <div className="flex gap-4 mt-2.5 text-xs text-[var(--text)] flex-wrap">
-              {[['#10b981','Neto',resultado.salarioNeto/bruto*100],['#f59e0b','SS',resultado.cotTra/bruto*100],['#ef4444','IRPF',resultado.irpfFinal/bruto*100]].map(([c,l,p]) => (
-                <span key={l} className="flex items-center gap-1.5 font-medium">
-                  <span className="w-2.5 h-2.5 rounded-md inline-block" style={{background:c, boxShadow:`0 2px 8px ${c}40`}}/>
-                  {l} {p.toFixed(1)}%
-                </span>
-              ))}
-            </div>
-          </div>
+          <FiscalBreakdown
+            total={bruto}
+            segments={[
+              { key: 'neto', value: resultado.salarioNeto },
+              { key: 'ssTra', value: resultado.cotTra },
+              { key: 'irpf', value: resultado.irpfFinal },
+            ]}
+          />
         )}
       </div>
 
       {/* ── Resultado ── */}
-      <div className="p-5 sm:p-6 lg:p-7">
+      <div className="calculator-results" aria-live="polite">
         {/* Números clave */}
         <div className="grid grid-cols-2 gap-3 mb-6">
           {/* Neto principal */}
-          <div className="metric-card col-span-2"
-            style={{
-              background: 'linear-gradient(135deg, rgba(52,211,153,0.06), rgba(52,211,153,0.02))',
-            }}>
+          <div className="metric-card metric-card--primary col-span-2">
             <div className="flex justify-between items-start">
               <div>
-                <div className="text-[10px] text-[#34d399]/80 font-bold uppercase tracking-wider mb-1.5">Salario neto anual</div>
-                <div className="text-3xl font-black text-[#34d399] font-mono tracking-tight">{eur(resultado.salarioNeto)}</div>
+                <div className="metric-label">Salario neto anual</div>
+                <div className="metric-primary-value font-mono">{eur(resultado.salarioNeto)}</div>
               </div>
               <div className="text-right">
-                <div className="text-[10px] text-[#34d399]/50 font-medium mb-1">{pagaLabel}</div>
-                <div className="text-xl font-bold text-[#34d399] font-mono">{eur(pagaDisplay)}</div>
-                <div className="text-[10px] text-[#34d399]/40 font-medium">por paga</div>
+                <div className="metric-side-label">{pagaLabel}</div>
+                <div className="metric-side-value font-mono">{eur(pagaDisplay)}</div>
+                <div className="metric-side-label">por paga</div>
               </div>
             </div>
           </div>
@@ -257,36 +238,12 @@ export default function CalculadoraCard({ bruto, anio, onChange, onShare, shareL
 
         {/* Tramos aplicados */}
         {resultado.baseImponible > 0 && (
-          <div className="mt-5 space-y-2">
-            <p className="text-[10px] font-bold text-[var(--text)] uppercase tracking-[0.1em] mb-3">
-              Tramos IRPF aplicados · {anio >= 2024 ? region.name : 'Escala del ejercicio'}
-            </p>
-            {(() => {
-              return resultado.tramos.map(([lim, tipo], i) => {
-                const desde = i === 0 ? 0 : resultado.tramos[i - 1][0];
-                const limReal = lim === Infinity ? resultado.baseImponible : lim;
-                const enRango = resultado.baseImponible > desde;
-                const lleno = resultado.baseImponible >= limReal;
-                const fraccion = !enRango ? 0 : lleno ? 1 : (resultado.baseImponible - desde) / (limReal - desde);
-                if (!enRango) return null;
-                const cuota = lleno ? (limReal - desde) * tipo : (resultado.baseImponible - desde) * tipo;
-                return (
-                  <div key={i} className="flex items-center gap-2.5 group">
-                    <div className="w-28 text-right text-[10px] text-[var(--text)] shrink-0 font-mono opacity-60 group-hover:opacity-100 transition-opacity">
-                      {lim === Infinity ? `+${eur(desde)}` : `${eur(desde)}–${eur(lim)}`}
-                    </div>
-                    <div className="tramo-bar flex-1">
-                      <div style={{ width: `${fraccion*100}%`, background: `linear-gradient(90deg, ${TRAMO_COLORS[i%TRAMO_COLORS.length]}, ${TRAMO_COLORS[i%TRAMO_COLORS.length]}cc)` }} />
-                    </div>
-                    <div className="w-10 text-[11px] font-mono font-bold shrink-0 text-right transition-all" style={{ color: TRAMO_COLORS[i%TRAMO_COLORS.length] }}>
-                      {(tipo*100).toFixed(1)}%
-                    </div>
-                    <div className="w-14 text-[11px] font-mono text-right text-[var(--text-h)] shrink-0 opacity-70">{eur(cuota)}</div>
-                  </div>
-                );
-              });
-            })()}
-          </div>
+          <BracketChart
+            base={resultado.baseImponible}
+            tramos={resultado.tramos}
+            region={anio >= 2024 ? region.name : 'Escala del ejercicio'}
+            anio={anio}
+          />
         )}
       </div>
     </div>

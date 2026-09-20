@@ -76,23 +76,23 @@ export default function SimuladorSubida({ bruto, anio, opts }) {
             </p>
             <div className="distribution-bar mb-3" style={{ height: '14px' }}>
               <div className="flex items-center justify-center text-[9px] font-bold text-white/90 transition-all duration-700"
-                style={{ width: `${Math.max(0, pctNeto)}%`, background: 'linear-gradient(90deg,#10b981,#059669)', borderRadius: '999px' }}>
+                style={{ width: `${Math.max(0, pctNeto)}%`, background: 'var(--ink)', borderRadius: '999px' }}>
                 {pctNeto > 14 ? `${pctNeto.toFixed(0)}€` : ''}
               </div>
               <div className="flex items-center justify-center text-[9px] font-bold text-white/90 transition-all duration-700"
-                style={{ width: `${Math.max(0, pctSS)}%`, background: 'linear-gradient(90deg,#f59e0b,#d97706)', borderRadius: '999px' }}>
+                style={{ width: `${Math.max(0, pctSS)}%`, background: 'var(--muted)', borderRadius: '999px' }}>
                 {pctSS > 8 ? `${pctSS.toFixed(0)}€` : ''}
               </div>
               <div className="flex items-center justify-center text-[9px] font-bold text-white/90 transition-all duration-700"
-                style={{ width: `${Math.max(0, pctIRPF)}%`, background: 'linear-gradient(90deg,#ef4444,#dc2626)', borderRadius: '999px' }}>
+                style={{ width: `${Math.max(0, pctIRPF)}%`, background: 'var(--signal)', borderRadius: '999px' }}>
                 {pctIRPF > 8 ? `${pctIRPF.toFixed(0)}€` : ''}
               </div>
             </div>
             <div className="grid grid-cols-3 gap-3 text-center text-xs">
               {[
-                ['te quedas', pctNeto, 'emerald', '#10b981'],
-                ['→ SS', pctSS, 'amber', '#f59e0b'],
-                ['→ IRPF', pctIRPF, 'red', '#ef4444'],
+                ['te quedas', pctNeto, 'ink', 'var(--ink)'],
+                ['→ SS', pctSS, 'muted', 'var(--muted)'],
+                ['→ IRPF', pctIRPF, 'signal', 'var(--signal)'],
               ].map(([label, val, , color]) => (
                 <div key={label} className="tone-card p-3" style={{ '--tone': color }}>
                   <div className="text-base font-black font-mono" style={{ color }}>{val.toFixed(1)}€</div>
@@ -114,10 +114,10 @@ export default function SimuladorSubida({ bruto, anio, opts }) {
             <div className="text-[10px] text-[var(--text)] opacity-40 mt-1">{eur(actual.salarioNeto / 12)}/mes</div>
           </div>
           <div className="metric-card"
-            style={{ background: 'linear-gradient(135deg, rgba(52,211,153,0.06), rgba(52,211,153,0.02))' }}>
-            <div className="text-[10px] text-[#34d399]/80 font-medium mb-1">Neto nuevo</div>
-            <div className="text-xl font-black font-mono text-[#34d399]">{eur(nuevo.salarioNeto)}</div>
-            <div className="text-[10px] text-[#34d399]/50 mt-1">{eur(nuevo.salarioNeto / 12)}/mes</div>
+            style={{ background: 'var(--paper-raised)' }}>
+            <div className="text-[10px] font-medium mb-1" style={{ color: 'var(--positive)' }}>Neto nuevo</div>
+            <div className="text-xl font-black font-mono" style={{ color: 'var(--positive)' }}>{eur(nuevo.salarioNeto)}</div>
+            <div className="text-[10px] mt-1" style={{ color: 'var(--positive)' }}>{eur(nuevo.salarioNeto / 12)}/mes</div>
           </div>
         </div>
 
@@ -128,8 +128,8 @@ export default function SimuladorSubida({ bruto, anio, opts }) {
               <div className="flex justify-between items-start">
                 <div>
                   <div className="text-[10px] text-[var(--text)] font-medium mb-1.5">Ganancia neta real</div>
-                  <div className="text-2xl font-black font-mono text-[#34d399] tracking-tight">+{eur(difNeto)}<span className="text-base text-[#34d399]/60 ml-1">/año</span></div>
-                  <div className="text-sm text-[#34d399]/60 mt-1 font-mono">+{eur(difNeto / 12)}/mes</div>
+                  <div className="text-2xl font-black font-mono tracking-tight" style={{ color: 'var(--positive)' }}>+{eur(difNeto)}<span className="text-base ml-1">/año</span></div>
+                  <div className="text-sm mt-1 font-mono" style={{ color: 'var(--positive)' }}>+{eur(difNeto / 12)}/mes</div>
                 </div>
                 <div className="text-right">
                   <div className="text-[10px] text-[var(--text)] font-medium mb-1">De {eur(incremento)} de subida</div>

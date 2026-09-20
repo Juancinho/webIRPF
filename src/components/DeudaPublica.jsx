@@ -5,6 +5,7 @@ import {
 } from 'recharts';
 import { ANIOS, DEUDA_ESPANA, calcularNomina } from '../engine/irpf';
 import { eur } from '../utils/format';
+import FigureZoom from './FigureZoom';
 
 export default function DeudaPublica({ bruto = 35000, anio: anioRef = 2026 }) {
   const [salarioBruto, setSalarioBruto] = useState(bruto);
@@ -102,6 +103,7 @@ export default function DeudaPublica({ bruto = 35000, anio: anioRef = 2026 }) {
       <div className="card p-5">
         <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--text-soft)] mb-1">Evolución 2012-2026</p>
         <h3 className="text-base font-bold text-[var(--text-h)] mb-4">Deuda pública española: per cápita y % PIB</h3>
+        <FigureZoom label="Evolución de la deuda pública española" minWidth={680}>
         <ResponsiveContainer width="100%" height={280}>
           <ComposedChart data={datosHistorico} margin={{ top: 8, right: 40, left: 0, bottom: 8 }}>
             <CartesianGrid strokeDasharray="2 4" stroke="var(--border)" />
@@ -118,6 +120,7 @@ export default function DeudaPublica({ bruto = 35000, anio: anioRef = 2026 }) {
             <ReferenceLine yAxisId="left" x={anio} stroke="var(--border-light)" strokeDasharray="3 2" />
           </ComposedChart>
         </ResponsiveContainer>
+        </FigureZoom>
         <p className="source-inline">
           La deuda per cápita ha crecido un {crecPerCap.toFixed(0)}% desde 2012.
           Fuente: Banco de España (PDE-Eurostat) + INE (ECP).
@@ -137,6 +140,7 @@ export default function DeudaPublica({ bruto = 35000, anio: anioRef = 2026 }) {
               className="w-24 align-middle" />
           </label>
         </p>
+        <FigureZoom label="Simulación de amortización de deuda" minWidth={680}>
         <ResponsiveContainer width="100%" height={220}>
           <BarChart data={proyeccion} margin={{ top: 8, right: 8, left: 0, bottom: 8 }}>
             <CartesianGrid strokeDasharray="2 4" stroke="var(--border)" />
@@ -150,6 +154,7 @@ export default function DeudaPublica({ bruto = 35000, anio: anioRef = 2026 }) {
             <Bar dataKey="pendiente" name="Deuda pendiente" fill="var(--red)" fillOpacity={0.7} />
           </BarChart>
         </ResponsiveContainer>
+        </FigureZoom>
       </div>
 
       {/* Nota metodológica */}

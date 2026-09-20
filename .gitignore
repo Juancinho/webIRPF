@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Local visual QA captures
+tmp/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

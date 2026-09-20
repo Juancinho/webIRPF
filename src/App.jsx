@@ -1,10 +1,13 @@
-import { lazy, Suspense, useCallback, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { useURLState } from './hooks/useURLState';
 import { useTheme } from './hooks/useTheme';
 import CalculadoraCard from './components/CalculadoraCard';
 import ThemeToggle from './components/ThemeToggle';
 import ScrollReveal from './components/ScrollReveal';
+import SalaryJourney from './components/SalaryJourney';
+import PayrollStudy from './components/PayrollStudy';
 import './index.css';
+import './styles/redesign.css';
 
 const SimuladorSubida = lazy(() => import('./components/SimuladorSubida'));
 const GraficoComparativo = lazy(() => import('./components/GraficoComparativo'));
@@ -117,83 +120,89 @@ export default function App() {
   const onChange = useCallback((campo, valor) => set(campo, valor), [set]);
   const { theme, toggle: toggleTheme } = useTheme();
 
-  const [activeId, setActiveId] = useState('calc');
+  const [activeId, setActiveId] = useState(() => {
+    const hash = typeof window === 'undefined' ? '' : window.location.hash.slice(1);
+    return SECCIONES.some(section => section.id === hash) ? hash : 'calc';
+  });
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const activeSection = SECCIONES.find(section => section.id === activeId) || SECCIONES[0];
+
+  useEffect(() => {
+    const syncHash = () => {
+      const hash = window.location.hash.slice(1);
+      if (SECCIONES.some(section => section.id === hash)) setActiveId(hash);
+    };
+    window.addEventListener('hashchange', syncHash);
+    return () => window.removeEventListener('hashchange', syncHash);
+  }, []);
 
   const navTo = id => {
     setActiveId(id);
     setMobileNavOpen(false);
+    window.history.replaceState(null, '', `#${id}`);
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
   return (
     <div className="app-root">
 
-      {/* ═══════════════ FIXED HEADER ═══════════════ */}
+      {/* ═══════════════ RUNNING PUBLICATION HEADER ═══════════════ */}
       <header className="app-header">
         <div className="app-header-inner">
-          {/* Logo */}
-          <div className="flex items-baseline gap-1">
-            <span className="logo-mark" style={{ color: 'var(--text-h)', fontSize: 22 }}>Fiscal</span>
-            <span className="logo-mark-accent" style={{ color: 'var(--accent)', fontSize: 22 }}>scope</span>
+          <button className="publication-masthead" onClick={() => navTo('calc')} aria-label="Ir a la portada de FiscalScope">
+            <strong>FISCALSCOPE</strong>
+            <span>INTERACTIVE FISCAL PAPER</span>
+          </button>
+
+          <div className="running-chapter" aria-live="polite">
+            <span>0{activeSection.n} / 06</span>
+            <strong>{activeSection.label}</strong>
           </div>
 
-          {/* Right controls */}
-          <div className="flex items-center gap-2">
-            <span className="hidden sm:block text-[11px] text-[var(--text-soft)]">Cálculo estatal y autonómico · Orientativo</span>
+          <div className="publication-actions">
+            <span className="header-note hidden sm:block">ES · {anio}</span>
             <ThemeToggle theme={theme} onToggle={toggleTheme} />
             <ShareButton getShareURL={getShareURL} />
-            {/* Mobile nav trigger */}
             <button
-              className="lg:hidden w-8 h-8 flex items-center justify-center rounded-lg border border-[var(--border)] ml-1"
-              style={{ background: 'var(--surface2)', color: 'var(--text)' }}
+              className="index-trigger"
               onClick={() => setMobileNavOpen(o => !o)}
-              aria-label="Secciones"
+              aria-label="Abrir índice de capítulos"
               aria-expanded={mobileNavOpen}
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                <line x1="3" y1="6" x2="21" y2="6" />
-                <line x1="3" y1="12" x2="21" y2="12" />
-                <line x1="3" y1="18" x2="21" y2="18" />
-              </svg>
+              ÍNDICE
             </button>
           </div>
         </div>
 
-        {/* Mobile section pills — visible below header on small screens */}
-        <div className={`mobile-sec-pills lg:hidden ${mobileNavOpen ? 'open' : ''}`}>
+        <nav className={`publication-index ${mobileNavOpen ? 'open' : ''}`} aria-label="Índice de capítulos">
+          <div className="publication-index__heading">
+            <span>ÍNDICE</span>
+            <button onClick={() => setMobileNavOpen(false)} aria-label="Cerrar índice">Cerrar</button>
+          </div>
           {SECCIONES.map(s => (
             <button key={s.id} onClick={() => navTo(s.id)}
-              className={`mobile-sec-pill ${activeId === s.id ? 'active' : ''}`}>
-              <span className="mobile-sec-num">{s.n}</span>
-              {s.label}
+              className={activeId === s.id ? 'active' : ''} aria-current={activeId === s.id ? 'page' : undefined}>
+              <span>0{s.n}</span>
+              <strong>{s.label}</strong>
+              <small>{s.desc}</small>
             </button>
           ))}
-        </div>
+        </nav>
       </header>
 
-      {/* ═══════════════ SIDEBAR NAV ═══════════════ */}
-      <nav className="side-nav" aria-label="Secciones">
-        <div className="side-nav-inner">
-          {/* Brief intro above nav */}
-          <div className="px-4 pt-5 pb-3 mb-1 border-b border-[var(--border)]" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
-            <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--text-soft)] mb-0.5">Radiografía fiscal</p>
-            <p className="text-[10.5px] text-[var(--text-soft)] leading-snug opacity-70">España 2012–2026</p>
-          </div>
-
-          <div className="px-2 py-3 space-y-0.5">
-            {SECCIONES.map(s => (
-              <button key={s.id} onClick={() => navTo(s.id)}
-                className={`side-nav-item ${activeId === s.id ? 'active' : ''}`}>
-                <span className="side-nav-num">{s.n}</span>
-                <div className="min-w-0">
-                  <p className="side-nav-title">{s.label}</p>
-                  <p className="side-nav-desc">{s.desc}</p>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
+      <nav className="chapter-rail" aria-label="Navegación por capítulos">
+        {SECCIONES.map(section => (
+          <button
+            key={section.id}
+            onClick={() => navTo(section.id)}
+            className={activeId === section.id ? 'active' : ''}
+            aria-label={`${section.n}. ${section.label}`}
+            aria-current={activeId === section.id ? 'page' : undefined}
+            title={section.label}
+          >
+            0{section.n}
+          </button>
+        ))}
       </nav>
 
       {/* ═══════════════ MAIN CONTENT ═══════════════ */}
@@ -203,56 +212,39 @@ export default function App() {
           <Suspense fallback={<SectionLoading />}>
           {/* ═══ Calculadora ═══ */}
           {activeId === 'calc' && (
-            <div className="space-y-10">
-              {/* Intro hero — only on first section */}
-              <div className="pt-2 pb-2">
-                <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--accent)] mb-3">Radiografía interactiva</p>
-                <h1 className="font-display text-[2rem] sm:text-[2.6rem] lg:text-[3.2rem] leading-[1.08] tracking-tight mb-4"
-                  style={{ color: 'var(--text-h)', fontWeight: 600 }}>
-                  Tu sueldo bajo el{' '}
-                  <em style={{ color: 'var(--accent)', fontWeight: 400 }}>microscopio fiscal</em>
-                </h1>
-                <p className="text-[14.5px] sm:text-[15.5px] leading-relaxed max-w-[52ch] text-[var(--text)]">
-                  IRPF + SS estimados con los parámetros de cada año desde 2012.
-                  Datos del <strong className="text-[var(--text-h)]">BOE, INE y TGSS</strong>.
-                </p>
-              </div>
+            <div className="space-y-16">
+              <section className="publication-cover" aria-labelledby="cover-title">
+                <div className="publication-cover__folio">
+                  <span>VOL. 01</span><span>ESPAÑA</span><span>2012—2026</span>
+                </div>
+                <div className="publication-cover__title">
+                  <p>CUADERNO FISCAL INTERACTIVO</p>
+                  <h1 id="cover-title">Lo que tu sueldo<br />dice de <em>España.</em></h1>
+                  <span>El cálculo es la portada. Mueve tu salario, elige un año y sigue cada euro.</span>
+                </div>
 
-              <div className="liquid-glass overflow-hidden">
-                <CalculadoraCard
-                  bruto={bruto} anio={anio} onChange={onChange}
-                  onShare={() => navigator.clipboard?.writeText(getShareURL())}
-                  shareLabel="Compartir"
-                  opts={opts}
-                  onOptsChange={setOpts}
-                />
-              </div>
+                <div className="calculator-shell">
+                  <CalculadoraCard
+                    bruto={bruto} anio={anio} onChange={onChange}
+                    onShare={() => navigator.clipboard?.writeText(getShareURL())}
+                    shareLabel="Compartir"
+                    opts={opts}
+                    onOptsChange={setOpts}
+                  />
+                </div>
+                <p className="publication-cover__source">FUENTE · BOE · INE · TGSS · CÁLCULO ORIENTATIVO</p>
+              </section>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <ScrollReveal delay={0}><InfoCard>
-                  <strong className="text-[var(--text-h)] block mb-1 text-[13px]">Tipo efectivo</strong>
-                  El porcentaje <em>real</em> de tu sueldo que va al IRPF. Si ganas 30.000€ y pagas 3.600€ de IRPF, tu tipo efectivo es 12% — no el tipo del tramo más alto.
-                </InfoCard></ScrollReveal>
-                <ScrollReveal delay={80}><InfoCard>
-                  <strong className="text-[var(--text-h)] block mb-1 text-[13px]">Tipo marginal</strong>
-                  Lo que pagas por el <em>siguiente</em> euro. Si te suben 100€ y llegan 58€, tu tipo marginal efectivo es 42%. Siempre mayor que el tipo efectivo.
-                </InfoCard></ScrollReveal>
-                <ScrollReveal delay={160}><InfoCard>
-                  <strong className="text-[var(--text-h)] block mb-1 text-[13px]">Base imponible</strong>
-                  Lo que tributa: bruto − SS − 2.000€ gastos Art.19 − reducción Art.20. La tarifa progresiva se aplica sobre esta cifra, no sobre el bruto.
-                </InfoCard></ScrollReveal>
-                <ScrollReveal delay={240}><InfoCard>
-                  <strong className="text-[var(--text-h)] block mb-1 text-[13px]">Coste laboral</strong>
-                  La empresa paga ~31,5% extra en SS patronal que tú nunca ves. Un bruto de 35.000€ cuesta más de 46.000€ a la empresa.
-                </InfoCard></ScrollReveal>
-              </div>
+              <PayrollStudy bruto={bruto} anio={anio} opts={opts} />
 
-              <div>
-                <SectionHeading tagline="Paso a paso">El viaje de tu <em className="text-[var(--accent)]">sueldo</em></SectionHeading>
-                <div className="liquid-glass p-5 sm:p-6 overflow-hidden">
+              <SalaryJourney bruto={bruto} anio={anio} opts={opts} />
+
+              <details className="technical-disclosure" open>
+                <summary>Apéndice técnico · fórmulas, artículos y fuentes paso a paso</summary>
+                <div className="technical-disclosure__body">
                   <DesgloseEducativo bruto={bruto} anio={anio} opts={opts} />
                 </div>
-              </div>
+              </details>
 
               <div>
                 <SectionHeading tagline="Simulador de subida">¿Cuánto ves de cada <em className="text-[var(--accent)]">100€</em> de aumento?</SectionHeading>
@@ -280,33 +272,54 @@ export default function App() {
 
           {/* ═══ Distribución ═══ */}
           {activeId === 'distribucion' && (
-            <div>
+            <div className="chapter-distribution">
               <SectionHeading tagline="Distribución salarial">¿Dónde estás en la <em className="text-[var(--accent)]">escala social</em>?</SectionHeading>
+              <div className="chapter-deck chapter-deck--distribution">
+                <p className="chapter-deck__lead">Un salario sólo adquiere escala cuando se coloca junto a los demás.</p>
+                <div className="chapter-deck__copy">
+                  <p>Esta lectura no mide riqueza, patrimonio ni bienestar familiar. Sitúa el salario bruto dentro de la distribución observada por el INE y muestra cómo cambia la posición relativa entre ejercicios.</p>
+                  <p>El percentil responde a una pregunta concreta: qué proporción de asalariados queda por debajo de esta retribución. No convierte esa posición en una clase social automática.</p>
+                </div>
+                <aside><span>NOTA DE LECTURA</span>Salario, renta disponible y patrimonio son magnitudes distintas.</aside>
+              </div>
               <DistribucionSalarial bruto={bruto} anio={anio} />
             </div>
           )}
 
           {/* ═══ OCDE ═══ */}
           {activeId === 'internacional' && (
-            <div>
+            <div className="chapter-international">
               <SectionHeading tagline="Comparativa OCDE">España frente al mundo</SectionHeading>
+              <div className="chapter-deck chapter-deck--international">
+                <p className="chapter-deck__lead">Comparar países exige mantener fijo el denominador.</p>
+                <div className="chapter-deck__copy">
+                  <p>La cuña fiscal de la OCDE se expresa sobre el coste laboral total: impuesto personal, cotización del trabajador y cotización del empleador. No es lo mismo que dividir únicamente las retenciones entre el salario bruto.</p>
+                  <p>La figura utiliza el supuesto comparable de trabajador soltero sin hijos. Tu resultado personal aparece aparte, porque incorpora el salario y el perfil fiscal seleccionados en esta publicación.</p>
+                </div>
+                <aside><span>UNIDAD COMÚN</span>% del coste laboral · Taxing Wages 2026</aside>
+              </div>
                   <OCDEComparativa bruto={bruto} anio={anio} opts={opts} />
             </div>
           )}
 
           {/* ═══ Sistema ═══ */}
           {activeId === 'sistema' && (
-            <div className="space-y-12">
+            <div className="chapter-system space-y-12">
+              <div className="system-thesis">
+                <span>CAPÍTULO 05 · LOS MECANISMOS</span>
+                <strong>EL COSTE<br />NO ES<br /><em>EL BRUTO.</em></strong>
+                <p>Y el bruto tampoco es la base. Este capítulo separa las magnitudes que una nómina suele mezclar: quién paga, sobre qué cantidad se aplica cada regla y en qué punto una reducción desaparece.</p>
+              </div>
               <div>
                 <SectionHeading tagline="Cuña fiscal">Cuánto de tu sueldo <em className="text-[var(--accent)]">nunca llega</em> a tu cuenta</SectionHeading>
-                <div className="liquid-glass p-5 sm:p-6">
+                <div className="figure-sheet">
                   <CuñaFiscal bruto={bruto} anio={anio} />
                 </div>
               </div>
 
               <div>
                 <SectionHeading tagline="Mecanismos ocultos">Art.20, umbrales y las <em className="text-[var(--accent)]">trampas</em> del sistema</SectionHeading>
-                <div className="liquid-glass p-5 sm:p-6">
+                <div className="figure-sheet">
                   <GraficoMecanismos />
                 </div>
               </div>
@@ -317,7 +330,15 @@ export default function App() {
 
           {/* ═══ Normativa ═══ */}
           {activeId === 'normativa' && (
-            <div className="space-y-12">
+            <div className="chapter-appendix space-y-12">
+              <div className="appendix-opening">
+                <p>APPENDIX / DOCUMENTACIÓN</p>
+                <h2>El estudio termina donde empiezan las fuentes.</h2>
+                <div>
+                  <span>A · METODOLOGÍA</span><span>B · FUENTES</span><span>C · PARÁMETROS</span><span>D · NORMATIVA</span>
+                </div>
+                <p>Esta cronología permite reconstruir por qué una cifra cambia entre ejercicios. Cada reforma se presenta como evidencia fechada, no como decoración narrativa.</p>
+              </div>
               <SectionHeading tagline="Cronología de reformas">15 años de cambios fiscales</SectionHeading>
               <CronologiaTimeline />
 
@@ -337,13 +358,13 @@ export default function App() {
             const next = SECCIONES[idx + 1];
             if (!next) return null;
             return (
-              <div className="mt-16 pt-8 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
-                <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--text-soft)] mb-3">Siguiente</p>
-                <button onClick={() => navTo(next.id)} className="group flex items-center gap-4 text-left">
-                  <span className="side-nav-num" style={{ width: 36, height: 36, borderRadius: 10, fontSize: 14 }}>{next.n}</span>
+              <div className="next-chapter">
+                <p>SIGUIENTE CAPÍTULO</p>
+                <button onClick={() => navTo(next.id)} className="group">
+                  <span>0{next.n}</span>
                   <div>
-                    <p className="font-display text-[1.1rem] text-[var(--text-h)] group-hover:text-[var(--accent)] transition-colors">{next.label}</p>
-                    <p className="text-[12px] text-[var(--text-soft)]">{next.tagline}</p>
+                    <strong>{next.label}</strong>
+                    <small>{next.tagline}</small>
                   </div>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
                     className="ml-2 text-[var(--text-soft)] group-hover:text-[var(--accent)] group-hover:translate-x-1 transition-all">
@@ -357,23 +378,15 @@ export default function App() {
         </div>{/* end app-content */}
 
         {/* Footer */}
-        <footer className="border-t mt-16 py-10" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+        <footer className="publication-footer">
           <div className="app-content">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
-              <div>
-                <div className="flex items-baseline gap-1 mb-1.5">
-                  <span className="logo-mark" style={{ color: 'var(--text-h)', fontSize: 18 }}>Fiscal</span>
-                  <span className="logo-mark-accent" style={{ color: 'var(--accent)', fontSize: 18 }}>scope</span>
-                </div>
-                <p className="text-[11px] text-[var(--text-soft)] max-w-[28ch] leading-relaxed">
-                  Herramienta independiente · Sin afiliación política
-                </p>
-              </div>
-              <div className="text-right space-y-1">
-                <p className="text-[10px] text-[var(--text-soft)] opacity-70">IPC histórico: INE · IPC 2026: estimación · Parámetros: LIRPF, LGSS, BOE</p>
-                <p className="text-[10px] text-[var(--text-soft)] opacity-45">FiscalScope · 2012–2026</p>
-              </div>
+            <div className="publication-footer__grid">
+              <strong>FISCALSCOPE</strong>
+              <div><span>DATOS</span><p>BOE · INE · TGSS · OCDE</p></div>
+              <div><span>PERIODO</span><p>ESPAÑA · 2012—2026</p></div>
+              <div><span>CARÁCTER</span><p>Estudio independiente · cálculo orientativo</p></div>
             </div>
+            <p className="publication-footer__end">END OF REPORT</p>
           </div>
         </footer>
 
