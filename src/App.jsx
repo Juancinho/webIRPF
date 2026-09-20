@@ -1,22 +1,21 @@
-import { useCallback, useState } from 'react';
+import { lazy, Suspense, useCallback, useState } from 'react';
 import { useURLState } from './hooks/useURLState';
 import { useTheme } from './hooks/useTheme';
-import { DEFAULT_OPTS } from './engine/irpf';
 import CalculadoraCard from './components/CalculadoraCard';
-import SimuladorSubida from './components/SimuladorSubida';
-import GraficoComparativo from './components/GraficoComparativo';
-import GraficoMecanismos from './components/GraficoMecanismos';
-import CuñaFiscal from './components/CuñaFiscal';
-import DesgloseEducativo from './components/DesgloseEducativo';
-import NormativaFAQ from './components/NormativaFAQ';
-import CurvaIRPF from './components/CurvaIRPF';
-import DistribucionSalarial from './components/DistribucionSalarial';
-import OCDEComparativa from './components/OCDEComparativa';
-import DeudaPublica from './components/DeudaPublica';
-import CronologiaTimeline from './components/CronologiaTimeline';
 import ThemeToggle from './components/ThemeToggle';
 import ScrollReveal from './components/ScrollReveal';
 import './index.css';
+
+const SimuladorSubida = lazy(() => import('./components/SimuladorSubida'));
+const GraficoComparativo = lazy(() => import('./components/GraficoComparativo'));
+const GraficoMecanismos = lazy(() => import('./components/GraficoMecanismos'));
+const CuñaFiscal = lazy(() => import('./components/CuñaFiscal'));
+const DesgloseEducativo = lazy(() => import('./components/DesgloseEducativo'));
+const NormativaFAQ = lazy(() => import('./components/NormativaFAQ'));
+const DistribucionSalarial = lazy(() => import('./components/DistribucionSalarial'));
+const OCDEComparativa = lazy(() => import('./components/OCDEComparativa'));
+const DeudaPublica = lazy(() => import('./components/DeudaPublica'));
+const CronologiaTimeline = lazy(() => import('./components/CronologiaTimeline'));
 
 const SECCIONES = [
   {
@@ -77,7 +76,9 @@ function ShareButton({ getShareURL }) {
     try {
       if (navigator.share) await navigator.share({ title: 'FiscalScope', url });
       else await navigator.clipboard.writeText(url);
-    } catch { }
+    } catch {
+      // Compartir puede cancelarse o no estar permitido; no requiere bloquear la interfaz.
+    }
   };
   return (
     <button onClick={handleShare} className="btn-ghost flex items-center gap-1.5 text-[12px]">
@@ -103,16 +104,21 @@ function SectionHeading({ tagline, children }) {
   );
 }
 
+function SectionLoading() {
+  return (
+    <div className="liquid-glass p-6 text-sm text-[var(--text-soft)]" role="status" aria-live="polite">
+      Cargando sección…
+    </div>
+  );
+}
+
 export default function App() {
-  const { bruto, anio, set, getShareURL } = useURLState();
+  const { bruto, anio, opts, set, setOpts, getShareURL } = useURLState();
   const onChange = useCallback((campo, valor) => set(campo, valor), [set]);
   const { theme, toggle: toggleTheme } = useTheme();
 
   const [activeId, setActiveId] = useState('calc');
-  const [opts, setOpts] = useState(DEFAULT_OPTS);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-
-  const seccion = SECCIONES.find(s => s.id === activeId);
 
   const navTo = id => {
     setActiveId(id);
@@ -134,7 +140,7 @@ export default function App() {
 
           {/* Right controls */}
           <div className="flex items-center gap-2">
-            <span className="hidden sm:block text-[11px] text-[var(--text-soft)]">Solo tarifa estatal · Orientativo</span>
+            <span className="hidden sm:block text-[11px] text-[var(--text-soft)]">Cálculo estatal y autonómico · Orientativo</span>
             <ThemeToggle theme={theme} onToggle={toggleTheme} />
             <ShareButton getShareURL={getShareURL} />
             {/* Mobile nav trigger */}
@@ -143,6 +149,7 @@ export default function App() {
               style={{ background: 'var(--surface2)', color: 'var(--text)' }}
               onClick={() => setMobileNavOpen(o => !o)}
               aria-label="Secciones"
+              aria-expanded={mobileNavOpen}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                 <line x1="3" y1="6" x2="21" y2="6" />
@@ -193,6 +200,7 @@ export default function App() {
       <main className="app-main">
         <div className="app-content">
 
+          <Suspense fallback={<SectionLoading />}>
           {/* ═══ Calculadora ═══ */}
           {activeId === 'calc' && (
             <div className="space-y-10">
@@ -205,7 +213,7 @@ export default function App() {
                   <em style={{ color: 'var(--accent)', fontWeight: 400 }}>microscopio fiscal</em>
                 </h1>
                 <p className="text-[14.5px] sm:text-[15.5px] leading-relaxed max-w-[52ch] text-[var(--text)]">
-                  IRPF + SS calculados con la normativa real de cada año desde 2012.
+                  IRPF + SS estimados con los parámetros de cada año desde 2012.
                   Datos del <strong className="text-[var(--text-h)]">BOE, INE y TGSS</strong>.
                 </p>
               </div>
@@ -249,12 +257,12 @@ export default function App() {
               <div>
                 <SectionHeading tagline="Simulador de subida">¿Cuánto ves de cada <em className="text-[var(--accent)]">100€</em> de aumento?</SectionHeading>
                 <div className="liquid-glass overflow-hidden">
-                  <SimuladorSubida bruto={bruto} anio={anio} />
+                  <SimuladorSubida bruto={bruto} anio={anio} opts={opts} />
                 </div>
                 <div className="mt-5">
                   <ScrollReveal><InfoCard>
                     <strong className="text-[var(--text-h)] text-[13px]">El efecto «cliff» del Art.20</strong>{' '}
-                    En ciertos tramos, ganar un euro extra puede disparar el IRPF más que proporcionalmente porque también reduce la deducción Art.20. El tipo marginal puede superar el 50% en rentas medias — una <em>trampa de actividad</em>.
+                    La reducción por rendimientos del trabajo disminuye gradualmente al aumentar la renta. Mientras se retira, una subida puede aumentar la base sometida a IRPF en más que el propio incremento bruto, elevando temporalmente el tipo marginal efectivo. Ese porcentaje afecta a los euros adicionales dentro de esa zona, no a todo el salario.
                   </InfoCard></ScrollReveal>
                 </div>
               </div>
@@ -321,6 +329,7 @@ export default function App() {
               </div>
             </div>
           )}
+          </Suspense>
 
           {/* Siguiente sección */}
           {(() => {
@@ -361,7 +370,7 @@ export default function App() {
                 </p>
               </div>
               <div className="text-right space-y-1">
-                <p className="text-[10px] text-[var(--text-soft)] opacity-70">IPC: INE · Parámetros: LIRPF, LGSS, BOE · Cuña: OCDE Taxing Wages 2026</p>
+                <p className="text-[10px] text-[var(--text-soft)] opacity-70">IPC histórico: INE · IPC 2026: estimación · Parámetros: LIRPF, LGSS, BOE</p>
                 <p className="text-[10px] text-[var(--text-soft)] opacity-45">FiscalScope · 2012–2026</p>
               </div>
             </div>

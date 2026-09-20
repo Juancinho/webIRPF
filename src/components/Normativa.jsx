@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { obtenerParametros } from '../engine/irpf';
-import { eur, pct, num } from '../utils/format';
+import { eur, num } from '../utils/format';
 
 const ANIOS = Array.from({ length: 15 }, (_, i) => 2012 + i);
 
@@ -51,7 +51,7 @@ const HITOS = [
     anios: [2026],
     titulo: 'Estado actual — Mayor protección a rentas bajas',
     color: '#6366f1',
-    texto: `La deducción para rentas próximas al SMI alcanza 590,89€, con fase-out progresivo hasta los 17.094€ brutos. El MEI sube al 0,75% (empresa) + 0,15% (trabajador). La cotización de solidaridad se intensifica. La base máxima de cotización alcanza 61.214,40€. Los parámetros del Art.20 no varían respecto a 2024.`,
+    texto: `La deducción para rentas próximas al SMI alcanza 590,89€, con reducción progresiva entre 17.094€ y 20.048,45€ brutos. El MEI sube al 0,75% (empresa) + 0,15% (trabajador). La cotización de solidaridad se intensifica. La base máxima de cotización alcanza 61.214,40€. Los parámetros del Art.20 no varían respecto a 2024.`,
   },
 ];
 

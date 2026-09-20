@@ -120,7 +120,7 @@ const EVENTOS = [
     tipo: 'smi',
     titulo: 'SMI 16.576 € — continuidad ascendente',
     subtitulo: 'Real Decreto SMI 2025',
-    descripcion: 'El SMI continúa su senda alcista. Desde 2018, el SMI ha aumentado un 65% en términos nominales. En términos reales (ajustados por IPC), el aumento es del 35%. El efecto sobre el IRPF es notable: más trabajadores superan el umbral de retención y la reducción Art.20 se vuelve menos valiosa.',
+    descripcion: 'El SMI continúa su senda alcista. Desde 2018 ha aumentado un 60,9% en términos nominales y cerca de un tercio en términos reales. El efecto sobre el IRPF es notable: más trabajadores superan el umbral de retención y la reducción Art.20 se vuelve menos valiosa.',
     metricas: [
       { label: 'SMI anual', valor: '16.576 €', color: 'var(--green)' },
       { label: 'Variación 2018→2025', valor: '+60,9%', color: 'var(--green)' },
@@ -128,14 +128,14 @@ const EVENTOS = [
   },
   {
     anio: 2026,
-    mes: 'Ene',
+    mes: 'Feb',
     tipo: 'smi',
-    titulo: 'SMI proyectado: 17.094 € (estimación)',
-    subtitulo: 'Proyección basada en acuerdos de diálogo social',
-    descripcion: 'Proyección orientativa. Si se mantiene el patrón de negociación del período 2019-2025, el SMI continuará por encima del IPC. Los parámetros del IRPF (tramos, Art.20) siguen sin indexarse automáticamente a la inflación — lo que garantiza que la "progresividad en frío" sigue erosionando el poder adquisitivo neto de las rentas medias.',
+    titulo: 'SMI 17.094 € — nueva deducción en cuota',
+    subtitulo: 'RD 126/2026 y RDL 5/2026',
+    descripcion: 'El SMI queda fijado en 1.221 € mensuales en 14 pagas. La deducción por rendimientos del trabajo sube a 590,89 € y desaparece progresivamente hasta 20.048,45 €. El IPC usado para las comparaciones en euros constantes de 2026 sigue siendo una estimación hasta que el INE publique el dato de diciembre.',
     metricas: [
-      { label: 'SMI proyectado', valor: '17.094 €', color: 'var(--text-soft)' },
-      { label: 'Art.20 umbral inf.', valor: '19.747,50 €', color: 'var(--text-soft)' },
+      { label: 'SMI anual', valor: '17.094 €', color: 'var(--green)' },
+      { label: 'Deducción máxima', valor: '590,89 €', color: 'var(--text-soft)' },
     ],
   },
 ];
@@ -274,7 +274,7 @@ export default function CronologiaTimeline() {
       </div>
 
       {/* Nota metodológica */}
-      <div className="card p-4 text-[12px] text-[var(--text)] leading-relaxed">
+      <div className="source-note">
         <strong className="text-[var(--text-h)]">Fuentes.</strong> LIRPF (Ley 35/2006 y modificaciones), Real Decreto-Ley 20/2011,
         Ley 26/2014, Ley 6/2018 (PGE 2018), Ley 6/2020 (PGE 2021 prórrogado), Ley 21/2021 (reforma autónomos),
         RD del SMI de cada año (BOE). Las fechas de entrada en vigor son las del ejercicio fiscal completo.

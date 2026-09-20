@@ -8,24 +8,7 @@ import {
   SMI_ANUAL, REFORMA_ANIOS
 } from '../engine/irpf';
 import { eur } from '../utils/format';
-
-export const YEAR_COLORS = {
-  2012: '#ef4444',  // rojo intenso
-  2013: '#3b82f6',  // azul vivo
-  2014: '#22c55e',  // verde brillante
-  2015: '#f59e0b',  // ámbar
-  2016: '#a855f7',  // púrpura
-  2017: '#06b6d4',  // cian
-  2018: '#f97316',  // naranja
-  2019: '#ec4899',  // rosa fuerte
-  2020: '#14b8a6',  // teal
-  2021: '#6366f1',  // índigo
-  2022: '#84cc16',  // lima
-  2023: '#f43f5e',  // rosa-rojizo
-  2024: '#0ea5e9',  // azul cielo
-  2025: '#d946ef',  // fucsia
-  2026: '#eab308',  // amarillo dorado
-};
+import { YEAR_COLORS } from '../constants/yearColors';
 
 const GRUPOS = {
   'Años clave': [2012, 2015, 2019, 2023, 2026],
@@ -35,7 +18,7 @@ const GRUPOS = {
 };
 
 /* ── Custom Brush traveller handle ── */
-function BrushHandle({ x, y, width, height }) {
+function BrushHandle({ x, y, height }) {
   const hw = 12;
   return (
     <g style={{ cursor: 'ew-resize' }}>
@@ -152,9 +135,7 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
   const inf = INFLACION_A_2026[anioRef] || 1;
   const smi2026 = Math.round((SMI_ANUAL[anioRef] || 0) * inf);
   const umbralInf2026 = params.art20Meta.uInf ? Math.round(params.art20Meta.uInf * inf) : null;
-  const umbralSup2026 = params.art20Meta.uSup ? Math.round(params.art20Meta.uSup * inf) : null;
   const baseMax2026 = Math.round(params.baseMax * inf);
-  const dataPuntoRef = DATOS_CHART.find(d => d.bruto >= bruto2026) || DATOS_CHART[DATOS_CHART.length - 1];
 
   // Datos para la vista por año (dual eje)
   const dataPorAnio = useMemo(() => ANIOS.map(anio => {
@@ -297,14 +278,9 @@ export default function GraficoComparativo({ brutoRef, anioRef }) {
               <h3 className="font-display text-[1.5rem] tracking-tight text-[var(--text-h)]">2. Carga fiscal real (<em className="text-[var(--accent)]">Tipo Efectivo</em>)</h3>
             </div>
 
-            <div className="flex items-center p-1 rounded-xl border border-[var(--border)] shrink-0" style={{
-              background: 'color-mix(in srgb, var(--surface2) 60%, transparent)',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
-              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)'
-            }}>
-              <button onClick={() => setModoTipo('real')} className={`px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-lg transition-all ${modoTipo === 'real' ? 'bg-[var(--accent)] shadow-sm' : 'text-[var(--text-soft)] hover:text-[var(--text-h)] hover:bg-[var(--surface3)]'}`} style={modoTipo === 'real' ? { color: '#ffffff' } : {}}>Real (€2026)</button>
-              <button onClick={() => setModoTipo('nominal')} className={`px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-lg transition-all ${modoTipo === 'nominal' ? 'bg-[var(--accent)] shadow-sm' : 'text-[var(--text-soft)] hover:text-[var(--text-h)] hover:bg-[var(--surface3)]'}`} style={modoTipo === 'nominal' ? { color: '#ffffff' } : {}}>Nominal</button>
+            <div className="segmented-control shrink-0">
+              <button onClick={() => setModoTipo('real')} className={`segmented-control__button px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider ${modoTipo === 'real' ? 'is-active' : ''}`}>Real (€2026)</button>
+              <button onClick={() => setModoTipo('nominal')} className={`segmented-control__button px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider ${modoTipo === 'nominal' ? 'is-active' : ''}`}>Nominal</button>
             </div>
           </div>
           <p className="text-[13px] text-[var(--text-soft)] leading-relaxed max-w-[85ch]">
@@ -451,26 +427,19 @@ function InsightTipo({ aniosActivos, bruto2026, modoTipo }) {
       mejor: sorted[0], peor: sorted[sorted.length - 1],
       v2019, v2026, diff1926Points, diffEuros
     };
-  }, [aniosActivos, bruto2026]);
+  }, [aniosActivos, bruto2026, modoTipo]);
 
   if (!datos) return null;
   const isExentoTanto19Como26 = datos.v2019 === 0 && datos.v2026 === 0;
 
   return (
-    <div className="p-5 rounded-2xl border border-[var(--border)] text-[13px] relative overflow-hidden space-y-3"
-      style={{
-        background: 'linear-gradient(135deg, color-mix(in srgb, var(--surface2) 88%, transparent), color-mix(in srgb, var(--surface3) 72%, transparent))',
-        backdropFilter: 'blur(16px) saturate(130%)',
-        WebkitBackdropFilter: 'blur(16px) saturate(130%)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.15), 0 0 0 1px rgba(251,113,133,0.08) inset'
-      }}>
-      <div className="absolute left-0 top-0 bottom-0 w-1" style={{ background: 'linear-gradient(to bottom, #fb7185, #f43f5e)' }} />
+    <div className="info-card p-5 text-[13px] space-y-3">
       <p className="text-[var(--text)] leading-relaxed">
         Para tu nivel de renta, la menor <strong>carga fiscal individual</strong> ocurrió en{' '}
-        <strong className="font-semibold" style={{ color: YEAR_COLORS[datos.mejor.anio] }}>{datos.mejor.anio}</strong>{' '}
+        <strong className="font-semibold text-[var(--text-h)]">{datos.mejor.anio}</strong>{' '}
         (un tipo del <strong className="text-[var(--text-h)]">{datos.mejor.val.toFixed(1)}%</strong>)
         mientras que el año más caro fue{' '}
-        <strong className="font-semibold" style={{ color: YEAR_COLORS[datos.peor.anio] }}>{datos.peor.anio}</strong>{' '}
+        <strong className="font-semibold text-[var(--text-h)]">{datos.peor.anio}</strong>{' '}
         (un <strong className="text-[var(--text-h)]">{datos.peor.val.toFixed(1)}%</strong>).
       </p>
       <div className="pt-3 border-t border-[var(--border)]">
@@ -484,11 +453,11 @@ function InsightTipo({ aniosActivos, bruto2026, modoTipo }) {
           <p className="text-[var(--text-soft)] leading-relaxed">
             <span className="font-bold uppercase text-[10px] tracking-wider block mb-1">Balance 2019 → 2026</span>
             Desde 2019, tu carga de IRPF ha {datos.diff1926Points >= 0 ? 'aumentado' : 'disminuido'}{' '}
-            <strong className={datos.diff1926Points >= 0 ? 'text-red-400' : 'text-emerald-400'}>
+            <strong className="text-[var(--accent-light)]">
               {Math.abs(datos.diff1926Points).toFixed(1)} puntos
             </strong>.
             Esto supone una diferencia de{' '}
-            <strong className={datos.diffEuros >= 0 ? 'text-red-400' : 'text-emerald-400'}>
+            <strong className="text-[var(--accent-light)]">
               {eur(Math.abs(datos.diffEuros))} {datos.diffEuros >= 0 ? 'menos' : 'más'}
             </strong> de neto al año para un sueldo real equivalente.
           </p>
@@ -512,26 +481,19 @@ function InsightSalario({ aniosActivos, bruto2026 }) {
 
   if (!datos) return null;
   return (
-    <div className="p-5 rounded-2xl border border-[var(--border)] text-[13px] relative overflow-hidden space-y-3"
-      style={{
-        background: 'linear-gradient(135deg, color-mix(in srgb, var(--surface2) 88%, transparent), color-mix(in srgb, var(--surface3) 72%, transparent))',
-        backdropFilter: 'blur(16px) saturate(130%)',
-        WebkitBackdropFilter: 'blur(16px) saturate(130%)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.15), 0 0 0 1px rgba(52,211,153,0.08) inset'
-      }}>
-      <div className="absolute left-0 top-0 bottom-0 w-1" style={{ background: 'linear-gradient(to bottom, #34d399, #10b981)' }} />
+    <div className="info-card p-5 text-[13px] space-y-3">
       <p className="text-[var(--text)] leading-relaxed">
         Con <strong className="text-[var(--text-h)] font-semibold">{eur(bruto2026)}</strong> brutos equiv., el mejor año fue{' '}
-        <strong className="font-semibold" style={{ color: YEAR_COLORS[datos.mejor.anio] }}>{datos.mejor.anio}</strong>{' '}
+        <strong className="font-semibold text-[var(--text-h)]">{datos.mejor.anio}</strong>{' '}
         ({eur(datos.mejor.val)} netos) y el peor{' '}
-        <strong className="font-semibold" style={{ color: YEAR_COLORS[datos.peor.anio] }}>{datos.peor.anio}</strong>{' '}
+        <strong className="font-semibold text-[var(--text-h)]">{datos.peor.anio}</strong>{' '}
         ({eur(datos.peor.val)} netos).
       </p>
       <div className="pt-3 border-t border-[var(--border)]">
         <p className="text-[var(--text-soft)]">
           <span className="font-bold uppercase text-[10px] tracking-wider block mb-0.5">Balance 2019 → 2026</span>
           Comparado con 2019, hoy recibes{' '}
-          <strong className={datos.diff1926 >= 0 ? 'text-emerald-400' : 'text-red-400'}>
+          <strong className="text-[var(--accent-light)]">
             {eur(Math.abs(datos.diff1926))} {datos.diff1926 >= 0 ? 'más' : 'menos'}
           </strong> al año en términos de poder adquisitivo real.
         </p>

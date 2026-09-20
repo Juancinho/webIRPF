@@ -3,7 +3,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer, ReferenceLine, Area, AreaChart, BarChart, Bar
 } from 'recharts';
-import { comparativaInflacion, calcularRango, INFLACION_A_2026 } from '../engine/irpf';
+import { comparativaInflacion, calcularRango } from '../engine/irpf';
 import { eur, pct, sign, num } from '../utils/format';
 
 const ANIOS = Array.from({ length: 15 }, (_, i) => 2012 + i);

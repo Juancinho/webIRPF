@@ -37,11 +37,11 @@ Resumen de las reformas fiscales del periodo, tabla de parámetros históricos y
 
 Los cálculos son **orientativos** y pueden contener errores. Hay que tenerlo en cuenta:
 
-- Solo se aplica la **tarifa estatal del IRPF** (el 50% del impuesto). No se incluyen los tramos autonómicos, que varían por comunidad autónoma.
-- No se contemplan deducciones personales: discapacidad, familia numerosa, planes de pensiones, rendimientos del capital, actividades económicas, etc.
+- Se usan escalas combinadas específicas para Madrid, Cataluña, Comunitat Valenciana y Andalucía desde 2024. El resto de comunidades usa una escala estándar aproximada; País Vasco y Navarra requieren un cálculo foral que esta versión no implementa.
+- Se contemplan mínimos familiares básicos y tributación conjunta, pero no discapacidad, familia numerosa, planes de pensiones, rendimientos del capital, actividades económicas ni otras deducciones particulares.
 - El año 2018 tiene un tratamiento especial (régimen transitorio entre las normativas de 2017 y 2019) que es una aproximación.
-- Los factores de inflación se calculan a partir del IPC interanual de diciembre publicado por el INE. Pueden diferir de otros índices de referencia.
-- El SMI de 2026 y los parámetros de cotización de años recientes pueden estar sujetos a cambios normativos no recogidos todavía.
+- Los factores de inflación se calculan a partir del IPC interanual de diciembre publicado por el INE. Para 2026 se usa provisionalmente una estimación del 3,0% hasta que se publique el dato de diciembre.
+- El SMI y las cotizaciones de 2026 están actualizados con el RD 126/2026 y la Orden PJC/297/2026. Los resultados siguen siendo orientativos y pueden no reproducir todas las particularidades de una nómina o declaración real.
 
 Si encuentras un error en los cálculos, en los parámetros históricos o en la interpretación normativa, se agradece mucho que lo reportes.
 
@@ -61,8 +61,8 @@ El motor fiscal está en `src/engine/irpf.js` e implementa la normativa año a a
 ## Instalación y uso local
 
 ```bash
-git clone https://github.com/tuusuario/fiscalscope.git
-cd fiscalscope
+git clone https://github.com/Juancinho/webIRPF.git
+cd webIRPF
 npm install
 npm run dev
 ```

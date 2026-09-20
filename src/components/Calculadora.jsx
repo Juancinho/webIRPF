@@ -162,15 +162,13 @@ export default function Calculadora() {
 
 function TramosVisuales({ baseImponible, tramos, anio }) {
   const COLORES = ['#3b82f6', '#8b5cf6', '#ec4899', '#ef4444', '#f97316', '#eab308', '#10b981'];
-  let prev = 0;
   const segmentos = tramos.map(([ lim, tipo ], i) => {
-    const limReal = lim === Infinity ? Math.max(baseImponible, prev + 1) : lim;
-    const desde = prev;
+    const desde = i === 0 ? 0 : tramos[i - 1][0];
+    const limReal = lim === Infinity ? Math.max(baseImponible, desde + 1) : lim;
     const hasta = limReal;
     const enRango = baseImponible > desde;
     const lleno = baseImponible >= hasta;
     const fraccion = enRango ? (lleno ? 1 : (baseImponible - desde) / (hasta - desde)) : 0;
-    prev = hasta === Infinity ? prev : hasta;
     return { desde, hasta: lim, tipo, fraccion, lleno, color: COLORES[i % COLORES.length] };
   }).filter(s => s.desde < (baseImponible > 0 ? baseImponible + 1 : 1));
 

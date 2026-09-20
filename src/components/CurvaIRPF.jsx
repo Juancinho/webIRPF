@@ -157,10 +157,10 @@ export default function CurvaIRPF({ bruto, anio: anioRef, opts = {} }) {
         <div className="flex flex-wrap gap-4">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--text-soft)] mb-2">Visualización</p>
-            <div className="flex rounded-xl border border-[var(--border)] overflow-hidden text-xs">
+            <div className="segmented-control text-xs">
               {[['euros','€ pagados'],['porcentaje','% efectivo']].map(([v,l]) => (
                 <button key={v} onClick={() => setModoVisual(v)}
-                  className={`px-3 py-2 font-semibold transition-all ${modoVisual === v ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent2)] text-white' : 'text-[var(--text)] hover:bg-[var(--surface2)]'}`}>
+                  className={`segmented-control__button px-3 py-2 font-semibold ${modoVisual === v ? 'is-active' : ''}`}>
                   {l}
                 </button>
               ))}
@@ -187,8 +187,7 @@ export default function CurvaIRPF({ bruto, anio: anioRef, opts = {} }) {
 
       {/* Métricas de referencia */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="card p-4 col-span-2 sm:col-span-1"
-          style={{ background: 'linear-gradient(135deg,rgba(99,102,241,0.06),rgba(99,102,241,0.02))', borderColor: 'rgba(99,102,241,0.2)' }}>
+        <div className="tone-card tone-card--accent p-4 col-span-2 sm:col-span-1">
           <div className="text-[10px] text-[var(--text-soft)] uppercase tracking-wider font-bold mb-1">
             {anioPrincipal} · {eur(salarioRef)}
           </div>

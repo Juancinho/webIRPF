@@ -13,6 +13,7 @@ const FUENTES = {
   art57: { label: 'BOE — LIRPF Art.57 (mínimo contribuyente)', url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764&p=20260321&tn=1#a57' },
   art85: { label: 'BOE — RIRPF Art.85.3 (límite 43%)', url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2007-6820' },
   deduSMI: { label: 'AEAT — Deducción por obtención de rendimientos del trabajo', url: 'https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c18-cuota-liquida-resultante-autoliquidacion/deducciones-cuota-liquida-total/deduccion-obtencion-rendimientos-trabajo.html' },
+  deduSMI2026: { label: 'BOE — Deducción por rendimientos del trabajo 2026', url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2026-3810#a2-10' },
   ine: { label: 'INE — Variación del IPC', url: 'https://www.ine.es/varipc/' },
 };
 
@@ -169,14 +170,8 @@ export default function DesgloseEducativo({ bruto, anio, opts = {} }) {
 
   const art20info = formulaArt20(anio, r.rnPrevio, r.redTrabajo);
   const deduSMIinfo = formulaDeduccionSMI(anio, bruto, r.deduccionSMI);
-  const aplicaDeduSMI = anio >= 2025 && r.deduccionSMI > 0;
   const aplicaF = anio >= 2015;
   const aplicaLimite = r.limiteRetencion < r.cuotaSMI && r.cuotaSMI > 0;
-
-  // Primer tramo, para la explicación J
-  const firstTipo = p.tramos[0][1];
-  const baseGravada = Math.max(0, r.baseImponible - 5550);
-  const irpfMinimoAnio = anio <= 2014 ? 5151 : 5550;
 
   return (
     <div className="desglose-edu">
@@ -340,7 +335,7 @@ export default function DesgloseEducativo({ bruto, anio, opts = {} }) {
           </p>
 
           {r.minimoFamiliar > 0 && (
-            <div className="mt-4 mb-4 bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl text-[12.5px] text-emerald-100">
+            <div className="notice-box notice-box--success mt-4 mb-4 text-[12.5px]">
               <div className="font-bold text-emerald-400 mb-2 uppercase tracking-wider text-[10px]">Tu situación personal y familiar</div>
               <div className="flex justify-between items-center py-1.5 border-b border-emerald-500/10">
                 <span>Mínimo personal base</span>
@@ -374,7 +369,7 @@ export default function DesgloseEducativo({ bruto, anio, opts = {} }) {
         </Paso>
 
         {/* J — Cuota íntegra */}
-        <Paso letra="J" titulo="Cuota íntegra por tramos" subtitulo="Aplicación de la tarifa progresiva estatal"
+        <Paso letra="J" titulo="Cuota íntegra por tramos" subtitulo="Aplicación de la escala combinada seleccionada"
           color="#f43f5e" resultado={r.cuotaTeorica}>
           <p className="paso-prosa">
             Se aplica la tarifa progresiva del IRPF <strong className="text-white">solo a la parte de la base que supera el mínimo</strong> del
@@ -383,10 +378,9 @@ export default function DesgloseEducativo({ bruto, anio, opts = {} }) {
 
           {(() => {
             const TRAMO_COLORS = ['#0ea5e9', '#06b6d4', '#10b981', '#84cc16', '#f59e0b', '#ef4444'];
-            let prev = 0;
-            const tramosData = p.tramos.map(([lim, tipo], i) => {
-              const desde = prev;
-              const ancho = lim === Infinity ? null : lim - prev;
+            const tramosData = r.tramos.map(([lim, tipo], i) => {
+              const desde = i === 0 ? 0 : r.tramos[i - 1][0];
+              const ancho = lim === Infinity ? null : lim - desde;
               const limReal = lim === Infinity ? r.baseImponible : lim;
               const enRango = r.baseImponible > desde;
               const lleno = r.baseImponible >= limReal;
@@ -395,7 +389,6 @@ export default function DesgloseEducativo({ bruto, anio, opts = {} }) {
               const fillPct = ancho == null
                 ? (eurosEnTramo > 0 ? 1 : 0)
                 : ancho > 0 ? eurosEnTramo / ancho : 0;
-              prev = limReal;
               return {
                 desde, hasta: lim, tipo, eurosEnTramo, cuota, fillPct, enRango,
                 color: TRAMO_COLORS[i % TRAMO_COLORS.length],
@@ -542,7 +535,7 @@ export default function DesgloseEducativo({ bruto, anio, opts = {} }) {
               «rebaja» de última hora para no penalizar a los que ganan poco.
             </p>
             <Formula>{deduSMIinfo.formula}</Formula>
-            <Fuente f={FUENTES.deduSMI} />
+            <Fuente f={anio === 2026 ? FUENTES.deduSMI2026 : FUENTES.deduSMI} />
           </Paso>
         ) : (
           anio >= 2025 && (
@@ -572,7 +565,7 @@ export default function DesgloseEducativo({ bruto, anio, opts = {} }) {
             </>}
           </Formula>
           {aplicaLimite && (
-            <div className="callout-info" style={{ borderColor: 'rgba(249,115,22,0.3)', background: 'rgba(249,115,22,0.07)' }}>
+            <div className="callout-info callout-info--warning">
               ⚠️ Se activa el límite protector del Art. 85.3. Sin él tu retención sería más alta.
             </div>
           )}
@@ -582,12 +575,7 @@ export default function DesgloseEducativo({ bruto, anio, opts = {} }) {
       </div>{/* end paso-timeline */}
 
       {/* Neto — Resultado final */}
-      <div className="mt-12 p-10 rounded-3xl relative overflow-hidden group transition-all duration-500 hover:shadow-2xl hover:shadow-emerald-500/10 border border-[var(--border)]"
-        style={{ background: 'var(--surface2)' }}>
-        {/* Background glow effects */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 blur-[80px] rounded-full -mr-20 -mt-20" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-500/3 blur-[60px] rounded-full -ml-10 -mb-10" />
-
+      <div className="card final-result-panel mt-12 p-6 sm:p-8">
         <div className="relative flex flex-col md:flex-row items-center gap-8 md:gap-12">
           <div className="flex-1 text-center md:text-left space-y-2">
             <h5 className="text-[11px] font-bold text-emerald-400 uppercase tracking-[0.2em] mb-3">Resultado Final</h5>
@@ -613,7 +601,7 @@ export default function DesgloseEducativo({ bruto, anio, opts = {} }) {
           <div className="hidden lg:block w-px h-24 bg-gradient-to-b from-transparent via-[var(--border)] to-transparent" />
 
           {/* Equation summary */}
-          <div className="bg-[var(--surface3)] px-6 py-5 rounded-2xl border border-[var(--border)] md:min-w-[240px]">
+          <div className="inset-panel px-6 py-5 border md:min-w-[240px]">
             <p className="text-[10px] font-bold text-[var(--text-soft)] uppercase tracking-wider mb-3">La cuenta final</p>
             <div className="space-y-2.5 font-mono text-[13px]">
               <div className="flex justify-between items-center gap-4">

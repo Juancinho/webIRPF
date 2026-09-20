@@ -31,7 +31,7 @@ function TooltipCuña({ active, payload, total }) {
 }
 
 /* ── Etiqueta exterior en el donut ── */
-function LabelOuter({ cx, cy, midAngle, outerRadius, percent, name }) {
+function renderOuterLabel({ cx, cy, midAngle, outerRadius, percent }) {
   if (percent < 0.04) return null;
   const RAD = Math.PI / 180;
   const r = outerRadius + 28;
@@ -81,27 +81,13 @@ export default function CuñaFiscal({ bruto, anio }) {
           </p>
         </div>
         {/* Toggle vista */}
-        <div className="inline-flex items-center rounded-2xl p-1 shrink-0"
-          style={{
-            background: 'linear-gradient(135deg, color-mix(in srgb, var(--surface2) 88%, transparent), color-mix(in srgb, var(--surface3) 72%, transparent))',
-            border: '1px solid var(--border)',
-            backdropFilter: 'blur(12px) saturate(130%)',
-            WebkitBackdropFilter: 'blur(12px) saturate(130%)',
-          }}>
+        <div className="segmented-control shrink-0">
           <button onClick={() => setVista('trabajador')}
-            className="px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-300"
-            style={vista === 'trabajador' ? {
-              background: 'linear-gradient(135deg, var(--accent), var(--accent2))',
-              color: 'white', boxShadow: '0 2px 16px rgba(212,168,83,0.30)',
-            } : { color: 'var(--text-soft)' }}>
+            className={`segmented-control__button px-3 py-2 text-xs font-semibold ${vista === 'trabajador' ? 'is-active' : ''}`}>
              Perspectiva trabajador
           </button>
           <button onClick={() => setVista('empresa')}
-            className="px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-300"
-            style={vista === 'empresa' ? {
-              background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-              color: 'white', boxShadow: '0 2px 16px rgba(99,102,241,0.30)',
-            } : { color: 'var(--text-soft)' }}>
+            className={`segmented-control__button px-3 py-2 text-xs font-semibold ${vista === 'empresa' ? 'is-active' : ''}`}>
              Coste real empresa
           </button>
         </div>
@@ -137,7 +123,7 @@ export default function CuñaFiscal({ bruto, anio }) {
                 nameKey="name"
                 paddingAngle={2}
                 labelLine={false}
-                label={LabelOuter}
+                label={renderOuterLabel}
                 onMouseEnter={(_, i) => setHover(i)}
                 onMouseLeave={() => setHover(null)}
                 stroke="none"
@@ -169,13 +155,8 @@ export default function CuñaFiscal({ bruto, anio }) {
             const pct = total > 0 ? (d.value / total * 100) : 0;
             return (
               <div key={d.name}
-                className="rounded-xl p-3.5 border transition-all duration-200 cursor-default"
-                style={{
-                  background: hover === i ? `${d.fill}0d` : 'linear-gradient(135deg, color-mix(in srgb, var(--surface2) 90%, transparent), color-mix(in srgb, var(--surface3) 70%, transparent))',
-                  borderColor: hover === i ? `${d.fill}40` : 'var(--border)',
-                  backdropFilter: 'blur(8px) saturate(120%)',
-                  WebkitBackdropFilter: 'blur(8px) saturate(120%)',
-                }}
+                className="inset-panel p-3.5 border transition-all duration-200 cursor-default"
+                style={{ borderColor: hover === i ? `${d.fill}40` : undefined }}
                 onMouseEnter={() => setHover(i)}
                 onMouseLeave={() => setHover(null)}>
                 <div className="flex items-center justify-between">
@@ -199,14 +180,7 @@ export default function CuñaFiscal({ bruto, anio }) {
           })}
 
           {/* Resumen total */}
-          <div className="rounded-xl p-3.5 border mt-2"
-            style={{
-              background: 'linear-gradient(135deg, color-mix(in srgb, var(--surface3) 85%, transparent), color-mix(in srgb, var(--surface2) 70%, transparent))',
-              borderColor: 'var(--border-light)',
-              backdropFilter: 'blur(12px) saturate(130%)',
-              WebkitBackdropFilter: 'blur(12px) saturate(130%)',
-              boxShadow: '0 4px 16px rgba(0,0,0,0.10)'
-            }}>
+          <div className="inset-panel p-3.5 border mt-2">
             <div className="flex justify-between items-center text-xs">
               <span className="text-[var(--text-soft)] font-semibold uppercase tracking-wider">
                 {vista === 'trabajador' ? 'Sueldo bruto contractual' : 'Coste laboral total empresa'}

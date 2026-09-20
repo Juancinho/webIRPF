@@ -1,7 +1,8 @@
 ﻿import { useState, useMemo } from 'react';
-import { calcularNomina, calcularTipoMarginal, ANIOS, obtenerParametros, SMI_ANUAL, DEFAULT_OPTS } from '../engine/irpf';
+import { calcularNomina, calcularTipoMarginal, ANIOS, obtenerParametros, SMI_ANUAL, DEFAULT_OPTS, REGIONES } from '../engine/irpf';
 import { eur, pct, num } from '../utils/format';
 import ConfigPanel from './ConfigPanel';
+import ConceptDetails from './ConceptDetails';
 
 const TRAMO_COLORS = ['#d4a853','#c9956b','#34d399','#fbbf24','#fb923c','#f87171'];
 
@@ -9,6 +10,7 @@ export default function CalculadoraCard({ bruto, anio, onChange, onShare, shareL
   const [pagas, setPagas] = useState(12);
   const [configOpen, setConfigOpen] = useState(false);
   const opts = optsProp || DEFAULT_OPTS;
+  const region = REGIONES[opts.ccaa] || REGIONES.default;
   const resultado = useMemo(() => calcularNomina(bruto, anio, opts), [bruto, anio, opts]);
   const marginal  = useMemo(() => calcularTipoMarginal(bruto, anio, opts), [bruto, anio, opts]);
   const params    = useMemo(() => obtenerParametros(anio), [anio]);
@@ -19,6 +21,12 @@ export default function CalculadoraCard({ bruto, anio, onChange, onShare, shareL
   const noPagaIRPF  = resultado.irpfFinal === 0 && bruto > 0;
   const limiteActivo = resultado.limiteRetencion < resultado.cuotaSMI && resultado.cuotaSMI > 0;
   const cliffZone = marginal.tipoMarginalTotal > 0.55;
+  const efectivoIRPFPor100 = resultado.tipoEfectivoIRPF * 100;
+  const efectivoSSPor100 = bruto > 0 ? (resultado.cotTra / bruto) * 100 : 0;
+  const efectivoNetoPor100 = bruto > 0 ? (resultado.salarioNeto / bruto) * 100 : 0;
+  const marginalIRPFPor100 = marginal.tipoMarginalIRPF * 100;
+  const marginalSSPor100 = (marginal.tipoMarginalTotal - marginal.tipoMarginalIRPF) * 100;
+  const marginalNetoPor100 = marginal.netoMarginal * 100;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
@@ -73,11 +81,10 @@ export default function CalculadoraCard({ bruto, anio, onChange, onShare, shareL
 
         {/* Pagas toggle + Share */}
         <div className="flex items-center gap-3 flex-wrap">
-          <div className="flex rounded-xl border border-[var(--border)] overflow-hidden text-xs">
+          <div className="segmented-control text-xs">
             {[12, 14].map(n => (
               <button key={n} onClick={() => setPagas(n)}
-                className={`px-4 py-2 font-semibold transition-all ${pagas === n ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent2)]' : 'text-[var(--text)] hover:bg-[var(--surface2)]'}`}
-                style={pagas === n ? { color: '#fff' } : {}}>
+                className={`segmented-control__button px-4 py-2 font-semibold ${pagas === n ? 'is-active' : ''}`}>
                 {n} pagas
               </button>
             ))}
@@ -88,10 +95,9 @@ export default function CalculadoraCard({ bruto, anio, onChange, onShare, shareL
           </button>
           {onOptsChange && (
             <button onClick={() => setConfigOpen(o => !o)}
-              className="btn-ghost flex items-center gap-1.5 ml-auto"
-              style={configOpen ? { color: 'var(--accent)' } : {}}>
+              className={`btn-ghost flex items-center gap-1.5 ml-auto ${configOpen ? 'is-active' : ''}`}>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
-              Perfil fiscal
+              Perfil fiscal · {region.name}
             </button>
           )}
         </div>
@@ -140,9 +146,7 @@ export default function CalculadoraCard({ bruto, anio, onChange, onShare, shareL
           <div className="metric-card col-span-2"
             style={{
               background: 'linear-gradient(135deg, rgba(52,211,153,0.06), rgba(52,211,153,0.02))',
-              borderColor: 'rgba(52,211,153,0.18)',
             }}>
-            <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ background: 'linear-gradient(90deg, #34d399, #10b981)' }} />
             <div className="flex justify-between items-start">
               <div>
                 <div className="text-[10px] text-[#34d399]/80 font-bold uppercase tracking-wider mb-1.5">Salario neto anual</div>
@@ -157,43 +161,77 @@ export default function CalculadoraCard({ bruto, anio, onChange, onShare, shareL
           </div>
 
           {/* Tipo efectivo */}
-          <div className="metric-card group" style={{ background: 'var(--surface2)', borderColor: 'var(--border)' }}>
-            <div className="flex items-center gap-1.5 mb-1">
-              <div className="text-[10px] text-[var(--text)] font-medium">Tipo efectivo IRPF</div>
-              <span className="w-3.5 h-3.5 rounded-full border border-[var(--border)] text-[8px] font-bold text-[var(--text)] flex items-center justify-center cursor-help opacity-50 group-hover:opacity-100 group-hover:border-[var(--accent)] group-hover:text-[var(--accent)] transition-all">?</span>
-            </div>
+          <div className="metric-card">
+            <div className="text-[10px] text-[var(--text)] font-medium mb-1">Tipo efectivo IRPF</div>
             <div className="text-xl font-black font-mono text-[var(--text-h)]">{pct(resultado.tipoEfectivoIRPF * 100)}</div>
             <div className="text-[10px] text-[var(--text)] opacity-40 mt-0.5">Total c/SS: {pct(resultado.tipoEfectivoTotal * 100)}</div>
-            <div className="overflow-hidden max-h-0 group-hover:max-h-20 transition-all duration-300 ease-in-out">
-              <p className="text-[10px] text-[var(--accent-light)] mt-2 pt-2 border-t border-[var(--border)] leading-relaxed">
-                 De cada 100€ que ganas, {pct(resultado.tipoEfectivoIRPF * 100)} van al IRPF. Es la media real, no el tipo del tramo.
-              </p>
-            </div>
           </div>
 
           {/* Tipo marginal */}
-          <div className={`metric-card group`}
-            style={{
-              background: cliffZone ? 'rgba(249,115,22,0.08)' : 'var(--surface2)',
-              borderColor: cliffZone ? 'rgba(249,115,22,0.2)' : 'var(--border)',
-            }}>
-            {cliffZone && <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ background: 'linear-gradient(90deg, #f97316, #ea580c)' }} />}
-            <div className="flex items-center gap-1.5 mb-1">
-              <div className={`text-[10px] font-medium ${cliffZone ? 'text-orange-400' : 'text-[var(--text)]'}`}>Tipo marginal efectivo</div>
-              <span className="w-3.5 h-3.5 rounded-full border border-[var(--border)] text-[8px] font-bold text-[var(--text)] flex items-center justify-center cursor-help opacity-50 group-hover:opacity-100 group-hover:border-[var(--accent)] group-hover:text-[var(--accent)] transition-all">?</span>
-            </div>
+          <div className={`metric-card ${cliffZone ? 'tone-card' : ''}`}
+            style={cliffZone ? { '--tone': '#f97316' } : undefined}>
+            <div className={`text-[10px] font-medium mb-1 ${cliffZone ? 'text-orange-400' : 'text-[var(--text)]'}`}>Tipo marginal efectivo</div>
             <div className={`text-xl font-black font-mono ${cliffZone ? 'text-orange-400' : 'text-[var(--text-h)]'}`}>
               {pct(marginal.tipoMarginalTotal * 100)}
             </div>
             <div className="text-[10px] text-[var(--text)] opacity-40 mt-0.5">
               {cliffZone ? 'Zona cliff Art.20' : `te quedas ${pct(marginal.netoMarginal * 100)} de cada €100 extra`}
             </div>
-            <div className="overflow-hidden max-h-0 group-hover:max-h-24 transition-all duration-300 ease-in-out">
-              <p className="text-[10px] mt-2 pt-2 border-t border-[var(--border)] leading-relaxed" style={{ color: cliffZone ? '#fdba74' : 'var(--accent-light)' }}>
-                 Si te suben el sueldo 100€, {pct(marginal.tipoMarginalTotal * 100)} se los queda Hacienda+SS. Es más alto que el tipo efectivo porque se aplica solo al "siguiente euro".
-              </p>
-            </div>
           </div>
+
+          {bruto > 0 && (
+            <ConceptDetails label="Entender el tipo efectivo y el marginal con tu sueldo" className="col-span-2">
+              <div className="concept-comparison">
+                <section>
+                  <div className="concept-eyebrow">Tipo efectivo</div>
+                  <h4>La media sobre todo tu salario bruto</h4>
+                  <p>
+                    En esta calculadora es el IRPF anual estimado dividido entre el salario bruto anual. Resume tu carga media de IRPF; no es el porcentaje de tu último tramo.
+                  </p>
+                  <div className="concept-formula">
+                    <span>{eur(resultado.irpfFinal)} de IRPF</span>
+                    <span>÷ {eur(bruto)} brutos</span>
+                    <strong>= {pct(efectivoIRPFPor100)}</strong>
+                  </div>
+                  <p>
+                    Traducido a 100 € brutos: <strong>{eur(efectivoIRPFPor100, 1)}</strong> van a IRPF, <strong>{eur(efectivoSSPor100, 1)}</strong> a tu Seguridad Social y quedan aproximadamente <strong>{eur(efectivoNetoPor100, 1)}</strong> netos.
+                  </p>
+                </section>
+
+                <section>
+                  <div className="concept-eyebrow">Tipo marginal efectivo</div>
+                  <h4>Lo que se descuenta de los siguientes 100 €</h4>
+                  <p>
+                    Compara tu neto actual con el que tendrías al ganar 100 € brutos más. Incluye tanto el IRPF adicional como la cotización adicional del trabajador y el efecto de reducciones o límites que cambien con la renta.
+                  </p>
+                  <div className="concept-formula">
+                    <span>{eur(marginalIRPFPor100, 1)} de IRPF extra</span>
+                    <span>+ {eur(marginalSSPor100, 1)} de SS extra</span>
+                    <strong>= {eur(marginal.tipoMarginalTotal * 100, 1)} descontados</strong>
+                  </div>
+                  <p>
+                    En tu caso, de esos 100 € adicionales conservarías cerca de <strong>{eur(marginalNetoPor100, 1)}</strong>. El tipo del último tramo aplicado es {pct(resultado.tipoMargIRPF * 100)}, pero el marginal efectivo total puede ser distinto por la SS y por la retirada gradual de beneficios fiscales.
+                  </p>
+                </section>
+              </div>
+
+              <div className="concept-note">
+                <strong>La clave:</strong> entrar en un tramo superior no hace que todo tu sueldo tribute a ese porcentaje. Cada tipo se aplica únicamente a la parte de base que cae en su tramo. Por eso el tipo efectivo suele ser menor que el del último tramo.
+              </div>
+
+              <div className="concept-why">
+                <strong>¿Por qué importa?</strong>
+                <p>
+                  El efectivo sirve para entender la carga total de tu salario. El marginal sirve para valorar una subida, horas extra o un bonus: aproxima cuánto de ese ingreso adicional llegará realmente a tu bolsillo. Si aparece una zona «cliff», el porcentaje alto afecta al incremento analizado, no a todo el sueldo.
+                </p>
+              </div>
+
+              <p className="concept-caveat">
+                Estimación anual orientativa. La retención mensual de la nómina es un pago a cuenta y puede no coincidir con la cuota final de la declaración.
+                {' '}<a href="https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c15-calculo-impuesto-determinacion-cuotas-integras/gravamen-base-liquidable-general/gravamen-estatal.html" target="_blank" rel="noreferrer">Ver metodología de la AEAT</a>.
+              </p>
+            </ConceptDetails>
+          )}
         </div>
 
         {/* Desglose */}
@@ -220,18 +258,18 @@ export default function CalculadoraCard({ bruto, anio, onChange, onShare, shareL
         {/* Tramos aplicados */}
         {resultado.baseImponible > 0 && (
           <div className="mt-5 space-y-2">
-            <p className="text-[10px] font-bold text-[var(--text)] uppercase tracking-[0.1em] mb-3">Tramos IRPF aplicados</p>
+            <p className="text-[10px] font-bold text-[var(--text)] uppercase tracking-[0.1em] mb-3">
+              Tramos IRPF aplicados · {anio >= 2024 ? region.name : 'Escala del ejercicio'}
+            </p>
             {(() => {
-              let prev = 0;
-              return params.tramos.map(([lim, tipo], i) => {
-                const desde = prev;
+              return resultado.tramos.map(([lim, tipo], i) => {
+                const desde = i === 0 ? 0 : resultado.tramos[i - 1][0];
                 const limReal = lim === Infinity ? resultado.baseImponible : lim;
                 const enRango = resultado.baseImponible > desde;
                 const lleno = resultado.baseImponible >= limReal;
                 const fraccion = !enRango ? 0 : lleno ? 1 : (resultado.baseImponible - desde) / (limReal - desde);
-                if (!enRango) { prev = limReal; return null; }
+                if (!enRango) return null;
                 const cuota = lleno ? (limReal - desde) * tipo : (resultado.baseImponible - desde) * tipo;
-                prev = limReal;
                 return (
                   <div key={i} className="flex items-center gap-2.5 group">
                     <div className="w-28 text-right text-[10px] text-[var(--text)] shrink-0 font-mono opacity-60 group-hover:opacity-100 transition-opacity">

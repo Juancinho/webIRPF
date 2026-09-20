@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, ReferenceLine, Legend
+  ResponsiveContainer
 } from 'recharts';
-import { CURVA_ART20, CURVA_ART20_REAL, ANIOS_ART20_MUESTRA, DATOS_UMBRALES, DATOS_UMBRALES_REAL, ANIOS } from '../engine/irpf';
+import { CURVA_ART20, CURVA_ART20_REAL, ANIOS_ART20_MUESTRA, DATOS_UMBRALES, DATOS_UMBRALES_REAL } from '../engine/irpf';
 import { eur } from '../utils/format';
-import { YEAR_COLORS as ART20_COLORS } from './GraficoComparativo';
+import { YEAR_COLORS as ART20_COLORS } from '../constants/yearColors';
 
 const UMBRAL_COLORS = {
   smi: 'var(--green)', minExento: 'var(--accent)',
@@ -15,24 +15,13 @@ const UMBRAL_COLORS = {
 /* ── Toggle reutilizable nominal / real ── */
 function ToggleReal({ real, setReal }) {
   return (
-    <div className="inline-flex items-center rounded-2xl p-1 mb-5"
-      style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
+    <div className="segmented-control mb-5">
       <button onClick={() => setReal(false)}
-        className="relative px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-300"
-        style={!real ? {
-          background: 'linear-gradient(135deg, var(--accent), var(--accent2))',
-          color: 'white',
-          boxShadow: '0 2px 12px rgba(56,189,248,0.25)',
-        } : { color: 'var(--text-soft)' }}>
+        className={`segmented-control__button relative px-4 py-2 text-xs font-semibold ${!real ? 'is-active' : ''}`}>
         € nominales
       </button>
       <button onClick={() => setReal(true)}
-        className="relative px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-300"
-        style={real ? {
-          background: 'linear-gradient(135deg, #10b981, #14b8a6)',
-          color: 'white',
-          boxShadow: '0 2px 12px rgba(16,185,129,0.3)',
-        } : { color: 'var(--text-soft)' }}>
+        className={`segmented-control__button relative px-4 py-2 text-xs font-semibold ${real ? 'is-active' : ''}`}>
         € reales 2026
       </button>
     </div>
@@ -146,14 +135,14 @@ function TabCurvaArt20() {
         <div className="info-card space-y-2">
           <strong className="text-white font-semibold"> Las tres zonas de la curva</strong>
           <div className="space-y-2 mt-1">
-            <div className="flex items-start gap-3 p-2.5 rounded-xl" style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)' }}>
+            <div className="inset-panel flex items-start gap-3 p-2.5 border">
               <div className="shrink-0 mt-0.5 text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-400">PLANA</div>
               <div className="text-[12px]">
                 <strong className="text-emerald-400">Descuento máximo y constante</strong> — aunque ganes algo más, el descuento no baja.
                 Es la zona de mejor trato fiscal. <em>Aquí una subida de sueldo se traduce directamente en más neto.</em>
               </div>
             </div>
-            <div className="flex items-start gap-3 p-2.5 rounded-xl" style={{ background: 'rgba(251,146,60,0.08)', border: '1px solid rgba(251,146,60,0.2)' }}>
+            <div className="inset-panel flex items-start gap-3 p-2.5 border">
               <div className="shrink-0 mt-0.5 text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-orange-500/20 text-orange-400">CLIFF</div>
               <div className="text-[12px]">
                 <strong className="text-orange-400">La línea cae en picado</strong> — cada euro que sube tu sueldo reduce el descuento.
@@ -161,7 +150,7 @@ function TabCurvaArt20() {
                 <strong className="text-white">De €100 brutos pueden llegarte solo €40-60 netos.</strong>
               </div>
             </div>
-            <div className="flex items-start gap-3 p-2.5 rounded-xl" style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.2)' }}>
+            <div className="inset-panel flex items-start gap-3 p-2.5 border">
               <div className="shrink-0 mt-0.5 text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-red-500/20 text-red-400">CERO</div>
               <div className="text-[12px]">
                 <strong className="text-red-400">Descuento agotado</strong> — ya no hay alivio fiscal del Art.20.
@@ -199,7 +188,7 @@ function TabCurvaArt20() {
       <ToggleReal real={real} setReal={setReal} />
 
       {real && (
-        <div className="mb-4 px-4 py-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5 text-[12px] text-emerald-300/80 leading-relaxed">
+        <div className="notice-box notice-box--success mb-4 text-[12px]">
           <strong className="text-emerald-300">Vista en €2026:</strong> ahora puedes comparar directamente entre años.
           Si dos líneas coinciden, el descuento tiene el mismo valor <em>real</em>. Si la de 2026 está por encima de la de 2012,
           el descuento ha crecido más que la inflación.
@@ -321,7 +310,7 @@ function TabCurvaArt20() {
             Estimación con tipo marginal del 19% (1.er tramo IRPF, el habitual en esta franja salarial). Resultado orientativo; la cifra exacta depende de tu situación personal.
           </div>
         </div>
-        <p className="text-[10px] text-[var(--text-soft)] mt-2 font-medium">Fuente: Art. 20 LIRPF; redacciones históricas — BOE</p>
+        <p className="source-inline">Fuente: Art. 20 LIRPF; redacciones históricas — BOE</p>
       </div>
     </div>
   );
@@ -384,7 +373,7 @@ function TabEvolucionUmbrales() {
       <ToggleReal real={real} setReal={setReal} />
 
       {real && (
-        <div className="mb-4 px-4 py-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5 text-[12px] text-emerald-300/80 leading-relaxed">
+        <div className="notice-box notice-box--success mb-4 text-[12px]">
           <strong className="text-emerald-300">Vista en €2026:</strong> ahora ves el valor <em>real</em> de cada umbral, descontando la inflación.
           Si una línea sube, ha crecido más que los precios. Si baja, ha perdido poder adquisitivo.
           En nominal el SMI parece haber subido un ~90%, pero en real (€2026) ha subido ~52%.
@@ -431,7 +420,7 @@ function TabEvolucionUmbrales() {
           </span>
         ))}
       </div>
-      <p className="text-[10px] text-[var(--text-soft)] mt-2.5 font-medium">
+      <p className="source-inline">
         Fuentes: LIRPF arts. 20, 57, 85-86 RIRPF; Órdenes anuales de cotización SS; RDs de SMI (BOE).
       </p>
     </div>

@@ -182,19 +182,25 @@ function deduccionSMI(anio, bruto) {
 }
 
 // ── Régimen autónomo ──────────────────────────────────────────────────────────
-// Tabla 2023+: [tope rendimiento mensual, base cotización mensual mínima]
-const SS_AUTONOMO_TABLA_2023 = [
-  [670, 735.29], [900, 816.99], [1166.7, 872.55], [1300, 950.98],
-  [1500, 960.78], [1700, 960.78], [1850, 1143.79], [2030, 1209.15],
-  [2330, 1274.51], [2760, 1356.21], [3190, 1437.91], [3620, 1519.61],
-  [4050, 1601.31], [6000, 1732.03], [Infinity, 1928.10],
+// Bases mínimas mensuales de cada tramo de rendimientos netos (RDL 13/2022 y
+// órdenes anuales de cotización). Los topes de tramo son comunes en 2023-2026.
+const SS_AUTONOMO_TOPES = [
+  670, 900, 1166.7, 1300, 1500, 1700, 1850, 2030,
+  2330, 2760, 3190, 3620, 4050, 6000, Infinity,
 ];
+
+const SS_AUTONOMO_BASES = {
+  2023: [751.63, 849.67, 898.69, 950.98, 960.78, 960.78, 1013.07, 1029.41, 1045.75, 1078.43, 1143.79, 1209.15, 1274.51, 1372.55, 1633.99],
+  2024: [735.29, 816.99, 872.55, 950.98, 960.78, 960.78, 1045.75, 1062.09, 1078.43, 1111.11, 1176.47, 1241.83, 1307.19, 1454.25, 1732.03],
+  2025: [653.59, 718.95, 849.67, 950.98, 960.78, 960.78, 1143.79, 1209.15, 1274.51, 1356.21, 1437.91, 1519.61, 1601.31, 1732.03, 1928.10],
+  2026: [653.59, 718.95, 849.67, 950.98, 960.78, 960.78, 1143.79, 1209.15, 1274.51, 1356.21, 1437.91, 1519.61, 1601.31, 1732.03, 1928.10],
+};
 
 function tipoAutonomoCombinado(anio) {
   if (anio >= 2026) return 0.315;
-  if (anio === 2025) return 0.313;
-  if (anio === 2024) return 0.3118;
-  if (anio === 2023) return 0.3110;
+  if (anio === 2025) return 0.314;
+  if (anio === 2024) return 0.313;
+  if (anio === 2023) return 0.312;
   return 0.298;
 }
 
@@ -208,11 +214,15 @@ export function calcularSSAutonomo(rendimientoNetoAnual, anio) {
     return baseMensual * 12 * tipo;
   }
   const monthly = Math.max(0, rendimientoNetoAnual) / 12;
-  let baseMin = SS_AUTONOMO_TABLA_2023[SS_AUTONOMO_TABLA_2023.length - 1][1];
-  for (const [tope, base] of SS_AUTONOMO_TABLA_2023) {
-    if (monthly < tope) { baseMin = base; break; }
+  const bases = SS_AUTONOMO_BASES[anio] || SS_AUTONOMO_BASES[2026];
+  let tramo = SS_AUTONOMO_TOPES.length - 1;
+  for (let i = 0; i < SS_AUTONOMO_TOPES.length; i++) {
+    const tope = SS_AUTONOMO_TOPES[i];
+    // El tercer tramo termina justo antes de 1.166,70 €; el siguiente lo incluye.
+    const dentro = i === 2 ? monthly < tope : monthly <= tope;
+    if (dentro) { tramo = i; break; }
   }
-  return baseMin * 12 * tipo;
+  return bases[tramo] * 12 * tipo;
 }
 
 // ── Mínimos personales y familiares (LIRPF arts. 56-61) ──────────────────────
@@ -310,7 +320,9 @@ export function calcularNomina(bruto, anio, opts = {}) {
   const rnPrevio = bruto - cotTra;
   const redTrabajo = Math.max(0, reduccionTrabajo(anio, rnPrevio));
   const rendimientoNeto = Math.max(0, rnPrevio - gastosFijos);
-  const reduccionConjunta = tributacion === 'conjunta' ? Math.min(REDUCCION_CONJUNTA, rendimientoNeto - redTrabajo) : 0;
+  const reduccionConjunta = tributacion === 'conjunta'
+    ? Math.max(0, Math.min(REDUCCION_CONJUNTA, rendimientoNeto - redTrabajo))
+    : 0;
   const baseImponible = Math.max(0, rendimientoNeto - redTrabajo - reduccionConjunta);
   const cuotaIntegra = calcularCuotaIRPF(baseImponible, tramos);
   const cuotaMinimo = calcularCuotaIRPF(minimoPersonalYFamiliar, tramos);

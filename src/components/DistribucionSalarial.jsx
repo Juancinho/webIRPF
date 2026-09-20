@@ -59,7 +59,7 @@ function BellCurve({ datos, salarioMarcado, dist, color = 'var(--accent)', anio 
 }
 
 // ─── Stats strip ─────────────────────────────────────────────────────────────
-function StatsStrip({ dist, salario, anio, color }) {
+function StatsStrip({ dist, salario, color }) {
   if (!dist) return null;
   const items = [
     { label: 'P10', value: dist.p10 },
@@ -69,7 +69,6 @@ function StatsStrip({ dist, salario, anio, color }) {
     { label: 'P75', value: dist.p75 },
     { label: 'P90', value: dist.p90 },
   ];
-  const pctl = percentilDe(salario, anio);
   return (
     <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mt-4 pt-4 border-t relative z-10" style={{ borderColor: 'var(--border)' }}>
       {items.map(({ label, value }) => {
@@ -244,14 +243,7 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
       </div>
 
       {/* ── Resultado principal ── */}
-      <div className="p-5 sm:p-6 rounded-2xl border border-[var(--border)] relative overflow-hidden" style={{
-        background: `linear-gradient(135deg, color-mix(in srgb, var(--surface2) 88%, transparent), color-mix(in srgb, var(--surface3) 72%, transparent))`,
-        backdropFilter: 'blur(16px) saturate(130%)',
-        WebkitBackdropFilter: 'blur(16px) saturate(130%)',
-        boxShadow: `0 8px 32px rgba(0,0,0,0.15), 0 0 0 1px color-mix(in srgb, ${tono.color} 15%, transparent) inset`
-      }}>
-        <div className="absolute left-0 top-0 bottom-0 w-1.5" style={{ background: `linear-gradient(to bottom, ${tono.color}, color-mix(in srgb, ${tono.color} 50%, transparent))` }} />
-        <div className="glass-reflection" />
+      <div className="card p-5 sm:p-6">
         
         <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6 lg:gap-8 relative z-10">
           <div className="flex-1 space-y-4">
@@ -287,7 +279,7 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
             </p>
           </div>
 
-          <div className="flex items-center gap-3 bg-[var(--surface)]/50 p-4 rounded-xl border border-[var(--border)] min-w-[280px] justify-center">
+          <div className="inset-panel flex items-center gap-3 p-4 border min-w-[280px] justify-center">
             <div className="text-center">
               <p className="text-[10px] uppercase tracking-wider mb-1 font-semibold" style={{ color: 'var(--red)' }}>{anioOrigen}</p>
               <p className="text-[2.5rem] font-black font-mono leading-none" style={{ color: 'var(--red)' }}>
@@ -344,7 +336,7 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
           </div>
         )}
 
-        <StatsStrip dist={escenario.distOrigen} salario={salarioBase} anio={anioOrigen} color="var(--red)" />
+        <StatsStrip dist={escenario.distOrigen} salario={salarioBase} color="var(--red)" />
       </div>
 
       {/* ── Curva año destino ── */}
@@ -377,7 +369,7 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
           </div>
         )}
 
-        <StatsStrip dist={escenario.distDestino} salario={escenario.salarioEquivDestino} anio={anioDestino} color="var(--accent)" />
+        <StatsStrip dist={escenario.distDestino} salario={escenario.salarioEquivDestino} color="var(--accent)" />
       </div>
 
       {/* ── Evolución histórica ── */}
@@ -393,14 +385,9 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
               </h3>
             </div>
             
-            <div className="flex items-center p-1 rounded-xl border border-[var(--border)] shrink-0 self-start sm:self-auto" style={{
-              background: 'color-mix(in srgb, var(--surface2) 60%, transparent)',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
-              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)'
-            }}>
-              <button onClick={() => setModoEvolucion('real')} className={`px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-lg transition-all ${modoEvolucion === 'real' ? 'bg-[var(--accent)] shadow-sm' : 'text-[var(--text-soft)] hover:text-[var(--text-h)] hover:bg-[var(--surface3)]'}`} style={modoEvolucion === 'real' ? { color: '#ffffff' } : {}}>Real (€2026)</button>
-              <button onClick={() => setModoEvolucion('nominal')} className={`px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-lg transition-all ${modoEvolucion === 'nominal' ? 'bg-[var(--accent)] shadow-sm' : 'text-[var(--text-soft)] hover:text-[var(--text-h)] hover:bg-[var(--surface3)]'}`} style={modoEvolucion === 'nominal' ? { color: '#ffffff' } : {}}>Nominal</button>
+            <div className="segmented-control shrink-0 self-start sm:self-auto">
+              <button onClick={() => setModoEvolucion('real')} className={`segmented-control__button px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider ${modoEvolucion === 'real' ? 'is-active' : ''}`}>Real (€2026)</button>
+              <button onClick={() => setModoEvolucion('nominal')} className={`segmented-control__button px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider ${modoEvolucion === 'nominal' ? 'is-active' : ''}`}>Nominal</button>
             </div>
           </div>
           
@@ -441,9 +428,8 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
       </div>
 
       {/* ── Fuente y metodología ── */}
-      <div className="dist-glass-panel p-5 space-y-4 relative">
-        <div className="glass-reflection" />
-        <div className="relative z-10">
+      <div className="source-panel source-panel--roomy space-y-4">
+        <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--text-soft)]">Fuente y metodología</p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-[12px] text-[var(--text)] leading-relaxed">
@@ -473,10 +459,10 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
           <p className="text-[var(--text-soft)]">
             <strong className="text-[var(--text-h)]">Fuente oficial INE (EAES) →</strong>
           </p>
-          <p className="font-mono text-[10.5px] break-all"
-            style={{ color: 'var(--accent)', background: 'var(--accent-soft)', padding: '6px 10px', borderRadius: 6 }}>
+          <a href="https://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177025&menu=resultados&idp=1254735976596"
+            target="_blank" rel="noopener noreferrer" className="source-link source-link--block font-mono break-all">
             ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177025&menu=resultados&idp=1254735976596
-          </p>
+          </a>
           <p className="text-[var(--text-soft)]">
             El INE publica los datos con aproximadamente 2 años de retraso. Los últimos datos disponibles al cierre de esta herramienta corresponden al ejercicio 2023.
           </p>

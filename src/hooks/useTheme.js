@@ -14,7 +14,9 @@ export function useTheme() {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
-    try { localStorage.setItem(STORAGE_KEY, theme); } catch {}
+    try { localStorage.setItem(STORAGE_KEY, theme); } catch {
+      // El tema sigue funcionando aunque el navegador bloquee el almacenamiento local.
+    }
   }, [theme]);
 
   const toggle = () => setTheme(t => (t === 'dark' ? 'light' : 'dark'));

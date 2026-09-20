@@ -154,15 +154,11 @@ export default function SidebarWidget({ bruto, anio, onChange, onNavigate }) {
             <div className="grid grid-cols-4 gap-1.5">
               {ANIOS.map(a => (
                 <button key={a} onClick={() => onChange('anio', a)}
-                  className="text-[9px] font-bold py-1.5 rounded-lg transition-all duration-150 text-center"
+                  className={`year-btn !text-[9px] !py-1.5 !px-1 text-center ${anio === a ? 'active' : ''}`}
                   style={anio === a ? {
                     background: 'linear-gradient(135deg, var(--accent), var(--accent2))',
                     color: 'var(--accent-on)',
-                    boxShadow: '0 1px 8px var(--glow-accent)',
-                  } : {
-                    background: 'var(--surface3)',
-                    color: 'var(--text-soft)',
-                  }}>
+                  } : undefined}>
                   {a}
                 </button>
               ))}
@@ -238,7 +234,7 @@ export default function SidebarWidget({ bruto, anio, onChange, onNavigate }) {
       <div style={{ height: 1, background: 'var(--border)' }} />
 
       <p className="text-[9px] text-[var(--text-soft)] leading-relaxed px-1">
-        Solo tarifa estatal · Cálculos orientativos · BOE, INE, TGSS
+        Escala estatal y autonómica aproximada · Cálculos orientativos · BOE, INE, TGSS
       </p>
     </div>
   );

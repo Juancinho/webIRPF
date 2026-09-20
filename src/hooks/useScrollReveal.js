@@ -7,6 +7,8 @@ import { useRef, useState, useEffect } from 'react';
 export function useScrollReveal(options = {}) {
   const ref = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
+  const threshold = options.threshold ?? 0.12;
+  const rootMargin = options.rootMargin ?? '0px 0px -60px 0px';
 
   useEffect(() => {
     const el = ref.current;
@@ -19,12 +21,12 @@ export function useScrollReveal(options = {}) {
           obs.disconnect();
         }
       },
-      { threshold: options.threshold ?? 0.12, rootMargin: options.rootMargin ?? '0px 0px -60px 0px' }
+      { threshold, rootMargin }
     );
 
     obs.observe(el);
     return () => obs.disconnect();
-  }, []);
+  }, [rootMargin, threshold]);
 
   return [ref, isVisible];
 }

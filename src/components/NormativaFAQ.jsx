@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { obtenerParametros, ANIOS, SMI_ANUAL, INFLACION_A_2026 } from '../engine/irpf';
 import { eur, pct } from '../utils/format';
-import { YEAR_COLORS } from './GraficoComparativo';
+import { YEAR_COLORS } from '../constants/yearColors';
 
 const HITOS = [
   {
@@ -52,11 +52,11 @@ const FAQS = [
   },
   {
     q: '¿Qué es el IRPF y cómo funciona?',
-    a: 'El Impuesto sobre la Renta de las Personas Físicas es un impuesto personal, progresivo y directo sobre la renta obtenida en España (arts. 1-14 LIRPF). \"Progresivo\" significa que a mayor renta, mayor tipo aplicable. Para trabajadores por cuenta ajena, el empleador actúa como retenedor: calcula y retiene mensualmente el IRPF e ingresa en Hacienda.\n\nEl cálculo sigue este orden crítico: del Salario Bruto se restan las Cotizaciones SS (Paso 1), el resultado es el Rendimiento Neto. A este se le restan los Gastos Deducibles (Art. 19) y la Reducción por Trabajo (Art. 20) para obtener la Base Imponible. Solo sobre esta última se aplica la tarifa por tramos.'
+    a: 'El Impuesto sobre la Renta de las Personas Físicas es un impuesto personal, progresivo y directo sobre la renta obtenida en España (arts. 1-14 LIRPF). "Progresivo" significa que a mayor renta, mayor tipo aplicable. Para trabajadores por cuenta ajena, el empleador actúa como retenedor: calcula y retiene mensualmente el IRPF e ingresa en Hacienda.\n\nEl cálculo sigue este orden crítico: del Salario Bruto se restan las Cotizaciones SS (Paso 1), el resultado es el Rendimiento Neto. A este se le restan los Gastos Deducibles (Art. 19) y la Reducción por Trabajo (Art. 20) para obtener la Base Imponible. Solo sobre esta última se aplica la tarifa por tramos.'
   },
   {
     q: '¿Qué es la reducción Art.20 y por qué es tan importante?',
-    a: 'Es el Art. 20 de la LIRPF (\"Reducción por obtención de rendimientos del trabajo\") y es la herramienta que usa el Estado para que las rentas bajas no paguen (o paguen muy poco) IRPF sin tener que bajar los impuestos a todo el mundo.\n\nFunciona con dos umbrales: por debajo del inferior (aprox. el SMI), la reducción es máxima y suele anular el impuesto. Entre ambos umbrales, la reducción desaparece progresivamente. El problema es que en esa zona de desaparición se crea el \"efecto cliff\": cada euro extra que ganas te quita parte de la reducción, por lo que tu base imponible sube más de un euro por cada euro ganado. Esto explica por qué el tipo marginal efectivo es tan alto para salarios entre 15.000€ y 20.000€.'
+    a: 'Es el Art. 20 de la LIRPF ("Reducción por obtención de rendimientos del trabajo") y es la herramienta que usa el Estado para que las rentas bajas no paguen (o paguen muy poco) IRPF sin tener que bajar los impuestos a todo el mundo.\n\nFunciona con dos umbrales: por debajo del inferior (aprox. el SMI), la reducción es máxima y suele anular el impuesto. Entre ambos umbrales, la reducción desaparece progresivamente. El problema es que en esa zona de desaparición se crea el "efecto cliff": cada euro extra que ganas te quita parte de la reducción, por lo que tu base imponible sube más de un euro por cada euro ganado. Esto explica por qué el tipo marginal efectivo es tan alto para salarios entre 15.000€ y 20.000€.'
   },
   {
     q: 'Diferencia entre Mínimo Personal y Mínimo Exento',
@@ -68,7 +68,7 @@ const FAQS = [
   },
   {
     q: '¿Qué es el tipo marginal y por qué puede superar el 40% en rentas medias?',
-    a: 'El tipo marginal es el impuesto que pagas por el \"siguiente euro\" que ganas. Si te suben el sueldo 1.000€ y Hacienda se queda con 400€, tu marginal es del 40%.\n\nEn España, el tipo marginal efectivo es engañoso: aunque los tramos oficiales dicen 19% o 24%, en las rentas entre 15k y 20k el marginal real se dispara. ¿Por qué? Porque al ganar más sueldo, pierdes la reducción del Art. 20. Esa pérdida de un beneficio actúa como un impuesto invisible adicional.'
+    a: 'El tipo marginal es el impuesto que pagas por el "siguiente euro" que ganas. Si te suben el sueldo 1.000€ y Hacienda se queda con 400€, tu marginal es del 40%.\n\nEn España, el tipo marginal efectivo es engañoso: aunque los tramos oficiales dicen 19% o 24%, en las rentas entre 15k y 20k el marginal real se dispara. ¿Por qué? Porque al ganar más sueldo, pierdes la reducción del Art. 20. Esa pérdida de un beneficio actúa como un impuesto invisible adicional.'
   },
 
 ];
@@ -106,8 +106,8 @@ const FUENTES = [
   },
   {
     concepto: 'Cotizaciones SS trabajadores 2026 (TGSS)',
-    fuente: 'Seguridad Social — Trabajadores',
-    url: 'https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/CotizacionRecaudacionTrabajadores/36537'
+    fuente: 'Orden PJC/297/2026 (BOE)',
+    url: 'https://www.boe.es/eli/es/o/2026/03/30/pjc297'
   },
   {
     concepto: 'Cotizaciones SS 2019 (archivado)',
@@ -277,11 +277,11 @@ export default function NormativaFAQ({ anioRef }) {
           {mostrarFuentes ? 'Ocultar' : 'Ver'} todas las fuentes y referencias legales
         </button>
         {mostrarFuentes && (
-          <div className="card overflow-hidden border border-[var(--border)] animate-in fade-in duration-500">
+          <div className="source-panel overflow-hidden !p-0 animate-in fade-in duration-500">
             <div className="px-6 py-5 border-b border-[var(--border)] bg-[var(--surface2)]">
               <p className="text-[12px] text-[var(--text-soft)] leading-relaxed">
                 Este simulador implementa la normativa estatal de la <strong className="text-[var(--text-h)]">LIRPF</strong> (Ley del IRPF) y la <strong className="text-[var(--text-h)]">LGSS</strong> (Ley General de la Seguridad Social).
-                Los datos históricos y multiplicadores de inflación se basan en el <strong className="text-[var(--text-h)]">INE</strong> y el <strong className="text-[var(--text-h)]">BOE</strong>.
+                Los datos históricos se basan en el <strong className="text-[var(--text-h)]">INE</strong> y el <strong className="text-[var(--text-h)]">BOE</strong>. El IPC de 2026 usado para expresar importes en euros constantes es una estimación del 3,0% hasta que exista el dato de diciembre.
               </p>
             </div>
             <div className="overflow-x-auto">

@@ -70,14 +70,14 @@ export default function DeudaPublica({ bruto = 35000, anio: anioRef = 2026 }) {
       </div>
 
       {/* La frase demoledora */}
-      <div className="card p-5" style={{ background: 'linear-gradient(135deg,var(--surface),rgba(251,113,133,0.04))', borderColor: 'rgba(251,113,133,0.2)' }}>
+      <div className="info-card p-5">
         <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--red)] mb-2">El cálculo en una frase</p>
         <p className="text-[15px] leading-relaxed text-[var(--text-h)]">
-          Pagas <strong className="font-mono text-[var(--yellow)]">{eur(irpfAnual)}</strong> de IRPF al año.
+          Pagas <strong className="font-mono text-[var(--accent-light)]">{eur(irpfAnual)}</strong> de IRPF al año.
           Tu parte proporcional de la deuda pública española en {anio} es{' '}
-          <strong className="font-mono text-[var(--red)]">{eur(datos.perCapita)}</strong>.
+          <strong className="font-mono text-[var(--accent-light)]">{eur(datos.perCapita)}</strong>.
           Tendrías que destinar el <strong>100% de tu IRPF durante{' '}
-          <span style={{ color: 'var(--red)' }}>{aniosParaPagar.toFixed(1)} años</span></strong>{' '}
+          <span className="text-[var(--accent-light)]">{aniosParaPagar.toFixed(1)} años</span></strong>{' '}
           solo para pagar tu cuota personal — sin financiar sanidad, educación, pensiones ni infraestructuras.
         </p>
       </div>
@@ -118,7 +118,7 @@ export default function DeudaPublica({ bruto = 35000, anio: anioRef = 2026 }) {
             <ReferenceLine yAxisId="left" x={anio} stroke="var(--border-light)" strokeDasharray="3 2" />
           </ComposedChart>
         </ResponsiveContainer>
-        <p className="text-[11px] text-[var(--text-soft)] mt-2">
+        <p className="source-inline">
           La deuda per cápita ha crecido un {crecPerCap.toFixed(0)}% desde 2012.
           Fuente: Banco de España (PDE-Eurostat) + INE (ECP).
         </p>
@@ -153,7 +153,7 @@ export default function DeudaPublica({ bruto = 35000, anio: anioRef = 2026 }) {
       </div>
 
       {/* Nota metodológica */}
-      <div className="card p-4 text-[12px] text-[var(--text)] leading-relaxed">
+      <div className="source-note">
         <strong className="text-[var(--text-h)]">Metodología.</strong> Los datos de deuda total y % PIB proceden del Banco de España, criterio PDE (Protocolo de Déficit Excesivo), el estándar de Eurostat. La deuda per cápita resulta de dividir la deuda total entre la población residente del INE. Es un cálculo aritmético, no un compromiso individual real. El cálculo de «años de IRPF» es una <strong>ilustración divulgativa</strong> del orden de magnitud de la carga fiscal personal frente al endeudamiento del Estado.
       </div>
     </div>

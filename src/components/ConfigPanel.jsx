@@ -1,5 +1,3 @@
-import { REGIONES, ANIOS } from '../engine/irpf';
-
 function PillGroup({ options, value, onChange }) {
   return (
     <div className="config-pill-group">
@@ -45,7 +43,7 @@ function Stepper({ label, value, onChange, min = 0, max = 6 }) {
 
 export default function ConfigPanel({ opts, onChange, anio, compact = false }) {
   const set = (key, val) => onChange({ ...opts, [key]: val });
-  const isForal = REGIONES[opts.ccaa]?.foral;
+  const region = REGIONES[opts.ccaa] || REGIONES.default;
 
   return (
     <div className={`config-panel-root ${compact ? 'compact' : ''}`}>
@@ -65,6 +63,32 @@ export default function ConfigPanel({ opts, onChange, anio, compact = false }) {
           <p className="config-note">
             Cotización por ingresos reales (2023+). IRPF por tramos, sin reducción Art.20.
           </p>
+        )}
+      </div>
+
+      {/* Comunidad autónoma */}
+      <div className="config-section">
+        <label className="config-label" htmlFor="config-ccaa">Comunidad autónoma</label>
+        <select
+          id="config-ccaa"
+          className="config-select"
+          value={opts.ccaa}
+          onChange={event => set('ccaa', event.target.value)}
+        >
+          {Object.entries(REGIONES).map(([value, item]) => (
+            <option key={value} value={value}>{item.name}</option>
+          ))}
+        </select>
+        {region.foral ? (
+          <p className="config-note config-note--warn">
+            País Vasco y Navarra tienen normativa propia. Se muestra la escala estándar únicamente como aproximación.
+          </p>
+        ) : anio < 2024 ? (
+          <p className="config-note">
+            Para años anteriores a 2024 se usa la escala combinada estándar.
+          </p>
+        ) : (
+          <p className="config-note">{region.desc}</p>
         )}
       </div>
 
@@ -119,3 +143,4 @@ export default function ConfigPanel({ opts, onChange, anio, compact = false }) {
     </div>
   );
 }
+import { REGIONES } from '../engine/irpf';

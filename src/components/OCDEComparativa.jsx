@@ -1,10 +1,10 @@
 import { useState, useMemo } from 'react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  Legend, ResponsiveContainer, Cell, ReferenceLine,
+  Legend, ResponsiveContainer,
 } from 'recharts';
 import { CUNA_OCDE_2025, calcularNomina } from '../engine/irpf';
-import { eur, pct } from '../utils/format';
+import { eur } from '../utils/format';
 
 const ESPANA = CUNA_OCDE_2025.find(p => p.code === 'ES');
 const MEDIA_OCDE = CUNA_OCDE_2025.find(p => p.code === 'OECD');
@@ -26,11 +26,20 @@ const COLOR_IRPF = '#fb7185';
 const COLOR_TRAB = '#fbbf24';
 const COLOR_EMP = '#818cf8';
 
-function CustomBar(props) {
-  const { esp, media } = datos.find(d => d.code === props.code) || {};
-  if (esp) return <rect {...props} fill={props.fill} stroke="rgba(251,113,133,0.6)" strokeWidth={2} />;
-  if (media) return <rect {...props} fill={props.fill} opacity={0.7} strokeDasharray="3 2" stroke="var(--border-light)" strokeWidth={1} />;
-  return <rect {...props} fill={props.fill} />;
+function ComparativaTooltip({ active, payload, label }) {
+  if (!active || !payload?.length) return null;
+  const fila = datos.find(d => d.pais === label);
+  return (
+    <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 14px', fontSize: 12 }}>
+      <p className="font-bold text-[var(--text-h)] mb-1">
+        {label}{fila?.esp ? ' 🇪🇸' : ''}{fila?.media ? ' (media)' : ''}
+      </p>
+      <p style={{ color: 'var(--red)' }}>Cuña total: <strong>{fila?.total}%</strong></p>
+      {payload.map((item) => (
+        <p key={item.dataKey} style={{ color: item.fill }}>{item.name}: {item.value.toFixed(1)}%</p>
+      ))}
+    </div>
+  );
 }
 
 export default function OCDEComparativa({ bruto = 35000, anio = 2026 }) {
@@ -62,22 +71,6 @@ export default function OCDEComparativa({ bruto = 35000, anio = 2026 }) {
     };
   }, [irpfTuyo]);
 
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (!active || !payload?.length) return null;
-    const fila = datos.find(d => d.pais === label);
-    return (
-      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 14px', fontSize: 12 }}>
-        <p className="font-bold text-[var(--text-h)] mb-1">
-          {label}{fila?.esp ? ' 🇪🇸' : ''}{fila?.media ? ' (media)' : ''}
-        </p>
-        <p style={{ color: 'var(--red)' }}>Cuña total: <strong>{fila?.total}%</strong></p>
-        {payload.map((p, i) => (
-          <p key={i} style={{ color: p.fill }}>{p.name}: {p.value.toFixed(1)}%</p>
-        ))}
-      </div>
-    );
-  };
-
   return (
     <div className="space-y-6">
       <div>
@@ -85,7 +78,7 @@ export default function OCDEComparativa({ bruto = 35000, anio = 2026 }) {
         <p className="text-[13px] text-[var(--text)] leading-relaxed max-w-3xl">
           La cuña fiscal mide la diferencia entre lo que le cuestas a tu empresa y lo que recibes en neto: IRPF + cotizaciones trabajador + cotizaciones empresa.
           España está en el <strong>10.º puesto</strong> de la OCDE con un <strong style={{ color: 'var(--red)' }}>41,4%</strong> — 6,3 puntos por encima de la media.
-          Fuente: <span className="font-mono text-[var(--text-soft)]">OCDE Taxing Wages 2026 (datos 2025).</span>
+          <span className="source-inline">Fuente: OCDE, <span className="font-mono">Taxing Wages 2026 (datos 2025).</span></span>
         </p>
       </div>
 
@@ -132,7 +125,7 @@ export default function OCDEComparativa({ bruto = 35000, anio = 2026 }) {
                 );
               }}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<ComparativaTooltip />} />
             <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
             <Bar dataKey="Neto" stackId="a" fill={COLOR_NETO} />
             <Bar dataKey="IRPF" stackId="a" fill={COLOR_IRPF} />
@@ -164,8 +157,7 @@ export default function OCDEComparativa({ bruto = 35000, anio = 2026 }) {
               ['SS trabajador', miCuña.ssTraPct, eur(miCuña.ssTra), 'var(--yellow)', 'Tu cotización obligatoria'],
               ['SS empresa', miCuña.ssEmpPct, eur(miCuña.ssEmp), 'var(--accent)', 'El componente oculto'],
             ].map(([label, pctVal, val, color, sub]) => (
-              <div key={label} className="dist-glass-panel p-3.5 text-center relative">
-                <div className="glass-reflection" />
+              <div key={label} className="tone-card p-3.5 text-center" style={{ '--tone': color }}>
                 <div className="relative z-10">
                   <p className="text-[9px] font-bold uppercase tracking-wider text-[var(--text-soft)] mb-1">{label}</p>
                   <p className="text-xl font-black font-mono" style={{ color }}>{pctVal}%</p>
@@ -176,10 +168,7 @@ export default function OCDEComparativa({ bruto = 35000, anio = 2026 }) {
             ))}
           </div>
 
-          <div className="rounded-xl p-4 border relative overflow-hidden" style={{
-            borderColor: parseFloat(miCuña.totalPct) > parseFloat(ESPANA.total) ? 'rgba(251,113,133,0.25)' : 'rgba(52,211,153,0.25)',
-            background: parseFloat(miCuña.totalPct) > parseFloat(ESPANA.total) ? 'var(--glow-red)' : 'var(--glow-green)',
-          }}>
+          <div className="info-card p-4">
             <p className="text-[13px] font-medium text-[var(--text-h)] leading-relaxed relative z-10">
               Tu cuña fiscal total es del <strong className="font-mono" style={{ color: parseFloat(miCuña.totalPct) > parseFloat(ESPANA.total) ? 'var(--red)' : 'var(--green)' }}>{miCuña.totalPct}%</strong>
               {' '}— es decir, de cada {eur(10000)} que cuestas a tu empresa, solo recibes {eur(Math.round(miCuña.netoPct * 100))}.
@@ -196,7 +185,7 @@ export default function OCDEComparativa({ bruto = 35000, anio = 2026 }) {
       </div>
 
       {/* Simulador "si viviera en..." */}
-      <div className="card p-5" style={{ background: 'linear-gradient(135deg,var(--surface),var(--surface2))', borderColor: 'var(--border-light)' }}>
+      <div className="card p-5">
         <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--accent)] mb-1">Simulador</p>
         <h3 className="text-base font-bold text-[var(--text-h)] mb-4">¿Cuánto cobrarías con el mismo coste laboral en otro país?</h3>
 
@@ -223,14 +212,14 @@ export default function OCDEComparativa({ bruto = 35000, anio = 2026 }) {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-          <div className="rounded-xl p-4 border" style={{ borderColor: 'rgba(251,113,133,0.25)', background: 'var(--glow-red)' }}>
+          <div className="tone-card tone-card--danger p-4">
             <p className="text-[11px] font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--red)' }}>
               🇪🇸 España · cuña {ESPANA.total}%
             </p>
             <div className="text-3xl font-black font-mono" style={{ color: 'var(--red)' }}>{eur(netoEspana)}</div>
             <div className="text-[12px] text-[var(--text)] mt-1">{eur(netoEspana / 12)} / mes</div>
           </div>
-          <div className="rounded-xl p-4 border" style={{ borderColor: 'rgba(99,102,241,0.25)', background: 'var(--accent-soft)' }}>
+          <div className="tone-card tone-card--accent p-4">
             <p className="text-[11px] font-bold uppercase tracking-wider mb-2 text-[var(--accent)]">
               {referencia.pais} · cuña {referencia.total}%
             </p>
@@ -240,17 +229,16 @@ export default function OCDEComparativa({ bruto = 35000, anio = 2026 }) {
         </div>
 
         {Math.abs(diferencia) > 200 && (
-          <div className="rounded-xl p-4 border" style={{
-            borderColor: diferencia > 0 ? 'rgba(52,211,153,0.25)' : 'rgba(251,113,133,0.20)',
-            background: diferencia > 0 ? 'var(--glow-green)' : 'var(--glow-red)',
+          <div className="tone-card p-4" style={{
+            '--tone': diferencia > 0 ? 'var(--green)' : 'var(--red)',
           }}>
             <p className="text-[13px] font-medium text-[var(--text-h)] leading-relaxed">
               {diferencia > 0
                 ? <>Con el sistema de <strong>{referencia.pais}</strong> y el mismo coste laboral, cobrarías{' '}
-                  <strong className="font-mono" style={{ color: 'var(--green)' }}>+{eur(diferencia)}</strong> al año —{' '}
+                  <strong className="font-mono text-[var(--accent-light)]">+{eur(diferencia)}</strong> al año —{' '}
                   {eur(diferencia / 12)} más al mes.</>
                 : <>España resulta más generosa que <strong>{referencia.pais}</strong> en este caso:{' '}
-                  cobras <strong className="font-mono" style={{ color: 'var(--red)' }}>{eur(Math.abs(diferencia))}</strong> más aquí al año.</>
+                  cobras <strong className="font-mono text-[var(--accent-light)]">{eur(Math.abs(diferencia))}</strong> más aquí al año.</>
               }
             </p>
           </div>
@@ -267,7 +255,7 @@ export default function OCDEComparativa({ bruto = 35000, anio = 2026 }) {
           <p>
             La clave está en el desglose: España tiene un IRPF moderado (<strong>{ESPANA.irpf}%</strong> sobre el bruto), similar a la media OCDE ({MEDIA_OCDE?.irpf}%), pero unas <strong>cotizaciones empresariales muy elevadas</strong> ({ESPANA.cotEmp}%). Son 23 céntimos de cada euro de coste laboral que la empresa paga directamente al Estado sin pasar por tu cuenta.
           </p>
-          <p className="text-[11px] text-[var(--text-soft)] pt-2 border-t border-[var(--border)]">
+          <p className="source-inline">
             Fuente: OCDE, <em>Taxing Wages 2026</em> (datos de 2025). Trabajador soltero sin hijos al salario medio nacional.
           </p>
         </div>

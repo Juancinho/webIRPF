@@ -1,13 +1,14 @@
 import { useState, useMemo } from 'react';
 import { calcularNomina, calcularTipoMarginal } from '../engine/irpf';
 import { eur, num } from '../utils/format';
+import ConceptDetails from './ConceptDetails';
 
-export default function SimuladorSubida({ bruto, anio }) {
+export default function SimuladorSubida({ bruto, anio, opts }) {
   const [incremento, setIncremento] = useState(3000);
 
-  const actual  = useMemo(() => calcularNomina(bruto, anio), [bruto, anio]);
-  const nuevo   = useMemo(() => calcularNomina(bruto + incremento, anio), [bruto, incremento, anio]);
-  const marginal = useMemo(() => calcularTipoMarginal(bruto, anio, Math.max(incremento, 100)), [bruto, anio, incremento]);
+  const actual  = useMemo(() => calcularNomina(bruto, anio, opts), [bruto, anio, opts]);
+  const nuevo   = useMemo(() => calcularNomina(bruto + incremento, anio, opts), [bruto, incremento, anio, opts]);
+  const marginal = useMemo(() => calcularTipoMarginal(bruto, anio, opts), [bruto, anio, opts]);
 
   const difNeto  = nuevo.salarioNeto - actual.salarioNeto;
   const difIRPF  = nuevo.irpfFinal   - actual.irpfFinal;
@@ -17,6 +18,9 @@ export default function SimuladorSubida({ bruto, anio }) {
   const pctNeto = incremento > 0 ? (difNeto  / incremento) * 100 : 0;
   const pctIRPF = incremento > 0 ? (difIRPF  / incremento) * 100 : 0;
   const pctSS   = incremento > 0 ? (difSS    / incremento) * 100 : 0;
+  const cargaMediaSubida = pctIRPF + pctSS;
+  const marginalIRPFPor100 = marginal.tipoMarginalIRPF * 100;
+  const marginalSSPor100 = (marginal.tipoMarginalTotal - marginal.tipoMarginalIRPF) * 100;
 
   const alertaCliff = marginal.tipoMarginalTotal > 0.55;
 
@@ -89,9 +93,8 @@ export default function SimuladorSubida({ bruto, anio }) {
                 ['te quedas', pctNeto, 'emerald', '#10b981'],
                 ['→ SS', pctSS, 'amber', '#f59e0b'],
                 ['→ IRPF', pctIRPF, 'red', '#ef4444'],
-              ].map(([label, val, name, color]) => (
-                <div key={label} className="metric-card p-3"
-                  style={{ background: `${color}08`, borderColor: `${color}18` }}>
+              ].map(([label, val, , color]) => (
+                <div key={label} className="tone-card p-3" style={{ '--tone': color }}>
                   <div className="text-base font-black font-mono" style={{ color }}>{val.toFixed(1)}€</div>
                   <div className="text-[10px] text-[var(--text)] mt-0.5 font-medium">{label}</div>
                 </div>
@@ -105,15 +108,13 @@ export default function SimuladorSubida({ bruto, anio }) {
       <div className="p-5 sm:p-6 lg:p-7">
         {/* Neto antes / después */}
         <div className="grid grid-cols-2 gap-3 mb-6">
-          <div className="metric-card"
-            style={{ background: 'linear-gradient(135deg, color-mix(in srgb, var(--surface2) 90%, transparent), color-mix(in srgb, var(--surface3) 70%, transparent))', borderColor: 'var(--border)' }}>
+          <div className="metric-card">
             <div className="text-[10px] text-[var(--text)] font-medium mb-1">Neto actual</div>
             <div className="text-xl font-black font-mono text-[var(--text-h)]">{eur(actual.salarioNeto)}</div>
             <div className="text-[10px] text-[var(--text)] opacity-40 mt-1">{eur(actual.salarioNeto / 12)}/mes</div>
           </div>
           <div className="metric-card"
-            style={{ background: 'linear-gradient(135deg, rgba(52,211,153,0.06), rgba(52,211,153,0.02))', borderColor: 'rgba(52,211,153,0.18)' }}>
-            <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ background: 'linear-gradient(90deg, #34d399, #10b981)' }} />
+            style={{ background: 'linear-gradient(135deg, rgba(52,211,153,0.06), rgba(52,211,153,0.02))' }}>
             <div className="text-[10px] text-[#34d399]/80 font-medium mb-1">Neto nuevo</div>
             <div className="text-xl font-black font-mono text-[#34d399]">{eur(nuevo.salarioNeto)}</div>
             <div className="text-[10px] text-[#34d399]/50 mt-1">{eur(nuevo.salarioNeto / 12)}/mes</div>
@@ -123,8 +124,7 @@ export default function SimuladorSubida({ bruto, anio }) {
         {/* Ganancia neta */}
         {incremento > 0 && (
           <>
-            <div className="metric-card mb-4"
-              style={{ background: 'linear-gradient(135deg, color-mix(in srgb, var(--surface2) 90%, transparent), color-mix(in srgb, var(--surface3) 70%, transparent))', borderColor: 'var(--border)' }}>
+            <div className="metric-card tone-card tone-card--success mb-4">
               <div className="flex justify-between items-start">
                 <div>
                   <div className="text-[10px] text-[var(--text)] font-medium mb-1.5">Ganancia neta real</div>
@@ -140,12 +140,8 @@ export default function SimuladorSubida({ bruto, anio }) {
             </div>
 
             {/* Tipo marginal */}
-            <div className={`metric-card ${alertaCliff ? '' : ''}`}
-              style={{
-                background: alertaCliff ? 'linear-gradient(135deg, rgba(249,115,22,0.08), rgba(249,115,22,0.03))' : 'linear-gradient(135deg, color-mix(in srgb, var(--surface2) 90%, transparent), color-mix(in srgb, var(--surface3) 70%, transparent))',
-                borderColor: alertaCliff ? 'rgba(249,115,22,0.22)' : 'var(--border)',
-              }}>
-              {alertaCliff && <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ background: 'linear-gradient(90deg, #f97316, #ea580c)' }} />}
+            <div className={`metric-card ${alertaCliff ? 'tone-card' : ''}`}
+              style={alertaCliff ? { '--tone': '#f97316' } : undefined}>
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <div className="text-[10px] font-bold text-[var(--text)] mb-1 uppercase tracking-wider">
@@ -185,6 +181,51 @@ export default function SimuladorSubida({ bruto, anio }) {
                 </div>
               ))}
             </div>
+
+            <ConceptDetails label="Cómo leer esta subida, paso a paso" className="mt-5">
+              <div className="concept-steps">
+                <div>
+                  <span>1</span>
+                  <p><strong>Partimos del aumento bruto:</strong> tu salario pasa de {eur(bruto)} a {eur(bruto + incremento)}, una diferencia de {eur(incremento)} al año.</p>
+                </div>
+                <div>
+                  <span>2</span>
+                  <p><strong>Calculamos solo las deducciones nuevas:</strong> {eur(difIRPF)} más de IRPF y {eur(difSS)} más de SS del trabajador. No se vuelve a gravar desde cero el salario que ya tenías.</p>
+                </div>
+                <div>
+                  <span>3</span>
+                  <p><strong>Obtenemos lo que llega al bolsillo:</strong> {eur(incremento)} − {eur(difIRPF)} − {eur(difSS)} = <strong>{eur(difNeto)} netos al año</strong>, unos {eur(difNeto / 12)} al mes en 12 pagas.</p>
+                </div>
+              </div>
+
+              <div className="concept-comparison concept-comparison--compact">
+                <section>
+                  <div className="concept-eyebrow">Toda la subida</div>
+                  <h4>Carga media del aumento: {cargaMediaSubida.toFixed(1)}%</h4>
+                  <p>
+                    Es la proporción realmente descontada de los {eur(incremento)} completos: {pctIRPF.toFixed(1)}% por IRPF y {pctSS.toFixed(1)}% por SS. El {pctNeto.toFixed(1)}% restante llega a tu neto.
+                  </p>
+                </section>
+                <section>
+                  <div className="concept-eyebrow">Siguientes 100 €</div>
+                  <h4>Marginal efectivo: {(marginal.tipoMarginalTotal * 100).toFixed(1)}%</h4>
+                  <p>
+                    Es una foto local en tu sueldo de partida: por los siguientes 100 €, el modelo estima {eur(marginalIRPFPor100, 1)} más de IRPF, {eur(marginalSSPor100, 1)} más de SS y {eur(marginal.netoMarginal * 100, 1)} más de neto.
+                  </p>
+                </section>
+              </div>
+
+              <div className="concept-note">
+                <strong>No son necesariamente el mismo porcentaje.</strong> La carga media usa toda la subida elegida, que puede atravesar varios tramos o zonas de reducción. El marginal mira únicamente los 100 € siguientes desde el salario inicial.
+              </div>
+
+              <div className="concept-why">
+                <strong>Úsalo para comparar ofertas con criterio.</strong>
+                <p>
+                  Mira primero la ganancia neta anual y mensual. Después, usa el coste adicional de empresa para entender el presupuesto laboral total. Para bonus u horas extra, el marginal da una aproximación rápida; para una subida grande, la cifra más representativa es la ganancia neta calculada sobre todo el aumento.
+                </p>
+              </div>
+            </ConceptDetails>
           </>
         )}
         {incremento === 0 && (
