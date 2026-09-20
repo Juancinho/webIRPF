@@ -5,7 +5,8 @@ import {
 } from 'recharts';
 import {
   ANIOS, DISTRIBUCION_SALARIAL, percentilDe, densidadLogNormal,
-  inflacionAcumulada, INFLACION_A_2026
+  inflacionAcumulada, INFLACION_A_2026, ULTIMO_ANIO_SALARIAL_OFICIAL,
+  CRECIMIENTO_PROYECCION_SALARIAL
 } from '../engine/irpf';
 import { eur } from '../utils/format';
 
@@ -90,6 +91,16 @@ function StatsStrip({ dist, salario, color }) {
   );
 }
 
+function MarcaEstimacion({ anio }) {
+  if (anio <= ULTIMO_ANIO_SALARIAL_OFICIAL) return null;
+  return (
+    <span className="ml-1.5 rounded-full px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-[var(--yellow)] bg-amber-500/10"
+      title="Estimación propia; no es un dato publicado por el INE">
+      estimación
+    </span>
+  );
+}
+
 // ─── Component principal ──────────────────────────────────────────────────────
 export default function DistribucionSalarial({ bruto, anio: anioRef }) {
   const [anioOrigen, setAnioOrigen] = useState(2018);
@@ -168,7 +179,7 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
             <div className="glass-reflection" />
             <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--accent)] mb-1">¿Qué es el percentil?</p>
             <p className="text-[12px] text-[var(--text)] leading-relaxed">
-              Si estás en el <strong className="text-[var(--text-h)]">percentil 60</strong>, ganas más que el 60% de los asalariados a tiempo completo en España.
+              Si estás en el <strong className="text-[var(--text-h)]">percentil 60</strong>, tu ganancia anual supera aproximadamente la del 60% de los asalariados incluidos en la EAES.
             </p>
           </div>
           <div className="dist-glass-panel p-4">
@@ -204,7 +215,7 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
                     ...(anioOrigen === a ? { background: 'var(--red)', boxShadow: '0 2px 10px var(--glow-red)' } : {}),
                     ...(a === anioDestino ? { opacity: 0.25, cursor: 'not-allowed' } : {}),
                   }}>
-                  {a}
+                  {a}{a > ULTIMO_ANIO_SALARIAL_OFICIAL && <sup className="ml-0.5 text-[7px]" title="Estimación propia">e</sup>}
                 </button>
               ))}
             </div>
@@ -222,7 +233,7 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
                     ...(anioDestino === a ? { background: 'linear-gradient(135deg,var(--accent),var(--accent2))', boxShadow: '0 2px 10px var(--glow-accent)' } : {}),
                     ...(a === anioOrigen ? { opacity: 0.25, cursor: 'not-allowed' } : {}),
                   }}>
-                  {a}
+                  {a}{a > ULTIMO_ANIO_SALARIAL_OFICIAL && <sup className="ml-0.5 text-[7px]" title="Estimación propia">e</sup>}
                 </button>
               ))}
             </div>
@@ -314,6 +325,7 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
           <div>
             <span className="inline-block w-3 h-3 rounded-full mr-2" style={{ background: 'var(--red)', verticalAlign: 'middle' }} />
             <span className="text-[13px] font-bold text-[var(--text-h)]">Distribución salarial en {anioOrigen}</span>
+            <MarcaEstimacion anio={anioOrigen} />
           </div>
           <span className="dist-glass-badge"
             style={{ background: 'color-mix(in srgb, var(--red) 12%, transparent)', color: 'var(--red)', borderColor: 'color-mix(in srgb, var(--red) 25%, transparent)' }}>
@@ -347,6 +359,7 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
           <div>
             <span className="inline-block w-3 h-3 rounded-full mr-2" style={{ background: 'var(--accent)', verticalAlign: 'middle' }} />
             <span className="text-[13px] font-bold text-[var(--text-h)]">Distribución salarial en {anioDestino}</span>
+            <MarcaEstimacion anio={anioDestino} />
           </div>
           <span className="dist-glass-badge"
             style={{ background: 'var(--accent-soft)', color: 'var(--accent)', borderColor: 'var(--accent-dim)' }}>
@@ -435,22 +448,22 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-[12px] text-[var(--text)] leading-relaxed">
           <div className="space-y-2">
             <p>
-              <strong className="text-[var(--text-h)]">Datos reales (2012–2023):</strong>{' '}
-              Encuesta Anual de Estructura Salarial (EAES) del INE. Ganancia bruta anual de asalariados a <strong>tiempo completo</strong>. Incluye todas las CCAA y todos los sectores.
+              <strong className="text-[var(--text-h)]">Datos oficiales (2012–{ULTIMO_ANIO_SALARIAL_OFICIAL}):</strong>{' '}
+              tabla 28191 de la Encuesta Anual de Estructura Salarial (EAES) del INE: ambos sexos, total nacional y ganancia bruta anual, sin filtrar por tipo de jornada. Se muestran los valores publicados de P10, P25, mediana, media, P75 y P90.
             </p>
             <p>
-              <strong className="text-[var(--text-h)]">Datos proyectados (2024–2026):</strong>{' '}
-              Estimaciones propias aplicando IPC previsto + crecimiento real salarial ~0,5% anual sobre la última cifra oficial (2023).
+              <strong className="text-[var(--text-h)]">Estimaciones propias (2025–2026):</strong>{' '}
+              escenario técnico reproducible que incrementa cada percentil oficial de 2024 un {(CRECIMIENTO_PROYECCION_SALARIAL * 100).toFixed(1).replace('.', ',')}% anual. No son datos ni previsiones del INE.
             </p>
           </div>
           <div className="space-y-2">
             <p>
               <strong className="text-[var(--text-h)]">Curva de densidad:</strong>{' '}
-              Aproximación log-normal calibrada con los percentiles oficiales (P10, P25, P50, P75, P90) de cada año. No es la distribución exacta, sino una estimación continua compatible con los datos observados.
+              representación log-normal orientativa ajustada con P10, mediana y P90. El INE publica puntos de la distribución, no esta curva continua; por eso su altura y forma intermedia no deben leerse como frecuencias exactas.
             </p>
             <p>
-              <strong className="text-[var(--text-h)]">Limitación:</strong>{' '}
-              Los datos excluyen trabajadores a tiempo parcial y autónomos.
+              <strong className="text-[var(--text-h)]">Percentil estimado:</strong>{' '}
+              se interpola entre los percentiles oficiales. Por debajo de P10 y por encima de P90 se extrapola, ya que la tabla no publica P1, P5, P95 ni P99. Es menos preciso en los extremos. La EAES no incluye trabajadores autónomos.
             </p>
           </div>
         </div>
@@ -459,12 +472,12 @@ export default function DistribucionSalarial({ bruto, anio: anioRef }) {
           <p className="text-[var(--text-soft)]">
             <strong className="text-[var(--text-h)]">Fuente oficial INE (EAES) →</strong>
           </p>
-          <a href="https://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177025&menu=resultados&idp=1254735976596"
+          <a href="https://www.ine.es/jaxiT3/Tabla.htm?t=28191"
             target="_blank" rel="noopener noreferrer" className="source-link source-link--block font-mono break-all">
-            ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177025&menu=resultados&idp=1254735976596
+            INE · tabla 28191: Medias y percentiles por sexo y CCAA
           </a>
           <p className="text-[var(--text-soft)]">
-            El INE publica los datos con aproximadamente 2 años de retraso. Los últimos datos disponibles al cierre de esta herramienta corresponden al ejercicio 2023.
+            Última actualización de esta serie en la herramienta: datos oficiales hasta 2024, publicados por el INE en 2026. Los años posteriores aparecen identificados como estimaciones propias.
           </p>
         </div>
         </div>

@@ -7,6 +7,14 @@ import {
   calcularNomina,
   calcularSSAutonomo,
   calcularTipoMarginal,
+  CARGA_PERSONAL_OCDE_2025,
+  CRECIMIENTO_PROYECCION_SALARIAL,
+  CUNA_OCDE_2025,
+  CUNA_OCDE_META,
+  DISTRIBUCION_SALARIAL,
+  DISTRIBUCION_SALARIAL_OFICIAL,
+  percentilDe,
+  ULTIMO_ANIO_SALARIAL_OFICIAL,
 } from '../src/engine/irpf.js';
 
 const closeTo = (actual, expected, tolerance = 0.02) => {
@@ -81,4 +89,59 @@ test('los tipos marginales son finitos en todo el rango de la interfaz', () => {
       assert.ok(Number.isFinite(marginal.tipoMarginalIRPF));
     }
   }
+});
+
+test('la distribución salarial reproduce la tabla 28191 del INE hasta 2024', () => {
+  assert.equal(ULTIMO_ANIO_SALARIAL_OFICIAL, 2024);
+  assert.deepEqual(DISTRIBUCION_SALARIAL_OFICIAL[2012], {
+    p10: 7979.40, p25: 13369.45, p50: 19040.98,
+    p75: 28395.50, p90: 40807.99, media: 22726.44,
+  });
+  assert.deepEqual(DISTRIBUCION_SALARIAL_OFICIAL[2024], {
+    p10: 12018.46, p25: 17457.47, p50: 24497.17,
+    p75: 36969.61, p90: 52515.27, media: 29540.26,
+  });
+});
+
+test('las estimaciones salariales posteriores son explícitas y reproducibles', () => {
+  const factor2025 = 1 + CRECIMIENTO_PROYECCION_SALARIAL;
+  closeTo(DISTRIBUCION_SALARIAL[2025].p50, DISTRIBUCION_SALARIAL[2024].p50 * factor2025);
+  closeTo(DISTRIBUCION_SALARIAL[2026].p50, DISTRIBUCION_SALARIAL[2024].p50 * factor2025 ** 2);
+});
+
+test('el estimador de percentil pasa por los puntos oficiales publicados', () => {
+  const dist = DISTRIBUCION_SALARIAL[2024];
+  for (const [clave, percentil] of [['p10', 10], ['p25', 25], ['p50', 50], ['p75', 75], ['p90', 90]]) {
+    closeTo(percentilDe(dist[clave], 2024), percentil, 0.001);
+  }
+});
+
+test('la comparativa OCDE reproduce la tabla 1.2 de Taxing Wages 2026', () => {
+  const paises = CUNA_OCDE_2025.filter(fila => !fila.media);
+  assert.equal(paises.length, 38);
+  assert.equal(new Set(paises.map(fila => fila.code)).size, 38);
+  assert.equal(CUNA_OCDE_META.ejercicio, 2025);
+  assert.equal(CUNA_OCDE_META.tabla, '1.2');
+
+  assert.deepEqual(CUNA_OCDE_2025.find(fila => fila.code === 'ES'), {
+    pais: 'España', code: 'ES', total: 41.4,
+    irpf: 13.1, cotTrab: 5.0, cotEmp: 23.4, esp: true,
+  });
+  assert.deepEqual(CUNA_OCDE_2025.find(fila => fila.code === 'OECD'), {
+    pais: 'Media OCDE', code: 'OECD', total: 35.1,
+    irpf: 13.4, cotTrab: 8.1, cotEmp: 13.5, media: true,
+  });
+
+  for (const fila of CUNA_OCDE_2025) {
+    closeTo(fila.irpf + fila.cotTrab + fila.cotEmp, fila.total, 0.11);
+  }
+});
+
+test('la carga personal sobre bruto permanece separada de la cuña sobre coste laboral', () => {
+  assert.deepEqual(CARGA_PERSONAL_OCDE_2025.espana, {
+    total: 23.5, irpf: 17.1, cotTrab: 6.5,
+  });
+  assert.deepEqual(CARGA_PERSONAL_OCDE_2025.mediaOCDE, {
+    total: 25.1, irpf: 15.5, cotTrab: 9.6,
+  });
 });

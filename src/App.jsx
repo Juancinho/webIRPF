@@ -290,7 +290,7 @@ export default function App() {
           {activeId === 'internacional' && (
             <div>
               <SectionHeading tagline="Comparativa OCDE">España frente al mundo</SectionHeading>
-              <OCDEComparativa bruto={bruto} anio={anio} />
+                  <OCDEComparativa bruto={bruto} anio={anio} opts={opts} />
             </div>
           )}
 

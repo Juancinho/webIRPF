@@ -463,34 +463,51 @@ export const DATOS_UMBRALES_REAL = ANIOS.map(anio => {
 });
 
 // ── Distribución salarial española (INE EAES) ─────────────────────────────────
-// Ganancia bruta anual de asalariados a tiempo completo, en € corrientes.
-// 2024-2026: proyecciones IPC + ~0,5% crecimiento real.
+// Tabla 28191: ambos sexos, total nacional, ganancia bruta anual, € corrientes.
+// https://www.ine.es/jaxiT3/Tabla.htm?t=28191
+// Los datos oficiales incluyen el conjunto de jornadas cubiertas por la EAES.
+export const ULTIMO_ANIO_SALARIAL_OFICIAL = 2024;
+export const CRECIMIENTO_PROYECCION_SALARIAL = 0.032;
+
+export const DISTRIBUCION_SALARIAL_OFICIAL = {
+  2012: { p10: 7979.40,  p25: 13369.45, p50: 19040.98, p75: 28395.50, p90: 40807.99, media: 22726.44 },
+  2013: { p10: 7692.30,  p25: 13039.36, p50: 19029.66, p75: 28563.69, p90: 41108.40, media: 22697.86 },
+  2014: { p10: 7626.20,  p25: 13217.84, p50: 19263.78, p75: 28782.70, p90: 41350.36, media: 22858.17 },
+  2015: { p10: 7962.45,  p25: 13414.92, p50: 19466.49, p75: 29163.66, p90: 41648.67, media: 23106.30 },
+  2016: { p10: 8095.44,  p25: 13369.74, p50: 19432.62, p75: 29191.56, p90: 41855.38, media: 23156.34 },
+  2017: { p10: 8583.81,  p25: 13897.22, p50: 19830.12, p75: 29628.64, p90: 42454.21, media: 23646.50 },
+  2018: { p10: 8457.36,  p25: 13998.29, p50: 20078.44, p75: 30057.33, p90: 43382.16, media: 24009.12 },
+  2019: { p10: 8943.26,  p25: 14271.06, p50: 20351.02, p75: 30558.45, p90: 44127.12, media: 24395.98 },
+  2020: { p10: 9586.51,  p25: 14641.96, p50: 20920.12, p75: 31550.01, p90: 45359.96, media: 25165.51 },
+  2021: { p10: 10192.38, p25: 15215.03, p50: 21638.69, p75: 32385.45, p90: 46430.36, media: 25896.82 },
+  2022: { p10: 10657.37, p25: 15913.52, p50: 22383.11, p75: 33561.62, p90: 48217.21, media: 26948.87 },
+  2023: { p10: 11466.88, p25: 16632.97, p50: 23349.00, p75: 34991.64, p90: 49836.00, media: 28049.94 },
+  2024: { p10: 12018.46, p25: 17457.47, p50: 24497.17, p75: 36969.61, p90: 52515.27, media: 29540.26 },
+};
+
+function proyectarDistribucion(base, anios) {
+  const factor = Math.pow(1 + CRECIMIENTO_PROYECCION_SALARIAL, anios);
+  return Object.fromEntries(
+    Object.entries(base).map(([clave, valor]) => [clave, Math.round(valor * factor * 100) / 100])
+  );
+}
+
 export const DISTRIBUCION_SALARIAL = {
-  2012: { p10: 8390,  p25: 13420, p50: 19041, p75: 27780, p90: 41420, media: 22726 },
-  2013: { p10: 8451,  p25: 13491, p50: 19029, p75: 27520, p90: 41450, media: 22697 },
-  2014: { p10: 8530,  p25: 13578, p50: 19263, p75: 28012, p90: 42180, media: 22858 },
-  2015: { p10: 8740,  p25: 13743, p50: 19467, p75: 28266, p90: 42420, media: 23106 },
-  2016: { p10: 8843,  p25: 13750, p50: 19432, p75: 28419, p90: 42760, media: 23156 },
-  2017: { p10: 8980,  p25: 13988, p50: 19830, p75: 29020, p90: 43500, media: 23646 },
-  2018: { p10: 8890,  p25: 14114, p50: 19469, p75: 28659, p90: 42659, media: 24009 },
-  2019: { p10: 10250, p25: 14710, p50: 20680, p75: 30450, p90: 45800, media: 24395 },
-  2020: { p10: 10510, p25: 14750, p50: 20920, p75: 30650, p90: 46100, media: 25165 },
-  2021: { p10: 10920, p25: 15240, p50: 21500, p75: 31500, p90: 47000, media: 25896 },
-  2022: { p10: 11345, p25: 15876, p50: 22166, p75: 32622, p90: 48575, media: 26948 },
-  2023: { p10: 12060, p25: 16908, p50: 23349, p75: 34236, p90: 51030, media: 28050 },
-  2024: { p10: 12500, p25: 17480, p50: 24130, p75: 35400, p90: 52800, media: 29010 },
-  2025: { p10: 12890, p25: 18030, p50: 24890, p75: 36510, p90: 54470, media: 29920 },
-  2026: { p10: 13290, p25: 18590, p50: 25670, p75: 37650, p90: 56170, media: 30850 },
+  ...DISTRIBUCION_SALARIAL_OFICIAL,
+  2025: proyectarDistribucion(DISTRIBUCION_SALARIAL_OFICIAL[2024], 1),
+  2026: proyectarDistribucion(DISTRIBUCION_SALARIAL_OFICIAL[2024], 2),
 };
 
 export function percentilDe(salario, anio) {
   const d = DISTRIBUCION_SALARIAL[anio];
   if (!d || salario <= 0) return 0;
   const puntos = [
-    [0, 0], [d.p10, 10], [d.p25, 25], [d.p50, 50],
-    [d.p75, 75], [d.p90, 90], [d.p90 * 1.7, 95],
-    [d.p90 * 3.0, 99], [d.p90 * 6.0, 99.9],
+    [d.p10, 10], [d.p25, 25], [d.p50, 50], [d.p75, 75], [d.p90, 90],
   ];
+  if (salario < d.p10) {
+    const fraccion = salario / d.p10;
+    return 10 * Math.pow(fraccion, 0.7);
+  }
   for (let i = 0; i < puntos.length - 1; i++) {
     const [s0, p0] = puntos[i];
     const [s1, p1] = puntos[i + 1];
@@ -498,42 +515,86 @@ export function percentilDe(salario, anio) {
       return p0 + ((salario - s0) / (s1 - s0)) * (p1 - p0);
     }
   }
-  return 99.9;
+  // El INE no publica P95/P99 en esta tabla. La cola se muestra como una
+  // extrapolación suave y se limita a P99,9 para no fingir precisión censal.
+  return Math.min(99.9, 90 + 10 * (1 - Math.exp(-(salario - d.p90) / d.p90)));
 }
 
 export function densidadLogNormal(salario, anio) {
   const d = DISTRIBUCION_SALARIAL[anio];
   if (!d || salario <= 0) return 0;
   const mu = Math.log(d.p50);
-  const ratio = d.media / d.p50;
-  if (ratio <= 1) return 0;
-  const sigma = Math.sqrt(2 * Math.log(ratio));
+  // Ajuste visual robusto mediante la distancia observada entre P10 y P90.
+  // Una log-normal no puede reproducir simultáneamente todos los percentiles.
+  const sigma = Math.log(d.p90 / d.p10) / (2 * 1.2815515655446004);
+  if (sigma <= 0) return 0;
   const x = Math.log(salario);
   return (1 / (salario * sigma * Math.sqrt(2 * Math.PI))) *
     Math.exp(-Math.pow(x - mu, 2) / (2 * sigma * sigma));
 }
 
 // ── Cuña fiscal OCDE 2025 (Taxing Wages 2026, datos 2025) ────────────────────
-// Trabajador soltero sin hijos al salario medio nacional.
+// Fuente: tabla 1.2. Persona soltera, sin hijos, al 100% del salario medio.
+// Unidad de total y componentes: % del coste laboral. La contribución del
+// empleador incluye impuestos sobre nóminas cuando corresponde.
+export const CUNA_OCDE_META = Object.freeze({
+  informe: 'Taxing Wages 2026',
+  ejercicio: 2025,
+  tabla: '1.2',
+  unidad: '% del coste laboral',
+  supuesto: 'Persona soltera, sin hijos, al 100% del salario medio nacional',
+  doi: 'https://doi.org/10.1787/3a5169ef-en',
+  fuente: 'https://www.oecd.org/en/publications/taxing-wages-2026_3a5169ef-en/full-report/overview_d93131c3.html',
+  verificado: '2026-09-20',
+});
+
 export const CUNA_OCDE_2025 = [
-  { pais: 'Bélgica',       code: 'BE',   total: 52.5, irpf: 21.0, cotTrab: 11.0, cotEmp: 20.5 },
-  { pais: 'Alemania',      code: 'DE',   total: 49.3, irpf: 16.0, cotTrab: 17.7, cotEmp: 15.6 },
-  { pais: 'Francia',       code: 'FR',   total: 47.2, irpf: 13.2, cotTrab:  9.2, cotEmp: 24.8 },
-  { pais: 'Austria',       code: 'AT',   total: 47.1, irpf: 12.8, cotTrab: 14.0, cotEmp: 20.3 },
-  { pais: 'Italia',        code: 'IT',   total: 45.8, irpf: 16.7, cotTrab:  7.2, cotEmp: 21.9 },
-  { pais: 'España',        code: 'ES',   total: 41.4, irpf: 13.1, cotTrab:  4.9, cotEmp: 23.4, esp: true },
-  { pais: 'Grecia',        code: 'GR',   total: 38.0, irpf: 10.2, cotTrab: 13.7, cotEmp: 14.1 },
-  { pais: 'Portugal',      code: 'PT',   total: 36.8, irpf: 14.6, cotTrab: 11.0, cotEmp: 11.2 },
-  { pais: 'Media OCDE',    code: 'OECD', total: 35.1, irpf: 13.4, cotTrab:  8.2, cotEmp: 13.5, media: true },
-  { pais: 'Países Bajos',  code: 'NL',   total: 35.0, irpf: 18.4, cotTrab:  9.7, cotEmp:  6.9 },
-  { pais: 'Reino Unido',   code: 'UK',   total: 33.7, irpf: 14.2, cotTrab:  7.6, cotEmp: 11.9 },
-  { pais: 'Estados Unidos',code: 'US',   total: 30.0, irpf: 14.4, cotTrab:  7.7, cotEmp:  7.9 },
-  { pais: 'Irlanda',       code: 'IE',   total: 29.9, irpf: 17.7, cotTrab:  4.0, cotEmp:  8.2 },
-  { pais: 'Suiza',         code: 'CH',   total: 22.9, irpf: 11.1, cotTrab:  6.3, cotEmp:  5.5 },
-  { pais: 'Nueva Zelanda', code: 'NZ',   total: 20.8, irpf: 20.8, cotTrab:  0.0, cotEmp:  0.0 },
-  { pais: 'México',        code: 'MX',   total: 21.7, irpf:  4.7, cotTrab:  1.3, cotEmp: 15.7 },
-  { pais: 'Chile',         code: 'CL',   total:  7.5, irpf:  0.0, cotTrab:  7.0, cotEmp:  0.5 },
+  { pais: 'Alemania',            code: 'DE', total: 49.3, irpf: 14.2, cotTrab: 17.8, cotEmp: 17.3 },
+  { pais: 'Suiza',               code: 'CH', total: 23.0, irpf: 10.9, cotTrab:  6.0, cotEmp:  6.0 },
+  { pais: 'Bélgica',             code: 'BE', total: 52.5, irpf: 20.1, cotTrab: 11.0, cotEmp: 21.4 },
+  { pais: 'Austria',             code: 'AT', total: 47.1, irpf: 11.4, cotTrab: 14.0, cotEmp: 21.6 },
+  { pais: 'Luxemburgo',          code: 'LU', total: 40.2, irpf: 17.3, cotTrab: 10.8, cotEmp: 12.0 },
+  { pais: 'Países Bajos',        code: 'NL', total: 35.9, irpf: 15.8, cotTrab:  8.9, cotEmp: 11.2 },
+  { pais: 'Noruega',             code: 'NO', total: 36.4, irpf: 18.1, cotTrab:  6.8, cotEmp: 11.5 },
+  { pais: 'Reino Unido',         code: 'UK', total: 32.4, irpf: 15.4, cotTrab:  4.9, cotEmp: 12.0 },
+  { pais: 'Francia',             code: 'FR', total: 47.2, irpf: 12.2, cotTrab:  8.3, cotEmp: 26.7 },
+  { pais: 'Irlanda',             code: 'IE', total: 32.6, irpf: 18.9, cotTrab:  3.7, cotEmp: 10.1 },
+  { pais: 'Canadá',              code: 'CA', total: 32.1, irpf: 17.2, cotTrab:  6.2, cotEmp:  8.8 },
+  { pais: 'Dinamarca',           code: 'DK', total: 35.8, irpf: 35.1, cotTrab:  0.0, cotEmp:  0.7 },
+  { pais: 'Islandia',            code: 'IS', total: 31.5, irpf: 25.4, cotTrab:  0.1, cotEmp:  6.0 },
+  { pais: 'Finlandia',           code: 'FI', total: 42.5, irpf: 17.6, cotTrab:  7.9, cotEmp: 17.0 },
+  { pais: 'Suecia',              code: 'SE', total: 41.1, irpf: 11.9, cotTrab:  5.3, cotEmp: 23.9 },
+  { pais: 'Australia',           code: 'AU', total: 27.9, irpf: 22.2, cotTrab:  0.0, cotEmp:  5.7 },
+  { pais: 'Italia',              code: 'IT', total: 45.8, irpf: 14.5, cotTrab:  7.2, cotEmp: 24.0 },
+  { pais: 'Estados Unidos',      code: 'US', total: 30.0, irpf: 15.4, cotTrab:  7.1, cotEmp:  7.5 },
+  { pais: 'España',              code: 'ES', total: 41.4, irpf: 13.1, cotTrab:  5.0, cotEmp: 23.4, esp: true },
+  { pais: 'Corea',               code: 'KR', total: 24.8, irpf:  6.4, cotTrab:  8.5, cotEmp: 10.0 },
+  { pais: 'Japón',               code: 'JP', total: 33.1, irpf:  6.9, cotTrab: 12.7, cotEmp: 13.5 },
+  { pais: 'Türkiye',             code: 'TR', total: 40.3, irpf: 12.1, cotTrab: 12.7, cotEmp: 15.6 },
+  { pais: 'Israel',              code: 'IL', total: 26.1, irpf: 11.9, cotTrab:  8.3, cotEmp:  5.9 },
+  { pais: 'Eslovenia',           code: 'SI', total: 45.3, irpf: 10.4, cotTrab: 20.6, cotEmp: 14.2 },
+  { pais: 'Polonia',             code: 'PL', total: 35.0, irpf:  5.7, cotTrab: 15.3, cotEmp: 14.0 },
+  { pais: 'Grecia',              code: 'GR', total: 39.3, irpf: 10.5, cotTrab: 11.0, cotEmp: 17.9 },
+  { pais: 'Chequia',             code: 'CZ', total: 41.2, irpf:  7.3, cotTrab:  8.7, cotEmp: 25.3 },
+  { pais: 'Estonia',             code: 'EE', total: 42.6, irpf: 16.2, cotTrab:  1.2, cotEmp: 25.3 },
+  { pais: 'Lituania',            code: 'LT', total: 39.8, irpf: 18.9, cotTrab: 19.2, cotEmp:  1.8 },
+  { pais: 'Portugal',            code: 'PT', total: 39.3, irpf: 11.3, cotTrab:  8.9, cotEmp: 19.2 },
+  { pais: 'Nueva Zelanda',       code: 'NZ', total: 20.8, irpf: 20.8, cotTrab:  0.0, cotEmp:  0.0 },
+  { pais: 'Letonia',             code: 'LV', total: 40.1, irpf: 12.5, cotTrab:  8.5, cotEmp: 19.1 },
+  { pais: 'Hungría',             code: 'HU', total: 41.2, irpf: 13.3, cotTrab: 16.4, cotEmp: 11.5 },
+  { pais: 'República Eslovaca',  code: 'SK', total: 42.7, irpf:  8.2, cotTrab: 10.1, cotEmp: 24.4 },
+  { pais: 'Costa Rica',          code: 'CR', total: 27.7, irpf:  0.0, cotTrab:  7.9, cotEmp: 19.8 },
+  { pais: 'Chile',               code: 'CL', total:  7.5, irpf:  0.1, cotTrab:  7.0, cotEmp:  0.4 },
+  { pais: 'México',              code: 'MX', total: 21.7, irpf: 10.6, cotTrab:  1.3, cotEmp:  9.8 },
+  { pais: 'Colombia',            code: 'CO', total:  0.0, irpf:  0.0, cotTrab:  0.0, cotEmp:  0.0 },
+  { pais: 'Media OCDE',          code: 'OECD', total: 35.1, irpf: 13.4, cotTrab: 8.1, cotEmp: 13.5, media: true },
 ];
+
+// Tabla 1.3: carga que afronta directamente el trabajador sobre salario bruto.
+export const CARGA_PERSONAL_OCDE_2025 = Object.freeze({
+  espana: { total: 23.5, irpf: 17.1, cotTrab: 6.5 },
+  mediaOCDE: { total: 25.1, irpf: 15.5, cotTrab: 9.6 },
+});
 
 // ── Deuda pública española (Banco de España / PDE + INE) ─────────────────────
 export const DEUDA_ESPANA = {
