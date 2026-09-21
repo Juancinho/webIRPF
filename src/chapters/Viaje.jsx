@@ -5,7 +5,7 @@ import Figure from '../figures/Figure';
 import ChartFrame from '../figures/ChartFrame';
 import { TickStrip, Label, Leader } from '../figures/marks';
 import { rnd, round } from '../figures/scale';
-import { eur, pct } from '../utils/format';
+import { eur, num, pct } from '../utils/format';
 
 const W = 900;
 const H = 470;
@@ -225,8 +225,8 @@ export default function Viaje() {
       </div>
 
       <div className="fs-page">
-        <p className="fs-statement" style={{ marginTop: 40, maxWidth: '16ch' }}>
-          {eur(nomina.cotEmp)}
+        <p className="fs-statement fs-statement-rule fs-statement-neg" style={{ marginTop: 40, maxWidth: '16ch' }}>
+          {num(nomina.cotEmp)} <span className="fs-u fs-u-neg">€</span>
         </p>
         <p className="fs-title-sm" style={{ marginTop: 16, maxWidth: '22ch' }}>
           nunca aparecen

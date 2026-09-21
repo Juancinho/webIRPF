@@ -56,7 +56,9 @@ export default function Portada() {
 
           <div>
             <p className="fs-label" style={{ marginBottom: 6 }}>Salario bruto anual</p>
-            <p className="fs-data" style={{ margin: 0 }}>{num(bruto)} €</p>
+            <p className="fs-data" style={{ margin: 0 }}>
+              {num(bruto)} <span className="fs-u">€</span>
+            </p>
 
             <Regla
               bruto={bruto}

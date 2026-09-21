@@ -19,12 +19,12 @@ import { eur, pct, sign } from '../utils/format';
 
 /**
  * 04 · QUINCE AÑOS DE FISCALIDAD
- * FIG. 10 the same real salary year by year · FIG. 11 the ranking of eras ·
- * FIG. 12 the two-year comparator · FIG. 13 the atlas · FIG. 14 cold
- * progressivity · FIG. 15 the art. 20 rewritten six times.
+ * FIG. 10 los quince años, en serie o en clasificación · FIG. 11 el comparador
+ * de dos años · FIG. 12 el atlas · FIG. 13 la progresividad fría ·
+ * FIG. 14 el art. 20 reescrito seis veces.
  */
 export default function Historia() {
-  const { bruto, anio, opts, setAnio } = useFiscal();
+  const { bruto, anio, opts, setAnio, setBruto } = useFiscal();
 
   const bruto2026 = useMemo(
     () => Math.round(bruto * (INFLACION_A_2026[anio] || 1)),
@@ -46,6 +46,20 @@ export default function Historia() {
         };
       }),
     [bruto2026, opts]
+  );
+
+  /* Elegir un año en la FIG. 10 cambiaba el ancla de la comparación: el bruto
+     se interpreta en euros del año seleccionado, así que al cambiar de año
+     cambiaba el poder adquisitivo y con él TODAS las cifras de la figura. Aquí
+     el año se elige conservando el poder adquisitivo: el bruto nominal se
+     reexpresa en euros de ese año, y la figura se queda quieta. */
+  const elegirAnio = useCallback(
+    a => {
+      const inf = INFLACION_A_2026[a] || 1;
+      setBruto(Math.round(bruto2026 / inf));
+      setAnio(a);
+    },
+    [bruto2026, setAnio, setBruto]
   );
 
   const mejor = serie.reduce((a, c) => (c.neto > a.neto ? c : a), serie[0]);
@@ -108,7 +122,9 @@ export default function Historia() {
 
             {Math.abs(dif) > 1 && (
               <>
-                <p className="fs-statement" style={{ maxWidth: '12ch' }}>{sign(dif)}</p>
+                <p className="fs-statement fs-statement-rule fs-signal" style={{ maxWidth: '12ch' }}>
+                  {sign(dif)}
+                </p>
                 <p className="fs-body" style={{ marginTop: 14, marginBottom: 40 }}>
                   Con el mismo poder adquisitivo, {mejor.anio} dejaba{' '}
                   <strong>{eur(mejor.neto)}</strong> netos reales y {hoy.anio} deja{' '}
@@ -118,11 +134,11 @@ export default function Historia() {
               </>
             )}
 
-            <Dumbbells serie={serie} anio={anio} mejor={mejor} setAnio={setAnio} bruto2026={bruto2026} />
+            <Dumbbells serie={serie} anio={anio} mejor={mejor} elegirAnio={elegirAnio} bruto2026={bruto2026} />
 
             <Epocas bruto2026={bruto2026} />
 
-            <Atlas anio={anio} bruto2026={bruto2026} setAnio={setAnio} />
+            <Atlas anio={anio} bruto2026={bruto2026} elegirAnio={elegirAnio} />
 
             <ProgresividadFria />
 
@@ -135,45 +151,131 @@ export default function Historia() {
   );
 }
 
-/* ── FIG. 08 ─────────────────────────────────────────────────────────────── */
-function Dumbbells({ serie, anio, mejor, setAnio, bruto2026 }) {
-  const W = 860;
-  const rowH = 26;
-  const H = serie.length * rowH + 52;
-  const X0 = 64;
-  const X1 = W - 150;
+/* ── FIG. 10 ─────────────────────────────────────────────────────────────── */
+/**
+ * La misma capacidad de compra, pasada por quince fiscalidades.
+ *
+ * Antes esto eran dos figuras con los mismos datos —una en orden cronológico y
+ * otra ordenada por neto— y nadie sabía en qué se diferenciaban. Es una sola,
+ * con un interruptor de orden: la serie responde «¿cómo ha ido cambiando?» y la
+ * clasificación «¿cuál fue el mejor año?», que son dos preguntas, no dos
+ * gráficos.
+ *
+ * Lo que se mide es la **distancia a hoy**: todas las barras salen de la misma
+ * vertical, el neto del último año. Elegir un año conserva el poder adquisitivo
+ * (`elegirAnio`), así que las cifras no se mueven al cambiar de año.
+ */
+function Dumbbells({ serie, anio, mejor, elegirAnio, bruto2026 }) {
+  const [orden, setOrden] = useState('cronologico');
+  const [hover, setHover] = useState(null);
+  const [tip, setTip] = useState(null);
 
-  const lo = Math.min(...serie.map(s => s.neto));
-  const hi = Math.max(...serie.map(s => s.neto));
-  const pad = Math.max(200, (hi - lo) * 0.18);
-  const x = linear([lo - pad, hi + pad], [X0, X1]);
+  const W = 880;
+  const rowH = 30;
+  const H = serie.length * rowH + 76;
+  const X0 = 78;
+  const X1 = W - 366;
+
   const ref = serie[serie.length - 1].neto;
-  const BEAD = 25; // one bead = 25 € of real difference
+  const difs = serie.map(s => s.neto - ref);
+  const lo = Math.min(0, ...difs);
+  const hiDif = Math.max(0, ...difs);
+  const aire = Math.max(hiDif - lo, 1) * 0.12;
+  const x = linear([lo - aire, hiDif + aire], [X0, X1]);
+  const cero = x(0);
+
+  const filas = orden === 'ranking' ? [...serie].sort((p, q) => q.neto - p.neto) : serie;
+  const peor = [...serie].sort((p, q) => p.neto - q.neto)[0];
+  const activo = serie.find(s => s.anio === (hover ?? anio)) || serie[serie.length - 1];
+
+  const COL_NETO = W - 300;
+  const COL_DIF = W - 208;
+  const COL_IRPF = W - 104;
+  const COL_CUNA = W - 2;
 
   return (
     <Figure
       id="10"
-      title={`Mismo poder adquisitivo, ${serie.length} fiscalidades distintas`}
-      sub={`${eur(bruto2026)} constantes de 2026 · neto real de cada año · perfil seleccionado`}
-      legend={`Una cuenta = ${eur(BEAD)} reales de diferencia frente a ${serie[serie.length - 1].anio} · círculo hueco = ese año · círculo lleno = hoy`}
+      title={
+        orden === 'ranking'
+          ? `Con este poder adquisitivo, tu mejor año fue ${mejor.anio} y el peor ${peor.anio}`
+          : `Mismo poder adquisitivo, ${serie.length} fiscalidades distintas`
+      }
+      sub={`${eur(bruto2026)} constantes de 2026 · cada barra mide lo que ese año dejaba de más o de menos que ${serie[serie.length - 1].anio} · pulsa un año para llevar la publicación a él`}
+      legend={`La vertical es el neto de ${serie[serie.length - 1].anio} · a la derecha, años que dejaban más · a la izquierda, años que dejaban menos · las dos últimas columnas son el tipo efectivo de IRPF y la cuña fiscal`}
       source="Fuente · cálculo propio · IPC INE"
+      note="Al elegir un año se mantiene tu poder adquisitivo: el bruto se reexpresa en euros de ese año, por eso las cifras de esta figura no se mueven al cambiar de año."
       summary={serie.map(s => `${s.anio}: ${eur(s.neto)}`).join('; ')}
     >
-      <ChartFrame viewBox={`0 0 ${W} ${H}`} scroll>
-        {serie.map((s, i) => {
-          const y = 18 + i * rowH;
-          const xs = x(s.neto);
-          const xr = x(ref);
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 14, alignItems: 'center' }}>
+        <span className="fs-seg">
+          <button type="button" aria-pressed={orden === 'cronologico'} onClick={() => setOrden('cronologico')}>
+            Cronológico
+          </button>
+          <button type="button" aria-pressed={orden === 'ranking'} onClick={() => setOrden('ranking')}>
+            Por neto real
+          </button>
+        </span>
+        <span className="fs-note" style={{ margin: 0 }}>
+          {orden === 'ranking' ? '¿Cuál fue el mejor año?' : '¿Cómo ha ido cambiando?'}
+        </span>
+      </div>
+
+      <div className="fs-readout">
+        <span>
+          <span className="fs-readout-k">Año {activo.anio}</span>
+          <span className="fs-readout-v">{eur(activo.neto)} netos reales</span>
+        </span>
+        <span>
+          <span className="fs-readout-k">IRPF efectivo</span>
+          <span className="fs-readout-v">{pct(activo.efectivo)}</span>
+        </span>
+        <span>
+          <span className="fs-readout-k">Cuña fiscal</span>
+          <span className="fs-readout-v">{pct(activo.cuna)}</span>
+        </span>
+        <span>
+          <span className="fs-readout-k">Frente a {mejor.anio}</span>
+          <span className="fs-readout-v fs-signal">{sign(activo.neto - mejor.neto)}</span>
+        </span>
+      </div>
+
+      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} scroll>
+        {/* cabeceras de las columnas numéricas */}
+        <Label x={COL_NETO} y={20} size={8.5} color="var(--ink-5)" anchor="end" mono>NETO REAL</Label>
+        <Label x={COL_DIF} y={20} size={8.5} color="var(--ink-5)" anchor="end" mono>VS. HOY</Label>
+        <Label x={COL_IRPF} y={20} size={8.5} color="var(--ink-5)" anchor="end" mono>IRPF EF.</Label>
+        <Label x={COL_CUNA} y={20} size={8.5} color="var(--ink-5)" anchor="end" mono>CUÑA</Label>
+
+        {/* la vertical de referencia: el neto de hoy */}
+        <line x1={round(cero)} y1={34} x2={round(cero)} y2={H - 40} stroke="var(--ink)" strokeWidth={1} />
+        <Label x={round(cero)} y={28} size={9} color="var(--ink-4)" anchor="middle" mono>
+          NETO DE {serie[serie.length - 1].anio}
+        </Label>
+
+        {filas.map((s, i) => {
+          const y = 50 + i * rowH;
+          const dif = s.neto - ref;
+          const xs = x(dif);
           const esSel = s.anio === anio;
+          const esHover = hover === s.anio;
           const esMejor = s.anio === mejor.anio;
-          const nBeads = Math.min(26, Math.round(Math.abs(s.neto - ref) / BEAD));
+          const esHoy = s.anio === serie[serie.length - 1].anio;
+          const apagado = hover && !esHover && !esSel;
+          const color = esSel ? 'var(--signal)' : esHover ? 'var(--ink)' : dif >= 0 ? 'var(--ink-2)' : 'var(--ink-4)';
           return (
-            <g key={s.anio} onMouseEnter={() => undefined}>
-              <line x1={X0 - 8} y1={y} x2={X1 + 8} y2={y} stroke="var(--ink-7)" strokeWidth={0.7} />
+            <g key={s.anio} className="fs-group" opacity={apagado ? 0.45 : 1}>
+              <line x1={X0} y1={y + 11} x2={COL_CUNA} y2={y + 11} stroke="var(--ink-7)" strokeWidth={0.6} />
+
+              {orden === 'ranking' && (
+                <Label x={X0 - 42} y={y + 4} size={8.5} color="var(--ink-5)" anchor="end" mono>
+                  {i + 1}.º
+                </Label>
+              )}
               <text
-                x={X0 - 16}
-                y={y + 3.5}
-                fontSize={10}
+                x={X0 - 12}
+                y={y + 4}
+                fontSize={10.5}
                 fontWeight={esSel ? 800 : 600}
                 textAnchor="end"
                 fill={esSel ? 'var(--signal)' : 'var(--ink-4)'}
@@ -182,41 +284,36 @@ function Dumbbells({ serie, anio, mejor, setAnio, bruto2026 }) {
                 {s.anio}
               </text>
 
-              {Array.from({ length: nBeads }, (_, k) => {
-                const t = (k + 0.5) / nBeads;
-                return (
-                  <circle
-                    key={k}
-                    cx={round(xr + t * (xs - xr))}
-                    cy={y}
-                    r={1.5}
-                    fill="var(--ink-5)"
-                    opacity={0.8}
-                  />
-                );
-              })}
+              {!esHoy && (
+                <rect
+                  x={round(Math.min(cero, xs))}
+                  y={y - 5}
+                  width={round(Math.max(1.5, Math.abs(xs - cero)))}
+                  height={11}
+                  fill={color}
+                  rx={1}
+                />
+              )}
+              {esHoy && <circle cx={round(cero)} cy={y} r={4} fill="var(--signal)" />}
 
-              <circle
-                cx={round(xs)}
-                cy={y}
-                r={esSel ? 5 : 4}
-                fill={s.anio === 2026 ? 'var(--ink)' : esSel ? 'var(--signal)' : 'var(--bone)'}
-                stroke={esSel ? 'var(--signal)' : 'var(--ink)'}
-                strokeWidth={1.2}
-              />
-
-              <text
-                x={X1 + 20}
-                y={y + 3.5}
-                fontSize={11}
-                fontWeight={esSel || esMejor ? 800 : 500}
-                fill={esSel ? 'var(--signal)' : 'var(--ink-2)'}
-                className="num"
-              >
+              <text x={COL_NETO} y={y + 4} fontSize={12} fontWeight={esSel || esMejor ? 800 : 500}
+                textAnchor="end" fill={esSel ? 'var(--signal)' : 'var(--ink-2)'} className="num">
                 {eur(s.neto)}
               </text>
+              {!esHoy && (
+                <text x={COL_DIF} y={y + 4} fontSize={10.5} fontWeight={600} textAnchor="end"
+                  fill={dif >= 0 ? 'var(--ink-3)' : 'var(--counter)'} className="num">
+                  {sign(dif)}
+                </text>
+              )}
+              <text x={COL_IRPF} y={y + 4} fontSize={10} textAnchor="end" fill="var(--ink-4)" className="num">
+                {pct(s.efectivo)}
+              </text>
+              <text x={COL_CUNA} y={y + 4} fontSize={10} textAnchor="end" fill="var(--ink-4)" className="num">
+                {pct(s.cuna)}
+              </text>
               {esMejor && (
-                <text x={X1 + 96} y={y + 3.5} fontSize={8.5} fill="var(--ink-4)" className="fs-t-stamp">
+                <text x={COL_DIF} y={y - 8} fontSize={8} textAnchor="end" fill="var(--ink-4)" className="fs-t-stamp">
                   MÁXIMO
                 </text>
               )}
@@ -227,27 +324,51 @@ function Dumbbells({ serie, anio, mejor, setAnio, bruto2026 }) {
                 y={y - rowH / 2}
                 width={W}
                 height={rowH}
-                onClick={() => setAnio(s.anio)}
+                onMouseEnter={() => {
+                  setHover(s.anio);
+                  setTip({
+                    vx: Math.max(cero, xs),
+                    vy: y,
+                    title: String(s.anio),
+                    sub: `${eur(s.neto)} netos reales`,
+                    rows: [
+                      ['Frente a hoy', sign(dif), dif >= 0 ? 'var(--ink)' : 'var(--counter)'],
+                      ['Bruto equivalente', eur(s.nominal)],
+                      ['IRPF efectivo', pct(s.efectivo)],
+                      ['Cuña fiscal', pct(s.cuna)],
+                    ],
+                  });
+                }}
+                onMouseLeave={() => { setHover(null); setTip(null); }}
+                onClick={() => elegirAnio(s.anio)}
+                style={{ cursor: 'pointer' }}
               >
-                <title>{`${s.anio} — ${eur(s.neto)} netos reales`}</title>
+                <title>{`${s.anio} — ${eur(s.neto)} netos reales (${sign(dif)} frente a hoy). Pulsa para leer el informe con la fiscalidad de ${s.anio}.`}</title>
               </rect>
             </g>
           );
         })}
 
-        <Label x={X0 - 16} y={H - 14} size={9} color="var(--ink-5)" anchor="end" mono>
-          MENOS
-        </Label>
-        <Label x={X1 + 8} y={H - 14} size={9} color="var(--ink-5)" anchor="end" mono>
-          MÁS NETO REAL →
+        {lo < 0 && (
+          <Label x={X0} y={H - 16} size={9} color="var(--ink-5)" mono>
+            ← MENOS NETO REAL QUE HOY
+          </Label>
+        )}
+        <Label x={X1} y={H - 16} size={9} color="var(--ink-5)" anchor="end" mono>
+          MÁS NETO REAL QUE HOY →
         </Label>
       </ChartFrame>
+
+      <p className="fs-note" style={{ marginTop: 12, maxWidth: '72ch' }}>
+        Pulsa cualquier año para leer el resto del informe con su fiscalidad. Tu poder adquisitivo
+        se mantiene: {eur(bruto2026)} de 2026 equivalen a {eur(serie[0].nominal)} de {serie[0].anio}.
+      </p>
     </Figure>
   );
 }
 
-/* ── FIG. 09 ─────────────────────────────────────────────────────────────── */
-function Atlas({ anio, bruto2026, setAnio }) {
+/* ── FIG. 12 · el atlas ─────────────────────────────────────────────────────────────── */
+function Atlas({ anio, bruto2026, elegirAnio }) {
   const [activos, setActivos] = useState(() => new Set([2012, 2015, 2019, 2023, 2026]));
   const [modo, setModo] = useState('real');
   const [medida, setMedida] = useState('neto');
@@ -270,7 +391,7 @@ function Atlas({ anio, bruto2026, setAnio }) {
 
   const W = 880;
   const H = 400;
-  const X0 = 20;
+  const X0 = 62;
   const X1 = W - 92;
   const Y0 = 20;
   const Y1 = H - 46;
@@ -280,10 +401,12 @@ function Atlas({ anio, bruto2026, setAnio }) {
   const x = linear(zoom.domain, [X0, X1]);
   const clip = useId().replace(/:/g, '');
 
+  // el eje de valores arranca siempre en cero: recortarlo exagera las
+  // diferencias entre años. Y se le deja aire arriba, para que la marca
+  // superior no quede pegada al borde ni encima de las curvas.
   const todos = ANIOS.flatMap(a => datos.map(d => d[`${key}_${a}`]));
-  const lo = medida === 'neto' ? Math.min(...todos) : 0;
-  const hi = Math.max(...todos);
-  const y = linear([lo, hi], [Y1, Y0]);
+  const hi = Math.max(...todos) * 1.16;
+  const y = linear([0, hi], [Y1, Y0]);
 
   const path = a => polyline(datos.map(d => [x(d.bruto), y(d[`${key}_${a}`])]));
   const ultimo = a => datos[datos.length - 1][`${key}_${a}`];
@@ -314,6 +437,19 @@ function Atlas({ anio, bruto2026, setAnio }) {
 
   const marcado = Math.min(Math.max(bruto2026, xs[0]), xs[xs.length - 1]);
 
+  /* Los años visibles terminan casi a la misma altura, así que sus rótulos se
+     pisaban. Se ordenan por valor y se separan un mínimo de píxeles, con un
+     hilo que devuelve cada rótulo a su curva. */
+  const etiquetas = ANIOS.filter(a => activos.has(a) || a === anio)
+    .map(a => ({ a, v: ultimo(a), y: y(ultimo(a)) + 3.5 }))
+    .sort((p, q) => p.y - q.y)
+    .reduce((acc, e) => {
+      const prev = acc[acc.length - 1];
+      const min = prev ? prev.y + 13 : Y0 + 4;
+      acc.push({ ...e, y: Math.max(e.y, min) });
+      return acc;
+    }, []);
+
   const onMove = e => {
     const svg = e.currentTarget.ownerSVGElement;
     const r = svg.getBoundingClientRect();
@@ -335,7 +471,7 @@ function Atlas({ anio, bruto2026, setAnio }) {
 
   return (
     <Figure
-      id="13"
+      id="12"
       title={
         medida === 'neto'
           ? 'El neto real por nivel de renta, año a año'
@@ -378,17 +514,14 @@ function Atlas({ anio, bruto2026, setAnio }) {
             <rect x={X0} y={Y0 - 12} width={X1 - X0} height={Y1 - Y0 + 14} />
           </clipPath>
         </defs>
-        {[0, 0.25, 0.5, 0.75, 1].map(t => {
-          const v = lo + (hi - lo) * t;
-          return (
-            <g key={t}>
-              <line x1={X0} y1={y(v)} x2={X1} y2={y(v)} stroke="var(--ink-7)" strokeWidth={0.6} />
-              <Label x={X0} y={y(v) - 5} size={9} color="var(--ink-5)" mono>
-                {medida === 'neto' ? eur(v) : pct(v, 0)}
-              </Label>
-            </g>
-          );
-        })}
+        {ticks(0, hi, 5).map(v => (
+          <g key={v}>
+            <line x1={X0} y1={round(y(v))} x2={X1} y2={round(y(v))} stroke="var(--ink-7)" strokeWidth={0.6} />
+            <Label x={X0 - 8} y={round(y(v)) + 3} size={9} color="var(--ink-5)" anchor="end" mono>
+              {medida === 'neto' ? eur(v) : pct(v, 0)}
+            </Label>
+          </g>
+        ))}
 
         <g clipPath={`url(#${clip})`}>
           {ANIOS.map(a => {
@@ -412,18 +545,31 @@ function Atlas({ anio, bruto2026, setAnio }) {
           {tip && <line className="fs-crosshair" x1={round(tip.vx)} y1={Y0 - 4} x2={round(tip.vx)} y2={Y1} />}
         </g>
 
-        {/* etiquetas directas al margen, fuera del recorte */}
-        {ANIOS.filter(a => activos.has(a) || a === anio).map(a => (
-          <Label key={a} x={X1 + 8} y={round(y(ultimo(a))) + 3.5} size={10} weight={a === anio ? 800 : 700} color={a === anio ? 'var(--signal)' : 'var(--ink-4)'} mono>
-            {a}
-          </Label>
+        {/* etiquetas directas al margen, separadas para que no se pisen */}
+        {etiquetas.map(e => (
+          <g key={e.a}>
+            {Math.abs(e.y - 3.5 - y(e.v)) > 2 && (
+              <line
+                x1={X1 + 1}
+                y1={round(y(e.v))}
+                x2={X1 + 6}
+                y2={round(e.y - 3.5)}
+                stroke="var(--ink-6)"
+                strokeWidth={0.6}
+                strokeDasharray="1.5 2"
+              />
+            )}
+            <Label x={X1 + 9} y={round(e.y)} size={10} weight={e.a === anio ? 800 : 700} color={e.a === anio ? 'var(--signal)' : 'var(--ink-4)'} mono>
+              {e.a}
+            </Label>
+          </g>
         ))}
 
         <Label x={round(x(marcado))} y={Y0 - 8} size={9} color="var(--counter)" anchor="middle" mono>
           TU SALARIO
         </Label>
 
-        {ticks(zoom.domain[0], zoom.domain[1], 5).map(v => (
+        {ticks(zoom.domain[0], zoom.domain[1], 6).map(v => (
           <g key={v}>
             <line x1={round(x(v))} y1={Y1} x2={round(x(v))} y2={Y1 + 5} stroke="var(--ink-5)" strokeWidth={0.7} />
             <Label x={round(x(v))} y={Y1 + 20} size={9.5} color="var(--ink-4)" anchor="middle" mono>
@@ -453,7 +599,7 @@ function Atlas({ anio, bruto2026, setAnio }) {
             style={{ padding: '5px 9px', minHeight: 30, fontSize: 10.5 }}
             aria-pressed={activos.has(a)}
             onClick={() => toggle(a)}
-            onDoubleClick={() => setAnio(a)}
+            onDoubleClick={() => elegirAnio(a)}
           >
             {a}
           </button>

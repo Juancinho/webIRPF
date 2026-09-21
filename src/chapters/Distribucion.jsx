@@ -18,7 +18,7 @@ import { eur, sign } from '../utils/format';
 const MAX_S = 90000;
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   FIG. 18 — LA CURVA DE LA DISTRIBUCIÓN
+   FIG. 17 — LA CURVA DE LA DISTRIBUCIÓN
    Where everyone is, and where you are inside that. Two years can be laid on
    top of each other so the whole shape can be compared, not just the median.
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -84,7 +84,7 @@ export function CurvaDistribucion() {
 
   return (
     <Figure
-      id="18"
+      id="17"
       title={`La mitad de los asalariados cobra menos de ${eur(dist.p50)}`}
       sub={`${anio} frente a ${comparar} · distribución estimada de la ganancia bruta anual · euros corrientes de cada año`}
       legend="El área es la densidad de trabajadores en cada nivel de salario · la marca de petróleo eres tú"
@@ -196,7 +196,7 @@ export function CurvaDistribucion() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   FIG. 19 — LOS PERCENTILES
+   FIG. 18 — LOS PERCENTILES
    The published numbers themselves, countable, with your salary cutting across.
    ═══════════════════════════════════════════════════════════════════════════ */
 export function Percentiles() {
@@ -223,7 +223,7 @@ export function Percentiles() {
 
   return (
     <Figure
-      id="19"
+      id="18"
       title={`Tu salario supera al ${Math.round(percentil)} % de los asalariados`}
       sub={`${anio} · percentiles publicados de la ganancia bruta anual · una marca = ${eur(UNIT)}`}
       legend={`Una marca = ${eur(UNIT)} · la línea vertical de petróleo es tu salario`}
@@ -279,7 +279,7 @@ export function Percentiles() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   FIG. 21 — LA DISTRIBUCIÓN A LO LARGO DEL TIEMPO
+   FIG. 20 — LA DISTRIBUCIÓN A LO LARGO DEL TIEMPO
    The whole spread moving year by year, not just the median: the band between
    P10 and P90, the quartiles inside it, and where you sit in each year.
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -335,7 +335,7 @@ export function EvolucionDistribucion() {
 
   return (
     <Figure
-      id="21"
+      id="20"
       title={
         real
           ? `En euros de hoy, la mediana salarial ha pasado de ${eur(primero.p50)} a ${eur(ultimo.p50)}`

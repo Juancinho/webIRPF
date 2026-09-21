@@ -2,16 +2,15 @@ import { useMemo, useState } from 'react';
 import { useFiscal } from '../state/fiscalContext';
 import { ANIOS, INFLACION_A_2026, calcularNomina, calcularTipoMarginal } from '../engine/irpf';
 import Figure from '../figures/Figure';
-import ChartFrame from '../figures/ChartFrame';
-import { Label } from '../figures/marks';
-import { linear, round } from '../figures/scale';
 import { eur, pct, sign } from '../utils/format';
 
 /**
  * ¿En qué época estabas mejor?
- * The same purchasing power run through fifteen tax systems, ranked, plus a
- * head-to-head comparator for any two years. Clicking a year anywhere here
- * moves the whole publication to it.
+ *
+ * La clasificación de los quince años vive ahora en la FIG. 10, junto a la
+ * serie cronológica y bajo el mismo interruptor de orden: eran los mismos
+ * datos dibujados dos veces. Aquí queda lo que aquella figura no hacía —
+ * comparar dos años concretos, línea a línea.
  */
 export default function Epocas({ bruto2026 }) {
   const { anio, opts, setAnio } = useFiscal();
@@ -38,146 +37,7 @@ export default function Epocas({ bruto2026 }) {
     [bruto2026, opts]
   );
 
-  const porNeto = [...serie].sort((a, b) => b.neto - a.neto);
-  const mejor = porNeto[0];
-  const peor = porNeto[porNeto.length - 1];
-
-  return (
-    <>
-      <Ranking serie={serie} orden={porNeto} anio={anio} setAnio={setAnio} bruto2026={bruto2026} mejor={mejor} peor={peor} />
-      <Comparador serie={serie} anioActual={anio} bruto2026={bruto2026} setAnio={setAnio} />
-    </>
-  );
-}
-
-/* ── ranked years ─────────────────────────────────────────────────────────── */
-function Ranking({ serie, orden, anio, setAnio, bruto2026, mejor, peor }) {
-  const [hover, setHover] = useState(null);
-  const [tip, setTip] = useState(null);
-
-  const W = 880;
-  const rowH = 30;
-  const H = orden.length * rowH + 58;
-  const X0 = 104;
-  const X1 = W - 232;
-
-  const lo = peor.neto;
-  const hi = mejor.neto;
-  const span = Math.max(1, hi - lo);
-  const x = linear([lo - span * 0.35, hi + span * 0.08], [X0, X1]);
-
-  const activo = serie.find(s => s.anio === (hover ?? anio)) || serie[serie.length - 1];
-
-  return (
-    <Figure
-      id="11"
-      title={`Con este poder adquisitivo, tu mejor año fue ${mejor.anio} y el peor ${peor.anio}`}
-      sub={`${eur(bruto2026)} constantes de 2026 · años ordenados por lo que te habrían dejado neto en euros de hoy · pulsa un año para llevar toda la publicación a él`}
-      legend="Barra = neto real de ese año · el año en curso va en petróleo · las dos columnas de la derecha son el tipo efectivo de IRPF y la cuña fiscal"
-      source="Fuente · cálculo propio · IPC INE"
-      summary={orden.map((s, i) => `${i + 1}. ${s.anio}: ${eur(s.neto)}`).join('; ')}
-    >
-      <div className="fs-readout">
-        <span>
-          <span className="fs-readout-k">Año {activo.anio}</span>
-          <span className="fs-readout-v">{eur(activo.neto)} netos reales</span>
-        </span>
-        <span>
-          <span className="fs-readout-k">IRPF efectivo</span>
-          <span className="fs-readout-v">{pct(activo.efectivo)}</span>
-        </span>
-        <span>
-          <span className="fs-readout-k">Cuña fiscal</span>
-          <span className="fs-readout-v">{pct(activo.cuna)}</span>
-        </span>
-        <span>
-          <span className="fs-readout-k">Frente a {mejor.anio}</span>
-          <span className="fs-readout-v fs-signal">{sign(activo.neto - mejor.neto)}</span>
-        </span>
-      </div>
-
-      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} scroll label="Años ordenados por neto real">
-        {orden.map((s, i) => {
-          const y = 22 + i * rowH;
-          const esSel = s.anio === anio;
-          const esHover = hover === s.anio;
-          const ancho = Math.max(0, x(s.neto) - X0);
-          const color = esSel ? 'var(--signal)' : esHover ? 'var(--ink)' : 'var(--ink-3)';
-          return (
-            <g key={s.anio} opacity={hover && !esHover && !esSel ? 0.45 : 1}>
-              <Label x={X0 - 14} y={y + 4} size={11} weight={esSel ? 800 : 600} color={color} anchor="end" mono>
-                {s.anio}
-              </Label>
-              <Label x={X0 - 62} y={y + 4} size={9} color="var(--ink-5)" anchor="end" mono>
-                {i + 1}.º
-              </Label>
-
-              <rect
-                x={X0}
-                y={y - 8}
-                width={round(ancho)}
-                height={16}
-                rx={2}
-                fill={color}
-                opacity={esSel || esHover ? 1 : 0.88}
-              />
-
-              <Label x={x(s.neto) + 10} y={y + 4} size={11.5} weight={esSel ? 800 : 600} color={color}>
-                {eur(s.neto)}
-              </Label>
-              <Label x={X1 + 96} y={y + 4} size={10} color="var(--ink-4)" anchor="end">
-                {pct(s.efectivo)}
-              </Label>
-              <Label x={X1 + 152} y={y + 4} size={10} color="var(--ink-4)" anchor="end">
-                {pct(s.cuna)}
-              </Label>
-
-              <rect
-                className="fs-hit"
-                x={0}
-                y={y - rowH / 2}
-                width={W}
-                height={rowH}
-                onMouseEnter={() => {
-                  setHover(s.anio);
-                  setTip({
-                    vx: x(s.neto),
-                    vy: y,
-                    title: String(s.anio),
-                    sub: 'Puesto ' + (i + 1) + ' de ' + orden.length,
-                    rows: [
-                      ['Neto real', eur(s.neto), 'var(--signal)'],
-                      ['Bruto equivalente', eur(s.nominal)],
-                      ['IRPF efectivo', pct(s.efectivo)],
-                      ['Marginal total', pct(s.marginal)],
-                      ['Cuña fiscal', pct(s.cuna)],
-                    ],
-                  });
-                }}
-                onMouseLeave={() => { setHover(null); setTip(null); }}
-                onClick={() => setAnio(s.anio)}
-              >
-                <title>{`${s.anio} — ${eur(s.neto)} netos reales, IRPF efectivo ${pct(s.efectivo)}, cuña ${pct(s.cuna)}`}</title>
-              </rect>
-            </g>
-          );
-        })}
-
-        <Label x={X1 + 96} y={12} size={8.5} color="var(--ink-5)" anchor="end" mono>
-          IRPF EF.
-        </Label>
-        <Label x={X1 + 152} y={12} size={8.5} color="var(--ink-5)" anchor="end" mono>
-          CUÑA
-        </Label>
-        <Label x={X0} y={H - 16} size={9} color="var(--ink-5)" mono>
-          MENOS NETO REAL
-        </Label>
-        <Label x={X1} y={H - 16} size={9} color="var(--ink-5)" anchor="end" mono>
-          MÁS NETO REAL →
-        </Label>
-      </ChartFrame>
-    </Figure>
-  );
+  return <Comparador serie={serie} anioActual={anio} bruto2026={bruto2026} setAnio={setAnio} />;
 }
 
 /* ── head-to-head comparator ──────────────────────────────────────────────── */
@@ -203,7 +63,7 @@ function Comparador({ serie, anioActual, bruto2026, setAnio }) {
 
   return (
     <Figure
-      id="12"
+      id="11"
       title={`${a} frente a ${b}, con el mismo poder adquisitivo`}
       sub={`${eur(bruto2026)} constantes de 2026 pasados por la fiscalidad de cada año · elige los dos años que quieras comparar`}
       legend="Todas las cifras monetarias están en euros de 2026 para que sean comparables"

@@ -7,21 +7,20 @@ const BOE = 'https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764&p=20260321&tn
 const TGSS = 'https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/CotizacionRecaudacionTrabajadores/36537';
 
 /**
- * FIG. 03 — EL DESGLOSE COMPLETO.
+ * FIG. 03 — EL DESGLOSE COMPLETO, DIBUJADO COMO LO QUE ES: UNA CASCADA.
  *
- * The calculation is a chain, so the figure is drawn as one: a spine runs down
- * the whole ledger, the milestones (`hito`) sit on it as nodes, and every
- * operation hangs off the milestone it modifies. Each row carries a bar drawn
- * to the same scale — labour cost — so the size of every step is comparable at
- * a glance, and rows that are not cash (the taxable base, the personal
- * minimum) are drawn hollow so they can never be mistaken for a deduction.
+ * Cada bloque tiene un único carril de medida que ocupa todo el ancho de la
+ * figura, y cada fila dibuja su barra **donde le toca dentro de ese carril**:
+ * los hitos arrancan en cero y llegan a su importe; las restas flotan sobre el
+ * tramo que se llevan, entre el nivel nuevo y el anterior. Un hilo vertical une
+ * el final de una barra con el principio de la siguiente, así que la resta se
+ * lee como un descuento sobre lo que había, no como una barra suelta.
  */
 export default function Desglose() {
   const { bruto, anio, pagas, nomina, params, opts } = useFiscal();
   const [abierto, setAbierto] = useState('J');
 
   const esAutonomo = nomina.regimen === 'autonomo';
-  const escala = Math.max(nomina.costeLab, 1);
 
   const tramos = useMemo(() => {
     let prev = 0;
@@ -38,14 +37,17 @@ export default function Desglose() {
   }, [nomina.tramos, nomina.baseImponible]);
 
   const limiteActivo = nomina.limiteRetencion < nomina.cuotaSMI && nomina.cuotaSMI > 0;
+  const escalaCuota = Math.max(nomina.cuotaIntegra, nomina.minimoPersonalYFamiliar, 1);
 
   const bloques = [
     {
       titulo: 'Lo que cuesta tu puesto',
       intro: 'La nómina no empieza en tu bruto: empieza más arriba.',
+      escala: nomina.costeLab,
+      escalaLabel: 'coste laboral',
       filas: [
         {
-          tipo: 'hito', k: 'A', label: 'Coste laboral total', valor: nomina.costeLab,
+          flujo: 'total', tipo: 'hito', k: 'A', label: 'Coste laboral total', valor: nomina.costeLab,
           sub: 'Lo que tu empresa desembolsa por ti',
           formula: `${eur(bruto)} + ${eur(nomina.cotEmp)} = ${eur(nomina.costeLab)}`,
           texto: esAutonomo
@@ -54,7 +56,7 @@ export default function Desglose() {
           fuente: ['TGSS — Bases y tipos de cotización', TGSS],
         },
         {
-          tipo: 'op', k: 'B', label: esAutonomo ? 'Sin cotización patronal' : 'Cotización de la empresa',
+          flujo: 'resta', tipo: 'op', k: 'B', label: esAutonomo ? 'Sin cotización patronal' : 'Cotización de la empresa',
           valor: -nomina.cotEmp,
           sub: esAutonomo ? 'No aplica en el RETA' : `${pct(params.tipoEmp * 100, 2)} de la base de cotización`,
           formula: esAutonomo ? null : `mín(${eur(bruto)}, ${eur(params.baseMax)}) × ${pct(params.tipoEmp * 100, 2)} = ${eur(nomina.cotEmp)}`,
@@ -64,7 +66,7 @@ export default function Desglose() {
           fuente: ['TGSS — Cotización', TGSS],
         },
         {
-          tipo: 'hito', k: 'C', label: 'Salario bruto anual', valor: bruto,
+          flujo: 'total', tipo: 'hito', k: 'C', label: 'Salario bruto anual', valor: bruto,
           sub: 'La cifra de tu contrato',
           formula: `${eur(bruto)} ÷ 12 = ${eur(bruto / 12)} · ÷ 14 = ${eur(bruto / 14)}`,
           texto: 'Lo único que negocias y lo único que la mayoría llama «su sueldo». Todo lo que viene después se descuenta de aquí.',
@@ -74,9 +76,11 @@ export default function Desglose() {
     {
       titulo: 'Lo que se descuenta en la nómina',
       intro: 'La Seguridad Social se va antes que el IRPF.',
+      escala: nomina.costeLab,
+      escalaLabel: 'coste laboral',
       filas: [
         {
-          tipo: 'op', k: 'D', label: esAutonomo ? 'Cuota de autónomos' : 'Cotización del trabajador',
+          flujo: 'resta', tipo: 'op', k: 'D', label: esAutonomo ? 'Cuota de autónomos' : 'Cotización del trabajador',
           valor: -nomina.cotTra,
           sub: esAutonomo ? 'Según el tramo de rendimientos netos' : `${pct(params.tipoTra * 100, 2)} de la base de cotización`,
           formula: esAutonomo
@@ -88,7 +92,7 @@ export default function Desglose() {
           fuente: ['TGSS — Bases y tipos de cotización', TGSS],
         },
         {
-          tipo: 'hito', k: 'E', label: 'Rendimiento íntegro del trabajo', valor: nomina.rnPrevio,
+          flujo: 'total', tipo: 'hito', k: 'E', label: 'Rendimiento íntegro del trabajo', valor: nomina.rnPrevio,
           sub: 'El punto de partida del IRPF',
           formula: `${eur(bruto)} − ${eur(nomina.cotTra)} = ${eur(nomina.rnPrevio)}`,
           texto: 'Hacienda no grava lo que ya se ha ido en cotizaciones.',
@@ -99,9 +103,11 @@ export default function Desglose() {
     {
       titulo: 'Lo que Hacienda acaba gravando',
       intro: 'Dos restas que no son dinero que se vaya: reducen la cifra sobre la que se calcula el impuesto.',
+      escala: nomina.costeLab,
+      escalaLabel: 'coste laboral',
       filas: [
         {
-          tipo: 'op', k: 'F', label: 'Gastos deducibles del art. 19.2.f', valor: -nomina.gastosFijos,
+          flujo: 'resta', tipo: 'op', k: 'F', label: 'Gastos deducibles del art. 19.2.f', valor: -nomina.gastosFijos,
           sub: anio >= 2015 ? 'Los 2.000 € de «otros gastos»' : 'No existían antes de 2015',
           formula: anio >= 2015 ? `${eur(nomina.rnPrevio)} − ${eur(nomina.gastosFijos)}` : null,
           texto: anio >= 2015
@@ -110,8 +116,10 @@ export default function Desglose() {
           fuente: ['BOE — LIRPF art. 19.2.f', `${BOE}#a19`],
         },
         {
-          tipo: 'op', k: 'G', label: 'Reducción por rendimientos del trabajo', valor: -nomina.redTrabajo,
-          sub: 'Art. 20 — la palanca que protege a las rentas bajas',
+          flujo: 'resta', tipo: 'op', k: 'G', label: 'Reducción por rendimientos del trabajo', valor: -nomina.redTrabajo,
+          sub: nomina.redTrabajo > 0
+            ? 'Art. 20 — la palanca que protege a las rentas bajas'
+            : 'Art. 20 — agotada a tu nivel de renta',
           formula: typeof params.art20Meta.uInf === 'number'
             ? `Máxima ${eur(params.art20Meta.rMax)} hasta ${eur(params.art20Meta.uInf)} · cero desde ${eur(params.art20Meta.uSup)}`
             : 'Régimen transitorio: media entre la redacción de 2017 y la de 2019',
@@ -122,7 +130,7 @@ export default function Desglose() {
         },
         ...(nomina.reduccionConjunta > 0
           ? [{
-              tipo: 'op', k: 'G2', label: 'Reducción por tributación conjunta', valor: -nomina.reduccionConjunta,
+              flujo: 'resta', tipo: 'op', k: 'G2', label: 'Reducción por tributación conjunta', valor: -nomina.reduccionConjunta,
               sub: 'Unidad familiar',
               formula: `${eur(nomina.reduccionConjunta)}`,
               texto: 'Reducción adicional por declarar de forma conjunta, limitada al rendimiento neto disponible.',
@@ -130,7 +138,7 @@ export default function Desglose() {
             }]
           : []),
         {
-          tipo: 'hito', k: 'H', label: 'Base imponible', valor: nomina.baseImponible, hueco: true,
+          flujo: 'total', tipo: 'hito', k: 'H', label: 'Base imponible', valor: nomina.baseImponible, hueco: true,
           sub: 'No es dinero que se te descuente: es la cifra sobre la que se aplica la escala',
           formula: `${eur(nomina.rnPrevio)} − ${eur(nomina.gastosFijos)} − ${eur(nomina.redTrabajo)}${nomina.reduccionConjunta > 0 ? ` − ${eur(nomina.reduccionConjunta)}` : ''} = ${eur(nomina.baseImponible)}`,
           texto: `Queda ${eur(bruto - nomina.baseImponible)} por debajo de tu bruto. Se dibuja hueca porque no es una salida de dinero, sino la magnitud que se grava.`,
@@ -140,9 +148,13 @@ export default function Desglose() {
     {
       titulo: 'Lo que sale de aplicar la escala',
       intro: 'Aquí está la progresividad: cada tramo grava sólo la parte de base que cae dentro de él.',
+      // aquí las magnitudes son cuotas, un orden de magnitud menores: medirlas
+      // contra el coste laboral las dejaría en hilos invisibles y engañosos
+      escala: escalaCuota,
+      escalaLabel: 'cuota íntegra y mínimo',
       filas: [
         {
-          tipo: 'op', k: 'J', label: 'Cuota íntegra por tramos', valor: nomina.cuotaIntegra, suma: true,
+          flujo: 'total', tipo: 'op', k: 'J', label: 'Cuota íntegra por tramos', valor: nomina.cuotaIntegra, suma: true,
           sub: `${tramos.length} tramo${tramos.length > 1 ? 's' : ''} aplicados sobre ${eur(nomina.baseImponible)}`,
           formula: tramos.map(t => `${eur(t.dentro)} × ${pct(t.tipo * 100)}`).join('  +  ') + ` = ${eur(nomina.cuotaIntegra)}`,
           texto: 'Ningún tipo se aplica nunca a todo tu sueldo: sólo al tramo de base que le corresponde.',
@@ -159,7 +171,7 @@ export default function Desglose() {
           },
         },
         {
-          tipo: 'op', k: 'I', label: 'Mínimo personal y familiar', valor: nomina.minimoPersonalYFamiliar, hueco: true,
+          flujo: 'ref', tipo: 'op', k: 'I', label: 'Mínimo personal y familiar', valor: nomina.minimoPersonalYFamiliar, hueco: true,
           sub: 'La renta vital que no tributa — se convierte en cuota y se resta',
           formula: `${eur(nomina.minimoPersonal)} personal${nomina.minimoFamiliar > 0 ? ` + ${eur(nomina.minimoFamiliar)} familiar` : ''} = ${eur(nomina.minimoPersonalYFamiliar)}`,
           texto: `No se resta de la base: se le aplica la misma escala y la cuota resultante se descuenta después. Por eso todos se benefician de la misma cantidad, gane lo que gane cada uno.${opts.nHijos > 0 ? ` Tus ${opts.nHijos} hijo${opts.nHijos > 1 ? 's' : ''} a cargo aportan ${eur(nomina.minimoFamiliar)}.` : ''}`,
@@ -176,7 +188,7 @@ export default function Desglose() {
             : null,
         },
         {
-          tipo: 'op', k: 'K', label: 'Cuota del mínimo personal y familiar', valor: -nomina.cuotaMinimo,
+          flujo: 'resta', tipo: 'op', k: 'K', label: 'Cuota del mínimo personal y familiar', valor: -nomina.cuotaMinimo,
           sub: 'Se resta de la cuota, no de la base',
           formula: `${eur(nomina.cuotaIntegra)} − ${eur(nomina.cuotaMinimo)} = ${eur(nomina.cuotaTeorica)}`,
           texto: `La misma escala aplicada a ${eur(nomina.minimoPersonalYFamiliar)} produce ${eur(nomina.cuotaMinimo)}.`,
@@ -184,7 +196,7 @@ export default function Desglose() {
         },
         ...(nomina.deduccionSMI > 0
           ? [{
-              tipo: 'op', k: 'L', label: 'Deducción por rendimientos del trabajo', valor: -nomina.deduccionSMI,
+              flujo: 'resta', tipo: 'op', k: 'L', label: 'Deducción por rendimientos del trabajo', valor: -nomina.deduccionSMI,
               sub: 'El descuento extra para salarios próximos al SMI',
               formula: `${eur(nomina.cuotaTeorica)} − ${eur(nomina.deduccionSMI)} = ${eur(nomina.cuotaSMI)}`,
               texto: 'Deducción directa en cuota que se retira progresivamente a medida que el salario se aleja del mínimo interprofesional.',
@@ -196,7 +208,7 @@ export default function Desglose() {
           : []),
         ...(limiteActivo
           ? [{
-              tipo: 'op', k: 'M', label: 'Límite del 43 % de retención', valor: nomina.limiteRetencion, hueco: true,
+              flujo: 'ref', tipo: 'op', k: 'M', label: 'Límite del 43 % de retención', valor: nomina.limiteRetencion, hueco: true,
               sub: 'Un tope reglamentario que en tu caso manda sobre el cálculo',
               formula: `(${eur(bruto)} − ${eur(params.minimoExento)}) × 43 % = ${eur(nomina.limiteRetencion)}`,
               texto: 'La retención no puede superar el 43 % de la diferencia entre el bruto y el mínimo exento de retención. Ese tope es menor que la cuota calculada, así que es el que se aplica.',
@@ -204,7 +216,7 @@ export default function Desglose() {
             }]
           : []),
         {
-          tipo: 'hito', k: 'N', label: 'IRPF final', valor: nomina.irpfFinal,
+          flujo: 'total', tipo: 'hito', k: 'N', label: 'IRPF final', valor: nomina.irpfFinal,
           sub: `Tipo efectivo ${pct(nomina.tipoEfectivoIRPF * 100)} sobre el bruto`,
           formula: `${eur(nomina.irpfFinal)} ÷ ${eur(bruto)} = ${pct(nomina.tipoEfectivoIRPF * 100)}`,
           texto: 'Lo que Hacienda retiene a lo largo del año. La declaración ajusta después esta cifra con el resto de tu situación fiscal.',
@@ -214,23 +226,50 @@ export default function Desglose() {
     {
       titulo: 'Lo que queda',
       intro: null,
+      escala: nomina.costeLab,
+      escalaLabel: 'coste laboral',
       filas: [
         {
-          tipo: 'hito', k: 'O', label: 'Renta neta', valor: nomina.salarioNeto, total: true,
+          flujo: 'total', tipo: 'hito', k: 'O', label: 'Renta neta', valor: nomina.salarioNeto, total: true,
           sub: `${eur(nomina.salarioNeto / pagas)} al mes en ${pagas} pagas`,
           formula: `${eur(bruto)} − ${eur(nomina.cotTra)} − ${eur(nomina.irpfFinal)} = ${eur(nomina.salarioNeto)}`,
-          texto: `De los ${eur(nomina.costeLab)} que costó tu trabajo llegan ${eur(nomina.salarioNeto)}: ${pct((nomina.salarioNeto / escala) * 100)} del total.`,
+          texto: `De los ${eur(nomina.costeLab)} que costó tu trabajo llegan ${eur(nomina.salarioNeto)}: ${pct((nomina.salarioNeto / Math.max(nomina.costeLab, 1)) * 100)} del total.`,
         },
       ],
     },
   ];
 
+  /* La geometría de la cascada: un nivel corriente que cada fila mueve.
+     Los hitos van de cero a su importe; las restas flotan entre el nivel
+     nuevo y el anterior; las referencias se dibujan huecas desde cero y no
+     mueven el nivel. */
+  let nivel = 0;
+  const dibujo = bloques.map(bloque => {
+    const filas = bloque.filas.map(f => {
+      const esc = Math.max(bloque.escala, 1);
+      const v = Math.abs(f.valor);
+      let desde = 0;
+      let hasta = v;
+      if (f.flujo === 'resta') {
+        hasta = nivel;
+        desde = Math.max(0, nivel - v);
+        nivel = desde;
+      } else if (f.flujo === 'total') {
+        nivel = v;
+      }
+      const x = Math.min(100, (desde / esc) * 100);
+      const w = Math.max(0, Math.min(100 - x, ((hasta - desde) / esc) * 100));
+      return { ...f, x, w, parte: v / esc };
+    });
+    return { ...bloque, filas };
+  });
+
   return (
     <Figure
       id="03"
       title="El desglose completo, eslabón a eslabón"
-      sub={`${anio} · ${esAutonomo ? 'régimen de autónomos' : 'asalariado'} · las barras están todas a la misma escala, la del coste laboral`}
-      legend="Los hitos van sobre la línea · las operaciones cuelgan del hito al que afectan · barra llena = dinero · barra hueca = magnitud de cálculo, no una salida de dinero"
+      sub={`${anio} · ${esAutonomo ? 'régimen de autónomos' : 'asalariado'} · cada bloque se mide sobre un único carril, y cada resta se dibuja encima del tramo que se lleva`}
+      legend="Barra llena = dinero · barra rayada = lo que se descuenta del nivel anterior · barra de trazos = magnitud de cálculo, no una salida de dinero · el hilo vertical enlaza el final de una barra con el principio de la siguiente"
       source="Fuente · BOE (LIRPF y RIRPF) · TGSS · AEAT"
       summary={bloques
         .flatMap(b => b.filas)
@@ -238,23 +277,32 @@ export default function Desglose() {
         .join('. ')}
     >
       <div className="fs-desglose">
-        {bloques.map(bloque => (
+        {dibujo.map(bloque => (
           <section key={bloque.titulo} className="fs-dbloque">
             <header className="fs-dbloque-head">
               <h4 className="fs-dbloque-t">{bloque.titulo}</h4>
               {bloque.intro && <p className="fs-dbloque-i">{bloque.intro}</p>}
             </header>
 
+            <div className="fs-descala" aria-hidden="true">
+              <span className="fs-descala-0">0 €</span>
+              <span className="fs-descala-linea" />
+              <span className="fs-descala-max">
+                {eur(bloque.escala)} <span className="fs-descala-q">· {bloque.escalaLabel}</span>
+              </span>
+            </div>
+
             <ol className="fs-dlista">
               {bloque.filas.map(f => {
                 const open = abierto === f.k;
-                const ancho = Math.min(100, (Math.abs(f.valor) / escala) * 100);
+                const hayBarra = f.w > 0.02;
                 return (
                   <li
                     key={f.k}
                     className={[
                       'fs-dfila',
                       f.tipo === 'hito' ? 'is-hito' : 'is-op',
+                      `is-f-${f.flujo}`,
                       f.total ? 'is-total' : '',
                       open ? 'is-open' : '',
                     ].filter(Boolean).join(' ')}
@@ -270,15 +318,25 @@ export default function Desglose() {
                       <span className="fs-dfila-main">
                         <span className="fs-dfila-label">{f.label}</span>
                         <span className="fs-dfila-sub">{f.sub}</span>
-                        <span
-                          className={`fs-dfila-bar ${f.hueco ? 'is-hueca' : ''} ${f.valor < 0 ? 'is-resta' : ''}`}
-                          style={{ '--w': `${ancho}%` }}
-                          aria-hidden="true"
-                        />
                       </span>
 
                       <span className={`fs-dfila-v ${f.valor < 0 ? 'is-neg' : ''}`}>
-                        {f.valor < 0 ? `− ${eur(Math.abs(f.valor))}` : f.suma ? `+ ${eur(f.valor)}` : eur(f.valor)}
+                        {f.valor < 0
+                          ? `− ${eur(Math.abs(f.valor))}`
+                          : f.suma
+                            ? `+ ${eur(f.valor)}`
+                            : eur(Math.abs(f.valor))}
+                      </span>
+
+                      <span className="fs-dfila-track">
+                        {hayBarra ? (
+                          <span
+                            className={`fs-dfila-bar ${f.hueco ? 'is-hueca' : ''}`}
+                            style={{ '--x': `${f.x}%`, '--w': `${f.w}%` }}
+                          />
+                        ) : (
+                          <span className="fs-dfila-cero">sin importe en este año</span>
+                        )}
                       </span>
                     </button>
 

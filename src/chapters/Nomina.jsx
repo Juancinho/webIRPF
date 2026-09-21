@@ -1,44 +1,54 @@
 import { useState } from 'react';
 import { useFiscal } from '../state/fiscalContext';
 import Figure from '../figures/Figure';
+import ChartFrame from '../figures/ChartFrame';
 import Desglose from './Desglose';
-import { TickStrip } from '../figures/marks';
+import { Label } from '../figures/marks';
+import { linear, round } from '../figures/scale';
 import { dec, eur, pct } from '../utils/format';
 
-const UNIT = 250; // one mark = 250 €
-const SVG_W = 600;
+const W = 880;
+const H = 186;
+const X0 = 0;
+const X1 = W;
+const BAR_Y = 86;
+const BAR_H = 54;
+const HUECO = 2;
 
 /**
- * 01 · TU NÓMINA — FIG. 02, the payroll ledger.
- * Quiet reading chapter: an editorial ledger where every line is a strip of
- * countable marks. Solid marks add, dashed marks take away (F9 grammar).
+ * 01 · TU NÓMINA — FIG. 02, el reparto del bruto.
+ * Una sola barra: tu salario bruto partido en lo que te queda y lo que se va
+ * antes de que lo veas. Un único denominador, tres piezas y las etiquetas
+ * fuera de la barra, para que se lea de un vistazo y sin descifrar tramas.
  */
 export default function Nomina() {
   const { bruto, anio, pagas, nomina, marginal, params, smi, vecesSMI, focus, setFocus } = useFiscal();
   const [pinned, setPinned] = useState(null);
+  const [tip, setTip] = useState(null);
 
   const esAutonomo = nomina.regimen === 'autonomo';
   const base = Math.max(bruto, 1);
 
-  const filas = [
+  const partes = [
     {
-      key: 'bruto',
-      label: 'Bruto anual',
-      value: bruto,
-      sign: 1,
-      sub: esAutonomo ? 'Rendimiento íntegro de tu actividad' : 'La cifra que aparece en tu contrato',
+      key: 'neto',
+      label: 'Renta neta',
+      valor: nomina.salarioNeto,
+      color: 'var(--signal)',
+      sub: `${eur(nomina.salarioNeto / pagas)} al mes en ${pagas} pagas`,
       detalle: {
-        titulo: 'Salario bruto',
-        texto: `Es la cantidad pactada antes de cualquier descuento. En 12 pagas equivale a ${eur(bruto / 12)} al mes; en 14 pagas, ${eur(bruto / 14)}.`,
-        formula: `${eur(bruto)} ÷ ${pagas} pagas = ${eur(bruto / pagas)}`,
+        titulo: 'Salario neto',
+        texto: 'Lo que efectivamente ingresa en tu cuenta a lo largo del año, antes de la declaración anual de la renta.',
+        formula: `${eur(bruto)} − ${eur(nomina.cotTra)} − ${eur(nomina.irpfFinal)} = ${eur(nomina.salarioNeto)}`,
         fuente: null,
       },
     },
     {
       key: 'ssTra',
       label: esAutonomo ? 'Cotización RETA' : 'SS trabajador',
-      value: nomina.cotTra,
-      sign: -1,
+      valor: nomina.cotTra,
+      color: 'var(--ink-4)',
+      colorNum: 'var(--ink-2)',
       sub: esAutonomo
         ? 'Tu cuota de autónomos según el tramo de rendimientos'
         : `${pct(params.tipoTra * 100, 2)} sobre la base de cotización`,
@@ -59,13 +69,13 @@ export default function Nomina() {
     {
       key: 'irpf',
       label: 'IRPF retenido',
-      value: nomina.irpfFinal,
-      sign: -1,
+      valor: nomina.irpfFinal,
+      color: 'var(--ink)',
       sub: `Tipo efectivo ${pct(nomina.tipoEfectivoIRPF * 100)} sobre el bruto`,
       detalle: {
         titulo: 'IRPF final',
         texto:
-          'Es la cuota que resulta de aplicar la escala progresiva a tu base imponible, restar la cuota del mínimo personal y familiar y, si procede, la deducción por rendimientos del trabajo. El capítulo 03 desmonta este cálculo tramo a tramo.',
+          'Es la cuota que resulta de aplicar la escala progresiva a tu base imponible, restar la cuota del mínimo personal y familiar y, si procede, la deducción por rendimientos del trabajo. El desglose de abajo lo abre paso a paso.',
         formula: `Cuota íntegra ${eur(nomina.cuotaIntegra)} − mínimo ${eur(nomina.cuotaMinimo)}${nomina.deduccionSMI > 0 ? ` − deducción ${eur(nomina.deduccionSMI)}` : ''} = ${eur(nomina.irpfFinal)}`,
         fuente: {
           label: 'BOE — LIRPF Ley 35/2006',
@@ -73,24 +83,32 @@ export default function Nomina() {
         },
       },
     },
-    {
-      key: 'neto',
-      label: 'Neto anual',
-      value: nomina.salarioNeto,
-      sign: 0,
-      total: true,
-      sub: `${eur(nomina.salarioNeto / pagas)} al mes en ${pagas} pagas`,
-      detalle: {
-        titulo: 'Salario neto',
-        texto: 'Lo que efectivamente ingresa en tu cuenta a lo largo del año, antes de la declaración anual de la renta.',
-        formula: `${eur(bruto)} − ${eur(nomina.cotTra)} − ${eur(nomina.irpfFinal)} = ${eur(nomina.salarioNeto)}`,
-        fuente: null,
-      },
-    },
   ];
 
-  const activa = filas.find(f => f.key === (pinned || focus)) || null;
+  // anchos acumulados de la barra, en coordenadas del lienzo
+  let acumulado = X0;
+  const segmentos = partes.map(p => {
+    const ancho = Math.max(0, (p.valor / base) * (X1 - X0) - HUECO);
+    const seg = { ...p, x: acumulado, ancho, pctBruto: (p.valor / base) * 100 };
+    acumulado += ancho + HUECO;
+    return seg;
+  });
+
+  const activa = partes.find(p => p.key === (pinned || focus)) || null;
   const limiteActivo = nomina.limiteRetencion < nomina.cuotaSMI && nomina.cuotaSMI > 0;
+  const x = linear([0, 100], [X0, X1]);
+
+  const mostrar = seg =>
+    setTip({
+      vx: seg.x + seg.ancho / 2,
+      vy: BAR_Y + BAR_H / 2,
+      title: eur(seg.valor),
+      sub: seg.label,
+      rows: [
+        ['De tu bruto', pct(seg.pctBruto), seg.color],
+        ['Al mes', `${eur(seg.valor / pagas)} · ${pagas} pagas`],
+      ],
+    });
 
   return (
     <section id="nomina" className="fs-chapter" aria-labelledby="nomina-t">
@@ -117,7 +135,7 @@ export default function Nomina() {
               <div className="fs-rail-item">
                 <span className="fs-stamp">Nota 01</span>
                 <p className="fs-note">
-                  Pasa el cursor —o el foco del teclado— por cualquier línea del libro para ver su
+                  Pasa el cursor por cualquier tramo de la barra —o pulsa su nombre— para ver su
                   fórmula, su artículo y su fuente.
                 </p>
               </div>
@@ -134,7 +152,7 @@ export default function Nomina() {
               </p>
             </div>
 
-            {(nomina.irpfFinal === 0 && bruto > 0) && (
+            {nomina.irpfFinal === 0 && bruto > 0 && (
               <div className="fs-rail-item">
                 <span className="fs-stamp">Sin IRPF</span>
                 <p className="fs-note">
@@ -181,79 +199,154 @@ export default function Nomina() {
 
             <Figure
               id="02"
-              title="El libro de la nómina"
-              sub={`${anio} · ${esAutonomo ? 'régimen de autónomos' : 'asalariado'} · euros anuales · una marca = ${UNIT} €`}
-              legend={`Una marca = ${UNIT} € · marcas llenas suman · marcas discontinuas restan`}
+              title={`De tus ${eur(bruto)} brutos, te quedan ${eur(nomina.salarioNeto)}`}
+              sub={`${anio} · ${esAutonomo ? 'régimen de autónomos' : 'asalariado'} · la barra entera es tu salario bruto, partido en sus tres destinos`}
+              legend="La barra completa = 100 % de tu bruto · cada tramo es proporcional a su importe"
               source="Fuente · TGSS · AEAT · BOE"
-              summary={`Bruto ${eur(bruto)}, cotización ${eur(nomina.cotTra)}, IRPF ${eur(nomina.irpfFinal)}, neto ${eur(nomina.salarioNeto)}.`}
+              summary={`Bruto ${eur(bruto)}: neto ${eur(nomina.salarioNeto)}, cotización ${eur(nomina.cotTra)}, IRPF ${eur(nomina.irpfFinal)}.`}
             >
-              <div className="fs-ledger">
-                {filas.map(f => {
-                  const w = Math.max(0, (Math.abs(f.value) / base) * (SVG_W - 20));
-                  const marks = Math.round(Math.abs(f.value) / UNIT);
-                  const dim = focus && focus !== f.key && !pinned;
+              <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} label="Reparto del salario bruto">
+                {/* la llave superior: toda la barra es el bruto */}
+                <Label x={X0} y={14} size={9.5} color="var(--ink-4)" mono>
+                  SALARIO BRUTO ANUAL · {eur(bruto)}
+                </Label>
+                <line x1={X0} y1={26} x2={X1} y2={26} stroke="var(--ink)" strokeWidth={1} />
+                <line x1={X0} y1={26} x2={X0} y2={33} stroke="var(--ink)" strokeWidth={1} />
+                <line x1={X1} y1={26} x2={X1} y2={33} stroke="var(--ink)" strokeWidth={1} />
+
+                {segmentos.map(seg => {
+                  const dim = focus && focus !== seg.key && !pinned;
+                  const centro = seg.x + seg.ancho / 2;
+                  const cabe = seg.ancho > 118;
+                  const cabeImporte = seg.ancho > 44;
                   return (
-                    <button
-                      key={f.key}
-                      type="button"
-                      className={`fs-ledger-row ${f.total ? 'is-total' : ''} ${dim ? 'is-dim' : ''}`}
-                      aria-pressed={pinned === f.key}
-                      onMouseEnter={() => setFocus(f.key)}
-                      onMouseLeave={() => setFocus(null)}
-                      onFocus={() => setFocus(f.key)}
-                      onBlur={() => setFocus(null)}
-                      onClick={() => setPinned(p => (p === f.key ? null : f.key))}
+                    <g
+                      key={seg.key}
+                      opacity={dim ? 0.32 : 1}
+                      onMouseEnter={() => {
+                        setFocus(seg.key);
+                        mostrar(seg);
+                      }}
+                      onMouseLeave={() => {
+                        setFocus(null);
+                        setTip(null);
+                      }}
+                      onClick={() => setPinned(p => (p === seg.key ? null : seg.key))}
+                      style={{ cursor: 'pointer' }}
                     >
-                      <span>
-                        <span className="fs-ledger-k">{f.label}</span>
-                      </span>
+                      {/* rótulo directo: nombre e importe encima de su propio tramo */}
+                      {cabe && (
+                        <Label x={round(centro)} y={52} size={9.5} color="var(--ink-4)" anchor="middle" mono>
+                          {seg.label.toUpperCase()}
+                        </Label>
+                      )}
+                      {cabeImporte && (
+                        <Label
+                          x={round(centro)}
+                          y={70}
+                          size={seg.ancho > 90 ? 15 : 12}
+                          weight={800}
+                          color={seg.colorNum || seg.color}
+                          anchor="middle"
+                        >
+                          {eur(seg.valor)}
+                        </Label>
+                      )}
+                      {cabeImporte && (
+                        <line
+                          x1={round(centro)}
+                          y1={75}
+                          x2={round(centro)}
+                          y2={BAR_Y - 4}
+                          stroke={seg.colorNum || seg.color}
+                          strokeWidth={0.8}
+                        />
+                      )}
 
-                      <span className="fs-svg-wrap">
-                        <svg className="fs-svg" viewBox={`0 0 ${SVG_W} 26`} aria-hidden="true">
-                          <TickStrip
-                            x={0}
-                            y={13}
-                            width={w}
-                            count={marks}
-                            height={f.total || f.key === 'bruto' ? 18 : 13}
-                            seed={f.key.length + 3}
-                            subtract={f.sign < 0}
-                            color={f.sign < 0 ? 'var(--ink-3)' : 'var(--ink)'}
-                          />
-                        </svg>
-                      </span>
-
-                      <span className={`fs-ledger-v ${f.sign < 0 ? 'is-neg' : ''}`}>
-                        {f.sign < 0 ? `−${eur(Math.abs(f.value))}` : eur(f.value)}
-                      </span>
-
-                      <span className="fs-ledger-sub fs-note">{f.sub}</span>
-                    </button>
+                      <rect x={round(seg.x)} y={BAR_Y} width={round(seg.ancho)} height={BAR_H} fill={seg.color} rx={2} />
+                      {seg.ancho > 44 && (
+                        <text
+                          x={round(centro)}
+                          y={BAR_Y + BAR_H / 2 + 5}
+                          fontSize={14}
+                          fontWeight={800}
+                          textAnchor="middle"
+                          fill={seg.key === 'ssTra' ? 'var(--ink)' : 'var(--bone)'}
+                        >
+                          {pct(seg.pctBruto, 0)}
+                        </text>
+                      )}
+                    </g>
                   );
                 })}
+
+                {/* eje del 0 al 100 % del bruto */}
+                <line x1={X0} y1={BAR_Y + BAR_H + 8} x2={X1} y2={BAR_Y + BAR_H + 8} stroke="var(--rule)" strokeWidth={0.8} />
+                {[0, 25, 50, 75, 100].map(v => (
+                  <g key={v}>
+                    <line
+                      x1={round(x(v))}
+                      y1={BAR_Y + BAR_H + 8}
+                      x2={round(x(v))}
+                      y2={BAR_Y + BAR_H + 13}
+                      stroke="var(--ink-5)"
+                      strokeWidth={0.7}
+                    />
+                    <Label
+                      x={round(x(v))}
+                      y={BAR_Y + BAR_H + 26}
+                      size={9.5}
+                      color="var(--ink-4)"
+                      anchor={v === 0 ? 'start' : v === 100 ? 'end' : 'middle'}
+                      mono
+                    >
+                      {pct(v, 0)}
+                    </Label>
+                  </g>
+                ))}
+                <Label x={X0} y={BAR_Y + BAR_H + 44} size={9} color="var(--ink-5)" mono>
+                  PORCENTAJE DE TU SALARIO BRUTO
+                </Label>
+              </ChartFrame>
+
+              <div className="fs-keys fs-keys-grid">
+                {segmentos.map(seg => (
+                  <button
+                    key={seg.key}
+                    type="button"
+                    className={`fs-key fs-key-lg ${focus && focus !== seg.key && !pinned ? 'is-dim' : ''}`}
+                    aria-pressed={pinned === seg.key}
+                    onMouseEnter={() => {
+                      setFocus(seg.key);
+                      mostrar(seg);
+                    }}
+                    onMouseLeave={() => {
+                      setFocus(null);
+                      setTip(null);
+                    }}
+                    onFocus={() => setFocus(seg.key)}
+                    onBlur={() => setFocus(null)}
+                    onClick={() => setPinned(p => (p === seg.key ? null : seg.key))}
+                  >
+                    <span className="fs-key-swatch" style={{ background: seg.color }} />
+                    <span>
+                      <span className="fs-key-label">{seg.label}</span>
+                      <span className="fs-key-big" style={{ color: seg.colorNum || seg.color }}>{eur(seg.valor)}</span>
+                      <span className="fs-key-sub">
+                        {pct(seg.pctBruto)} de tu bruto · {seg.sub}
+                      </span>
+                    </span>
+                  </button>
+                ))}
               </div>
             </Figure>
 
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px 56px', marginTop: 4 }}>
-              <div>
-                <span className="fs-label">Por paga · 12</span>
-                <p className="fs-data-md num" style={{ margin: '4px 0 0' }}>{eur(nomina.salarioNeto / 12)}</p>
-              </div>
-              <div>
-                <span className="fs-label">Por paga · 14</span>
-                <p className="fs-data-md num" style={{ margin: '4px 0 0' }}>{eur(nomina.salarioNeto / 14)}</p>
-              </div>
-              <div>
-                <span className="fs-label">Tipo efectivo IRPF</span>
-                <p className="fs-data-md num" style={{ margin: '4px 0 0' }}>{pct(nomina.tipoEfectivoIRPF * 100)}</p>
-              </div>
-            </div>
-
             <p className="fs-body" style={{ marginTop: 36, marginBottom: 48 }}>
-              El recibo de la nómina enseña dos descuentos. Pero tu trabajo no le cuesta a la empresa{' '}
-              <strong>{eur(bruto)}</strong>: le cuesta <strong>{eur(nomina.costeLab)}</strong>. La
-              diferencia nunca aparece en ningún papel que tú firmes. Y entre el bruto y lo que
-              Hacienda grava hay otra docena de pasos, cada uno con su artículo:
+              El recibo de la nómina enseña esos dos descuentos. Pero tu trabajo no le cuesta a la
+              empresa <strong>{eur(bruto)}</strong>: le cuesta{' '}
+              <strong>{eur(nomina.costeLab)}</strong>. La diferencia nunca aparece en ningún papel
+              que tú firmes. Y entre el bruto y lo que Hacienda grava hay otra docena de pasos,
+              cada uno con su artículo:
             </p>
 
             <Desglose />

@@ -374,8 +374,13 @@
 /* ── sticky figure chapters (02, 03) ──────────────────────────────────────── */
 .fs-sticky {
   display: grid;
-  grid-template-columns: 1fr;
+  /* minmax(0, …) para que el lienzo desplazable no estire la columna */
+  grid-template-columns: minmax(0, 1fr);
   gap: 32px;
+}
+
+.fs-sticky-fig {
+  min-width: 0;
 }
 
 @media (min-width: 1000px) {
@@ -792,10 +797,13 @@
 .fs-dfila-head {
   display: grid;
   grid-template-columns: 30px minmax(0, 1fr) minmax(112px, auto);
+  grid-template-areas:
+    'k main val'
+    'track track track';
   gap: 4px 14px;
   align-items: start;
   width: 100%;
-  padding: 11px 0;
+  padding: 11px 0 13px;
   border: 0;
   background: transparent;
   text-align: left;
@@ -840,7 +848,7 @@
 }
 
 .fs-dfila-k {
-  grid-column: 1;
+  grid-area: k;
   font-family: var(--mono);
   font-size: 10px;
   color: var(--ink-5);
@@ -853,7 +861,7 @@
 }
 
 .fs-dfila-main {
-  grid-column: 2;
+  grid-area: main;
   min-width: 0;
 }
 
@@ -887,41 +895,122 @@
   max-width: 60ch;
 }
 
-/* barra proporcional, misma escala en todas las filas */
+/* ── el carril de la cascada ──────────────────────────────────────────────
+   Un único carril por bloque, del mismo ancho en todas sus filas: por eso
+   las longitudes se pueden comparar de un vistazo. La barra se coloca dentro
+   del carril (`--x`) en vez de arrancar siempre del borde, que es lo que hace
+   que una resta se lea como lo que es: un mordisco al nivel anterior. */
+.fs-dfila-track {
+  grid-area: track;
+  position: relative;
+  height: 11px;
+  margin: 6px 0 0 var(--sangria);
+  border-bottom: 1px solid var(--rule-soft);
+}
+
 .fs-dfila-bar {
-  display: block;
-  height: 8px;
+  position: absolute;
+  left: var(--x);
   width: var(--w);
   min-width: 2px;
-  margin-top: 7px;
-  background: var(--ink);
+  top: 2px;
+  bottom: 1px;
+  background: var(--ink-4);
   border-radius: 1px;
 }
 
-.fs-dfila.is-op .fs-dfila-bar {
-  height: 6px;
-  background: var(--ink-4);
+/* el hilo que enlaza el final de una barra con el principio de la siguiente */
+.fs-dfila-bar::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  bottom: -14px;
+  width: 1px;
+  background: var(--ink-6);
 }
 
+.fs-dfila.is-f-resta .fs-dfila-bar::after {
+  left: 0;
+}
+
+.fs-dfila.is-f-total .fs-dfila-bar::after,
+.fs-dfila.is-f-ref .fs-dfila-bar::after {
+  right: 0;
+}
+
+.fs-dfila:last-child .fs-dfila-bar::after {
+  display: none;
+}
+
+/* hitos: dinero, del cero a su importe */
+.fs-dfila.is-hito .fs-dfila-bar {
+  top: 0;
+  background: var(--ink);
+}
+
+/* restas: el tramo que se lleva, rayado */
+.fs-dfila.is-f-resta .fs-dfila-bar {
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--ink-3) 0 1.5px,
+    transparent 1.5px 4.5px
+  );
+  box-shadow: inset 0 0 0 1px var(--ink-6);
+}
+
+/* magnitudes de cálculo: nunca sólidas, para que no parezcan dinero */
+.fs-dfila-bar.is-hueca {
+  background: transparent;
+  box-shadow: none;
+  border: 1px dashed var(--counter);
+}
+
+/* el último eslabón, lo que queda */
 .fs-dfila.is-total .fs-dfila-bar {
   background: var(--signal);
 }
 
-.fs-dfila-bar.is-resta {
-  background: repeating-linear-gradient(
-    90deg,
-    var(--ink-4) 0 2px,
-    transparent 2px 4.5px
-  );
+.fs-dfila-cero {
+  position: absolute;
+  left: 0;
+  top: -1px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-5);
 }
 
-.fs-dfila-bar.is-hueca {
-  background: transparent;
-  border: 1px dashed var(--counter);
+/* ── la cabecera de escala de cada bloque ─────────────────────────────────── */
+.fs-descala {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 2px;
+  padding-left: var(--sangria);
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-5);
+}
+
+.fs-descala-linea {
+  flex: 1;
+  height: 1px;
+  background: var(--rule-soft);
+}
+
+.fs-descala-max {
+  color: var(--ink-3);
+}
+
+.fs-descala-q {
+  color: var(--ink-5);
 }
 
 .fs-dfila-v {
-  grid-column: 3;
+  grid-area: val;
   font-family: var(--sans);
   font-size: 14px;
   font-weight: 700;
@@ -957,14 +1046,20 @@
   }
   .fs-dfila-head {
     grid-template-columns: 24px minmax(0, 1fr);
+    grid-template-areas:
+      'k main'
+      'val val'
+      'track track';
     row-gap: 6px;
   }
   .fs-dfila-k {
     padding-left: var(--sangria);
   }
   .fs-dfila-v {
-    grid-column: 2;
     text-align: left;
+  }
+  .fs-descala-q {
+    display: none;
   }
   .fs-dfila-body {
     padding-left: calc(var(--sangria) + 24px);
@@ -1010,4 +1105,152 @@
 
 .fs-night .fs-explica-pasos li {
   border-top-color: var(--night-rule);
+}
+
+/* ── leyenda grande: la clave de lectura de una barra repartida (FIG. 02) ─── */
+.fs-keys-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px 28px;
+  margin-top: 20px;
+}
+
+.fs-key-lg {
+  align-items: flex-start;
+  gap: 10px;
+  text-transform: none;
+  letter-spacing: normal;
+  padding: 10px 0 0;
+  border-top: 1px solid var(--rule-soft);
+  text-align: left;
+  width: 100%;
+}
+
+.fs-key-lg .fs-key-swatch {
+  width: 12px;
+  height: 12px;
+  margin-top: 4px;
+  border-radius: 2px;
+}
+
+.fs-key-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.fs-key-big {
+  display: block;
+  font-size: clamp(20px, 2vw, 26px);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums lining-nums;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  margin-top: 2px;
+}
+
+.fs-key-sub {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--ink-4);
+  line-height: 1.45;
+  margin-top: 3px;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.fs-key-lg[aria-pressed='true'] .fs-key-big {
+  color: var(--signal);
+}
+
+/* ── FIG. 21 · la forma vertical del río ───────────────────────────────────
+   En pantalla estrecha el Sankey no se comprime: se recompone en una lista
+   ordenada por destino, que es lo que de verdad se lee en un móvil. */
+.fs-rio-origen {
+  font-size: 12.5px;
+  color: var(--ink-3);
+  margin: 0 0 16px;
+  border-bottom: 1px solid var(--rule-soft);
+  padding-bottom: 10px;
+}
+
+.fs-rio-grupo + .fs-rio-grupo {
+  margin-top: 18px;
+}
+
+.fs-rio-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  border-top: 1px solid var(--rule);
+  padding-top: 8px;
+}
+
+.fs-rio-head h4 {
+  font-family: var(--sans);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0;
+}
+
+.fs-rio-head span {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.fs-rio-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.fs-rio-lista li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 10px;
+  padding: 9px 0 7px;
+  border-bottom: 1px solid var(--rule-soft);
+}
+
+.fs-rio-k {
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.fs-rio-v {
+  font-family: var(--sans);
+  font-size: 13.5px;
+  font-weight: 700;
+  text-align: right;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.fs-rio-bar {
+  grid-column: 1;
+  align-self: center;
+  height: 6px;
+  width: var(--w);
+  min-width: 2px;
+  margin-top: 5px;
+  background: var(--ink-3);
+  border-radius: 1px;
+}
+
+.fs-rio-p {
+  grid-column: 2;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--ink-4);
+  text-align: right;
+  padding-top: 5px;
 }

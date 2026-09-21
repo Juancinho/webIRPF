@@ -388,7 +388,9 @@ export function obtenerParametros(anio) {
 }
 
 // ── Datos precomputados (gráficos existentes — usan opts por defecto) ──────────
-export const SALARIOS_CHART = Array.from({ length: 171 }, (_, i) => 15000 + i * 500);
+// El atlas arranca en cero: recortar el eje por abajo dejaba las curvas
+// colgando a media altura y hacía ilegible el primer tramo de la escala.
+export const SALARIOS_CHART = Array.from({ length: 201 }, (_, i) => i * 500);
 
 export const DATOS_CHART = SALARIOS_CHART.map(bruto2026 => {
   const point = { bruto: bruto2026 };
@@ -614,5 +616,59 @@ export const DEUDA_ESPANA = {
   2025: { totalMM: 1698, pctPIB: 100.7, poblacion: 49.57, perCapita: 34259 },
   2026: { totalMM: 1735, pctPIB:  99.7, poblacion: 50.05, perCapita: 34664 },
 };
+
+
+// ── Destino del gasto público · clasificación funcional COFOG ────────────────
+// IGAE, «Informe sobre la clasificación de las funciones de las Administraciones
+// Públicas», último ejercicio publicado (2023, provisional). Importes en
+// millones de euros de 2023. El presupuesto español NO está afectado: ningún
+// impuesto concreto financia una función concreta. Estas proporciones sirven
+// para repartir una aportación individual *como se reparte el gasto real*, que
+// es la única lectura honesta posible.
+export const GASTO_COFOG = Object.freeze({
+  anio: 2023,
+  total: 680952,
+  fuente: 'IGAE — Clasificación funcional del gasto de las AAPP (COFOG), 2023 provisional',
+  url: 'https://www.igae.pap.hacienda.gob.es/sitios/igae/es-ES/Contabilidad/ContabilidadNacional/Publicaciones/paginas/iacogof.aspx',
+  grupos: [
+    {
+      key: 'social',
+      label: 'Protección social',
+      nota: 'Pensiones, desempleo, incapacidad y prestaciones familiares',
+      partidas: [
+        { key: 'vejez',     label: 'Pensiones de jubilación', valor: 153153, nota: 'Vejez (COFOG 10.2)' },
+        { key: 'incap',     label: 'Enfermedad e incapacidad', valor: 39948, nota: 'Incapacidad temporal y permanente' },
+        { key: 'superv',    label: 'Viudedad y orfandad',      valor: 33634, nota: 'Supervivencia' },
+        { key: 'paro',      label: 'Desempleo',                valor: 22995, nota: 'Prestaciones y subsidios por desempleo' },
+        { key: 'familia',   label: 'Familia e hijos',          valor: 14679, nota: 'Prestaciones familiares y por nacimiento' },
+        { key: 'exclusion', label: 'Exclusión social',         valor: 10150, nota: 'Incluye el ingreso mínimo vital' },
+        { key: 'otrasPS',   label: 'Otras prestaciones',       valor:  2545, nota: 'Vivienda social, I+D y gestión del sistema' },
+      ],
+    },
+    {
+      key: 'servicios',
+      label: 'Servicios públicos',
+      nota: 'Lo que el Estado y las comunidades prestan directamente',
+      partidas: [
+        { key: 'salud',     label: 'Sanidad',                 valor: 98624, nota: 'Hospitales, atención primaria, farmacia' },
+        { key: 'educacion', label: 'Educación',               valor: 63040, nota: 'De infantil a universidad' },
+        { key: 'orden',     label: 'Orden público y justicia', valor: 27443, nota: 'Policía, bomberos, tribunales, prisiones' },
+        { key: 'ocio',      label: 'Ocio, cultura y religión', valor: 18729, nota: 'Deporte, cultura, medios públicos' },
+        { key: 'medio',     label: 'Medio ambiente',          valor: 14640, nota: 'Residuos, aguas, protección del entorno' },
+        { key: 'defensa',   label: 'Defensa',                 valor: 13987, nota: 'Fuerzas armadas y defensa civil' },
+        { key: 'vivienda',  label: 'Vivienda y urbanismo',    valor:  7643, nota: 'Vivienda, alumbrado, abastecimiento de agua' },
+      ],
+    },
+    {
+      key: 'estado',
+      label: 'Economía y Estado',
+      nota: 'La máquina administrativa, la deuda y el apoyo a la actividad',
+      partidas: [
+        { key: 'generales', label: 'Servicios generales', valor: 84784, nota: 'Administración, exterior y los intereses de la deuda' },
+        { key: 'economia',  label: 'Asuntos económicos',  valor: 74958, nota: 'Transporte, energía, agricultura, I+D, empleo' },
+      ],
+    },
+  ],
+});
 
 function r2(n) { return Math.round(n * 100) / 100; }

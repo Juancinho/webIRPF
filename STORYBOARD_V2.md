@@ -553,6 +553,23 @@ el tamaño del texto.
 Decisions taken after the first review:
 
 - **El número de capítulo dejó de ser marca de agua**: se superponía al título en 02, 05 y 07.
+- **FIG. 02 pasó de cuatro tiras de marcas a una sola barra repartida.** Las tiras contables
+  no se entendían: cuatro filas, cuatro anchos distintos y ninguna relación visible entre
+  ellas. Ahora es una única barra —tu salario bruto entero— partida en sus tres destinos
+  (renta neta, cotización, IRPF), con el porcentaje dentro de cada tramo, un eje del 0 al
+  100 % debajo y una leyenda grande con el importe de cada pieza. Un solo denominador y
+  una sola lectura.
+- **Las barras del desglose (FIG. 03) declaran su escala.** Antes todas se medían contra el
+  coste laboral, incluidas las cuotas, que son un orden de magnitud menores y quedaban en
+  hilos engañosos. Ahora cada bloque dice contra qué se miden sus barras: los bloques de
+  renta contra el coste laboral, el bloque de la escala contra la cuota íntegra.
+- **FIG. 09 es explícitamente un simulador de tipo marginal**: presets, deslizador, el tipo
+  marginal como cifra grande y la resta completa en una tabla, además del campo de cien
+  bloques.
+- **El eje de valores del atlas (FIG. 13) arranca en cero**, no en el mínimo de la serie:
+  recortarlo exageraba las diferencias entre años y amontonaba los rótulos contra el borde.
+- **Las cifras grandes llevan acento de color**: la unidad en petróleo y una regla de acento
+  bajo las que sostienen el argumento del capítulo.
 - **FIG. 03 se rehízo como cadena, no como lista.** Una espina recorre todo el cálculo; los
   hitos (coste laboral, bruto, rendimiento íntegro, base imponible, IRPF final, renta neta)
   se asientan sobre ella como nodos y cada operación cuelga con un conector del hito al que

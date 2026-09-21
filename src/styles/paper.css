@@ -196,6 +196,26 @@ input,
 .fs-signal {
   color: var(--signal);
 }
+
+/* un enlace dentro de una nota: subrayado fino, nunca azul de navegador */
+.fs-enlace {
+  color: var(--signal);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  font-weight: 600;
+}
+
+.fs-enlace:hover {
+  color: var(--ink);
+}
+
+/* destino de salto, separado de la cabecera fija */
+.fs-ancla {
+  display: block;
+  height: 1px;
+  scroll-margin-top: 96px;
+}
 .fs-counter {
   color: var(--counter);
 }
@@ -234,10 +254,13 @@ input,
   user-select: none;
 }
 
-/* rail + reading column */
+/* rail + reading column
+   `minmax(0, 1fr)` en vez de `1fr`: sin él, cualquier hijo ancho —una tabla,
+   un lienzo con ancho mínimo— estira la columna y saca la página entera de
+   cuadro en pantallas estrechas. */
 .fs-spread {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 28px;
 }
 
@@ -253,6 +276,7 @@ input,
   flex-direction: column;
   gap: 22px;
   padding-top: 6px;
+  min-width: 0;
 }
 
 @media (min-width: 1200px) {
@@ -289,6 +313,7 @@ input,
 
 .fs-field {
   max-width: 100%;
+  min-width: 0;
 }
 
 .fs-bleed {
@@ -705,4 +730,46 @@ select.fs-select {
   body {
     padding-bottom: 0;
   }
+}
+
+/* ── acentos en las cifras grandes ────────────────────────────────────────
+   Los números son material gráfico: la unidad va en petróleo y las cifras
+   que sostienen el argumento del capítulo llevan una regla de acento debajo.
+   El color nunca es el único canal — siempre hay un rótulo al lado.        */
+.fs-u {
+  color: var(--signal);
+  font-weight: 500;
+}
+
+.fs-u-neg {
+  color: var(--counter);
+}
+
+.fs-u-muted {
+  color: var(--ink-4);
+}
+
+.fs-night .fs-u {
+  color: var(--night-signal);
+}
+
+.fs-data-rule::after,
+.fs-statement-rule::after {
+  content: '';
+  display: block;
+  width: 1.6em;
+  height: 4px;
+  background: var(--signal);
+  margin-top: 0.22em;
+  border-radius: 2px;
+}
+
+.fs-night .fs-data-rule::after,
+.fs-night .fs-statement-rule::after {
+  background: var(--night-signal);
+}
+
+.fs-data-neg::after,
+.fs-statement-neg::after {
+  background: var(--counter);
 }

@@ -74,7 +74,7 @@ export default function ProgresividadFria() {
 
   return (
     <Figure
-      id="14"
+      id="13"
       title={
         perdida < -1
           ? `Con el sueldo subiendo cada año exactamente con el IPC, hoy te quedan ${eur(Math.abs(perdida))} reales menos que en ${base}`

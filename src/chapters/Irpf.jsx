@@ -17,8 +17,9 @@ const UNIT = 250;
 
 /**
  * 03 · CÓMO FUNCIONA EL IRPF
- * FIG. 04 the bracket ladder · FIG. 05 the marginal/effective poster ·
- * FIG. 06 the Art. 20 cliff · FIG. 07 a hundred euros of raise.
+ * FIG. 05 la escalera de tramos · FIG. 06 marginal y efectivo contados en
+ * euros · FIG. 07 la curva de tipos · FIG. 08 el acantilado del art. 20 ·
+ * FIG. 09 el simulador de subida.
  */
 export default function Irpf() {
   const { anio, nomina, marginal } = useFiscal();
@@ -243,20 +244,68 @@ export default function Irpf() {
   );
 }
 
-/** FIG. 05 — the typographic lesson, with two gauges on one shared axis. */
+/**
+ * FIG. 06 — LA LECCIÓN, EN EUROS CONTABLES.
+ *
+ * El tipo marginal y el efectivo no se entienden como dos barras de longitud
+ * distinta: se entienden contando euros. Dos campos de cien cuadrados —uno por
+ * los cien euros que ya ganas, otro por los cien siguientes— con los euros que
+ * se lleva el IRPF rellenos y los que te quedas huecos. La diferencia deja de
+ * ser una distancia en un eje y pasa a ser un puñado de cuadrados más.
+ */
+function CampoCien({ x, y, llenos, color, cols = 25, size = 12, gap = 4 }) {
+  const paso = size + gap;
+  return (
+    <g>
+      {Array.from({ length: 100 }, (_, i) => {
+        const cx = x + (i % cols) * paso;
+        const cy = y + Math.floor(i / cols) * paso;
+        const on = i < llenos;
+        return (
+          <rect
+            key={i}
+            x={round(cx)}
+            y={round(cy)}
+            width={size}
+            height={size}
+            rx={1}
+            fill={on ? color : 'none'}
+            stroke={on ? 'none' : 'var(--ink-6)'}
+            strokeWidth={0.8}
+          />
+        );
+      })}
+    </g>
+  );
+}
+
 function Poster({ marginal, nomina }) {
   const marg = marginal.tipoMarginalIRPF * 100;
   const efe = nomina.tipoEfectivoIRPF * 100;
-  const max = Math.max(50, Math.ceil(marg / 10) * 10);
-  const gw = 680;
-  const x = linear([0, max], [0, gw]);
+  const nEfe = Math.max(0, Math.min(100, Math.round(efe)));
+  const nMarg = Math.max(0, Math.min(100, Math.round(marg)));
+
+  const COLS = 25;
+  const SIZE = 14;
+  const GAP = 4.5;
+  const PASO = SIZE + GAP;
+  const ANCHO = COLS * PASO - GAP;
+  const ALTO = 4 * PASO - GAP;
+  const XG = 2;
+  const YA = 32;
+  const YB = YA + ALTO + 66;
+  const XT = XG + ANCHO + 46;
+  const W6 = 880;
+  const H6 = YB + ALTO + 26;
 
   return (
     <div style={{ margin: '0 0 clamp(40px, 6vh, 72px)' }}>
       <div className="fs-hr" />
       <div style={{ display: 'grid', gap: 28, gridTemplateColumns: 'minmax(0, 1fr)' }}>
         <div>
-          <p className="fs-statement" style={{ maxWidth: '14ch' }}>{pct(marg)}</p>
+          <p className="fs-statement fs-statement-rule fs-statement-neg fs-counter" style={{ maxWidth: '14ch' }}>
+            {pct(marg)}
+          </p>
           <p className="fs-title-sm" style={{ marginTop: 14, maxWidth: '18ch' }}>
             no es lo que pagas
             <br />
@@ -266,34 +315,58 @@ function Poster({ marginal, nomina }) {
 
         <Figure
           id="06"
-          title="Marginal y efectivo miden cosas distintas"
-          sub="Mismo eje, misma escala: el marginal se aplica al siguiente euro; el efectivo, al total del bruto"
-          legend="Ambas barras comparten el eje 0 % — la diferencia de longitud es la diferencia real"
+          title="Cuenta los euros: el marginal sólo manda sobre los que aún no has ganado"
+          sub="Dos veces cien euros, mismo tamaño de cuadro: arriba los cien que ya cobras, abajo los cien siguientes"
+          legend="Cada cuadrado = 1 € · cuadrado lleno = se lo lleva el IRPF · cuadrado hueco = se queda contigo"
           source="Fuente · cálculo propio sobre la escala vigente"
           summary={`Tipo marginal del IRPF ${pct(marg)}; tipo efectivo ${pct(efe)}.`}
         >
-          <ChartFrame viewBox={`0 0 ${gw + 180} 130`} scroll>
-            {[0, max / 2, max].map(v => (
-              <g key={v}>
-                <line x1={x(v)} y1={18} x2={x(v)} y2={104} stroke="var(--ink-7)" strokeWidth={0.7} />
-                <Label x={x(v)} y={120} size={9.5} color="var(--ink-5)" anchor="middle" mono>
-                  {pct(v, 0)}
-                </Label>
-              </g>
-            ))}
+          <ChartFrame viewBox={`0 0 ${W6} ${H6}`} scroll minWidth={620} label="Marginal y efectivo, contados en euros">
+            {/* ── los cien euros que ya ganas ──────────────────────────── */}
+            <Label x={XG} y={YA - 12} size={9.5} color="var(--ink-4)" mono>
+              DE CADA 100 € QUE YA GANAS
+            </Label>
+            <CampoCien x={XG} y={YA} llenos={nEfe} color="var(--signal)" cols={COLS} size={SIZE} gap={GAP} />
+            <Label x={XT} y={YA + 20} size={10} color="var(--ink-3)" mono>
+              TIPO EFECTIVO
+            </Label>
+            <Label x={XT} y={YA + 46} size={26} weight={800} color="var(--signal)">
+              {pct(efe)}
+            </Label>
+            <Label x={XT} y={YA + 62} size={10.5} color="var(--ink-4)">
+              {nEfe} € de IRPF · {100 - nEfe} € para ti
+            </Label>
 
-            <TickStrip x={0} y={40} width={x(marg)} count={Math.round(marg)} height={22} seed={7} color="var(--ink)" />
-            <Label x={x(marg) + 10} y={38} size={10} color="var(--ink-3)" mono>MARGINAL</Label>
-            <Label x={x(marg) + 10} y={52} size={13} weight={800} color="var(--ink)">{pct(marg)}</Label>
+            {/* ── los cien euros siguientes ────────────────────────────── */}
+            <Label x={XG} y={YB - 12} size={9.5} color="var(--ink-4)" mono>
+              DE LOS PRÓXIMOS 100 € DE SUBIDA
+            </Label>
+            <CampoCien x={XG} y={YB} llenos={nMarg} color="var(--counter)" cols={COLS} size={SIZE} gap={GAP} />
+            <Label x={XT} y={YB + 20} size={10} color="var(--ink-3)" mono>
+              TIPO MARGINAL
+            </Label>
+            <Label x={XT} y={YB + 46} size={26} weight={800} color="var(--counter)">
+              {pct(marg)}
+            </Label>
+            <Label x={XT} y={YB + 62} size={10.5} color="var(--ink-4)">
+              {nMarg} € de IRPF · {100 - nMarg} € para ti
+            </Label>
 
-            <TickStrip x={0} y={88} width={x(efe)} count={Math.round(efe)} height={18} seed={9} color="var(--signal)" />
-            <Label x={x(efe) + 10} y={86} size={10} color="var(--ink-3)" mono>EFECTIVO</Label>
-            <Label x={x(efe) + 10} y={100} size={13} weight={800} color="var(--signal)">{pct(efe)}</Label>
+            {/* ── la diferencia, dicha una sola vez ────────────────────── */}
+            <line x1={XG} y1={YB - 32} x2={XG + ANCHO} y2={YB - 32} stroke="var(--rule)" strokeWidth={0.8} />
+            <Label x={XG} y={YB - 40} size={10.5} weight={700} color="var(--counter)">
+              {nMarg - nEfe > 0
+                ? `Son ${nMarg - nEfe} cuadrados más — y sólo en esta segunda fila`
+                : 'A tu nivel de renta las dos filas coinciden'}
+            </Label>
           </ChartFrame>
 
-          <p className="fs-note" style={{ marginTop: 12 }}>
+          <p className="fs-note" style={{ marginTop: 14 }}>
             Sobre tu bruto, el IRPF se lleva <strong>{eur(nomina.irpfFinal)}</strong>. Si te subieran
-            el sueldo, el siguiente euro tributaría al {pct(marg)} — sólo ese euro.
+            el sueldo, el siguiente euro tributaría al {pct(marg)} — sólo ese euro.{' '}
+            <a className="fs-enlace" href="#fig-09">
+              Calcula tu subida real en la FIG. 09 ↓
+            </a>
           </p>
         </Figure>
       </div>

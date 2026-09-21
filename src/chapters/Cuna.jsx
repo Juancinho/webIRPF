@@ -11,9 +11,9 @@ const ESPANA = CUNA_OCDE_2025.find(p => p.code === 'ES');
 
 /**
  * 05 · LA CUÑA FISCAL — the inverted chapter.
- * FIG. 16 a hundred countable blocks that regroup between the worker's and the
- * employer's perspective (object continuity, never a graphic swap).
- * FIG. 17 the same hundred euros, country by country across the OECD.
+ * FIG. 15 cien bloques contables que se reagrupan entre la perspectiva del
+ * trabajador y la de la empresa (continuidad del objeto, nunca un cambio de
+ * gráfico). FIG. 16 los mismos cien euros, país a país, en la OCDE.
  */
 export default function Cuna() {
   const { bruto, anio, nomina, focus, setFocus } = useFiscal();
@@ -78,7 +78,7 @@ export default function Cuna() {
 
           <div className="fs-field">
             <Figure
-              id="16"
+              id="15"
               title={`${Math.round(netoPct)} € de cada 100 llegan como renta neta`}
               sub={`${anio} · ${vista === 'empresa' ? `sobre el coste laboral total (${eur(nomina.costeLab)})` : `sobre el salario bruto (${eur(bruto)})`} · un bloque = 1 €`}
               legend={`Un bloque = 1 € de cada 100 · ${grupos.map(g => `${g.label} ${g.value}`).join(' + ')} = ${suma}${suma < 100 ? ` · ${100 - suma} € se reparten en el redondeo` : ''}`}
@@ -128,7 +128,7 @@ export default function Cuna() {
               </div>
             </Figure>
 
-            <p className="fs-data" style={{ color: 'var(--night-signal)', marginTop: 8 }}>
+            <p className="fs-data fs-data-rule" style={{ color: 'var(--night-signal)', marginTop: 8 }}>
               {pct(nomina.cunaFiscal * 100)}
             </p>
             <p className="fs-body" style={{ marginTop: 10 }}>

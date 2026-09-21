@@ -66,7 +66,7 @@ export default function Art20Historia() {
 
   return (
     <Figure
-      id="15"
+      id="14"
       title="La reducción del art. 20, redibujada seis veces en quince años"
       sub={`${real ? 'Euros constantes de 2026' : 'Euros nominales de cada año'} · eje horizontal: rendimiento neto previo · eje vertical: reducción aplicable`}
       legend="Cada curva se nombra en su propio extremo · la caída de cada una es el tramo donde aparece el acantilado de ese año"

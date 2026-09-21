@@ -20,7 +20,7 @@ const MAXB = 30000;
 const STEP = 200;
 
 /**
- * FIG. 06 — EL ACANTILADO.
+ * FIG. 08 — EL ACANTILADO.
  * The Art. 20 reduction and the total marginal rate share one axis (gross
  * salary), so the cliff and the rate spike line up vertically and the reader
  * can see the cause above the effect. L3 Barcode Lollipop grammar below,
@@ -228,6 +228,7 @@ export default function Acantilado() {
 
       <ComoFunciona />
 
+      <span id="fig-09" className="fs-ancla" aria-hidden="true" />
       <CienEuros />
       <p className="fs-body" style={{ marginTop: 8 }}>
         Este efecto no es un error del cálculo ni una opinión: es la consecuencia aritmética de
@@ -239,7 +240,12 @@ export default function Acantilado() {
   );
 }
 
-/** FIG. 07 — of a hundred euros of raise, how many arrive. */
+/**
+ * FIG. 09 — EL SIMULADOR DE SUBIDA.
+ * La pregunta práctica que cierra el capítulo: si te suben el sueldo, ¿cuánto
+ * llega? El tipo marginal deja de ser un concepto y pasa a ser el resultado de
+ * una resta que se puede seguir línea a línea.
+ */
 function CienEuros() {
   const { bruto, anio, opts } = useFiscal();
   const [incremento, setIncremento] = useState(3000);
@@ -251,7 +257,14 @@ function CienEuros() {
     const difNeto = b.salarioNeto - a.salarioNeto;
     const difIRPF = b.irpfFinal - a.irpfFinal;
     const difSS = b.cotTra - a.cotTra;
-    return { difNeto, difIRPF, difSS, a, b };
+    return {
+      difNeto,
+      difIRPF,
+      difSS,
+      marginal: incremento > 0 ? (1 - difNeto / incremento) * 100 : 0,
+      antes: a,
+      despues: b,
+    };
   }, [bruto, anio, opts, incremento]);
 
   const p = v => (incremento > 0 ? (v / incremento) * 100 : 0);
@@ -269,28 +282,90 @@ function CienEuros() {
   return (
     <Figure
       id="09"
-      title={`De cada 100 € de subida, te llegan ${pNeto} €`}
-      sub={`${anio} · subida bruta de ${eur(incremento)} sobre ${eur(bruto)} · un bloque = 1 € de cada 100 € de aumento`}
+      title={`Si te suben ${eur(incremento)} brutos, te llegan ${eur(d.difNeto)}: un tipo marginal del ${pct(d.marginal)}`}
+      sub={`${anio} · sobre un bruto de ${eur(bruto)} · mueve la subida y mira cómo cambia el reparto`}
       legend={`Un bloque = 1 € de cada 100 € de subida bruta${suma < 100 ? ` · ${100 - suma} € se reparten en el redondeo` : ''}`}
       source="Fuente · cálculo propio sobre la escala vigente"
       summary={`Una subida bruta de ${eur(incremento)} deja ${eur(d.difNeto)} netos: ${eur(d.difIRPF)} van a IRPF y ${eur(d.difSS)} a cotizaciones.`}
     >
-      <div className="fs-readout">
-        <span>
-          <span className="fs-readout-k">Subida bruta</span>
-          <span className="fs-readout-v">{eur(incremento)}</span>
-        </span>
-        <span>
-          <span className="fs-readout-k">Llega neto</span>
-          <span className="fs-readout-v fs-signal">{eur(d.difNeto)}</span>
-        </span>
-        <span>
-          <span className="fs-readout-k">Al mes</span>
-          <span className="fs-readout-v">{eur(d.difNeto / 12)}</span>
-        </span>
+      <div className="fs-sim">
+        <div className="fs-sim-control">
+          <span className="fs-label">Súbete el sueldo</span>
+          <div className="fs-sim-presets">
+            {[1000, 3000, 6000, 12000].map(n => (
+              <button
+                key={n}
+                type="button"
+                className="fs-btn"
+                aria-pressed={incremento === n}
+                onClick={() => setIncremento(n)}
+              >
+                {eur(n)}
+              </button>
+            ))}
+          </div>
+          <div className="fs-scrub">
+            <label className="fs-sr" htmlFor="sim-inc">
+              Importe de la subida bruta anual
+            </label>
+            <input
+              id="sim-inc"
+              type="range"
+              min="500"
+              max="20000"
+              step="500"
+              value={incremento}
+              onChange={e => setIncremento(+e.target.value)}
+              aria-valuetext={`${eur(incremento)} de subida bruta`}
+            />
+            <div className="fs-scrub-ticks">
+              <span>500 €</span>
+              <span>10.000 €</span>
+              <span>20.000 €</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="fs-sim-resultado">
+          <span className="fs-label">Tipo marginal de esta subida</span>
+          <p className="fs-data-md fs-counter fs-data-rule fs-data-neg num" style={{ margin: '4px 0 0' }}>
+            {pct(d.marginal)}
+          </p>
+          <p className="fs-note" style={{ marginTop: 10 }}>
+            De cada 100 € brutos de más, <strong>{pNeto} €</strong> llegan a tu cuenta.
+          </p>
+        </div>
       </div>
 
-      <svg className="fs-svg" viewBox="0 0 430 130" style={{ maxWidth: 430 }}>
+      <div className="fs-table-scroll" style={{ marginTop: 22 }}>
+        <table className="fs-table">
+          <caption>La resta completa, paso a paso</caption>
+          <tbody>
+            <tr>
+              <th scope="row">Tu bruto sube</th>
+              <td>{eur(incremento)}</td>
+              <td>{eur(bruto)} → {eur(bruto + incremento)}</td>
+            </tr>
+            <tr>
+              <th scope="row">Cotizaciones de más</th>
+              <td>− {eur(d.difSS)}</td>
+              <td>{pct(p(d.difSS))} de la subida</td>
+            </tr>
+            <tr>
+              <th scope="row">IRPF de más</th>
+              <td>− {eur(d.difIRPF)}</td>
+              <td>{pct(p(d.difIRPF))} de la subida</td>
+            </tr>
+            <tr className="is-current">
+              <th scope="row">Te llega</th>
+              <td>{eur(d.difNeto)}</td>
+              <td>{eur(d.difNeto / 12)} al mes en 12 pagas</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <svg className="fs-svg" viewBox="0 0 430 130" style={{ maxWidth: 430, marginTop: 22 }}>
         <HundredField groups={grupos} columns={20} size={14} gap={5} x={2} y={6} focus={focus} onFocus={setFocus} />
       </svg>
 
@@ -312,30 +387,11 @@ function CienEuros() {
         ))}
       </div>
 
-      <div className="fs-scrub">
-        <label className="fs-label" htmlFor="cien-inc">
-          Simula la subida
-        </label>
-        <input
-          id="cien-inc"
-          type="range"
-          min="500"
-          max="20000"
-          step="500"
-          value={incremento}
-          onChange={e => setIncremento(+e.target.value)}
-          aria-valuetext={`${eur(incremento)} de subida bruta`}
-        />
-        <div className="fs-scrub-ticks">
-          <span>500 €</span>
-          <span>10.000 €</span>
-          <span>20.000 €</span>
-        </div>
-      </div>
-
-      <p className="fs-note" style={{ marginTop: 10 }}>
-        {eur(incremento)} brutos − {eur(d.difIRPF)} de IRPF − {eur(d.difSS)} de cotizaciones ={' '}
-        <strong>{eur(d.difNeto)}</strong> netos al año, unos {eur(d.difNeto / 12)} al mes en 12 pagas.
+      <p className="fs-note" style={{ marginTop: 14, maxWidth: '72ch' }}>
+        Ese {pct(d.marginal)} es tu <strong>tipo marginal real</strong> para esta subida
+        concreta: no aparece en ninguna tabla oficial, porque suma el tramo del IRPF, las
+        cotizaciones y —si estás en la franja del art. 20— la reducción que pierdes por el
+        camino. Tu tipo efectivo sobre el total del sueldo sigue siendo mucho menor.
       </p>
     </Figure>
   );

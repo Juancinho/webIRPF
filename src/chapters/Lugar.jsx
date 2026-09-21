@@ -10,6 +10,7 @@ import {
 } from '../engine/irpf';
 import Figure from '../figures/Figure';
 import Deuda from './Deuda';
+import Destino from './Destino';
 import { CurvaDistribucion, Percentiles, EvolucionDistribucion } from './Distribucion';
 import ChartFrame from '../figures/ChartFrame';
 import { Label, YouMark } from '../figures/marks';
@@ -18,8 +19,9 @@ import { dec, eur, pct } from '../utils/format';
 
 /**
  * 06 · TU LUGAR Y TU PARTE
- * FIG. 18 the distribution curve · FIG. 19 the percentiles · FIG. 20 a
- * hundred workers · FIG. 21 the distribution over time · FIG. 22–24 the
+ * FIG. 17 la curva de la distribución · FIG. 18 los percentiles · FIG. 19 cien
+ * trabajadores · FIG. 20 la distribución en el tiempo · FIG. 21 el destino de
+ * tu aportación · FIG. 22–24 la
  * public debt.
  */
 export default function Lugar() {
@@ -81,7 +83,10 @@ export default function Lugar() {
               </p>
             </div>
 
-            <p className="fs-statement" style={{ maxWidth: '10ch' }}>{Math.round(percentil)}</p>
+            <p className="fs-statement fs-statement-rule fs-signal" style={{ maxWidth: '10ch' }}>
+              {Math.round(percentil)}
+              <span className="fs-u fs-u-muted" style={{ fontSize: '0.3em', letterSpacing: '0.1em' }}> DE 100</span>
+            </p>
             <p className="fs-body" style={{ marginTop: 12, marginBottom: 36 }}>
               Es tu percentil en {anio}: ganas más que {Math.round(percentil)} de cada 100
               asalariados. La mediana está en <strong>{eur(dist.p50)}</strong> — la mitad de los
@@ -97,6 +102,8 @@ export default function Lugar() {
             <EvolucionDistribucion />
 
             {anio > 2012 && <Escenario bruto={bruto} anio={anio} />}
+
+            <Destino />
 
             <Deuda />
           </div>
@@ -125,7 +132,7 @@ function salarioEnPercentil(p, dist) {
   return dist.p90 * (1 - Math.log(Math.max(1e-3, 1 - (q - 90) / 10)));
 }
 
-/* ── FIG. 20 ─────────────────────────────────────────────────────────────── */
+/* ── FIG. 19 · cien trabajadores ─────────────────────────────────────────── */
 function CienTrabajadores({ bruto, anio, dist, percentil }) {
   const W = 880;
   const H = 300;
@@ -152,7 +159,7 @@ function CienTrabajadores({ bruto, anio, dist, percentil }) {
 
   return (
     <Figure
-      id="20"
+      id="19"
       title="Cien asalariados de España, puestos en fila por salario"
       sub={`${anio} · una marca = un trabajador de cada cien · altura = su salario bruto anual`}
       legend="Una marca = un asalariado de cada cien · las líneas verticales son los percentiles publicados por el INE"
