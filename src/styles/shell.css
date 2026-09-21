@@ -1,0 +1,548 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   FISCALSCOPE — SHELL
+   Masthead, running header, chapter rail, index sheet, la cinta, colophon.
+   Document navigation, never a product navbar.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── cover ────────────────────────────────────────────────────────────────── */
+.fs-cover {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(20px, 4vh, 44px) 0 clamp(18px, 3vh, 34px);
+}
+
+.fs-masthead {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  border-bottom: 1px solid var(--ink);
+  padding-bottom: 10px;
+}
+
+.fs-masthead-name {
+  font-family: var(--sans);
+  font-weight: 800;
+  font-size: clamp(17px, 1.7vw, 23px);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink);
+  line-height: 1;
+}
+
+.fs-masthead-sub {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  margin-top: 7px;
+  line-height: 1.5;
+}
+
+.fs-masthead-meta {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  text-align: right;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.fs-cover-main {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(26px, 5vh, 54px);
+  padding: clamp(28px, 6vh, 70px) 0;
+  align-items: center;
+}
+
+@media (min-width: 900px) {
+  .fs-cover-main {
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+    gap: clamp(32px, 4vw, 72px);
+  }
+}
+
+.fs-cover-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+  border-top: 1px solid var(--rule);
+  padding-top: 10px;
+}
+
+.fs-cover-scroll {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  padding: 6px 0;
+}
+
+.fs-cover-scroll:hover {
+  color: var(--signal);
+}
+
+/* ── running header ───────────────────────────────────────────────────────── */
+.fs-running {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 38px;
+  background: color-mix(in srgb, var(--bone) 92%, transparent);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--rule);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  transform: translateY(-100%);
+  transition: transform var(--t-ui) ease;
+}
+
+.fs-running.is-on {
+  transform: none;
+}
+
+.fs-running-inner {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.fs-running-chapter {
+  flex: 1 1 auto;
+  text-align: center;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fs-running-name {
+  font-family: var(--sans);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.fs-running button {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: none;
+  border: 0;
+  color: var(--ink-3);
+  cursor: pointer;
+  padding: 8px 2px;
+}
+
+.fs-running button:hover {
+  color: var(--signal);
+}
+
+.fs-progress {
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  height: 1px;
+  background: var(--signal);
+  transform-origin: 0 50%;
+}
+
+/* ── chapter rail ─────────────────────────────────────────────────────────── */
+.fs-rail-nav {
+  position: fixed;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 35;
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+}
+
+@media (min-width: 1280px) {
+  .fs-rail-nav.is-on {
+    display: flex;
+  }
+}
+
+.fs-rail-nav a {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  color: var(--ink-6);
+  text-decoration: none;
+  padding: 5px 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: color var(--t-ui);
+}
+
+.fs-rail-nav a::before {
+  content: '';
+  width: 10px;
+  height: 1px;
+  background: currentColor;
+  transition: width var(--t-ui);
+}
+
+.fs-rail-nav a:hover,
+.fs-rail-nav a.is-on {
+  color: var(--ink);
+}
+
+.fs-rail-nav a.is-on::before {
+  width: 20px;
+  background: var(--signal);
+}
+
+.fs-rail-nav a .fs-rail-label {
+  opacity: 0;
+  transition: opacity var(--t-ui);
+  white-space: nowrap;
+  text-transform: uppercase;
+  font-size: 9.5px;
+}
+
+.fs-rail-nav:hover a .fs-rail-label,
+.fs-rail-nav a:focus-visible .fs-rail-label {
+  opacity: 1;
+}
+
+/* ── index sheet ──────────────────────────────────────────────────────────── */
+.fs-indice {
+  position: fixed;
+  inset: 0;
+  background: var(--bone);
+  z-index: 60;
+  padding: clamp(20px, 5vh, 56px) var(--gutter);
+  overflow-y: auto;
+  animation: fs-fade 180ms ease both;
+}
+
+.fs-indice-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 1px solid var(--ink);
+  padding-bottom: 10px;
+  margin-bottom: 8px;
+}
+
+.fs-indice a {
+  display: grid;
+  grid-template-columns: 46px 1fr;
+  gap: 16px;
+  align-items: baseline;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--rule-soft);
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.fs-indice a:hover {
+  color: var(--signal);
+}
+
+.fs-indice-n {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-4);
+}
+
+.fs-indice-t {
+  font-family: var(--serif);
+  font-size: clamp(22px, 3.4vw, 34px);
+  line-height: 1.1;
+}
+
+.fs-indice-d {
+  grid-column: 2;
+  font-size: 12.5px;
+  color: var(--ink-4);
+  margin-top: 4px;
+}
+
+/* ── la cinta ─────────────────────────────────────────────────────────────── */
+.fs-cinta {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 45;
+  background: var(--bone-raised);
+  border-top: 1px solid var(--rule);
+  transform: translateY(110%);
+  transition: transform var(--t-ui) var(--ease);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.fs-cinta.is-on {
+  transform: none;
+}
+
+.fs-cinta-inner {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 9px var(--gutter);
+  display: grid;
+  gap: 8px 22px;
+  grid-template-columns: 1fr;
+  align-items: center;
+}
+
+@media (min-width: 900px) {
+  .fs-cinta-inner {
+    grid-template-columns: minmax(230px, auto) minmax(140px, 1fr) auto;
+    padding: 10px var(--gutter);
+  }
+}
+
+.fs-cinta-pair {
+  display: flex;
+  align-items: baseline;
+  gap: 8px 16px;
+  flex-wrap: wrap;
+}
+
+.fs-cinta-k {
+  font-family: var(--sans);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+.fs-cinta-v {
+  font-family: var(--sans);
+  font-size: 17px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums lining-nums;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.fs-cinta-v.is-net {
+  color: var(--signal);
+}
+
+.fs-cinta-note {
+  font-size: 11.5px;
+  color: var(--ink-4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fs-cinta-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.fs-cinta-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  min-width: 120px;
+  height: 30px;
+  background: transparent;
+  cursor: pointer;
+  margin: 0;
+}
+
+.fs-cinta-range::-webkit-slider-runnable-track {
+  height: 1px;
+  background: var(--rule);
+}
+
+.fs-cinta-range::-moz-range-track {
+  height: 1px;
+  background: var(--rule);
+}
+
+.fs-cinta-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--signal);
+  margin-top: -5.5px;
+}
+
+.fs-cinta-range::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--signal);
+}
+
+.fs-year {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.fs-year button {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  color: var(--ink-3);
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1;
+  padding: 9px 10px;
+  min-height: 34px;
+}
+
+.fs-year button:disabled {
+  color: var(--ink-6);
+  cursor: default;
+}
+
+.fs-year-v {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  min-width: 4ch;
+  text-align: center;
+}
+
+/* profile sheet */
+.fs-perfil {
+  position: fixed;
+  right: var(--gutter);
+  bottom: calc(var(--cinta-h) + 10px);
+  width: min(400px, calc(100vw - 2 * var(--gutter)));
+  max-height: min(70vh, 560px);
+  overflow-y: auto;
+  background: var(--bone-raised);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  padding: 18px;
+  z-index: 50;
+  animation: fs-fade 160ms ease both;
+}
+
+.fs-perfil h3 {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  margin: 0 0 14px;
+}
+
+.fs-field-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+  padding: 10px 0;
+  border-top: 1px solid var(--rule-soft);
+}
+
+.fs-field-row:first-of-type {
+  border-top: 0;
+}
+
+.fs-field-row > .fs-label {
+  color: var(--ink-3);
+}
+
+.fs-field-hint {
+  font-size: 11.5px;
+  color: var(--ink-4);
+  line-height: 1.5;
+}
+
+.fs-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fs-stepper button {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--rule);
+  background: transparent;
+  color: var(--ink-2);
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.fs-stepper button:disabled {
+  color: var(--ink-6);
+  cursor: default;
+}
+
+.fs-stepper output {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  min-width: 2ch;
+  text-align: center;
+}
+
+/* ── colophon ─────────────────────────────────────────────────────────────── */
+.fs-colofon {
+  border-top: 1px solid var(--ink);
+  padding: clamp(36px, 6vh, 64px) 0 clamp(60px, 8vh, 90px);
+}
+
+.fs-colofon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 26px;
+}
+
+.fs-colofon-end {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-5);
+  text-align: center;
+  margin-top: clamp(34px, 5vh, 56px);
+  border-top: 1px solid var(--rule);
+  padding-top: 18px;
+}

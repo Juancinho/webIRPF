@@ -6,8 +6,8 @@ Before making any substantial UI or visualization change, read:
 
 1. `DESIGN.md`
 2. `REDESIGN_PROMPT.md` if the current task is the redesign
-3. `VISUAL_PLAN_V3.md` if present
-4. `STORYBOARD.md` if present
+3. `VISUAL_PLAN_V4.md` — the current art direction (COLD PRESS)
+4. `STORYBOARD_V2.md` — the current chapter-by-chapter plan
 5. the installed `lieflat-charts` skill when the task involves visualization
 
 The main visual reference is:

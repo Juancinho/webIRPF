@@ -50,11 +50,27 @@ Si encuentras un error en los cálculos, en los parámetros históricos o en la 
 ## Stack técnico
 
 - **React** con Vite como bundler
-- **Recharts** para todas las visualizaciones
-- **Tailwind CSS** para el sistema de estilos
+- **SVG a medida** para todas las figuras: no hay librería de gráficos
+- **CSS propio** (`src/styles/`), sin framework de utilidades
 - **JavaScript** puro para el motor de cálculo, sin dependencias externas
 
+En producción sólo se envían React y el propio código: las únicas dependencias del paquete son `react` y `react-dom`.
+
 El motor fiscal está en `src/engine/irpf.js` e implementa la normativa año a año de forma explícita. Es la parte más delicada del proyecto y la que más puede beneficiarse de revisión externa.
+
+La interfaz es una publicación de scroll continuo dividida en ocho capítulos y quince
+figuras. La dirección de arte está documentada en `VISUAL_PLAN_V4.md` y el guion capítulo a
+capítulo en `STORYBOARD_V2.md`; ambos son la referencia antes de tocar la capa visual.
+
+```text
+src/
+  engine/     motor fiscal (protegido)
+  state/      estado fiscal único: salario, año, pagas, perfil
+  figures/    marco de figura, escalas y primitivas de trazo
+  chapters/   los ocho capítulos de la publicación
+  shell/      cabecera de lectura, índice, raíl de capítulos, cinta y colofón
+  styles/     paper.css · figures.css · shell.css
+```
 
 ---
 

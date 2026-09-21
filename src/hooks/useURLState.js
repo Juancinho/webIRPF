@@ -13,6 +13,7 @@ function writeURLState(url, state) {
   url.searchParams.set('anio', state.anio);
 
   const optional = {
+    pagas: state.pagas,
     regimen: state.opts.regimen,
     ccaa: state.opts.ccaa,
     tributacion: state.opts.tributacion,
@@ -21,6 +22,7 @@ function writeURLState(url, state) {
     ascendientes: state.opts.nAscendientes,
   };
   const defaults = {
+    pagas: 12,
     regimen: DEFAULT_OPTS.regimen,
     ccaa: DEFAULT_OPTS.ccaa,
     tributacion: DEFAULT_OPTS.tributacion,
@@ -42,6 +44,7 @@ export function useURLState() {
     return {
       bruto: intParam(p, 'bruto', 35000, 0, 200000),
       anio: intParam(p, 'anio', 2026, 2012, 2026),
+      pagas: p.get('pagas') === '14' ? 14 : 12,
       opts: {
         regimen: ['asalariado', 'autonomo'].includes(p.get('regimen')) ? p.get('regimen') : DEFAULT_OPTS.regimen,
         ccaa: Object.hasOwn(REGIONES, p.get('ccaa')) ? p.get('ccaa') : DEFAULT_OPTS.ccaa,

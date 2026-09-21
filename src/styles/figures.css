@@ -1,0 +1,767 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   FISCALSCOPE — FIGURES
+   Figure frame, annotation, unit legend and the hairline mark primitives.
+   Grammar ported from lieflat-charts (Lupi Editorial / Lupi Basics):
+   hairline strokes, countable units, environment furniture, direct labels.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── figure frame ─────────────────────────────────────────────────────────── */
+.fs-figure {
+  margin: 0 0 clamp(40px, 6vh, 72px);
+}
+
+.fs-figure-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px 24px;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 10px;
+  margin-bottom: 18px;
+}
+
+.fs-figure-id {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  white-space: nowrap;
+}
+
+.fs-figure-title {
+  font-family: var(--sans);
+  font-size: clamp(15px, 1.25vw, 18px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin: 0;
+  flex: 1 1 320px;
+}
+
+.fs-figure-sub {
+  flex-basis: 100%;
+  font-size: 12.5px;
+  color: var(--ink-3);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.fs-figure-body {
+  position: relative;
+}
+
+.fs-figure-legend {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-5);
+  margin-top: 12px;
+}
+
+.fs-figure-foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 24px;
+  margin-top: 10px;
+  border-top: 1px solid var(--rule-soft);
+  padding-top: 8px;
+}
+
+.fs-night .fs-figure-head {
+  border-bottom-color: var(--night-rule);
+}
+
+.fs-night .fs-figure-foot {
+  border-top-color: var(--night-rule);
+}
+
+.fs-night .fs-figure-title {
+  color: var(--night-ink);
+}
+
+.fs-night .fs-figure-id,
+.fs-night .fs-figure-legend {
+  color: #6d7679;
+}
+
+.fs-night .fs-figure-sub {
+  color: #a8adae;
+}
+
+/* ── svg canvas ───────────────────────────────────────────────────────────── */
+.fs-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  touch-action: pan-y;
+}
+
+.fs-svg text {
+  font-family: var(--sans);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.fs-svg .fs-t-stamp {
+  font-family: var(--mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* halo so labels stay legible over dense mark fields */
+.fs-svg .fs-halo {
+  paint-order: stroke;
+  stroke: var(--bone);
+  stroke-width: 3.5px;
+  stroke-linejoin: round;
+}
+
+.fs-night .fs-svg .fs-halo {
+  stroke: var(--night);
+}
+
+/* ── interactive marks ────────────────────────────────────────────────────── */
+.fs-hit {
+  cursor: pointer;
+  fill: transparent;
+  stroke: transparent;
+}
+
+.fs-group {
+  transition: opacity var(--t-ui) ease;
+}
+
+.fs-group.is-dim {
+  opacity: 0.28;
+}
+
+.fs-mark {
+  transition: opacity var(--t-ui) ease;
+}
+
+.fs-strip-rect,
+.fs-rung,
+.fs-tick {
+  transition: x var(--t-figure) var(--ease), y var(--t-figure) var(--ease),
+    width var(--t-figure) var(--ease), height var(--t-figure) var(--ease),
+    opacity var(--t-ui) ease;
+}
+
+/* ── annotation ───────────────────────────────────────────────────────────── */
+.fs-annot {
+  font-size: 11.5px;
+  font-weight: 600;
+  fill: var(--ink-2);
+}
+
+.fs-annot-lead {
+  stroke: var(--ink-5);
+  stroke-width: 0.7;
+  fill: none;
+}
+
+.fs-axis {
+  font-family: var(--sans);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  fill: var(--ink-4);
+}
+
+.fs-night .fs-annot {
+  fill: #c9c7c0;
+}
+
+.fs-night .fs-axis {
+  fill: #8d9497;
+}
+
+.fs-night .fs-annot-lead {
+  stroke: #4a5153;
+}
+
+/* ── readout: the in-figure replacement for chart-library tooltips ────────── */
+.fs-readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 28px;
+  align-items: baseline;
+  min-height: 42px;
+  border-left: 2px solid var(--signal);
+  padding: 2px 0 2px 12px;
+  margin-bottom: 14px;
+}
+
+.fs-readout-k {
+  font-family: var(--sans);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  display: block;
+}
+
+.fs-readout-v {
+  font-family: var(--sans);
+  font-size: 17px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums lining-nums;
+  color: var(--ink);
+}
+
+.fs-night .fs-readout {
+  border-left-color: var(--night-signal);
+}
+
+.fs-night .fs-readout-v {
+  color: var(--night-ink);
+}
+
+.fs-night .fs-readout-k {
+  color: #8d9497;
+}
+
+/* ── ledger (FIG. 02) ─────────────────────────────────────────────────────── */
+.fs-ledger {
+  display: grid;
+  gap: 0;
+}
+
+.fs-ledger-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 170px) minmax(0, 1fr) minmax(96px, auto);
+  gap: 12px 18px;
+  align-items: center;
+  padding: 13px 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+  border-top: 1px solid var(--rule-soft);
+  transition: background var(--t-ui);
+}
+
+.fs-ledger-row:first-child {
+  border-top: 0;
+}
+
+.fs-ledger-row.is-total {
+  border-top: 1px solid var(--ink);
+}
+
+.fs-ledger-row:hover,
+.fs-ledger-row:focus-visible {
+  background: var(--bone-raised);
+}
+
+.fs-ledger-row.is-dim {
+  opacity: 0.4;
+}
+
+.fs-ledger-k {
+  font-family: var(--sans);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.fs-ledger-v {
+  font-family: var(--sans);
+  font-size: clamp(16px, 1.5vw, 21px);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums lining-nums;
+  text-align: right;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.fs-ledger-v.is-neg {
+  color: var(--ink-3);
+  font-weight: 500;
+}
+
+.fs-ledger-sub {
+  grid-column: 2 / -1;
+  font-size: 12px;
+  color: var(--ink-4);
+  margin-top: -6px;
+}
+
+@media (max-width: 640px) {
+  .fs-ledger-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .fs-ledger-row > .fs-svg-wrap {
+    grid-column: 1 / -1;
+    order: 3;
+  }
+  .fs-ledger-sub {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ── scrubber ─────────────────────────────────────────────────────────────── */
+.fs-scrub {
+  position: relative;
+  padding: 14px 0 6px;
+}
+
+.fs-scrub input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 34px;
+  background: transparent;
+  cursor: pointer;
+  margin: 0;
+}
+
+.fs-scrub input[type='range']::-webkit-slider-runnable-track {
+  height: 1px;
+  background: var(--rule);
+}
+
+.fs-scrub input[type='range']::-moz-range-track {
+  height: 1px;
+  background: var(--rule);
+}
+
+.fs-scrub input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--signal);
+  border: 0;
+  margin-top: -6px;
+}
+
+.fs-scrub input[type='range']::-moz-range-thumb {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--signal);
+  border: 0;
+}
+
+.fs-scrub-ticks {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  color: var(--ink-5);
+  pointer-events: none;
+}
+
+.fs-night .fs-scrub input[type='range']::-webkit-slider-runnable-track {
+  background: var(--night-rule);
+}
+
+.fs-night .fs-scrub input[type='range']::-webkit-slider-thumb {
+  background: var(--night-signal);
+}
+
+/* ── sticky figure chapters (02, 03) ──────────────────────────────────────── */
+.fs-sticky {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+
+@media (min-width: 1000px) {
+  .fs-sticky {
+    grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+    gap: 56px;
+    align-items: start;
+  }
+  .fs-sticky-fig {
+    position: sticky;
+    top: 92px;
+  }
+}
+
+@media (max-width: 999px) {
+  .fs-sticky-fig {
+    position: sticky;
+    top: 56px;
+    background: var(--bone);
+    padding-bottom: 12px;
+    z-index: 2;
+  }
+  .fs-night .fs-sticky-fig {
+    background: var(--night);
+  }
+}
+
+.fs-step {
+  padding: clamp(24px, 6vh, 64px) 0;
+  border-top: 1px solid var(--rule-soft);
+  transition: opacity var(--t-ui) ease;
+}
+
+.fs-step:first-child {
+  border-top: 0;
+}
+
+.fs-step.is-off {
+  opacity: 0.34;
+}
+
+.fs-step-id {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  color: var(--ink-4);
+  display: block;
+  margin-bottom: 8px;
+}
+
+.fs-step h3 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(22px, 2vw, 30px);
+  line-height: 1.14;
+  margin: 0 0 10px;
+  color: var(--ink);
+}
+
+.fs-step p {
+  margin: 0 0 10px;
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+.fs-formula {
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--ink-3);
+  background: var(--bone-raised);
+  border-left: 2px solid var(--rule);
+  padding: 9px 12px;
+  margin: 12px 0;
+  overflow-x: auto;
+}
+
+.fs-night .fs-step {
+  border-top-color: var(--night-rule);
+}
+
+/* ── dot progress (mobile sticky) ─────────────────────────────────────────── */
+.fs-dots {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.fs-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink-6);
+  transition: background var(--t-ui), transform var(--t-ui);
+}
+
+.fs-dot.is-on {
+  background: var(--signal);
+  transform: scale(1.35);
+}
+
+/* ── hundred field grid fallback / group labels ───────────────────────────── */
+.fs-keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin-top: 14px;
+}
+
+.fs-key {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  background: none;
+  border: 0;
+  padding: 4px 0;
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.fs-key.is-dim {
+  opacity: 0.4;
+}
+
+.fs-key-swatch {
+  width: 10px;
+  height: 10px;
+  flex: none;
+  border-radius: 1px;
+}
+
+.fs-key-v {
+  font-variant-numeric: tabular-nums lining-nums;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.fs-night .fs-key {
+  color: #a8adae;
+}
+
+.fs-night .fs-key-v {
+  color: var(--night-ink);
+}
+
+/* ── narrow screens ──────────────────────────────────────────────────────── */
+@media (max-width: 700px) {
+  .fs-figure-head {
+    gap: 6px 16px;
+  }
+
+  .fs-readout {
+    gap: 10px 20px;
+  }
+}
+
+/* ── zoomable figure frame ────────────────────────────────────────────────── */
+.fs-zoom {
+  position: relative;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.fs-zoom.is-grabbing {
+  cursor: grabbing;
+}
+
+.fs-zoom:not(.is-grabbing) {
+  cursor: grab;
+}
+
+.fs-zoom-controls {
+  position: absolute;
+  right: 0;
+  top: 0;
+  display: flex;
+  gap: 4px;
+  opacity: 0.55;
+  transition: opacity var(--t-ui);
+}
+
+.fs-zoom:hover .fs-zoom-controls,
+.fs-zoom:focus-within .fs-zoom-controls {
+  opacity: 1;
+}
+
+.fs-zoom-controls button {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--rule);
+  background: var(--bone-raised);
+  border-radius: 7px;
+  color: var(--ink-3);
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+}
+
+.fs-zoom-controls button:hover {
+  color: var(--ink);
+  border-color: var(--ink-4);
+}
+
+.fs-zoom-controls button:disabled {
+  color: var(--ink-6);
+  cursor: default;
+}
+
+.fs-night .fs-zoom-controls button {
+  background: #161c1f;
+  border-color: var(--night-rule);
+  color: #a8adae;
+}
+
+.fs-zoom-hint {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-5);
+  margin-top: 6px;
+}
+
+.fs-night .fs-zoom-hint {
+  color: #6d7679;
+}
+
+/* the figure's own readout line replaces floating chart tooltips */
+.fs-crosshair {
+  stroke: var(--signal);
+  stroke-width: 0.9;
+  stroke-dasharray: 2 3;
+  pointer-events: none;
+}
+
+/* ── step ledger (FIG. 03 · el desglose completo) ─────────────────────────── */
+.fs-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: paso;
+}
+
+.fs-stepline {
+  border-top: 1px solid var(--rule-soft);
+}
+
+.fs-stepline:first-child {
+  border-top: 0;
+}
+
+.fs-stepline.is-total {
+  border-top: 1px solid var(--ink);
+}
+
+.fs-stepline.is-open {
+  background: var(--bone-raised);
+}
+
+.fs-stepline-head {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) minmax(104px, auto);
+  gap: 6px 16px;
+  align-items: baseline;
+  width: 100%;
+  padding: 12px 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.fs-stepline-head:hover .fs-stepline-t {
+  color: var(--signal);
+}
+
+.fs-stepline-k {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-4);
+}
+
+.fs-stepline.is-open .fs-stepline-k {
+  color: var(--signal);
+}
+
+.fs-stepline-t {
+  font-family: var(--sans);
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--ink);
+  transition: color var(--t-ui);
+}
+
+.fs-stepline-s {
+  display: block;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--ink-4);
+  margin-top: 2px;
+}
+
+.fs-stepline-v {
+  font-family: var(--sans);
+  font-size: 15.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums lining-nums;
+  text-align: right;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.fs-stepline-v.is-neg {
+  color: var(--ink-3);
+  font-weight: 500;
+}
+
+.fs-stepline.is-total .fs-stepline-v {
+  color: var(--signal);
+  font-size: 18px;
+}
+
+.fs-stepline-body {
+  padding: 0 0 18px 46px;
+  animation: fs-fade 200ms ease both;
+}
+
+@media (max-width: 640px) {
+  .fs-stepline-head {
+    grid-template-columns: 24px minmax(0, 1fr);
+  }
+  .fs-stepline-v {
+    grid-column: 2;
+    text-align: left;
+  }
+  .fs-stepline-body {
+    padding-left: 24px;
+  }
+}
+
+/* ── explainer blocks ─────────────────────────────────────────────────────── */
+.fs-explica {
+  margin: 0 0 clamp(40px, 6vh, 72px);
+  border-top: 1px solid var(--rule);
+  padding-top: 20px;
+}
+
+.fs-explica-pasos {
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.fs-explica-pasos li {
+  border-top: 1px solid var(--rule-soft);
+  padding-top: 10px;
+}
+
+.fs-explica-pasos .fs-stamp {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.fs-caso {
+  margin-top: 26px;
+  border-left: 2px solid var(--counter);
+  padding-left: 16px;
+  max-width: 620px;
+}
+
+.fs-night .fs-explica {
+  border-top-color: var(--night-rule);
+}
+
+.fs-night .fs-explica-pasos li {
+  border-top-color: var(--night-rule);
+}
