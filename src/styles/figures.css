@@ -656,6 +656,34 @@
   flex: none;
 }
 
+/* Year selectors repeat the line colour without turning the control row into
+   a rainbow block. Text remains the second identification channel. */
+.fs-btn[style*='--year-color'] {
+  position: relative;
+  border-color: color-mix(in srgb, var(--year-color) 42%, var(--rule));
+}
+
+.fs-btn[style*='--year-color']::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 6px;
+  background: var(--year-color);
+  border-radius: 50%;
+  vertical-align: 1px;
+  opacity: 0.42;
+}
+
+.fs-btn[style*='--year-color'][aria-pressed='true'] {
+  color: var(--ink);
+  background: var(--bone-raised);
+  border-color: var(--year-color);
+  box-shadow: inset 0 -3px 0 var(--year-color);
+}
+
+.fs-btn[style*='--year-color'][aria-pressed='true']::before { opacity: 1; }
+
 .fs-night .fs-tip {
   background: var(--night-ink);
   color: var(--night);

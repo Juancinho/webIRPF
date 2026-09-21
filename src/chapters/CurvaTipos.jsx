@@ -20,7 +20,7 @@ const STEP = 250;
 const LINEAS = [
   { k: 'marg', label: 'Marginal total', color: 'var(--counter)', width: 1.6, nota: 'lo que se lleva el siguiente euro' },
   { k: 'efTotal', label: 'Efectivo total', color: 'var(--ink)', width: 1.4, nota: 'IRPF + cotizaciones sobre el bruto' },
-  { k: 'efIrpf', label: 'Efectivo IRPF', color: 'var(--ink-4)', width: 1.2, nota: 'sólo IRPF sobre el bruto' },
+  { k: 'efIrpf', label: 'Efectivo IRPF', color: 'var(--series-jade)', width: 1.35, nota: 'sólo IRPF sobre el bruto' },
 ];
 
 /**

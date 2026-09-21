@@ -29,6 +29,14 @@
   --counter: #23406e;
   --counter-soft: #bfc8d6;
 
+  /* cold chart spectrum — selected comparison series only, never decoration */
+  --series-cyan: #087487;
+  --series-indigo: #3d5696;
+  --series-jade: #2f7463;
+  --series-violet: #704f8b;
+  --series-steel: #326b87;
+  --series-plum: #7a4e72;
+
   /* inverted chapter */
   --night: #0e1214;
   --night-ink: #e8e6df;

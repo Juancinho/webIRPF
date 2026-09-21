@@ -19,6 +19,24 @@ import { Label, Series } from '../figures/marks';
 import { linear, polyline, round, ticks } from '../figures/scale';
 import { eur, pct, sign } from '../utils/format';
 
+/* A compact cold spectrum for explicitly selected years. Context years stay
+   grey; the publication's active year always remains petrol. Fixed assignment
+   by year means a series keeps its identity while the cursor moves. */
+const ATLAS_COLORS = [
+  'var(--counter)',
+  'var(--series-cyan)',
+  'var(--series-indigo)',
+  'var(--series-jade)',
+  'var(--series-violet)',
+  'var(--series-steel)',
+  'var(--series-plum)',
+];
+
+const atlasColor = (year, currentYear) =>
+  year === currentYear
+    ? 'var(--signal)'
+    : ATLAS_COLORS[ANIOS.indexOf(year) % ATLAS_COLORS.length];
+
 /**
  * 04 · QUINCE AÑOS DE FISCALIDAD
  * FIG. 10 los quince años, en serie o en clasificación · FIG. 11 el comparador
@@ -471,7 +489,7 @@ function Atlas({ anio, bruto2026, elegirAnio }) {
      pisaban. Se ordenan por valor y se separan un mínimo de píxeles, con un
      hilo que devuelve cada rótulo a su curva. */
   const etiquetas = ANIOS.filter(a => activos.has(a) || a === anio)
-    .map(a => ({ a, v: ultimo(a), y: y(ultimo(a)) + 3.5 }))
+    .map(a => ({ a, v: ultimo(a), y: y(ultimo(a)) + 3.5, color: atlasColor(a, anio) }))
     .sort((p, q) => p.y - q.y)
     .reduce((acc, e) => {
       const prev = acc[acc.length - 1];
@@ -485,17 +503,20 @@ function Atlas({ anio, bruto2026, elegirAnio }) {
     const r = svg.getBoundingClientRect();
     const v = x.invert(((e.clientX - r.left) / r.width) * W);
     const d = datos.reduce((best, c) => (Math.abs(c.bruto - v) < Math.abs(best.bruto - v) ? c : best), datos[0]);
-    const vistos = ANIOS.filter(a => activos.has(a) || a === anio);
+    const vistos = ANIOS.filter(a => activos.has(a) || a === anio)
+      .map(a => ({ a, value: d[`${key}_${a}`], color: atlasColor(a, anio) }))
+      .sort((p, q) => q.value - p.value || q.a - p.a);
     setTip({
       vx: x(d.bruto),
-      vy: y(d[`${key}_${anio}`]),
+      vy: y(vistos[0]?.value ?? d[`${key}_${anio}`]),
       title: eur(d.bruto),
-      sub: medida === 'neto' ? 'Salario neto por bruto' : 'Tipo efectivo de IRPF',
-      rows: vistos.map(a => [
-        String(a),
-        medida === 'neto' ? eur(d[`neto_${a}`]) : pct(d[`irpf_${a}`]),
-        a === anio ? 'var(--signal)' : 'var(--ink-4)',
+      sub: `${medida === 'neto' ? 'Salario neto por bruto' : 'Tipo efectivo de IRPF'} · mayor a menor`,
+      rows: vistos.map(({ a, value, color }, rank) => [
+        `${rank + 1} · ${a}`,
+        medida === 'neto' ? eur(value) : pct(value),
+        color,
       ]),
+      marks: vistos.map(({ a, value, color }) => ({ a, y: y(value), color })),
     });
   };
 
@@ -508,7 +529,7 @@ function Atlas({ anio, bruto2026, elegirAnio }) {
           : 'La carga real del IRPF por nivel de renta, año a año'
       }
       sub={`${medida === 'neto' ? 'Euros constantes de 2026' : modo === 'real' ? 'Euros constantes de 2026' : 'Euros nominales de cada año'} · perfil estándar: individual, sin hijos, escala estatal`}
-      legend="Año en curso en negro · año seleccionado en petróleo · resto en gris · sin leyenda: cada línea se nombra en su propio extremo"
+      legend="Año en curso en petróleo · años seleccionados en tonos minerales · contexto en gris · al pasar el cursor, la lectura se ordena de mayor a menor"
       source="Fuente · cálculo propio sobre parámetros BOE · IPC INE"
       summary={`Curvas de ${medida === 'neto' ? 'salario neto' : 'tipo efectivo de IRPF'} para ${ANIOS.length} años entre ${eur(xs[0])} y ${eur(xs[xs.length - 1])} de bruto.`}
     >
@@ -538,7 +559,14 @@ function Atlas({ anio, bruto2026, elegirAnio }) {
         </button>
       </div>
 
-      <ChartFrame viewBox={`0 0 ${W} ${H}`} zoom={zoom} tip={tip} label="El atlas de la renta">
+      <ChartFrame
+        viewBox={`0 0 ${W} ${H}`}
+        zoom={zoom}
+        tip={tip}
+        scroll
+        minWidth={620}
+        label="El atlas de la renta"
+      >
         <defs>
           <clipPath id={clip}>
             <rect x={X0} y={Y0 - 12} width={X1 - X0} height={Y1 - Y0 + 14} />
@@ -564,15 +592,30 @@ function Atlas({ anio, bruto2026, elegirAnio }) {
               <Series
                 key={a}
                 d={path(a)}
-                color={esActual ? 'var(--signal)' : 'var(--ink-4)'}
-                width={esActual ? 1.8 : 0.9}
+                color={atlasColor(a, anio)}
+                width={esActual ? 2.25 : 1.7}
               />
             );
           })}
 
           <line x1={round(x(marcado))} y1={Y0 - 4} x2={round(x(marcado))} y2={Y1} stroke="var(--counter)" strokeWidth={1} strokeDasharray="3 3" />
 
-          {tip && <line className="fs-crosshair" x1={round(tip.vx)} y1={Y0 - 4} x2={round(tip.vx)} y2={Y1} />}
+          {tip && (
+            <g>
+              <line className="fs-crosshair" x1={round(tip.vx)} y1={Y0 - 4} x2={round(tip.vx)} y2={Y1} />
+              {tip.marks?.map(mark => (
+                <circle
+                  key={mark.a}
+                  cx={round(tip.vx)}
+                  cy={round(mark.y)}
+                  r={mark.a === anio ? 4.1 : 3.2}
+                  fill={mark.color}
+                  stroke="var(--bone)"
+                  strokeWidth={1.4}
+                />
+              ))}
+            </g>
+          )}
         </g>
 
         {/* etiquetas directas al margen, separadas para que no se pisen */}
@@ -584,12 +627,12 @@ function Atlas({ anio, bruto2026, elegirAnio }) {
                 y1={round(y(e.v))}
                 x2={X1 + 6}
                 y2={round(e.y - 3.5)}
-                stroke="var(--ink-6)"
+                stroke={e.color}
                 strokeWidth={0.6}
                 strokeDasharray="1.5 2"
               />
             )}
-            <Label x={X1 + 9} y={round(e.y)} size={10} weight={e.a === anio ? 800 : 700} color={e.a === anio ? 'var(--signal)' : 'var(--ink-4)'} mono>
+            <Label x={X1 + 9} y={round(e.y)} size={10} weight={e.a === anio ? 800 : 700} color={e.color} mono>
               {e.a}
             </Label>
           </g>
@@ -626,7 +669,7 @@ function Atlas({ anio, bruto2026, elegirAnio }) {
             key={a}
             type="button"
             className="fs-btn"
-            style={{ padding: '5px 9px', minHeight: 30, fontSize: 10.5 }}
+            style={{ '--year-color': atlasColor(a, anio), padding: '5px 9px', minHeight: 30, fontSize: 10.5 }}
             aria-pressed={activos.has(a)}
             onClick={() => toggle(a)}
             onDoubleClick={() => elegirAnio(a)}

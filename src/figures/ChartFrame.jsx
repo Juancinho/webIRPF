@@ -37,6 +37,7 @@ export default function ChartFrame({
   const lienzo = (
     <div
       className={`fs-chart ${zoom ? 'fs-chart-zoom' : ''} ${zoom?.zoomed ? 'is-zoomed' : ''}`.trim()}
+      style={scroll && narrow ? { minWidth } : undefined}
       ref={zoom ? zoom.ref : undefined}
       tabIndex={zoom ? 0 : undefined}
       role={zoom ? 'group' : undefined}
@@ -75,7 +76,7 @@ export default function ChartFrame({
       )}
 
       {zoom && (
-        <div className="fs-zoom-controls">
+        <div className="fs-zoom-controls" onPointerDown={e => e.stopPropagation()}>
           <button type="button" onClick={zoom.zoomIn} disabled={!zoom.canZoomIn} aria-label="Ampliar el eje">
             +
           </button>

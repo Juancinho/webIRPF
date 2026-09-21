@@ -49,20 +49,30 @@ export default function Art20Historia() {
     const rn = x.invert(px);
     const p = datos.reduce((best, d) => (Math.abs(d.rn - rn) < Math.abs(best.rn - rn) ? d : best), datos[0]);
     setHover(p);
+    const ordenados = ANIOS_ART20_MUESTRA.filter(a => activos.has(a))
+      .map(a => ({ a, value: p[`red_${a}`], color: tono(ANIOS_ART20_MUESTRA.indexOf(a)) }))
+      .sort((a, b) => b.value - a.value || b.a - a.a);
     setTip({
       vx: x(p.rn),
-      vy: y(p[`red_${ANIOS_ART20_MUESTRA[0]}`]),
+      vy: y(ordenados[0]?.value ?? 0),
       title: eur(p.rn),
-      sub: 'Rendimiento neto previo',
-      rows: ANIOS_ART20_MUESTRA.filter(a => activos.has(a)).map(a => [
-        String(a),
-        eur(p[`red_${a}`]),
-        tono(ANIOS_ART20_MUESTRA.indexOf(a)),
+      sub: 'Rendimiento neto previo · mayor a menor',
+      rows: ordenados.map(({ a, value, color }, rank) => [
+        `${rank + 1} · ${a}`,
+        eur(value),
+        color,
       ]),
     });
   };
 
-  const tono = i => ['var(--ink)', 'var(--ink-2)', 'var(--ink-3)', 'var(--ink-4)', 'var(--ink-5)', 'var(--counter)'][i % 6];
+  const tono = i => [
+    'var(--counter)',
+    'var(--series-cyan)',
+    'var(--series-indigo)',
+    'var(--series-jade)',
+    'var(--series-violet)',
+    'var(--series-steel)',
+  ][i % 6];
 
   return (
     <Figure
@@ -86,7 +96,7 @@ export default function Art20Historia() {
         {ANIOS_ART20_MUESTRA.filter(a => activos.has(a)).map(a => (
           <span key={a}>
             <span className="fs-readout-k">{a}</span>
-            <span className="fs-readout-v">{hover ? eur(hover[`red_${a}`]) : '—'}</span>
+            <span className="fs-readout-v" style={{ color: tono(ANIOS_ART20_MUESTRA.indexOf(a)) }}>{hover ? eur(hover[`red_${a}`]) : '—'}</span>
           </span>
         ))}
       </div>
@@ -101,7 +111,7 @@ export default function Art20Historia() {
             key={a}
             type="button"
             className="fs-btn"
-            style={{ padding: '5px 10px', minHeight: 30, fontSize: 10.5 }}
+            style={{ '--year-color': tono(ANIOS_ART20_MUESTRA.indexOf(a)), padding: '5px 10px', minHeight: 30, fontSize: 10.5 }}
             aria-pressed={activos.has(a)}
             onClick={() => toggle(a)}
           >
