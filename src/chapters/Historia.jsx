@@ -87,7 +87,7 @@ export default function Historia() {
   const dif = hoy.neto - mejor.neto;
 
   return (
-    <section id="historia" className="fs-chapter" aria-labelledby="historia-t">
+    <section id="historia" className="fs-chapter fs-open-archive" aria-labelledby="historia-t">
       <div className="fs-page">
         <span className="fs-chapter-numeral" aria-hidden="true">04</span>
 
@@ -126,7 +126,7 @@ export default function Historia() {
           </aside>
 
           <div className="fs-field">
-            <div className="fs-chapter-head">
+            <div className="fs-chapter-head" data-gesture="2012   2015   2019   2023   2026">
               <span className="fs-stamp">04 / 09 · Quince años de fiscalidad</span>
               <h2 id="historia-t" className="fs-title">
                 El mismo sueldo,
@@ -134,9 +134,10 @@ export default function Historia() {
                 quince años
               </h2>
               <p className="fs-kicker">
-                Las reglas que acabas de ver no son eternas: se han reescrito quince veces desde
-                2012. Esta es la misma capacidad de compra —{eur(bruto2026)} de hoy— pasada por la
-                fiscalidad de cada año.
+                Para comparar ejercicios aislamos la inflación: en cada año usamos el salario nominal
+                equivalente a <strong>{eur(bruto2026)} de 2026</strong>. Así, cualquier diferencia en
+                el resultado procede de los parámetros fiscales y de cotización aplicables en cada fecha,
+                no de comparar euros con distinto poder de compra.
               </p>
             </div>
 
@@ -149,7 +150,7 @@ export default function Historia() {
                   Con el mismo poder adquisitivo, {mejor.anio} dejaba{' '}
                   <strong>{eur(mejor.neto)}</strong> netos reales y {hoy.anio} deja{' '}
                   <strong>{eur(hoy.neto)}</strong>. La diferencia no viene de ganar menos, sino de
-                  cómo han cambiado la escala, las cotizaciones y las reducciones.
+                  cómo han cambiado la escala, las cotizaciones, los mínimos y las reducciones.
                 </p>
               </>
             )}
@@ -165,9 +166,9 @@ export default function Historia() {
             <Epocas bruto2026={bruto2026} />
 
             <Puente rotulo="Y ahora, todos los sueldos">
-              Todo lo anterior fija <strong>tu</strong> sueldo y recorre los años. Cambiemos la
-              pregunta: ¿le ha pasado lo mismo a quien cobra la mitad, o el doble? Para eso hace
-              falta recorrer la escala entera, año por año.
+              Hasta aquí hemos mantenido fijo un nivel salarial. El atlas amplía la comparación a
+              toda la escala: permite comprobar si una reforma produce el mismo efecto relativo en
+              rentas bajas, medias y altas, o si las curvas se cruzan.
             </Puente>
 
             <Atlas anio={anio} bruto2026={bruto2026} elegirAnio={elegirAnio} />
@@ -184,10 +185,9 @@ export default function Historia() {
             el sitio —y romper la retícula es justo lo que pide el capítulo. */}
         <div className="fs-field" style={{ maxWidth: 'var(--reading-max)', margin: '0 auto' }}>
           <Puente rotulo="Quince años, de una vez">
-            Cada figura de este capítulo ha fijado algo: un sueldo, un año, dos años. La última no
-            fija nada. Quince ejercicios y cien niveles de renta en una sola imagen, con el color
-            como única medida — y una advertencia: la columna que te toca <strong>se lee de
-            arriba abajo</strong>.
+            La última figura reúne las dos dimensiones anteriores: quince ejercicios y cien niveles
+            de renta. El color representa una única magnitud fiscal y permite localizar periodos o
+            tramos salariales que se apartan del patrón general.
           </Puente>
         </div>
 

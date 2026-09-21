@@ -83,8 +83,8 @@ export default function Art20Historia() {
       source="Fuente · BOE — LIRPF art. 20, redacciones sucesivas"
       note={
         real
-          ? 'En euros constantes se ve lo que de verdad protegía cada versión: una reducción nominalmente mayor puede valer menos si los precios han subido más.'
-          : 'En euros nominales, la reducción no ha dejado de crecer desde 2015 y ha ido alcanzando a rentas cada vez más altas.'
+          ? 'En euros constantes se compara el poder adquisitivo cubierto por cada versión: una reducción nominalmente mayor puede equivaler a una cuantía real menor si los precios han crecido más.'
+          : 'En euros nominales se observan las cuantías y umbrales legales de cada ejercicio, sin corregir el nivel de precios.'
       }
       summary={ANIOS_ART20_MUESTRA.map(a => `${a}: máximo ${eur(datos[0][`red_${a}`])}`).join('; ')}
     >

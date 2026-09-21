@@ -772,21 +772,62 @@
 .fs-desglose {
   --spine: 15px;
   --sangria: 34px;
+  counter-reset: fiscal-block;
+}
+
+.fs-ledger-summary {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+  margin: 0 0 24px;
+  padding: 14px 0 16px;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--rule);
+}
+
+.fs-ledger-summary p {
+  margin: 6px 0 0;
+  max-width: 64ch;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-3);
+}
+
+@media (max-width: 640px) {
+  .fs-ledger-summary {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }
 
 .fs-dbloque + .fs-dbloque {
-  margin-top: 26px;
+  margin-top: 38px;
 }
 
 .fs-dbloque-head {
-  border-top: 1px solid var(--rule);
-  padding: 12px 0 10px;
+  counter-increment: fiscal-block;
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 2px 12px;
+  border-top: 2px solid var(--ink);
+  padding: 11px 0 13px;
+}
+
+.fs-dbloque-head::before {
+  content: '0' counter(fiscal-block);
+  grid-row: 1 / span 2;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--counter);
+  padding-top: 2px;
 }
 
 .fs-dbloque-t {
   font-family: var(--sans);
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ink-3);
@@ -841,7 +882,11 @@
 
 .fs-dfila-head:hover,
 .fs-dfila.is-open > .fs-dfila-head {
-  background: var(--bone-raised);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--counter) 5%, transparent), transparent 72%);
+}
+
+.fs-dfila.is-open > .fs-dfila-head {
+  box-shadow: inset 2px 0 0 var(--counter);
 }
 
 /* nodo del hito sobre la espina */
@@ -897,7 +942,7 @@
   display: block;
   font-family: var(--sans);
   font-size: 13.5px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--ink-2);
   line-height: 1.3;
 }
@@ -920,7 +965,7 @@
   color: var(--ink-4);
   line-height: 1.45;
   margin-top: 2px;
-  max-width: 60ch;
+  max-width: 64ch;
 }
 
 /* ── el carril de la cascada ──────────────────────────────────────────────
@@ -931,8 +976,8 @@
 .fs-dfila-track {
   grid-area: track;
   position: relative;
-  height: 11px;
-  margin: 6px 0 0 var(--sangria);
+  height: 12px;
+  margin: 8px 0 0 var(--sangria);
   border-bottom: 1px solid var(--rule-soft);
 }
 
@@ -974,6 +1019,7 @@
 .fs-dfila.is-hito .fs-dfila-bar {
   top: 0;
   background: var(--ink);
+  height: 8px;
 }
 
 /* restas: el tramo que se lleva, rayado */
@@ -1064,7 +1110,8 @@
 }
 
 .fs-dfila-body {
-  padding: 0 0 18px calc(var(--sangria) + 30px);
+  padding: 3px 0 22px calc(var(--sangria) + 30px);
+  border-bottom: 1px solid var(--rule);
   animation: fs-fade 200ms ease both;
 }
 
@@ -1133,6 +1180,36 @@
 
 .fs-night .fs-explica-pasos li {
   border-top-color: var(--night-rule);
+}
+
+.fs-deflation-note {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  margin: 0 0 24px;
+  padding: 16px 0 18px;
+  border-top: 2px solid var(--counter);
+  border-bottom: 1px solid var(--rule);
+}
+
+.fs-deflation-note .fs-stamp {
+  color: var(--counter);
+}
+
+.fs-deflation-note .fs-body,
+.fs-deflation-note .fs-note {
+  margin: 0;
+  max-width: 76ch;
+}
+
+@media (min-width: 900px) {
+  .fs-deflation-note {
+    grid-template-columns: minmax(210px, 0.42fr) minmax(0, 1fr);
+    column-gap: 28px;
+  }
+  .fs-deflation-note .fs-note {
+    grid-column: 2;
+  }
 }
 
 /* ── leyenda grande: la clave de lectura de una barra repartida (FIG. 02) ─── */

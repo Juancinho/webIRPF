@@ -104,12 +104,12 @@ export default function Cinta({ visible }) {
 
             <button
               type="button"
-              className="fs-btn"
-              aria-expanded={perfilOpen}
-              onClick={() => setPerfilOpen(o => !o)}
-            >
-              Perfil · {region.name}
-            </button>
+            className="fs-btn"
+            aria-expanded={perfilOpen}
+            onClick={() => setPerfilOpen(o => !o)}
+          >
+              Perfil<span className="fs-profile-label"> · {region.name}</span>
+          </button>
           </div>
         </div>
       </div>

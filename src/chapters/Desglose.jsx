@@ -18,7 +18,7 @@ const TGSS = 'https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/Cot
  */
 export default function Desglose() {
   const { bruto, anio, pagas, nomina, params, opts } = useFiscal();
-  const [abierto, setAbierto] = useState('J');
+  const [abierto, setAbierto] = useState('all');
 
   const esAutonomo = nomina.regimen === 'autonomo';
 
@@ -42,17 +42,17 @@ export default function Desglose() {
   const bloques = [
     {
       titulo: 'Lo que cuesta tu puesto',
-      intro: 'La nómina no empieza en tu bruto: empieza más arriba.',
+      intro: 'El coste laboral incluye el salario bruto y la cotización a cargo de la empresa.',
       escala: nomina.costeLab,
       escalaLabel: 'coste laboral',
       filas: [
         {
           flujo: 'total', tipo: 'hito', k: 'A', label: 'Coste laboral total', valor: nomina.costeLab,
-          sub: 'Lo que tu empresa desembolsa por ti',
+          sub: 'Salario bruto más cotización empresarial',
           formula: `${eur(bruto)} + ${eur(nomina.cotEmp)} = ${eur(nomina.costeLab)}`,
           texto: esAutonomo
             ? 'En el régimen de autónomos no existe parte empresarial: el coste de tu actividad coincide con tu rendimiento íntegro.'
-            : 'Tu salario bruto más la cotización que la empresa ingresa a la Seguridad Social. Es el precio real de tu puesto de trabajo.',
+            : 'Suma el salario bruto y la cotización que la empresa ingresa a la Seguridad Social. Es la medida de coste laboral utilizada en esta publicación.',
           fuente: ['TGSS — Bases y tipos de cotización', TGSS],
         },
         {
@@ -69,13 +69,13 @@ export default function Desglose() {
           flujo: 'total', tipo: 'hito', k: 'C', label: 'Salario bruto anual', valor: bruto,
           sub: 'La cifra de tu contrato',
           formula: `${eur(bruto)} ÷ 12 = ${eur(bruto / 12)} · ÷ 14 = ${eur(bruto / 14)}`,
-          texto: 'Lo único que negocias y lo único que la mayoría llama «su sueldo». Todo lo que viene después se descuenta de aquí.',
+          texto: 'Es la remuneración anual pactada antes de practicar la cotización del trabajador y la retención de IRPF.',
         },
       ],
     },
     {
       titulo: 'Lo que se descuenta en la nómina',
-      intro: 'La Seguridad Social se va antes que el IRPF.',
+      intro: 'La cotización del trabajador y la retención de IRPF son conceptos distintos y se calculan con bases diferentes.',
       escala: nomina.costeLab,
       escalaLabel: 'coste laboral',
       filas: [
@@ -95,14 +95,14 @@ export default function Desglose() {
           flujo: 'total', tipo: 'hito', k: 'E', label: 'Rendimiento íntegro del trabajo', valor: nomina.rnPrevio,
           sub: 'El punto de partida del IRPF',
           formula: `${eur(bruto)} − ${eur(nomina.cotTra)} = ${eur(nomina.rnPrevio)}`,
-          texto: 'Hacienda no grava lo que ya se ha ido en cotizaciones.',
+          texto: 'Las cotizaciones del trabajador se deducen antes de determinar el rendimiento neto sujeto al IRPF.',
           fuente: ['BOE — LIRPF art. 19', `${BOE}#a19`],
         },
       ],
     },
     {
-      titulo: 'Lo que Hacienda acaba gravando',
-      intro: 'Dos restas que no son dinero que se vaya: reducen la cifra sobre la que se calcula el impuesto.',
+      titulo: 'Cómo se obtiene la base imponible',
+      intro: 'Estas partidas no son salidas adicionales de caja: reducen la magnitud sobre la que se calcula el impuesto.',
       escala: nomina.costeLab,
       escalaLabel: 'coste laboral',
       filas: [
@@ -111,14 +111,14 @@ export default function Desglose() {
           sub: anio >= 2015 ? 'Los 2.000 € de «otros gastos»' : 'No existían antes de 2015',
           formula: anio >= 2015 ? `${eur(nomina.rnPrevio)} − ${eur(nomina.gastosFijos)}` : null,
           texto: anio >= 2015
-            ? 'Cantidad fija que se resta sin justificarla, para compensar los gastos que conlleva trabajar. La creó la reforma de 2015.'
+            ? 'Cuantía general de otros gastos deducibles que se aplica sin acreditar gastos individuales. La Ley 26/2014 la introdujo con efectos desde 2015.'
             : 'No existía: la Ley 26/2014 la introdujo con efectos desde 2015.',
           fuente: ['BOE — LIRPF art. 19.2.f', `${BOE}#a19`],
         },
         {
           flujo: 'resta', tipo: 'op', k: 'G', label: 'Reducción por rendimientos del trabajo', valor: -nomina.redTrabajo,
           sub: nomina.redTrabajo > 0
-            ? 'Art. 20 — la palanca que protege a las rentas bajas'
+            ? 'Art. 20 — reducción aplicable a determinados rendimientos bajos'
             : 'Art. 20 — agotada a tu nivel de renta',
           formula: typeof params.art20Meta.uInf === 'number'
             ? `Máxima ${eur(params.art20Meta.rMax)} hasta ${eur(params.art20Meta.uInf)} · cero desde ${eur(params.art20Meta.uSup)}`
@@ -172,9 +172,9 @@ export default function Desglose() {
         },
         {
           flujo: 'ref', tipo: 'op', k: 'I', label: 'Mínimo personal y familiar', valor: nomina.minimoPersonalYFamiliar, hueco: true,
-          sub: 'La renta vital que no tributa — se convierte en cuota y se resta',
+          sub: 'Magnitud legal que se convierte en cuota y se resta',
           formula: `${eur(nomina.minimoPersonal)} personal${nomina.minimoFamiliar > 0 ? ` + ${eur(nomina.minimoFamiliar)} familiar` : ''} = ${eur(nomina.minimoPersonalYFamiliar)}`,
-          texto: `No se resta de la base: se le aplica la misma escala y la cuota resultante se descuenta después. Por eso todos se benefician de la misma cantidad, gane lo que gane cada uno.${opts.nHijos > 0 ? ` Tus ${opts.nHijos} hijo${opts.nHijos > 1 ? 's' : ''} a cargo aportan ${eur(nomina.minimoFamiliar)}.` : ''}`,
+          texto: `No se resta directamente de la base: se le aplica la escala y la cuota resultante se descuenta después, conforme al procedimiento de los arts. 56–61.${opts.nHijos > 0 ? ` Tus ${opts.nHijos} hijo${opts.nHijos > 1 ? 's' : ''} a cargo incorporan ${eur(nomina.minimoFamiliar)} al mínimo familiar.` : ''}`,
           fuente: ['BOE — LIRPF arts. 56-61', `${BOE}#a57`],
           tabla: nomina.minimoFamiliar > 0
             ? {
@@ -219,7 +219,7 @@ export default function Desglose() {
           flujo: 'total', tipo: 'hito', k: 'N', label: 'IRPF final', valor: nomina.irpfFinal,
           sub: `Tipo efectivo ${pct(nomina.tipoEfectivoIRPF * 100)} sobre el bruto`,
           formula: `${eur(nomina.irpfFinal)} ÷ ${eur(bruto)} = ${pct(nomina.tipoEfectivoIRPF * 100)}`,
-          texto: 'Lo que Hacienda retiene a lo largo del año. La declaración ajusta después esta cifra con el resto de tu situación fiscal.',
+          texto: 'Retención anual estimada con los datos del perfil. La declaración puede regularizarla al incorporar el resto de circunstancias fiscales.',
         },
       ],
     },
@@ -263,12 +263,13 @@ export default function Desglose() {
     });
     return { ...bloque, filas };
   });
+  const totalFilas = bloques.reduce((n, bloque) => n + bloque.filas.length, 0);
 
   return (
     <Figure
       id="03"
       title="El desglose completo, eslabón a eslabón"
-      sub={`${anio} · ${esAutonomo ? 'régimen de autónomos' : 'asalariado'} · cada bloque se mide sobre un único carril, y cada resta se dibuja encima del tramo que se lleva`}
+      sub={`${anio} · ${esAutonomo ? 'régimen de autónomos' : 'asalariado'} · cada bloque usa una escala común y cada resta ocupa exactamente el intervalo que descuenta`}
       legend="Barra llena = dinero · barra rayada = lo que se descuenta del nivel anterior · barra de trazos = magnitud de cálculo, no una salida de dinero · el hilo vertical enlaza el final de una barra con el principio de la siguiente"
       source="Fuente · BOE (LIRPF y RIRPF) · TGSS · AEAT"
       summary={bloques
@@ -276,6 +277,24 @@ export default function Desglose() {
         .map(f => `${f.label}: ${eur(f.valor)}`)
         .join('. ')}
     >
+      <div className="fs-ledger-summary">
+        <div>
+          <span className="fs-stamp">Libro de cálculo · {totalFilas} operaciones</span>
+          <p>
+            De <strong>{eur(nomina.costeLab)}</strong> de coste laboral a{' '}
+            <strong>{eur(nomina.salarioNeto)}</strong> de renta neta. Cada fila conserva su fórmula,
+            explicación y fuente cuando existe.
+          </p>
+        </div>
+        <button
+          type="button"
+          className="fs-btn fs-btn-quiet"
+          onClick={() => setAbierto(actual => (actual === 'all' ? null : 'all'))}
+        >
+          {abierto === 'all' ? 'Contraer explicaciones' : 'Desplegar todo'}
+        </button>
+      </div>
+
       <div className="fs-desglose">
         {dibujo.map(bloque => (
           <section key={bloque.titulo} className="fs-dbloque">
@@ -294,7 +313,7 @@ export default function Desglose() {
 
             <ol className="fs-dlista">
               {bloque.filas.map(f => {
-                const open = abierto === f.k;
+                const open = abierto === 'all' || abierto === f.k;
                 const hayBarra = f.w > 0.02;
                 return (
                   <li
@@ -311,7 +330,7 @@ export default function Desglose() {
                       type="button"
                       className="fs-dfila-head"
                       aria-expanded={open}
-                      onClick={() => setAbierto(open ? null : f.k)}
+                      onClick={() => setAbierto(abierto === 'all' ? f.k : open ? null : f.k)}
                     >
                       <span className="fs-dfila-k">{f.k}</span>
 

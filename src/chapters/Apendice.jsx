@@ -37,11 +37,11 @@ export default function Apendice() {
   );
 
   return (
-    <section id="apendice" className="fs-chapter" aria-labelledby="apendice-t">
+    <section id="apendice" className="fs-chapter fs-open-method" aria-labelledby="apendice-t">
       <div className="fs-page">
         <span className="fs-chapter-numeral" aria-hidden="true">09</span>
 
-        <div className="fs-chapter-head">
+        <div className="fs-chapter-head" data-gesture="SUPUESTOS · PARÁMETROS · NORMAS · FUENTES · LÍMITES">
           <span className="fs-stamp">09 / 09 · Apéndice</span>
           <h2 id="apendice-t" className="fs-title">
             Cómo está
@@ -66,8 +66,9 @@ export default function Apendice() {
           </p>
           <p className="fs-body">
             Las comparaciones históricas se expresan en <strong>euros constantes de 2026</strong>{' '}
-            usando el IPC de diciembre publicado por el INE. Comparar euros nominales de años
-            distintos daría una lectura falsa: la inflación acumulada del periodo supera el 25 %.
+            usando el IPC de diciembre publicado por el INE. Los euros nominales de años distintos
+            no son directamente comparables porque representan niveles de precios diferentes; por
+            eso se ofrece también la lectura en euros constantes.
           </p>
           <p className="fs-body">
             El perfil por defecto es asalariado, tributación individual, sin hijos ni ascendientes a

@@ -137,7 +137,7 @@ export default function Cierre() {
       x.letterSpacing = '0px';
       x.font = '400 15px Inter, system-ui, sans-serif';
       x.fillText(`${bloques[0].value} € llegan a tu cuenta`, 820, 372);
-      x.fillText(`${bloques[1].value + bloques[2].value} € se quedan por el camino`, 820, 396);
+      x.fillText(`${bloques[1].value + bloques[2].value} € corresponden a IRPF y cotizaciones`, 820, 396);
 
       // pie
       x.fillStyle = '#4d5559';
@@ -223,8 +223,8 @@ export default function Cierre() {
               </svg>
               <p className="fs-note" style={{ marginTop: 8 }}>
                 <strong>{bloques[0].value} €</strong> llegan a tu cuenta ·{' '}
-                {dec((cuna / Math.max(nomina.costeLab, 1)) * 100)} % se queda por el camino, y{' '}
-                {pct(parteSocial * 100, 0)} de eso vuelve como protección social.
+                {dec((cuna / Math.max(nomina.costeLab, 1)) * 100)} % corresponde a IRPF y cotizaciones;{' '}
+                según la correspondencia COFOG, {pct(parteSocial * 100, 0)} se asignaría a protección social.
               </p>
             </div>
           </figure>

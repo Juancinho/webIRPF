@@ -64,7 +64,7 @@ export default function Irpf() {
   const activa = conDatos.find(b => b.i === hover) || conDatos.find(b => base > b.desde && base <= b.hasta);
 
   return (
-    <section id="irpf" className="fs-chapter" aria-labelledby="irpf-t">
+    <section id="irpf" className="fs-chapter fs-open-steps" aria-labelledby="irpf-t">
       <div className="fs-page">
         <span className="fs-chapter-numeral" aria-hidden="true">03</span>
 
@@ -110,7 +110,7 @@ export default function Irpf() {
           </aside>
 
           <div className="fs-field">
-            <div className="fs-chapter-head">
+            <div className="fs-chapter-head" data-gesture="CADA TIPO SE APLICA SÓLO A SU TRAMO">
               <span className="fs-stamp">03 / 09 · Cómo funciona el IRPF</span>
               <h2 id="irpf-t" className="fs-title">
                 La escalera
@@ -118,9 +118,10 @@ export default function Irpf() {
                 y el acantilado
               </h2>
               <p className="fs-kicker">
-                El IRPF no es un porcentaje: es una escalera. Cada tramo grava sólo la parte de
-                renta que cae dentro de él. Y, en un punto concreto de la escala española, la
-                escalera tiene un escalón que sube mucho más de lo que parece.
+                El IRPF combina varios tipos, no uno solo. Cada tipo se aplica únicamente a la
+                porción de base comprendida en su tramo. Por eso el tipo marginal —el del siguiente
+                euro— y el tipo efectivo —la cuota total dividida por el bruto— responden a preguntas
+                distintas.
               </p>
             </div>
 
@@ -237,19 +238,17 @@ export default function Irpf() {
             <Poster marginal={marginal} nomina={nomina} />
 
             <Puente rotulo="De un sueldo a todos los sueldos">
-              Con un solo salario, el marginal y el efectivo son dos cifras que se pueden contar
-              con los dedos. Con todos los salarios a la vez son dos curvas, y lo único que
-              importa de ellas es <strong>cuánto se separan</strong>: esa distancia es,
-              literalmente, la confusión que genera la palabra «tramo».
+              En un salario concreto, marginal y efectivo son dos cifras. Al recorrer toda la escala
+              se convierten en dos curvas: su separación muestra cuánto difiere el gravamen aplicado
+              al siguiente euro de la carga media soportada hasta ese punto.
             </Puente>
 
             <CurvaTipos />
 
             <Puente rotulo="Donde la escalera se rompe">
-              Las dos curvas suben de forma ordenada en casi toda la escala. Casi. Hay una franja
-              —entre los quince y los veintiún mil euros— en la que el tipo marginal se dispara
-              por encima de cualquier tipo que aparezca en el BOE. No hay ningún tramo que lo
-              explique, porque no es un tramo: es <strong>una reducción que se retira</strong>.
+              En determinados niveles de renta, el marginal puede superar los tipos nominales de
+              la escala. La causa no es un tramo adicional: al aumentar el rendimiento se reduce
+              simultáneamente el beneficio del artículo 20. El siguiente bloque separa ambos efectos.
             </Puente>
 
             <Acantilado />
@@ -379,7 +378,7 @@ function Poster({ marginal, nomina }) {
           </ChartFrame>
 
           <p className="fs-note" style={{ marginTop: 14 }}>
-            Sobre tu bruto, el IRPF se lleva <strong>{eur(nomina.irpfFinal)}</strong>. Si te subieran
+            Sobre tu bruto, el IRPF asciende a <strong>{eur(nomina.irpfFinal)}</strong>. Si te subieran
             el sueldo, el siguiente euro tributaría al {pct(marg)} — sólo ese euro.{' '}
             <a className="fs-enlace" href="#fig-09">
               Calcula tu subida real en la FIG. 09 ↓

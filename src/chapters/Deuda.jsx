@@ -19,20 +19,21 @@ export default function Deuda() {
   const { anio, nomina } = useFiscal();
 
   return (
-    <section id="deuda" className="fs-chapter" aria-labelledby="deuda-t">
+    <section id="deuda" className="fs-chapter fs-open-debt" aria-labelledby="deuda-t">
       <div className="fs-page">
         <span className="fs-chapter-numeral" aria-hidden="true">08</span>
 
-        <div className="fs-chapter-head">
+        <div className="fs-chapter-head" data-gesture="SALDO ACUMULADO · EUROS · POR HABITANTE · % DEL PIB">
           <span className="fs-stamp">08 / 09 · La deuda</span>
           <h2 id="deuda-t" className="fs-title">
-            Lo que ya se debe
+            La deuda pública,
             <br />
-            en tu nombre
+            en tres escalas
           </h2>
           <p className="fs-kicker">
-            Hasta aquí, lo que se recauda y a dónde va. Falta la parte que no se ha pagado todavía:
-            el saldo que se arrastra de los años en que el Estado gastó más de lo que ingresó.
+            La deuda es un saldo acumulado, no una factura individual. La leeremos en euros totales,
+            por habitante y como porcentaje del PIB; cada escala responde a una pregunta distinta y
+            ninguna, por sí sola, describe la sostenibilidad fiscal completa.
           </p>
         </div>
 
@@ -41,13 +42,13 @@ export default function Deuda() {
         <p className="fs-body" style={{ marginTop: 14 }}>
           Cada año en que el Estado gasta más de lo que ingresa, la diferencia se financia
           emitiendo deuda. La deuda pública es la suma acumulada de todos esos déficits, menos lo
-          amortizado. No es una factura pendiente que alguien vaya a pasarte: es un saldo que se
-          refinancia continuamente, y de lo único que hay que responder cada año es de los
-          intereses.
+          amortizado. No es una factura individual: es un pasivo del conjunto de las
+          administraciones que genera intereses y vencimientos, y que habitualmente se refinancia.
         </p>
         <p className="fs-body">
-          Por eso la cifra que importa para la solvencia no son los euros, sino la proporción
-          sobre el tamaño de la economía: el <strong>porcentaje del PIB</strong>. Y por eso la
+          Para analizar su sostenibilidad no basta con una sola cifra: importan su proporción
+          sobre el <strong>PIB</strong>, el coste de financiación, los vencimientos, el crecimiento
+          y el saldo presupuestario. Por eso la
           deuda <em>por habitante</em> que verás más abajo es una <strong>escala de magnitud</strong>,
           no una obligación personal. Sirve para responder a «¿de qué tamaño estamos hablando?»,
           no para decir cuánto debes tú.
@@ -241,7 +242,7 @@ function Cascada() {
       sub={`Aumento de la deuda total en cada ejercicio · miles de millones de euros · una marca = ${UNIT}.000 millones`}
       legend={`Una marca = ${UNIT}.000 M € · marcas llenas = la deuda sube · marcas discontinuas = la deuda baja`}
       source="Fuente · Banco de España (Protocolo de Déficit Excesivo)"
-      note="Cada columna es el déficit de ese año convertido en deuda nueva. La pandemia no cambió la tendencia: la adelantó varios años de golpe."
+      note="Cada columna muestra la variación del saldo de deuda respecto al cierre anterior. No coincide necesariamente con el déficit del ejercicio por ajustes de valoración y otras operaciones financieras; 2020 registra el mayor aumento de la serie."
       summary={pasos.map(p => `${p.anio}: ${sign(p.inc)} mM €`).join('; ')}
     >
       <div className="fs-readout">
@@ -327,7 +328,7 @@ function Cascada() {
   );
 }
 
-/* ── FIG. 24 · tu parte ───────────────────────────────────────────────────── */
+/* ── FIG. 25 · comparación por habitante ──────────────────────────────────── */
 function TuParte({ anio, irpf }) {
   const [horizonte, setHorizonte] = useState(20);
   const d = DEUDA_ESPANA[anio];
@@ -352,18 +353,18 @@ function TuParte({ anio, irpf }) {
       id="25"
       title={
         anios
-          ? `Tu parte de la deuda equivale a ${dec(anios)} años de tu IRPF completo`
+          ? `La deuda por habitante equivale a ${dec(anios)} años de tu IRPF anual`
           : 'A tu nivel de renta no pagas IRPF, así que esta comparación no aplica'
       }
       sub={`${anio} · deuda por habitante ${eur(d.perCapita)} frente a tu IRPF anual ${eur(irpf)} · un bloque = ${eur(UNIT)}, ambas cifras a la misma escala`}
-      legend={`Un bloque = ${eur(UNIT)} · arriba tu parte de la deuda · abajo lo que pagas de IRPF en un año`}
+      legend={`Un bloque = ${eur(UNIT)} · arriba, deuda por habitante · abajo, tu IRPF anual`}
       source="Fuente · Banco de España · INE · cálculo propio"
       note="Es una escala de magnitud, no una deuda personal ni una previsión: la deuda pública no se amortiza con el IRPF de una persona, se refinancia y se sostiene con el conjunto de la economía."
       summary={`Deuda por habitante ${eur(d.perCapita)}; IRPF anual ${eur(irpf)}.`}
     >
       <div className="fs-readout">
         <span>
-          <span className="fs-readout-k">Tu parte</span>
+          <span className="fs-readout-k">Deuda por habitante</span>
           <span className="fs-readout-v">{eur(d.perCapita)}</span>
         </span>
         <span>
@@ -376,9 +377,9 @@ function TuParte({ anio, irpf }) {
         </span>
       </div>
 
-      <ChartFrame viewBox={`0 0 ${W} ${H}`} scroll label="Tu parte de la deuda frente a tu IRPF anual">
+      <ChartFrame viewBox={`0 0 ${W} ${H}`} scroll label="Deuda por habitante frente a tu IRPF anual">
         <Label x={0} y={14} size={10} color="var(--ink-3)" mono>
-          TU PARTE DE LA DEUDA · {eur(d.perCapita)}
+          DEUDA POR HABITANTE · {eur(d.perCapita)}
         </Label>
         {Array.from({ length: bloquesDeuda }, (_, i) => {
           const [cx, cy] = cell(i, 0, 26);
@@ -393,7 +394,7 @@ function TuParte({ anio, irpf }) {
               fill={dentro ? 'var(--signal)' : 'var(--ink-6)'}
               opacity={dentro ? 1 : 0.85}
             >
-              <title>{`${eur(UNIT)} de tu parte de la deuda`}</title>
+              <title>{`${eur(UNIT)} de deuda por habitante`}</title>
             </rect>
           );
         })}

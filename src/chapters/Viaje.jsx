@@ -50,7 +50,7 @@ export default function Viaje() {
   const pctNeto = (nomina.salarioNeto / total) * 100;
 
   return (
-    <section id="viaje" className="fs-chapter" aria-labelledby="viaje-t">
+    <section id="viaje" className="fs-chapter fs-open-flow" aria-labelledby="viaje-t">
       <div className="fs-page">
         <span className="fs-chapter-numeral" aria-hidden="true">02</span>
 
@@ -62,9 +62,19 @@ export default function Viaje() {
             y lo que te llega
           </h2>
           <p className="fs-kicker">
-            Tu nómina no empieza en el bruto. Empieza más arriba, en lo que tu trabajo le cuesta a
-            quien te contrata, y desciende por cuatro escalones hasta tu cuenta corriente.
+            Cambiamos el denominador. En vez de empezar por el salario bruto, seguimos el coste
+            laboral completo hasta la renta neta y distinguimos qué importes son cotizaciones, qué
+            importes forman la base del impuesto y qué cantidad llega finalmente a la cuenta.
           </p>
+          <div className="fs-flow-sequence" aria-label="Recorrido desde el coste laboral hasta la renta neta">
+            <span><b>01</b>Coste laboral</span>
+            <i aria-hidden="true">→</i>
+            <span><b>02</b>Salario bruto</span>
+            <i aria-hidden="true">→</i>
+            <span><b>03</b>Rendimiento</span>
+            <i aria-hidden="true">→</i>
+            <span><b>04</b>Renta neta</span>
+          </div>
         </div>
       </div>
 
@@ -231,13 +241,13 @@ export default function Viaje() {
           {num(cotEmpAnimada)} <span className="fs-u fs-u-neg">€</span>
         </p>
         <p className="fs-title-sm" style={{ marginTop: 16, maxWidth: '22ch' }}>
-          nunca aparecen
+          quedan fuera
           <br />
-          en tu nómina.
+          de tu bruto.
         </p>
         <p className="fs-body" style={{ marginTop: 18 }}>
-          Es la cotización que paga la empresa por ti. No la ves, no la firmas y no consta en tu
-          recibo — pero forma parte del precio de tu trabajo y se calcula sobre tu base de
+          Es la cotización a cargo de la empresa. No se descuenta de tu salario bruto ni forma
+          parte del líquido de la nómina, pero sí integra el coste laboral y se calcula sobre la base de
           cotización, topada en {eur(params.baseMax)} en {anio}.
         </p>
       </div>
@@ -255,7 +265,7 @@ function pasos({ bruto, anio, nomina, params, esAutonomo }) {
   return [
     {
       id: 'A · Coste laboral',
-      titulo: 'Lo que tu trabajo cuesta de verdad',
+      titulo: 'El coste laboral completo',
       cuerpo: [
         `Antes de tu bruto existe una cifra mayor: ${eur(nomina.costeLab)}. Es lo que tu empresa desembolsa por tenerte contratado en ${anio}.`,
         esAutonomo
@@ -272,7 +282,7 @@ function pasos({ bruto, anio, nomina, params, esAutonomo }) {
         ? ['Como autónomo asumes íntegramente tu cotización: no existe una parte empresarial equivalente.']
         : [
             `La empresa aporta ${pct(params.tipoEmp * 100, 2)} de tu base de cotización: contingencias comunes, desempleo, FOGASA, formación profesional, accidentes de trabajo${params.mei[0] > 0 ? ' y MEI' : ''}.`,
-            `Son ${eur(nomina.cotEmp)} al año que financian pensiones y prestaciones, y que jamás figuran en tu recibo de nómina.`,
+            `Son ${eur(nomina.cotEmp)} al año. Forman parte del coste empresarial y no se descuentan del salario bruto del trabajador.`,
           ],
       formula: esAutonomo ? null : `mín(${eur(bruto)}, ${eur(params.baseMax)}) × ${pct(params.tipoEmp * 100, 2)} = ${eur(nomina.cotEmp)}`,
       fuente: { label: 'TGSS — Cotización', url: 'https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/CotizacionRecaudacionTrabajadores/36537' },
@@ -281,7 +291,7 @@ function pasos({ bruto, anio, nomina, params, esAutonomo }) {
       id: 'C · Salario bruto',
       titulo: 'La cifra del contrato',
       cuerpo: [
-        `${eur(bruto)} es lo que tú llamas «tu sueldo» y lo único que negocias. Equivale a ${eur(bruto / 12)} al mes en 12 pagas o ${eur(bruto / 14)} en 14.`,
+        `${eur(bruto)} es el salario anual pactado antes de retenciones y cotizaciones del trabajador. Equivale a ${eur(bruto / 12)} al mes en 12 pagas o ${eur(bruto / 14)} en 14.`,
         'A partir de aquí empiezan los descuentos que sí aparecen en la nómina.',
       ],
       formula: null,
@@ -293,7 +303,7 @@ function pasos({ bruto, anio, nomina, params, esAutonomo }) {
       cuerpo: [
         esAutonomo
           ? `Tu cuota de autónomos asciende a ${eur(nomina.cotTra)} en ${anio}, según el tramo de rendimientos netos previstos.`
-          : `Se te descuenta ${pct(params.tipoTra * 100, 2)} de la base: ${eur(nomina.cotTra)} al año. Es el primer recorte visible.`,
+          : `La cotización del trabajador es el ${pct(params.tipoTra * 100, 2)} de la base: ${eur(nomina.cotTra)} al año. Es la primera deducción visible en la nómina.`,
         `Lo que queda, ${eur(nomina.rnPrevio)}, es tu rendimiento íntegro del trabajo: el punto de partida del IRPF.`,
       ],
       formula: `${eur(bruto)} − ${eur(nomina.cotTra)} = ${eur(nomina.rnPrevio)}`,
@@ -307,7 +317,7 @@ function pasos({ bruto, anio, nomina, params, esAutonomo }) {
           ? `Sobre el rendimiento íntegro se restan ${eur(nomina.gastosFijos)} de gastos deducibles (art. 19.2.f)${art20 > 0 ? ` y ${eur(art20)} de reducción por rendimientos del trabajo (art. 20)` : ', sin reducción del art. 20 a tu nivel de renta'}.`
           : `Antes de 2015 no existían los 2.000 € de gastos deducibles del art. 19.2.f${art20 > 0 ? `; sí se aplica la reducción del art. 20, de ${eur(art20)}` : ''}.`,
         `El resultado, ${eur(nomina.baseImponible)}, es la base imponible: no es dinero que se te descuente, sino la cifra sobre la que se aplica la escala progresiva.`,
-        `Además, la cuota correspondiente al mínimo personal y familiar (${eur(nomina.minimoPersonalYFamiliar)}) se resta después: esa renta vital no tributa.`,
+        `Además, la tarifa se aplica separadamente a la base y al mínimo personal y familiar (${eur(nomina.minimoPersonalYFamiliar)}); la diferencia determina la cuota íntegra en este cálculo simplificado.`,
       ],
       formula: `${eur(nomina.rnPrevio)} − ${eur(nomina.gastosFijos)} − ${eur(art20)} = ${eur(nomina.baseImponible)}`,
       fuente: { label: 'BOE — LIRPF arts. 19, 20 y 56-61', url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764&p=20260321&tn=1#a20' },

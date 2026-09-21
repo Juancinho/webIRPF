@@ -213,7 +213,7 @@ export default function Ocde() {
         ({pct(ESPANA.irpf)} frente al {pct(MEDIA.irpf)} de media) y una cotización del trabajador
         más baja todavía ({pct(ESPANA.cotTrab)} frente al {pct(MEDIA.cotTrab)}), compensadas por
         una cotización empresarial muy alta ({pct(ESPANA.cotEmp)} frente al {pct(MEDIA.cotEmp)}).
-        Por eso la nómina española parece menos gravada de lo que en realidad está el puesto de
+        Por eso una lectura limitada a la nómina muestra una carga menor que la medida sobre el puesto de
         trabajo. En la carga que soporta directamente el trabajador sobre su bruto (tabla 1.3),
         España marca {pct(CARGA_PERSONAL_OCDE_2025.espana.total)} frente al{' '}
         {pct(CARGA_PERSONAL_OCDE_2025.mediaOCDE.total)} de media.

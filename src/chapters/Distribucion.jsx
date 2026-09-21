@@ -29,11 +29,11 @@ export function CurvaDistribucion() {
   const [tip, setTip] = useState(null);
 
   const W = 880;
-  const H = 380;
+  const H = 410;
   const X0 = 26;
   const X1 = W - 120;
-  const Y1 = H - 56;
-  const Y0 = 28;
+  const Y1 = H - 66;
+  const Y0 = 54;
 
   const curva = useMemo(() => {
     const pts = [];
@@ -123,10 +123,10 @@ export function CurvaDistribucion() {
         </span>
       </div>
 
-      <ChartFrame viewBox={`0 0 ${W} ${H}`} zoom={zoom} tip={tip} label="Curva de distribución salarial">
+      <ChartFrame viewBox={`0 0 ${W} ${H}`} zoom={zoom} tip={tip} scroll minWidth={620} label="Curva de distribución salarial">
         <defs>
           <clipPath id={clip}>
-            <rect x={X0} y={Y0 - 10} width={X1 - X0} height={Y1 - Y0 + 12} />
+            <rect x={X0} y={Y0 - 5} width={X1 - X0} height={Y1 - Y0 + 10} />
           </clipPath>
         </defs>
         <g clipPath={`url(#${clip})`}>
@@ -144,21 +144,11 @@ export function CurvaDistribucion() {
           strokeDasharray="4 3"
         />
 
-        {hitos.map(([k, v]) => (
+        {hitos.filter(([, v]) => v >= zoom.domain[0] && v <= zoom.domain[1]).map(([k, v]) => (
           <g key={k}>
             <line x1={round(x(v))} y1={Y0 - 4} x2={round(x(v))} y2={Y1} stroke="var(--ink-6)" strokeWidth={0.7} strokeDasharray="2 4" />
-            <Label x={round(x(v))} y={Y0 - 8} size={8.5} color="var(--ink-4)" anchor="middle" mono>
-              {k}
-            </Label>
-            <Label x={round(x(v))} y={Y1 + 18} size={9} color="var(--ink-4)" anchor="middle">
-              {eur(v)}
-            </Label>
           </g>
         ))}
-
-        {bruto > 0 && bruto <= MAX_S && (
-          <YouMark x={x(bruto)} y={Y1} height={Y1 - Y0 + 8} label={`TÚ · PERCENTIL ${Math.round(percentil)}`} />
-        )}
 
         {activo && (
           <g>
@@ -169,6 +159,23 @@ export function CurvaDistribucion() {
         )}
 
         </g>
+
+        {/* Labels live outside the clipping window: the former implementation
+            cut their ascenders at the top and their values at the baseline. */}
+        {hitos.filter(([, v]) => v >= zoom.domain[0] && v <= zoom.domain[1]).map(([k, v]) => (
+          <g key={`label-${k}`}>
+            <Label x={round(x(v))} y={28} size={9.5} weight={700} color="var(--ink-3)" anchor="middle" mono>
+              {k}
+            </Label>
+            <Label x={round(x(v))} y={Y1 + 19} size={9} color="var(--ink-4)" anchor="middle">
+              {eur(v)}
+            </Label>
+          </g>
+        ))}
+
+        {bruto > 0 && bruto <= MAX_S && (
+          <YouMark x={x(bruto)} y={Y1} height={Y1 - Y0 + 8} label={`TÚ · PERCENTIL ${Math.round(percentil)}`} />
+        )}
         <Label x={X1 + 8} y={round(y(curva[Math.round(curva.length * 0.28)].a))} size={9.5} weight={700} color="var(--ink)" mono>
           {anio}
         </Label>
@@ -471,12 +478,13 @@ export function EvolucionDistribucion() {
         arriba; la mediana, en cambio, parte la población exactamente por la mitad. Los puntos
         de petróleo son <strong style={{ color: 'var(--signal)' }}>tu salario llevado a cada
         año con el IPC</strong>: el mismo poder adquisitivo que tienes hoy, expresado en los
-        euros de aquel año. Sirve para ver contra qué distribución competías entonces.
+        euros de aquel año. Sirve para situar un mismo poder adquisitivo dentro de la distribución
+        observada en cada ejercicio.
       </p>
       <p className="fs-note" style={{ marginTop: 10, maxWidth: '72ch' }}>
         {real
-          ? 'En euros constantes tu línea es plana por construcción —tu poder adquisitivo es el que se mantiene fijo— así que lo que se mueve es el reparto a tu alrededor. La banda apenas se ensancha: lo que más ha cambiado es la parte baja, empujada por el SMI.'
-          : 'En euros corrientes todo sube, incluido tu salario equivalente, pero buena parte de esa subida es sólo inflación. Cambia a euros constantes para ver el movimiento real.'}
+          ? 'En euros constantes tu línea es plana por construcción: mantiene el mismo poder adquisitivo. Los cambios de las bandas describen la evolución de la distribución. El desplazamiento de su parte baja coincide con las revisiones del SMI, aunque esta figura por sí sola no identifica causalidad.'
+          : 'En euros corrientes aumentan tanto los salarios observados como tu salario equivalente. Cambia a euros constantes para separar la variación de precios del cambio en poder adquisitivo.'}
       </p>
     </Figure>
   );

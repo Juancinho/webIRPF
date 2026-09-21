@@ -19,10 +19,8 @@ const R1 = 386;
 /**
  * PROGRESIVIDAD EN FRÍO.
  * The premise is generous to the tax system: your salary rises every single
- * year by exactly the CPI, so your purchasing power never changes. Because
- * the brackets, the minimums and the art. 20 thresholds are written in
- * nominal euros and are not deflated, your real net still falls. The gap
- * between the two lines is the tax nobody voted.
+ * year by exactly the CPI, so purchasing power does not change. The figure
+ * compares the enacted nominal parameters with a fully indexed benchmark.
  */
 export default function ProgresividadFria() {
   const { bruto, anio, opts } = useFiscal();
@@ -77,15 +75,33 @@ export default function ProgresividadFria() {
       id="13"
       title={
         perdida < -1
-          ? `Con el sueldo subiendo cada año exactamente con el IPC, hoy te quedan ${eur(Math.abs(perdida))} reales menos que en ${base}`
+          ? `Sin indexación completa, el neto real queda ${eur(Math.abs(perdida))} por debajo del punto de partida de ${base}`
           : `Con el sueldo subiendo cada año exactamente con el IPC, tu neto real apenas se mueve desde ${base}`
       }
       sub={`Supuesto: tu salario crece cada año justo lo que el IPC, así que tu poder adquisitivo nunca cambia · euros constantes de ${base} · perfil seleccionado`}
-      legend="Línea de puntos = lo que cobrarías si los tramos y los mínimos se deflactaran cada año · línea continua = lo que realmente cobras"
+      legend="Línea continua = resultado con las reglas aprobadas en cada ejercicio · línea discontinua = referencia con todos los umbrales monetarios indexados al IPC"
       source="Fuente · cálculo propio sobre parámetros BOE · IPC diciembre INE"
-      note="Los tramos, el mínimo personal y los umbrales del art. 20 están escritos en euros nominales y no se actualizan automáticamente con la inflación. Esa es toda la mecánica: no hace falta ninguna subida de impuestos para que la carga aumente."
+      note="La comparación mantiene constantes el poder adquisitivo y el perfil. No atribuye intención ni valora el resultado: cuantifica únicamente la diferencia entre las reglas vigentes y una referencia de indexación completa."
       summary={`Entre ${base} y 2026 el neto real pasa de ${eur(serie[0].netoReal)} a ${eur(ultimo.netoReal)} manteniendo el poder adquisitivo.`}
     >
+      <div className="fs-deflation-note">
+        <span className="fs-stamp">Concepto · qué significa «deflactar el IRPF»</span>
+        <p className="fs-body">
+          <strong>Deflactar una cifra</strong> significa expresarla en euros de un mismo año para
+          eliminar el efecto de los precios. En política tributaria, <strong>deflactar o indexar la
+          tarifa</strong> significa actualizar con la inflación los importes nominales que delimitan
+          tramos, mínimos, reducciones y deducciones. No cambia los tipos legales: evita que una
+          subida salarial que sólo compensa el IPC desplace por sí sola al contribuyente hacia
+          umbrales fiscales más altos en términos reales.
+        </p>
+        <p className="fs-note">
+          La línea de referencia conserva, en euros constantes de {base}, el resultado fiscal del
+          año inicial. La distancia respecto a la línea observada mide el efecto conjunto de no
+          indexar todos los parámetros y de las reformas aprobadas después; no permite asignar la
+          diferencia a una única norma sin descomponerla.
+        </p>
+      </div>
+
       <div className="fs-readout">
         <span>
           <span className="fs-readout-k">Año {activo.anio}</span>
@@ -96,7 +112,7 @@ export default function ProgresividadFria() {
           <span className="fs-readout-v">{eur(activo.netoReal)}</span>
         </span>
         <span>
-          <span className="fs-readout-k">Si se deflactara</span>
+          <span className="fs-readout-k">Referencia indexada</span>
           <span className="fs-readout-v fs-muted">{eur(activo.netoDeflactado)}</span>
         </span>
         <span>
@@ -158,7 +174,7 @@ export default function ProgresividadFria() {
                   rows: [
                     ['Bruto equivalente', eur(s.nominal)],
                     ['Neto real', eur(s.netoReal), 'var(--ink)'],
-                    ['Si se deflactara', eur(s.netoDeflactado), 'var(--ink-4)'],
+                    ['Referencia indexada', eur(s.netoDeflactado), 'var(--ink-4)'],
                     ['Diferencia', sign(s.netoReal - s.netoDeflactado), 'var(--signal)'],
                     ['Carga total', pct(s.efectivo), 'var(--counter)'],
                   ],
@@ -166,13 +182,13 @@ export default function ProgresividadFria() {
               }}
               onMouseLeave={() => { setHover(null); setTip(null); }}
             >
-              <title>{`${s.anio} — neto real ${eur(s.netoReal)}, si se deflactara ${eur(s.netoDeflactado)}`}</title>
+              <title>{`${s.anio} — neto real ${eur(s.netoReal)}, referencia indexada ${eur(s.netoDeflactado)}`}</title>
             </rect>
           </g>
         ))}
 
         <Label x={X1 + 10} y={round(y(ultimo.netoDeflactado)) + 3} size={9} color="var(--ink-4)" mono>
-          SI SE DEFLACTARA
+          REFERENCIA INDEXADA
         </Label>
         <Label x={X1 + 10} y={round(y(ultimo.netoDeflactado)) + 16} size={11} weight={700} color="var(--ink-4)">
           {eur(ultimo.netoDeflactado)}
@@ -216,9 +232,10 @@ export default function ProgresividadFria() {
       </ChartFrame>
 
       <p className="fs-body" style={{ marginTop: 18 }}>
-        Sumando todos los años desde {base}, la diferencia acumulada asciende a{' '}
-        <strong>{eur(Math.abs(acumulada))}</strong> de euros constantes. Nadie aprobó una subida
-        del IRPF para conseguirlo: basta con dejar los tramos quietos mientras los precios suben.
+        Sumando las diferencias anuales desde {base}, la separación acumulada es de{' '}
+        <strong>{eur(Math.abs(acumulada))}</strong> en euros constantes de {base}. Es una magnitud
+        contrafactual: compara el sistema aplicado cada año con una indexación integral, sin afirmar
+        que ese importe constituya una deuda, una cuota adicional concreta o el efecto de una sola reforma.
       </p>
     </Figure>
   );

@@ -31,7 +31,7 @@ export default function Lugar() {
   const percentilAnimado = useNumeroAnimado(percentil);
 
   return (
-    <section id="lugar" className="fs-chapter" aria-labelledby="lugar-t">
+    <section id="lugar" className="fs-chapter fs-open-percentile" aria-labelledby="lugar-t">
       <div className="fs-page">
         <span className="fs-chapter-numeral" aria-hidden="true">06</span>
 
@@ -72,7 +72,7 @@ export default function Lugar() {
           </aside>
 
           <div className="fs-field">
-            <div className="fs-chapter-head">
+            <div className="fs-chapter-head" data-gesture={`PERCENTIL ${Math.round(percentil)} · POSICIÓN, NO RIQUEZA`}>
               <span className="fs-stamp">06 / 09 · Tu lugar</span>
               <h2 id="lugar-t" className="fs-title">
                 Dónde te coloca
@@ -80,8 +80,9 @@ export default function Lugar() {
                 el sistema
               </h2>
               <p className="fs-kicker">
-                Hasta aquí, tu dinero. Queda situarte: no frente a la ley, sino frente a los demás
-                asalariados. Un mismo sueldo pesa distinto según dónde caiga en la escala.
+                Dejamos el cálculo fiscal y pasamos a la distribución salarial. El percentil sitúa
+                tu bruto entre los asalariados: indica qué proporción cobra menos, pero no mide
+                patrimonio, renta del hogar ni bienestar económico.
               </p>
             </div>
 
@@ -116,6 +117,12 @@ export default function Lugar() {
             <EvolucionDistribucion />
 
             {anio > 2012 && <Escenario bruto={bruto} anio={anio} />}
+
+            <Puente rotulo="Cambio de pregunta">
+              La distribución termina aquí: responde <strong>dónde está tu salario</strong>. El
+              capítulo siguiente no continúa esta escala ni describe tu percentil; cambia de objeto
+              y estudia, de forma agregada, <strong>cómo se distribuye el gasto público por funciones</strong>.
+            </Puente>
           </div>
         </div>
       </div>

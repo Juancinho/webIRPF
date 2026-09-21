@@ -48,11 +48,11 @@ function cinta(x0, a0, a1, x1, b0, b1) {
 /** El capítulo: la figura del río con su cabecera y su margen. */
 export default function Destino() {
   return (
-    <section id="destino" className="fs-chapter" aria-labelledby="destino-t">
+    <section id="destino" className="fs-chapter fs-open-allocation" aria-labelledby="destino-t">
       <div className="fs-page">
         <span className="fs-chapter-numeral" aria-hidden="true">07</span>
 
-        <div className="fs-chapter-head">
+        <div className="fs-chapter-head" data-gesture="APORTACIÓN  →  GASTO PÚBLICO POR FUNCIONES">
           <span className="fs-stamp">07 / 09 · A dónde va</span>
           <h2 id="destino-t" className="fs-title">
             A dónde va
@@ -60,18 +60,19 @@ export default function Destino() {
             lo que no ves
           </h2>
           <p className="fs-kicker">
-            El capítulo 05 midió el tamaño del hueco entre lo que cuesta tu puesto y lo que
-            cobras. Queda la pregunta incómoda: ese dinero no desaparece, va a alguna parte. Esta
-            es esa parte, con tus euros y con tus jornadas de trabajo como unidad.
+            Este capítulo es una estimación de correspondencia, no un seguimiento contable de tus
+            impuestos. Como los ingresos públicos no están afectados a partidas concretas, aplicamos
+            a tu aportación la distribución funcional del gasto consolidado y mostramos el resultado
+            en euros y jornadas de trabajo.
           </p>
         </div>
 
         <RioDeLosEuros />
 
         <Puente rotulo="Lo que todavía no se ha pagado">
-          Este reparto sólo cuenta el dinero que existe: lo que se recauda un año y se gasta ese
-          mismo año. Falta la otra mitad de la contabilidad — los ejercicios en que el gasto fue
-          mayor que el ingreso y la diferencia se financió pidiéndola prestada.
+          La clasificación funcional explica en qué se emplea el gasto, pero no cómo se financia
+          cada ejercicio. Cuando los ingresos son inferiores a los gastos aparece un déficit; su
+          financiación mediante emisiones de deuda se estudia en el capítulo siguiente.
         </Puente>
       </div>
     </section>
@@ -182,8 +183,8 @@ function RioDeLosEuros() {
   return (
     <Figure
       id="22"
-      title={`De los ${eur(cuna)} que tu puesto aporta al sistema, ${eur(euros(social.parte))} vuelven como protección social`}
-      sub={`${anio} · tu cuña fiscal repartida como se reparte el gasto público real · clasificación funcional COFOG de ${GASTO_COFOG.anio}`}
+      title={`Aplicando el reparto COFOG, ${eur(euros(social.parte))} de tu aportación equivalen a protección social`}
+      sub={`${anio} · correspondencia proporcional de tu cuña fiscal con el gasto público consolidado · clasificación funcional COFOG de ${GASTO_COFOG.anio}`}
       legend={`Dos afluentes —cotizaciones e IRPF— desembocan en una caja común · el ancho de cada cinta es su parte del gasto · los días se cuentan sobre ${DIAS_LABORABLES} jornadas laborables`}
       source={`Fuente · ${GASTO_COFOG.fuente}`}
       note="El presupuesto español no está afectado: ningún impuesto concreto financia una función concreta, y las cotizaciones sostienen sobre todo las prestaciones contributivas. Esta figura no dice a dónde fue tu dinero, sino cómo se repartiría tu aportación si siguiera el reparto del gasto público total."
@@ -434,7 +435,7 @@ function RioDeLosEuros() {
         llegan a tu cuenta. Repartidos como se reparte el gasto público, la partida más grande con
         diferencia son las <strong>pensiones de jubilación</strong>:{' '}
         <strong>{eur(euros(partidas[0].parte))}</strong> al año, {eur(euros(partidas[0].parte) / 12)} al
-        mes. La sanidad se lleva {eur(euros(partidas.find(p => p.key === 'salud').parte))} y la
+        mes. A sanidad le corresponden {eur(euros(partidas.find(p => p.key === 'salud').parte))} y a
         educación {eur(euros(partidas.find(p => p.key === 'educacion').parte))}.
       </p>
     </Figure>

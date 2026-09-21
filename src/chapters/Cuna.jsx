@@ -40,11 +40,11 @@ export default function Cuna() {
   const netoPct = p(nomina.salarioNeto);
 
   return (
-    <section id="cuna" className="fs-chapter fs-night" aria-labelledby="cuna-t">
+    <section id="cuna" className="fs-chapter fs-night fs-open-wedge" aria-labelledby="cuna-t">
       <div className="fs-page">
         <span className="fs-chapter-numeral" aria-hidden="true">05</span>
 
-        <div className="fs-chapter-head">
+        <div className="fs-chapter-head" data-gesture="COSTE LABORAL = NETO + IRPF + COTIZACIONES">
           <span className="fs-stamp">05 / 09 · La cuña fiscal</span>
           <h2 id="cuna-t" className="fs-title">
             De cada 100 €
@@ -52,8 +52,9 @@ export default function Cuna() {
             de coste laboral
           </h2>
           <p className="fs-kicker">
-            Esta es la pregunta que el capítulo 02 dejó abierta. Cien bloques, uno por euro, y la
-            misma figura vista desde los dos lados del contrato.
+            La cuña fiscal mide la diferencia entre el coste laboral total y la renta neta. La
+            expresamos sobre cien euros para separar sus componentes y para comparar el mismo
+            indicador, con una metodología homogénea, entre países.
           </p>
         </div>
 
@@ -133,8 +134,8 @@ export default function Cuna() {
               {pct(nomina.cunaFiscal * 100)}
             </p>
             <p className="fs-body" style={{ marginTop: 10 }}>
-              Es tu cuña fiscal sobre el coste laboral total: la parte del precio de tu trabajo que
-              no llega a tu cuenta. En la misma medida estandarizada, España se sitúa en el{' '}
+              Es tu cuña fiscal sobre el coste laboral total: la suma de IRPF y cotizaciones en este
+              supuesto. En la medida estandarizada de la OCDE, España se sitúa en el{' '}
               {pct(ESPANA.total)} y la media de la OCDE en el {pct(MEDIA.total)}.
             </p>
 
@@ -151,4 +152,3 @@ export default function Cuna() {
     </section>
   );
 }
-

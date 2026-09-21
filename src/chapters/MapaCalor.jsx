@@ -81,11 +81,11 @@ export default function MapaCalor() {
   return (
     <Figure
       id="15"
-      title={`Para un sueldo que no se ha movido, ${ultimo} se lleva ${dec(Math.abs(deltaTuyo))} puntos ${deltaTuyo >= 0 ? 'más' : 'menos'} que ${primero}`}
+      title={`Para un sueldo real constante, la carga de ${ultimo} difiere en ${dec(Math.abs(deltaTuyo))} puntos respecto a ${primero}`}
       sub={`${ANIOS.length} ejercicios × ${columnas.length} niveles de renta · euros constantes de 2026 · cada celda es ${MEDIDAS[medida].nota}`}
-      legend="Una fila es un año · una columna es el mismo poder adquisitivo en los quince · cuanto más oscura la celda, más se llevaba el impuesto"
+      legend="Una fila es un año · cada columna mantiene el mismo poder adquisitivo · una celda más oscura indica una carga efectiva mayor"
       source="Fuente · cálculo propio sobre parámetros BOE · IPC INE"
-      note="Leer una columna de arriba abajo es el experimento que ninguna reforma anuncia: el mismo salario real, quince fiscalidades. Las bandas horizontales son reformas; la deriva vertical, sin banda que la explique, es progresividad en frío."
+      note="Leer una columna de arriba abajo mantiene constante el salario real y cambia únicamente el ejercicio fiscal. Las discontinuidades suelen coincidir con reformas; los cambios graduales entre ellas pueden reflejar inflación e indexación parcial de parámetros."
       summary={ANIOS.map(a => `${a}: de ${pct(columnas[0][`${campo}_${a}`])} a ${pct(fin[`${campo}_${a}`])}`).join('; ')}
     >
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center', marginBottom: 16 }}>

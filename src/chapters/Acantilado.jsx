@@ -82,7 +82,7 @@ export default function Acantilado() {
         id="08"
         title={
           redMax > 0
-            ? `La reducción del art. 20 se retira, y mientras se retira el tipo marginal se dispara hasta el ${pct(pico.marg, 0)}`
+            ? `Al retirarse la reducción del art. 20, el tipo marginal combinado alcanza el ${pct(pico.marg, 0)}`
             : 'En este año la reducción del art. 20 no llega a tu nivel de renta'
         }
         sub={`${anio} · eje común: salario bruto anual de 0 a ${eur(MAXB)} · arriba la reducción en euros, abajo el tipo marginal total (IRPF + SS)`}
@@ -90,7 +90,7 @@ export default function Acantilado() {
         source="Fuente · BOE — LIRPF art. 20 · cálculo propio"
         note={
           redMax > 0
-            ? `Zona plana hasta ${eur(bPlana ?? 0)} de bruto; la reducción desaparece a partir de ${eur(bCero ?? 0)}. Entre ambos puntos, cada euro adicional retira parte de la reducción y engorda la base imponible más deprisa que el propio aumento.`
+            ? `La reducción se mantiene hasta ${eur(bPlana ?? 0)} de bruto y se agota a partir de ${eur(bCero ?? 0)}. Entre ambos puntos, cada euro adicional aumenta el rendimiento y reduce simultáneamente el beneficio fiscal, por lo que la base imponible crece más de un euro.`
             : undefined
         }
         summary={`Tipo marginal máximo ${pct(pico.marg)} en ${eur(pico.b)} de bruto. Reducción máxima ${eur(redMax)}.`}
@@ -230,9 +230,9 @@ export default function Acantilado() {
       <ComoFunciona />
 
       <Puente rotulo="La pregunta práctica">
-        Hasta aquí, la mecánica: de dónde sale la cuota, qué tipo se aplica a qué y por qué hay un
-        escalón donde no debería haberlo. Queda la única pregunta que se hace todo el mundo cuando
-        negocia un sueldo: <strong>si mañana te suben, ¿cuánto llega de verdad?</strong>
+        Hasta aquí, la mecánica: de dónde sale la cuota, qué tipo se aplica a cada parte de la base
+        y cómo la retirada de una reducción eleva temporalmente el marginal efectivo. Ahora podemos
+        medir una cuestión práctica: <strong>qué parte de una subida bruta se convierte en renta neta.</strong>
       </Puente>
 
       <span id="fig-09" className="fs-ancla" aria-hidden="true" />
@@ -297,7 +297,7 @@ function CienEuros() {
     >
       <div className="fs-sim">
         <div className="fs-sim-control">
-          <span className="fs-label">Súbete el sueldo</span>
+          <span className="fs-label">Incremento bruto anual</span>
           <div className="fs-sim-presets">
             {[1000, 3000, 6000, 12000].map(n => (
               <button
@@ -395,10 +395,10 @@ function CienEuros() {
       </div>
 
       <p className="fs-note" style={{ marginTop: 14, maxWidth: '72ch' }}>
-        Ese {pct(d.marginal)} es tu <strong>tipo marginal real</strong> para esta subida
-        concreta: no aparece en ninguna tabla oficial, porque suma el tramo del IRPF, las
-        cotizaciones y —si estás en la franja del art. 20— la reducción que pierdes por el
-        camino. Tu tipo efectivo sobre el total del sueldo sigue siendo mucho menor.
+        Ese {pct(d.marginal)} es el <strong>tipo marginal combinado</strong> para esta subida
+        concreta. Integra el incremento de IRPF, las cotizaciones y —cuando corresponde— la
+        reducción del art. 20 que deja de aplicarse. No debe confundirse con el tipo efectivo
+        calculado sobre el salario completo.
       </p>
     </Figure>
   );
@@ -451,8 +451,8 @@ function ComoFunciona() {
         <li>
           <span className="fs-stamp">02 · La retirada</span>
           <p className="fs-note">
-            A partir de ese umbral la reducción empieza a retirarse. Por cada euro que ganas de más
-            pierdes una fracción de reducción, así que tu base imponible sube{' '}
+            A partir de ese umbral la reducción empieza a disminuir. Por cada euro adicional de
+            rendimiento se reduce una fracción del beneficio, así que la base imponible sube{' '}
             <strong>más de un euro por cada euro ganado</strong>. El tipo que notas no es el del
             tramo: es el del tramo más el efecto de la reducción que desaparece.
           </p>
@@ -474,27 +474,27 @@ function ComoFunciona() {
         <table className="fs-table">
           <tbody>
             <tr>
-              <th scope="row">Tu bruto sube</th>
+              <th scope="row">Aumento del bruto</th>
               <td>{eur(1000)}</td>
             </tr>
             <tr>
-              <th scope="row">Pierdes de reducción del art. 20</th>
+              <th scope="row">Disminución de la reducción del art. 20</th>
               <td>−{eur(caso.dRed)}</td>
             </tr>
             <tr>
-              <th scope="row">Tu base imponible sube</th>
+              <th scope="row">Aumento de la base imponible</th>
               <td>{eur(caso.dBase)}</td>
             </tr>
             <tr>
-              <th scope="row">Pagas de IRPF</th>
+              <th scope="row">Aumento del IRPF</th>
               <td>−{eur(caso.dIrpf)}</td>
             </tr>
             <tr>
-              <th scope="row">Pagas de cotizaciones</th>
+              <th scope="row">Aumento de cotizaciones</th>
               <td>−{eur(caso.dSS)}</td>
             </tr>
             <tr className="is-current">
-              <th scope="row">Te llega</th>
+              <th scope="row">Aumento de renta neta</th>
               <td>{eur(caso.dNeto)}</td>
             </tr>
           </tbody>

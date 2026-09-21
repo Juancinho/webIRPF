@@ -112,7 +112,7 @@ export default function Nomina() {
     });
 
   return (
-    <section id="nomina" className="fs-chapter" aria-labelledby="nomina-t">
+    <section id="nomina" className="fs-chapter fs-open-ledger" aria-labelledby="nomina-t">
       <div className="fs-page">
         <span className="fs-chapter-numeral" aria-hidden="true">01</span>
 
@@ -184,7 +184,7 @@ export default function Nomina() {
           </aside>
 
           <div className="fs-field">
-            <div className="fs-chapter-head">
+            <div className="fs-chapter-head" data-gesture="BRUTO  −  COTIZACIÓN  −  IRPF  =  NETO">
               <span className="fs-stamp">01 / 09 · Tu nómina</span>
               <h2 id="nomina-t" className="fs-title">
                 Lo que ves
@@ -192,9 +192,9 @@ export default function Nomina() {
                 en la nómina
               </h2>
               <p className="fs-kicker">
-                Empecemos por lo visible: la cifra del contrato, los dos descuentos que aparecen en
-                tu recibo y lo que queda. El capítulo siguiente mostrará que la nómina no empieza
-                donde tú crees.
+                Primero, la nómina tal como se liquida: salario bruto, cotización del trabajador,
+                retención de IRPF y renta neta. Después ampliaremos el perímetro para incluir el
+                coste laboral que no figura como salario en el recibo.
               </p>
             </div>
 
@@ -344,11 +344,11 @@ export default function Nomina() {
             </Figure>
 
             <Puente rotulo="Lo que el recibo no enseña">
-              El recibo de la nómina enseña esos dos descuentos y se queda ahí. Pero tu trabajo no
-              le cuesta a la empresa <strong>{eur(bruto)}</strong>: le cuesta{' '}
-              <strong>{eur(nomina.costeLab)}</strong>, y esa diferencia no aparece en ningún papel
-              que tú firmes. Entre el bruto y la cifra que Hacienda acaba gravando hay, además,
-              otra docena de pasos: cada uno con su artículo y su resta.
+              El recibo parte del salario bruto, pero el coste laboral es más amplio:{' '}
+              <strong>{eur(nomina.costeLab)}</strong> frente a <strong>{eur(bruto)}</strong>. La
+              diferencia corresponde a la cotización empresarial. Entre el bruto y la base del
+              IRPF intervienen además gastos deducibles, reducciones y mínimos; el desglose siguiente
+              identifica cada operación y su fundamento normativo.
             </Puente>
 
             <Desglose />
