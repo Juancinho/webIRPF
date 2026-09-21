@@ -25,3 +25,15 @@ tmp/
 *.njsproj
 *.sln
 *.sw?
+
+# Notas, planificación y capturas: viven en la carpeta, no en el repositorio.
+# Aquí sólo entra lo que hace falta para construir la web.
+.claude/
+Claude outputs/
+*.md
+remixed-*.tsx
+write_css.py
+
+# Artefactos de sincronización y de compilación
+src-snapshot.tgz
+*.bundle
