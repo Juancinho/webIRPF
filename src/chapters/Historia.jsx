@@ -1,28 +1,27 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useId, useMemo, useState } from 'react';
 import { useFiscal } from '../state/fiscalContext';
 import {
   ANIOS,
   DATOS_CHART,
   DATOS_CHART_NOMINAL,
-  DATOS_UMBRALES,
-  DATOS_UMBRALES_REAL,
   INFLACION_A_2026,
-  REFORMA_ANIOS,
   calcularNomina,
 } from '../engine/irpf';
 import Figure from '../figures/Figure';
 import Epocas from './Epocas';
 import ProgresividadFria from './ProgresividadFria';
 import Art20Historia from './Art20Historia';
-import ZoomSvg from '../figures/ZoomSvg';
-import { Label, Leader, Series } from '../figures/marks';
-import { linear, polyline, round } from '../figures/scale';
+import ChartFrame from '../figures/ChartFrame';
+import { useDomainZoom } from '../figures/useDomainZoom';
+import { Label, Series } from '../figures/marks';
+import { linear, polyline, round, ticks } from '../figures/scale';
 import { eur, pct, sign } from '../utils/format';
 
 /**
  * 04 · QUINCE AÑOS DE FISCALIDAD
- * FIG. 08 the same real salary year by year · FIG. 09 the atlas ·
- * FIG. 10 how the thresholds moved.
+ * FIG. 10 the same real salary year by year · FIG. 11 the ranking of eras ·
+ * FIG. 12 the two-year comparator · FIG. 13 the atlas · FIG. 14 cold
+ * progressivity · FIG. 15 the art. 20 rewritten six times.
  */
 export default function Historia() {
   const { bruto, anio, opts, setAnio } = useFiscal();
@@ -129,7 +128,6 @@ export default function Historia() {
 
             <Art20Historia />
 
-            <Umbrales anio={anio} />
           </div>
         </div>
       </div>
@@ -161,7 +159,7 @@ function Dumbbells({ serie, anio, mejor, setAnio, bruto2026 }) {
       source="Fuente · cálculo propio · IPC INE"
       summary={serie.map(s => `${s.anio}: ${eur(s.neto)}`).join('; ')}
     >
-      <ZoomSvg viewBox={`0 0 ${W} ${H}`}>
+      <ChartFrame viewBox={`0 0 ${W} ${H}`} scroll>
         {serie.map((s, i) => {
           const y = 18 + i * rowH;
           const xs = x(s.neto);
@@ -243,7 +241,7 @@ function Dumbbells({ serie, anio, mejor, setAnio, bruto2026 }) {
         <Label x={X1 + 8} y={H - 14} size={9} color="var(--ink-5)" anchor="end" mono>
           MÁS NETO REAL →
         </Label>
-      </ZoomSvg>
+      </ChartFrame>
     </Figure>
   );
 }
@@ -253,6 +251,7 @@ function Atlas({ anio, bruto2026, setAnio }) {
   const [activos, setActivos] = useState(() => new Set([2012, 2015, 2019, 2023, 2026]));
   const [modo, setModo] = useState('real');
   const [medida, setMedida] = useState('neto');
+  const [tip, setTip] = useState(null);
 
   const toggle = useCallback(
     a =>
@@ -277,7 +276,9 @@ function Atlas({ anio, bruto2026, setAnio }) {
   const Y1 = H - 46;
 
   const xs = datos.map(d => d.bruto);
-  const x = linear([xs[0], xs[xs.length - 1]], [X0, X1]);
+  const zoom = useDomainZoom([xs[0], xs[xs.length - 1]], { pxRange: [X0, X1], vbWidth: W, maxZoom: 16 });
+  const x = linear(zoom.domain, [X0, X1]);
+  const clip = useId().replace(/:/g, '');
 
   const todos = ANIOS.flatMap(a => datos.map(d => d[`${key}_${a}`]));
   const lo = medida === 'neto' ? Math.min(...todos) : 0;
@@ -312,6 +313,25 @@ function Atlas({ anio, bruto2026, setAnio }) {
   };
 
   const marcado = Math.min(Math.max(bruto2026, xs[0]), xs[xs.length - 1]);
+
+  const onMove = e => {
+    const svg = e.currentTarget.ownerSVGElement;
+    const r = svg.getBoundingClientRect();
+    const v = x.invert(((e.clientX - r.left) / r.width) * W);
+    const d = datos.reduce((best, c) => (Math.abs(c.bruto - v) < Math.abs(best.bruto - v) ? c : best), datos[0]);
+    const vistos = ANIOS.filter(a => activos.has(a) || a === anio);
+    setTip({
+      vx: x(d.bruto),
+      vy: y(d[`${key}_${anio}`]),
+      title: eur(d.bruto),
+      sub: medida === 'neto' ? 'Salario neto por bruto' : 'Tipo efectivo de IRPF',
+      rows: vistos.map(a => [
+        String(a),
+        medida === 'neto' ? eur(d[`neto_${a}`]) : pct(d[`irpf_${a}`]),
+        a === anio ? 'var(--signal)' : 'var(--ink-4)',
+      ]),
+    });
+  };
 
   return (
     <Figure
@@ -352,7 +372,12 @@ function Atlas({ anio, bruto2026, setAnio }) {
         </button>
       </div>
 
-      <ZoomSvg viewBox={`0 0 ${W} ${H}`}>
+      <ChartFrame viewBox={`0 0 ${W} ${H}`} zoom={zoom} tip={tip} label="El atlas de la renta">
+        <defs>
+          <clipPath id={clip}>
+            <rect x={X0} y={Y0 - 12} width={X1 - X0} height={Y1 - Y0 + 14} />
+          </clipPath>
+        </defs>
         {[0, 0.25, 0.5, 0.75, 1].map(t => {
           const v = lo + (hi - lo) * t;
           return (
@@ -365,38 +390,59 @@ function Atlas({ anio, bruto2026, setAnio }) {
           );
         })}
 
-        {ANIOS.map(a => {
-          const esActual = a === anio;
-          const on = activos.has(a);
-          if (!on && !esActual) {
-            return <Series key={a} d={path(a)} color="var(--ink-7)" width={0.6} dim />;
-          }
-          return (
-            <Series
-              key={a}
-              d={path(a)}
-              color={esActual ? 'var(--signal)' : 'var(--ink-4)'}
-              width={esActual ? 1.8 : 0.9}
-              label={String(a)}
-              labelX={X1 + 8}
-              labelY={y(ultimo(a)) + 3.5}
-            />
-          );
-        })}
+        <g clipPath={`url(#${clip})`}>
+          {ANIOS.map(a => {
+            const esActual = a === anio;
+            const on = activos.has(a);
+            if (!on && !esActual) {
+              return <Series key={a} d={path(a)} color="var(--ink-7)" width={0.6} dim />;
+            }
+            return (
+              <Series
+                key={a}
+                d={path(a)}
+                color={esActual ? 'var(--signal)' : 'var(--ink-4)'}
+                width={esActual ? 1.8 : 0.9}
+              />
+            );
+          })}
 
-        {/* the reader's position */}
-        <line x1={round(x(marcado))} y1={Y0 - 4} x2={round(x(marcado))} y2={Y1} stroke="var(--counter)" strokeWidth={1} strokeDasharray="3 3" />
-        <Label x={x(marcado)} y={Y0 - 8} size={9} color="var(--counter)" anchor="middle" mono>
+          <line x1={round(x(marcado))} y1={Y0 - 4} x2={round(x(marcado))} y2={Y1} stroke="var(--counter)" strokeWidth={1} strokeDasharray="3 3" />
+
+          {tip && <line className="fs-crosshair" x1={round(tip.vx)} y1={Y0 - 4} x2={round(tip.vx)} y2={Y1} />}
+        </g>
+
+        {/* etiquetas directas al margen, fuera del recorte */}
+        {ANIOS.filter(a => activos.has(a) || a === anio).map(a => (
+          <Label key={a} x={X1 + 8} y={round(y(ultimo(a))) + 3.5} size={10} weight={a === anio ? 800 : 700} color={a === anio ? 'var(--signal)' : 'var(--ink-4)'} mono>
+            {a}
+          </Label>
+        ))}
+
+        <Label x={round(x(marcado))} y={Y0 - 8} size={9} color="var(--counter)" anchor="middle" mono>
           TU SALARIO
         </Label>
 
-        {[15000, 40000, 65000, 90000].map(v => (
-          <Label key={v} x={x(v)} y={Y1 + 22} size={9.5} color="var(--ink-4)" anchor="middle" mono>
-            {eur(v)}
-          </Label>
+        {ticks(zoom.domain[0], zoom.domain[1], 5).map(v => (
+          <g key={v}>
+            <line x1={round(x(v))} y1={Y1} x2={round(x(v))} y2={Y1 + 5} stroke="var(--ink-5)" strokeWidth={0.7} />
+            <Label x={round(x(v))} y={Y1 + 20} size={9.5} color="var(--ink-4)" anchor="middle" mono>
+              {eur(v)}
+            </Label>
+          </g>
         ))}
         <line x1={X0} y1={Y1} x2={X1} y2={Y1} stroke="var(--rule)" strokeWidth={0.8} />
-      </ZoomSvg>
+
+        <rect
+          className="fs-hit"
+          x={X0}
+          y={Y0 - 12}
+          width={X1 - X0}
+          height={Y1 - Y0 + 14}
+          onMouseMove={onMove}
+          onMouseLeave={() => setTip(null)}
+        />
+      </ChartFrame>
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 14 }}>
         {ANIOS.map(a => (
@@ -417,129 +463,6 @@ function Atlas({ anio, bruto2026, setAnio }) {
         Selecciona los años que quieres destacar; el año en curso ({anio}) se dibuja siempre. El
         botón de descarga exporta los años seleccionados.
       </p>
-    </Figure>
-  );
-}
-
-/* ── FIG. 10 ─────────────────────────────────────────────────────────────── */
-const SERIES_UMBRAL = [
-  { key: 'smi', label: 'SMI anual' },
-  { key: 'minExento', label: 'Mínimo exento de retención' },
-  { key: 'art20Inf', label: 'Art. 20 · umbral inferior' },
-  { key: 'art20Sup', label: 'Art. 20 · umbral superior' },
-  { key: 'baseMax', label: 'Base máxima de cotización' },
-];
-
-function Umbrales({ anio }) {
-  const [real, setReal] = useState(false);
-  const [activas, setActivas] = useState(() => new Set(['smi', 'minExento', 'art20Inf', 'art20Sup']));
-
-  const datos = real ? DATOS_UMBRALES_REAL : DATOS_UMBRALES;
-
-  const W = 880;
-  const H = 330;
-  const X0 = 22;
-  const X1 = W - 190;
-  const Y0 = 18;
-  const Y1 = H - 40;
-
-  const x = linear([2012, 2026], [X0, X1]);
-  const vals = datos.flatMap(d => SERIES_UMBRAL.filter(s => activas.has(s.key)).map(s => d[s.key])).filter(v => typeof v === 'number');
-  const hi = Math.max(...vals, 1);
-  const y = linear([0, hi], [Y1, Y0]);
-
-  const toggle = k =>
-    setActivas(prev => {
-      const next = new Set(prev);
-      if (next.has(k)) {
-        if (next.size > 1) next.delete(k);
-      } else next.add(k);
-      return next;
-    });
-
-  return (
-    <Figure
-      id="16"
-      title="Las líneas invisibles que deciden cuánto pagas"
-      sub={`${real ? 'Euros constantes de 2026' : 'Euros nominales de cada año'} · un punto por año · las reformas se marcan sobre el eje`}
-      legend="Cada serie se nombra en su propio extremo · los tramos sin dato se interrumpen"
-      source="Fuente · BOE · TGSS · órdenes anuales de cotización"
-      summary={SERIES_UMBRAL.filter(s => activas.has(s.key))
-        .map(s => `${s.label}: ${eur(datos[datos.length - 1][s.key] || 0)} en 2026`)
-        .join('; ')}
-    >
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 14 }}>
-        <span className="fs-seg">
-          <button type="button" aria-pressed={!real} onClick={() => setReal(false)}>
-            Nominal
-          </button>
-          <button type="button" aria-pressed={real} onClick={() => setReal(true)}>
-            Real (€2026)
-          </button>
-        </span>
-        {SERIES_UMBRAL.map(s => (
-          <button
-            key={s.key}
-            type="button"
-            className="fs-btn"
-            style={{ padding: '5px 10px', minHeight: 30, fontSize: 10.5 }}
-            aria-pressed={activas.has(s.key)}
-            onClick={() => toggle(s.key)}
-          >
-            {s.label}
-          </button>
-        ))}
-      </div>
-
-      <ZoomSvg viewBox={`0 0 ${W} ${H}`}>
-        <line x1={X0} y1={Y1} x2={X1} y2={Y1} stroke="var(--rule)" strokeWidth={0.8} />
-
-        {REFORMA_ANIOS.map(r => (
-          <g key={r.anio}>
-            <line x1={round(x(r.anio))} y1={Y0} x2={round(x(r.anio))} y2={Y1} stroke="var(--ink-7)" strokeWidth={0.7} strokeDasharray="2 4" />
-            <Label x={x(r.anio)} y={Y0 - 4} size={8.5} color="var(--ink-5)" anchor="middle" mono>
-              {r.label.toUpperCase()}
-            </Label>
-          </g>
-        ))}
-
-        {SERIES_UMBRAL.filter(s => activas.has(s.key)).map((s, si) => {
-          const pts = datos
-            .map(d => (typeof d[s.key] === 'number' ? [x(d.anio), y(d[s.key])] : null))
-            .filter(Boolean);
-          const last = datos[datos.length - 1][s.key];
-          const color = si === 0 ? 'var(--ink)' : `var(--ink-${Math.min(5, si + 2)})`;
-          return (
-            <g key={s.key}>
-              <path d={polyline(pts)} fill="none" stroke={color} strokeWidth={1.1} />
-              {datos.map(d =>
-                typeof d[s.key] === 'number' ? (
-                  <circle key={d.anio} cx={round(x(d.anio))} cy={round(y(d[s.key]))} r={d.anio === anio ? 3.6 : 2.2} fill={d.anio === anio ? 'var(--signal)' : color}>
-                    <title>{`${s.label} ${d.anio} — ${eur(d[s.key])}`}</title>
-                  </circle>
-                ) : null
-              )}
-              {typeof last === 'number' && (
-                <>
-                  <Leader x1={X1 + 4} y1={y(last)} x2={X1 + 12} y2={y(last)} />
-                  <Label x={X1 + 16} y={y(last) - 2} size={9} color={color} mono>
-                    {s.label.toUpperCase()}
-                  </Label>
-                  <Label x={X1 + 16} y={y(last) + 11} size={11} weight={700} color={color}>
-                    {eur(last)}
-                  </Label>
-                </>
-              )}
-            </g>
-          );
-        })}
-
-        {[2012, 2016, 2020, 2024, 2026].map(a => (
-          <Label key={a} x={x(a)} y={Y1 + 20} size={9.5} color="var(--ink-4)" anchor="middle" mono>
-            {a}
-          </Label>
-        ))}
-      </ZoomSvg>
     </Figure>
   );
 }

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useFiscal } from '../state/fiscalContext';
 import { ANIOS, INFLACION_A_2026, calcularNomina, inflacionAcumulada } from '../engine/irpf';
 import Figure from '../figures/Figure';
-import ZoomSvg from '../figures/ZoomSvg';
+import ChartFrame from '../figures/ChartFrame';
 import { Label } from '../figures/marks';
 import { linear, polyline, round } from '../figures/scale';
 import { eur, pct, sign } from '../utils/format';
@@ -28,6 +28,7 @@ export default function ProgresividadFria() {
   const { bruto, anio, opts } = useFiscal();
   const [base, setBase] = useState(2012);
   const [hover, setHover] = useState(null);
+  const [tip, setTip] = useState(null);
 
   const bruto2026 = Math.round(bruto * (INFLACION_A_2026[anio] || 1));
   const salarioBase = bruto2026 / INFLACION_A_2026[base];
@@ -113,7 +114,7 @@ export default function ProgresividadFria() {
         </select>
       </div>
 
-      <ZoomSvg viewBox={`0 0 ${W} ${H}`} label="Progresividad en frío">
+      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} scroll label="Progresividad en frío">
         {/* the gap is the point of the figure */}
         <path d={polyline(areaGap) + ' Z'} fill="var(--signal)" opacity={0.1} />
 
@@ -147,8 +148,23 @@ export default function ProgresividadFria() {
               y={Y0 - 14}
               width={24}
               height={R1 - Y0 + 20}
-              onMouseEnter={() => setHover(s.anio)}
-              onMouseLeave={() => setHover(null)}
+              onMouseEnter={() => {
+                setHover(s.anio);
+                setTip({
+                  vx: x(s.anio),
+                  vy: y(s.netoReal),
+                  title: String(s.anio),
+                  sub: 'Euros constantes de ' + base,
+                  rows: [
+                    ['Bruto equivalente', eur(s.nominal)],
+                    ['Neto real', eur(s.netoReal), 'var(--ink)'],
+                    ['Si se deflactara', eur(s.netoDeflactado), 'var(--ink-4)'],
+                    ['Diferencia', sign(s.netoReal - s.netoDeflactado), 'var(--signal)'],
+                    ['Carga total', pct(s.efectivo), 'var(--counter)'],
+                  ],
+                });
+              }}
+              onMouseLeave={() => { setHover(null); setTip(null); }}
             >
               <title>{`${s.anio} — neto real ${eur(s.netoReal)}, si se deflactara ${eur(s.netoDeflactado)}`}</title>
             </rect>
@@ -197,7 +213,7 @@ export default function ProgresividadFria() {
             </Label>
           );
         })}
-      </ZoomSvg>
+      </ChartFrame>
 
       <p className="fs-body" style={{ marginTop: 18 }}>
         Sumando todos los años desde {base}, la diferencia acumulada asciende a{' '}

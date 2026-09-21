@@ -2,9 +2,9 @@ import { useMemo, useState } from 'react';
 import { useFiscal } from '../state/fiscalContext';
 import { ANIOS, INFLACION_A_2026, calcularNomina, calcularTipoMarginal } from '../engine/irpf';
 import Figure from '../figures/Figure';
-import ZoomSvg from '../figures/ZoomSvg';
-import { Label, TickStrip } from '../figures/marks';
-import { linear } from '../figures/scale';
+import ChartFrame from '../figures/ChartFrame';
+import { Label } from '../figures/marks';
+import { linear, round } from '../figures/scale';
 import { eur, pct, sign } from '../utils/format';
 
 /**
@@ -53,6 +53,7 @@ export default function Epocas({ bruto2026 }) {
 /* ── ranked years ─────────────────────────────────────────────────────────── */
 function Ranking({ serie, orden, anio, setAnio, bruto2026, mejor, peor }) {
   const [hover, setHover] = useState(null);
+  const [tip, setTip] = useState(null);
 
   const W = 880;
   const rowH = 30;
@@ -72,7 +73,7 @@ function Ranking({ serie, orden, anio, setAnio, bruto2026, mejor, peor }) {
       id="11"
       title={`Con este poder adquisitivo, tu mejor año fue ${mejor.anio} y el peor ${peor.anio}`}
       sub={`${eur(bruto2026)} constantes de 2026 · años ordenados por lo que te habrían dejado neto en euros de hoy · pulsa un año para llevar toda la publicación a él`}
-      legend="Una marca = 100 € reales de neto · el año en curso va en petróleo"
+      legend="Barra = neto real de ese año · el año en curso va en petróleo · las dos columnas de la derecha son el tipo efectivo de IRPF y la cuña fiscal"
       source="Fuente · cálculo propio · IPC INE"
       summary={orden.map((s, i) => `${i + 1}. ${s.anio}: ${eur(s.neto)}`).join('; ')}
     >
@@ -95,7 +96,7 @@ function Ranking({ serie, orden, anio, setAnio, bruto2026, mejor, peor }) {
         </span>
       </div>
 
-      <ZoomSvg viewBox={`0 0 ${W} ${H}`} label="Años ordenados por neto real">
+      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} scroll label="Años ordenados por neto real">
         {orden.map((s, i) => {
           const y = 22 + i * rowH;
           const esSel = s.anio === anio;
@@ -111,15 +112,14 @@ function Ranking({ serie, orden, anio, setAnio, bruto2026, mejor, peor }) {
                 {i + 1}.º
               </Label>
 
-              <TickStrip
+              <rect
                 x={X0}
-                y={y}
-                width={ancho}
-                count={Math.round((s.neto - (lo - span * 0.35)) / 100)}
-                height={15}
-                seed={i + 4}
-                color={color}
-                dot={false}
+                y={y - 8}
+                width={round(ancho)}
+                height={16}
+                rx={2}
+                fill={color}
+                opacity={esSel || esHover ? 1 : 0.88}
               />
 
               <Label x={x(s.neto) + 10} y={y + 4} size={11.5} weight={esSel ? 800 : 600} color={color}>
@@ -138,8 +138,23 @@ function Ranking({ serie, orden, anio, setAnio, bruto2026, mejor, peor }) {
                 y={y - rowH / 2}
                 width={W}
                 height={rowH}
-                onMouseEnter={() => setHover(s.anio)}
-                onMouseLeave={() => setHover(null)}
+                onMouseEnter={() => {
+                  setHover(s.anio);
+                  setTip({
+                    vx: x(s.neto),
+                    vy: y,
+                    title: String(s.anio),
+                    sub: 'Puesto ' + (i + 1) + ' de ' + orden.length,
+                    rows: [
+                      ['Neto real', eur(s.neto), 'var(--signal)'],
+                      ['Bruto equivalente', eur(s.nominal)],
+                      ['IRPF efectivo', pct(s.efectivo)],
+                      ['Marginal total', pct(s.marginal)],
+                      ['Cuña fiscal', pct(s.cuna)],
+                    ],
+                  });
+                }}
+                onMouseLeave={() => { setHover(null); setTip(null); }}
                 onClick={() => setAnio(s.anio)}
               >
                 <title>{`${s.anio} — ${eur(s.neto)} netos reales, IRPF efectivo ${pct(s.efectivo)}, cuña ${pct(s.cuna)}`}</title>
@@ -160,7 +175,7 @@ function Ranking({ serie, orden, anio, setAnio, bruto2026, mejor, peor }) {
         <Label x={X1} y={H - 16} size={9} color="var(--ink-5)" anchor="end" mono>
           MÁS NETO REAL →
         </Label>
-      </ZoomSvg>
+      </ChartFrame>
     </Figure>
   );
 }

@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { useFiscal } from '../state/fiscalContext';
 import { useSteps } from '../hooks/useChapters';
 import Figure from '../figures/Figure';
-import ZoomSvg from '../figures/ZoomSvg';
+import ChartFrame from '../figures/ChartFrame';
 import { TickStrip, Label, Leader } from '../figures/marks';
 import { rnd, round } from '../figures/scale';
 import { eur, pct } from '../utils/format';
@@ -78,7 +78,7 @@ export default function Viaje() {
                 source="Fuente · TGSS · BOE LIRPF · AEAT"
                 summary={`De ${eur(nomina.costeLab)} de coste laboral, ${eur(nomina.cotEmp)} son cotización de la empresa, ${eur(nomina.cotTra)} cotización del trabajador y ${eur(nomina.irpfFinal)} IRPF; llegan ${eur(nomina.salarioNeto)} netos.`}
               >
-                <ZoomSvg viewBox={`0 0 ${W} ${H}`} style={{ maxHeight: '64vh' }}>
+                <ChartFrame viewBox={`0 0 ${W} ${H}`} scroll style={{ maxHeight: '64vh' }}>
                   {/* guide rail: the full width of the labour cost, always present */}
                   <Rule x={CX} y0={34} y1={H - 10} />
 
@@ -186,7 +186,7 @@ export default function Viaje() {
                   <Label x={26} y={H - 30} size={22} weight={800} color="var(--signal)">
                     {pct(pctNeto)}
                   </Label>
-                </ZoomSvg>
+                </ChartFrame>
 
                 <div className="fs-dots" aria-hidden="true">
                   {Array.from({ length: 6 }, (_, i) => (

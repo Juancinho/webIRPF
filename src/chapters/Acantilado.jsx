@@ -1,10 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { useFiscal } from '../state/fiscalContext';
 import { calcularNomina, calcularTipoMarginal } from '../engine/irpf';
 import Figure from '../figures/Figure';
-import ZoomSvg from '../figures/ZoomSvg';
+import ChartFrame from '../figures/ChartFrame';
+import { useDomainZoom } from '../figures/useDomainZoom';
 import { Label, HundredField, YouMark } from '../figures/marks';
-import { linear, polyline, round } from '../figures/scale';
+import { clamp, linear, polyline, round, ticks } from '../figures/scale';
 import { eur, pct } from '../utils/format';
 
 const W = 880;
@@ -27,6 +28,7 @@ const STEP = 200;
  */
 export default function Acantilado() {
   const { bruto, anio, opts, marginal, nomina } = useFiscal();
+  const [tip, setTip] = useState(null);
 
   const serie = useMemo(() => {
     const out = [];
@@ -41,8 +43,10 @@ export default function Acantilado() {
   const redMax = Math.max(...serie.map(p => p.red), 1);
   const margMax = Math.max(...serie.map(p => p.marg), 1);
 
-  const x = linear([0, MAXB], [X0, X1]);
+  const zoom = useDomainZoom([0, MAXB], { pxRange: [X0, X1], vbWidth: W, maxZoom: 24 });
+  const x = linear(zoom.domain, [X0, X1]);
   const yRed = linear([0, redMax], [CURVA_Y1, CURVA_Y0]);
+  const clip = useId().replace(/:/g, '');
 
   // thresholds read off the series, so they always match what is drawn
   const iPlana = serie.findIndex(p => p.red < redMax - 0.5);
@@ -51,7 +55,25 @@ export default function Acantilado() {
   const bCero = iCero > 0 ? serie[iCero].b : null;
   const pico = serie.reduce((a, c) => (c.marg > a.marg ? c : a), serie[0]);
 
-  const dentro = bruto <= MAXB;
+  const dentro = bruto >= zoom.domain[0] && bruto <= zoom.domain[1];
+  const cx = v => clamp(x(v), X0, X1);
+
+  const onMove = e => {
+    const svg = e.currentTarget.ownerSVGElement;
+    const r = svg.getBoundingClientRect();
+    const b = x.invert(((e.clientX - r.left) / r.width) * W);
+    const p = serie.reduce((best, c) => (Math.abs(c.b - b) < Math.abs(best.b - b) ? c : best), serie[0]);
+    setTip({
+      vx: x(p.b),
+      vy: BAR_Y - (p.marg / margMax) * BAR_H,
+      title: eur(p.b),
+      sub: `Bruto anual · ${anio}`,
+      rows: [
+        ['Reducción art. 20', eur(p.red), 'var(--ink)'],
+        ['Marginal total', pct(p.marg), 'var(--counter)'],
+      ],
+    });
+  };
 
   return (
     <>
@@ -72,26 +94,35 @@ export default function Acantilado() {
         }
         summary={`Tipo marginal máximo ${pct(pico.marg)} en ${eur(pico.b)} de bruto. Reducción máxima ${eur(redMax)}.`}
       >
-        <ZoomSvg viewBox={`0 0 ${W} ${H}`}>
+        <ChartFrame viewBox={`0 0 ${W} ${H}`} zoom={zoom} tip={tip} label="El acantilado del artículo 20">
+          <defs>
+            <clipPath id={clip}>
+              <rect x={X0} y={CURVA_Y0 - 30} width={X1 - X0} height={BAR_Y - CURVA_Y0 + 44} />
+            </clipPath>
+          </defs>
           {/* ── zones ─────────────────────────────────────────────────── */}
           {bPlana !== null && bCero !== null && redMax > 0 && (
             <g>
               {[
-                { x0: X0, x1: x(bPlana), t: 'PLANA', d: `reducción máxima ${eur(redMax)}` },
-                { x0: x(bPlana), x1: x(bCero), t: 'CAÍDA', d: 'la reducción se retira' },
-                { x0: x(bCero), x1: X1, t: 'CERO', d: 'sin reducción' },
+                { x0: X0, x1: cx(bPlana), t: 'PLANA', d: `reducción máxima ${eur(redMax)}` },
+                { x0: cx(bPlana), x1: cx(bCero), t: 'CAÍDA', d: 'la reducción se retira' },
+                { x0: cx(bCero), x1: X1, t: 'CERO', d: 'sin reducción' },
               ].map(z => (
                 <g key={z.t}>
                   <line x1={z.x0} y1={CURVA_Y0 - 16} x2={z.x1} y2={CURVA_Y0 - 16} stroke="var(--rule)" strokeWidth={0.8} />
-                  <Label x={z.x0 + 4} y={CURVA_Y0 - 22} size={9.5} color="var(--ink-3)" mono>
-                    {z.t}
-                  </Label>
-                  <Label x={z.x0 + 4} y={CURVA_Y0 - 6} size={9.5} color="var(--ink-5)">
-                    {z.d}
-                  </Label>
+                  {z.x1 - z.x0 > 46 && (
+                    <>
+                      <Label x={z.x0 + 4} y={CURVA_Y0 - 22} size={9.5} color="var(--ink-3)" mono>
+                        {z.t}
+                      </Label>
+                      <Label x={z.x0 + 4} y={CURVA_Y0 - 6} size={9.5} color="var(--ink-5)">
+                        {z.d}
+                      </Label>
+                    </>
+                  )}
                 </g>
               ))}
-              {[bPlana, bCero].map(b => (
+              {[bPlana, bCero].filter(b => b >= zoom.domain[0] && b <= zoom.domain[1]).map(b => (
                 <line
                   key={b}
                   x1={round(x(b))}
@@ -108,6 +139,7 @@ export default function Acantilado() {
 
           {/* ── art. 20 curve ─────────────────────────────────────────── */}
           <line x1={X0} y1={CURVA_Y1} x2={X1} y2={CURVA_Y1} stroke="var(--rule)" strokeWidth={0.8} />
+          <g clipPath={`url(#${clip})`}>
           <path
             d={polyline(serie.map(p => [x(p.b), yRed(p.red)]))}
             fill="none"
@@ -144,6 +176,7 @@ export default function Acantilado() {
               </line>
             );
           })}
+          </g>
           <line x1={X0} y1={BAR_Y} x2={X1} y2={BAR_Y} stroke="var(--ink)" strokeWidth={0.9} />
 
           <Label x={round(x(pico.b))} y={round(BAR_Y - BAR_H - 10)} size={12} weight={800} color="var(--counter)" anchor="middle">
@@ -160,17 +193,30 @@ export default function Acantilado() {
           </Label>
 
           {/* ── axis ─────────────────────────────────────────────────── */}
-          {[0, 10000, 20000, 30000].map(v => (
-            <Label key={v} x={x(v)} y={BAR_Y + 30} size={9.5} color="var(--ink-4)" anchor={v === 0 ? 'start' : 'middle'} mono>
-              {v === 0 ? '0 €' : `${v / 1000}.000`}
-            </Label>
+          {ticks(zoom.domain[0], zoom.domain[1], 6).map(v => (
+            <g key={v}>
+              <line x1={round(x(v))} y1={BAR_Y} x2={round(x(v))} y2={BAR_Y + 5} stroke="var(--ink-5)" strokeWidth={0.7} />
+              <Label x={round(x(v))} y={BAR_Y + 22} size={9.5} color="var(--ink-4)" anchor="middle" mono>
+                {v === 0 ? '0 €' : eur(v)}
+              </Label>
+            </g>
           ))}
+
+          <rect
+            className="fs-hit"
+            x={X0}
+            y={CURVA_Y0 - 30}
+            width={X1 - X0}
+            height={BAR_Y - CURVA_Y0 + 40}
+            onMouseMove={onMove}
+            onMouseLeave={() => setTip(null)}
+          />
 
           {/* ── the reader ───────────────────────────────────────────── */}
           {dentro && (
             <YouMark x={x(bruto)} y={BAR_Y} height={BAR_H + 34} label={`TÚ · ${pct(marginal.tipoMarginalTotal * 100, 0)}`} />
           )}
-        </ZoomSvg>
+        </ChartFrame>
 
         {!dentro && (
           <p className="fs-note" style={{ marginTop: 12 }}>

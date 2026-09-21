@@ -254,6 +254,28 @@ Lupi Basics → Glance, per the skill's hard constraint. Nothing is retained by 
 | 13 Dónde estás | Where am I in the distribution? | area + bars | **discard** | L14 + F11 | 100 marks = 100 workers ordered, your position marked, percentile ruler |
 | 15 Tu parte | What is my share of public debt? | composed + bars | **discard** | F11 Tick Gauge + F1 rungs | one major number plus a years-to-repay rung strip |
 
+## The figure library
+
+Three shared pieces in `src/figures/`:
+
+- **`ChartFrame`** — the common frame: SVG canvas, hover readout box and axis controls.
+- **`useDomainZoom`** — **domain zoom, never image zoom**. Scaling the drawing would thicken
+  strokes and type like magnifying a photograph; instead the horizontal *domain* moves, the
+  figure recomputes its scales and its tick marks, and the type keeps its size. The vertical
+  axis is deliberately left fixed: it is the axis being compared across series, and rescaling
+  it would make the slope lie. Wheel, pinch, drag, `+`, `−`, `0` and the arrows. Only the
+  five figures with a continuous money axis carry it — the rate curve, the cliff, the atlas,
+  the art. 20 history and the distribution curve.
+- **The readout box** (`tip`) — HTML over the canvas rather than SVG, so the type is crisp
+  and the box can overflow the plot. It follows the cursor, flips near the edges and lists
+  each series with its colour dot and value, replacing native `<title>` tooltips.
+
+Categorical figures — rows of countries, years or percentiles — have no continuous axis to
+rescale, so they carry no zoom; on narrow screens they scroll sideways at full type size.
+
+Final count: **twenty-four figures**, listed in `STORYBOARD_V2.md`. Every figure of the
+pre-redesign application is present; ten are new.
+
 ## Chart technology decision
 
 **Bespoke SVG in React. No chart library.**

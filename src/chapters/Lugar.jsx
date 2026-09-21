@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react';
 import { useFiscal } from '../state/fiscalContext';
 import {
   ANIOS,
-  DEUDA_ESPANA,
   DISTRIBUCION_SALARIAL,
   ULTIMO_ANIO_SALARIAL_OFICIAL,
   CRECIMIENTO_PROYECCION_SALARIAL,
@@ -10,19 +9,21 @@ import {
   percentilDe,
 } from '../engine/irpf';
 import Figure from '../figures/Figure';
+import Deuda from './Deuda';
 import { CurvaDistribucion, Percentiles, EvolucionDistribucion } from './Distribucion';
-import ZoomSvg from '../figures/ZoomSvg';
-import { Label, TickStrip, YouMark } from '../figures/marks';
+import ChartFrame from '../figures/ChartFrame';
+import { Label, YouMark } from '../figures/marks';
 import { linear, round } from '../figures/scale';
 import { dec, eur, pct } from '../utils/format';
 
 /**
  * 06 · TU LUGAR Y TU PARTE
- * FIG. 13 a hundred workers · FIG. 14 the median, year by year ·
- * FIG. 15 your share of the public debt.
+ * FIG. 18 the distribution curve · FIG. 19 the percentiles · FIG. 20 a
+ * hundred workers · FIG. 21 the distribution over time · FIG. 22–24 the
+ * public debt.
  */
 export default function Lugar() {
-  const { bruto, anio, percentil, nomina } = useFiscal();
+  const { bruto, anio, percentil } = useFiscal();
   const dist = DISTRIBUCION_SALARIAL[anio];
 
   return (
@@ -97,7 +98,7 @@ export default function Lugar() {
 
             {anio > 2012 && <Escenario bruto={bruto} anio={anio} />}
 
-            <Deuda anio={anio} irpf={nomina.irpfFinal} />
+            <Deuda />
           </div>
         </div>
       </div>
@@ -124,7 +125,7 @@ function salarioEnPercentil(p, dist) {
   return dist.p90 * (1 - Math.log(Math.max(1e-3, 1 - (q - 90) / 10)));
 }
 
-/* ── FIG. 13 ─────────────────────────────────────────────────────────────── */
+/* ── FIG. 20 ─────────────────────────────────────────────────────────────── */
 function CienTrabajadores({ bruto, anio, dist, percentil }) {
   const W = 880;
   const H = 300;
@@ -151,7 +152,7 @@ function CienTrabajadores({ bruto, anio, dist, percentil }) {
 
   return (
     <Figure
-      id="21"
+      id="20"
       title="Cien asalariados de España, puestos en fila por salario"
       sub={`${anio} · una marca = un trabajador de cada cien · altura = su salario bruto anual`}
       legend="Una marca = un asalariado de cada cien · las líneas verticales son los percentiles publicados por el INE"
@@ -163,7 +164,7 @@ function CienTrabajadores({ bruto, anio, dist, percentil }) {
       }
       summary={hitos.map(([l, , v]) => `${l}: ${eur(v)}`).join('; ')}
     >
-      <ZoomSvg viewBox={`0 0 ${W} ${H}`}>
+      <ChartFrame viewBox={`0 0 ${W} ${H}`} scroll>
         <line x1={X0} y1={BASE} x2={X1} y2={BASE} stroke="var(--rule)" strokeWidth={0.8} />
 
         {marcas.map(m => {
@@ -215,7 +216,7 @@ function CienTrabajadores({ bruto, anio, dist, percentil }) {
         <Label x={X1} y={H - 6} size={9} color="var(--ink-5)" anchor="end" mono>
           MÁS SALARIO →
         </Label>
-      </ZoomSvg>
+      </ChartFrame>
     </Figure>
   );
 }
@@ -277,120 +278,5 @@ function Escenario({ bruto, anio }) {
             : `Siguiendo el IPC desde ${origen}, tu posición relativa se mantendría prácticamente igual.`}
       </p>
     </div>
-  );
-}
-
-/* ── FIG. 15 ─────────────────────────────────────────────────────────────── */
-function Deuda({ anio, irpf }) {
-  const [horizonte, setHorizonte] = useState(20);
-  const d = DEUDA_ESPANA[anio];
-  const anios = irpf > 0 ? d.perCapita / irpf : Infinity;
-
-  const W = 860;
-  const H = 150;
-
-  const serie = ANIOS.map(a => DEUDA_ESPANA[a]);
-  const hi = Math.max(...serie.map(s => s.perCapita));
-  const x = linear([2012, 2026], [24, W - 150]);
-  const y = linear([0, hi], [110, 24]);
-
-  const restante = Math.max(0, d.perCapita - irpf * horizonte);
-
-  return (
-    <Figure
-      id="23"
-      title={`Tu parte de la deuda pública son ${eur(d.perCapita)}`}
-      sub={`${anio} · deuda per cápita · ${Number.isFinite(anios) ? `equivale a ${dec(anios)} años de tu IRPF íntegro` : 'sin IRPF a este nivel de renta'}`}
-      legend={`Una marca = un año de tu IRPF completo (${eur(irpf)})`}
-      source="Fuente · Banco de España (PDE) · INE"
-      note="La deuda no se amortiza con el IRPF de una sola persona: esta lectura es una escala de magnitud, no una previsión."
-      summary={`Deuda per cápita ${eur(d.perCapita)}, ${pct(d.pctPIB)} del PIB en ${anio}.`}
-    >
-      <div className="fs-readout">
-        <span>
-          <span className="fs-readout-k">Deuda per cápita</span>
-          <span className="fs-readout-v">{eur(d.perCapita)}</span>
-        </span>
-        <span>
-          <span className="fs-readout-k">Sobre el PIB</span>
-          <span className="fs-readout-v">{pct(d.pctPIB)}</span>
-        </span>
-        <span>
-          <span className="fs-readout-k">Total</span>
-          <span className="fs-readout-v">{d.totalMM.toLocaleString('es-ES')} mM €</span>
-        </span>
-      </div>
-
-      <ZoomSvg viewBox={`0 0 ${W} ${H}`}>
-        <line x1={24} y1={110} x2={W - 150} y2={110} stroke="var(--rule)" strokeWidth={0.8} />
-        {ANIOS.map(a => (
-          <g key={a}>
-            <line
-              x1={round(x(a))}
-              y1={110}
-              x2={round(x(a))}
-              y2={round(y(DEUDA_ESPANA[a].perCapita))}
-              stroke={a === anio ? 'var(--signal)' : 'var(--ink-4)'}
-              strokeWidth={a === anio ? 2.4 : 1.4}
-              opacity={a === anio ? 1 : 0.7}
-            >
-              <title>{`${a} — ${eur(DEUDA_ESPANA[a].perCapita)} por habitante, ${pct(DEUDA_ESPANA[a].pctPIB)} del PIB`}</title>
-            </line>
-          </g>
-        ))}
-        <Label x={W - 142} y={y(DEUDA_ESPANA[2026].perCapita) + 4} size={10} weight={700} color="var(--ink-2)">
-          {eur(DEUDA_ESPANA[2026].perCapita)}
-        </Label>
-        <Label x={W - 142} y={y(DEUDA_ESPANA[2026].perCapita) + 18} size={9} color="var(--ink-4)" mono>
-          POR HABITANTE
-        </Label>
-        {[2012, 2020, 2026].map(a => (
-          <Label key={a} x={x(a)} y={130} size={9.5} color="var(--ink-4)" anchor="middle" mono>
-            {a}
-          </Label>
-        ))}
-      </ZoomSvg>
-
-      <div style={{ marginTop: 18 }}>
-        <span className="fs-label">Si destinaras el 100 % de tu IRPF durante</span>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', marginTop: 8 }}>
-          <span className="fs-seg">
-            {[10, 20, 30].map(n => (
-              <button key={n} type="button" aria-pressed={horizonte === n} onClick={() => setHorizonte(n)}>
-                {n} años
-              </button>
-            ))}
-          </span>
-          <span className="fs-note">
-            Pagarías {eur(Math.min(d.perCapita, irpf * horizonte))} y te quedarían{' '}
-            <strong>{eur(restante)}</strong> {restante === 0 ? '— la habrías cubierto' : 'por cubrir'}.
-          </span>
-        </div>
-        <ZoomSvg viewBox="0 0 860 40" style={{ marginTop: 10 }}>
-          <TickStrip
-            x={0}
-            y={20}
-            width={820 * Math.min(1, (irpf * horizonte) / Math.max(d.perCapita, 1))}
-            count={horizonte}
-            height={22}
-            seed={5}
-            color="var(--ink)"
-          />
-          <TickStrip
-            x={820 * Math.min(1, (irpf * horizonte) / Math.max(d.perCapita, 1)) + 6}
-            y={20}
-            width={Math.max(0, 820 * (restante / Math.max(d.perCapita, 1)))}
-            count={Math.max(0, Math.round(restante / Math.max(irpf, 1)))}
-            height={16}
-            seed={6}
-            color="var(--ink-5)"
-            subtract
-          />
-        </ZoomSvg>
-        <p className="fs-figure-legend">
-          Marcas llenas = años de IRPF aportados · marcas discontinuas = lo que seguiría pendiente
-        </p>
-      </div>
-    </Figure>
   );
 }

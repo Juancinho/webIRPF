@@ -498,8 +498,8 @@ For each chapter, before it is called done:
 
 # WHAT SHIPPED (implementation notes)
 
-Twenty-three figures, numbered FIG. 01–23 in reading order. Every figure from the
-pre-redesign app is present — none was dropped — and eight are new.
+Twenty-four figures, numbered FIG. 01–24 in reading order. Every figure of the
+pre-redesign application is present; ten are new.
 
 | Fig | Cap. | Figura | Origen |
 |---|---|---|---|
@@ -510,40 +510,69 @@ pre-redesign app is present — none was dropped — and eight are new.
 | 05 | 03 | La escalera de tramos | `CalculadoraCard` / `BracketChart` |
 | 06 | 03 | Marginal frente a efectivo (cartel) | nueva |
 | 07 | 03 | La curva de tipos | nueva |
-| 08 | 03 | El acantilado del art. 20 | `GraficoMecanismos` |
+| 08 | 03 | El acantilado del art. 20 + cómo funciona | `GraficoMecanismos` |
 | 09 | 03 | Cien euros de subida | `SimuladorSubida` |
 | 10 | 04 | Mismo sueldo, quince años | `GraficoComparativo` (3) |
-| 11 | 04 | El ranking de épocas | nueva |
+| 11 | 04 | El ranking de épocas (barras sólidas) | nueva |
 | 12 | 04 | Comparador de dos años | nueva |
 | 13 | 04 | El atlas — neto y tipo efectivo por renta | `GraficoComparativo` (1 y 2) |
 | 14 | 04 | Progresividad en frío | nueva |
 | 15 | 04 | El art. 20 a través de los años | `GraficoMecanismos` (pestaña art20) |
-| 16 | 04 | Las líneas invisibles — umbrales | `GraficoMecanismos` (pestaña umbrales) |
-| 17 | 05 | De cada 100 € de coste laboral | `CuñaFiscal` (tarta descartada) |
-| 18 | 05 | España en la OCDE | `OCDEComparativa` |
-| 19 | 06 | La curva de la distribución | `DistribucionSalarial` |
-| 20 | 06 | Los percentiles | `DistribucionSalarial` |
-| 21 | 06 | Cien trabajadores | nueva |
-| 22 | 06 | La distribución a lo largo del tiempo | `DistribucionSalarial` (histórico) |
-| 23 | 06 | Tu parte de la deuda | `DeudaPublica` |
+| 16 | 05 | De cada 100 € de coste laboral | `CuñaFiscal` (tarta descartada) |
+| 17 | 05 | España en la OCDE | `OCDEComparativa` |
+| 18 | 06 | La curva de la distribución | `DistribucionSalarial` |
+| 19 | 06 | Los percentiles | `DistribucionSalarial` |
+| 20 | 06 | Cien trabajadores | nueva |
+| 21 | 06 | La distribución a lo largo del tiempo | `DistribucionSalarial` (histórico) |
+| 22 | 06 | La deuda española, año a año | `DeudaPublica` |
+| 23 | 06 | De dónde salió — el aumento de cada ejercicio | nueva |
+| 24 | 06 | Tu parte, a escala | `DeudaPublica` |
 
-Interaction, applied to every dense figure:
+## La librería de figuras
 
-- **Zoom y paneo** (`ZoomSvg`): rueda o pellizco para ampliar alrededor del cursor,
-  arrastre para desplazarse, doble clic o ⟲ para reiniciar, y las mismas acciones desde
-  el teclado (`+`, `−`, `0`, flechas) cuando la figura tiene el foco. En móvil las figuras
-  densas abren ya ampliadas en lugar de encoger sus etiquetas.
-- **Readout propio** en lugar de tooltip flotante: una línea de lectura sobre la figura que
-  sigue al cursor y nombra cada magnitud.
-- **Estado fiscal compartido**: cambiar el año en cualquier figura —o pulsar un año en el
-  ranking o en la evolución— mueve toda la publicación a ese año.
+Tres piezas compartidas, en `src/figures/`:
 
-Deviations from the storyboard, and why:
+- **`ChartFrame`** — el marco común: lienzo SVG, recuadro de lectura y controles de eje.
+- **`useDomainZoom`** — **zoom de datos, no de imagen**. En vez de escalar el dibujo, mueve
+  el *dominio* del eje horizontal: la figura recalcula sus escalas y sus divisiones, así que
+  al ampliar aparecen más marcas de eje y la tipografía y los trazos conservan su grosor.
+  El eje vertical se deja quieto a propósito, porque es el que se compara entre series y
+  reescalarlo haría mentir a la pendiente. Rueda, pellizco, arrastre, `+` `−` `0` y flechas.
+  Lo llevan las cinco figuras con eje continuo de dinero: la curva de tipos, el acantilado,
+  el atlas, el art. 20 histórico y la curva de distribución.
+- **Recuadro de lectura** (`tip`) — en HTML sobre el lienzo, no en SVG: sigue al cursor,
+  se voltea al acercarse a un borde y lista cada serie con su punto de color y su valor.
+  Sustituye a los `<title>` nativos y a la línea de lectura fija.
 
-- **El número de capítulo dejó de ser marca de agua.** Se superponía al título en los
-  capítulos 02, 05 y 07; ahora abre el capítulo como elemento de flujo.
-- **The base imponible is drawn as a dashed aside inside FIG. 04**, not as a step in the
-  cash descent: `neto = bruto − SS − IRPF`, so a thread from the base to the net would have
-  been a false geometry.
-- **Threshold evolution and the art. 20 history are separate figures** (15 y 16): they
-  answer different questions and share no axis.
+Las figuras categóricas —filas de países, de años o de percentiles— no llevan zoom: ahí no
+hay eje continuo que reescalar. En pantallas estrechas se desplazan lateralmente, conservando
+el tamaño del texto.
+
+- **Estado fiscal compartido**: cambiar el año en cualquier figura mueve toda la publicación.
+
+Decisions taken after the first review:
+
+- **El número de capítulo dejó de ser marca de agua**: se superponía al título en 02, 05 y 07.
+- **FIG. 03 se rehízo como cadena, no como lista.** Una espina recorre todo el cálculo; los
+  hitos (coste laboral, bruto, rendimiento íntegro, base imponible, IRPF final, renta neta)
+  se asientan sobre ella como nodos y cada operación cuelga con un conector del hito al que
+  modifica. Todas las barras comparten la escala del coste laboral, así que el tamaño
+  relativo de cada paso se lee de un vistazo, y las magnitudes que no son dinero —la base
+  imponible, el mínimo personal, el tope del 43 %— van con barra hueca de trazo discontinuo
+  para que no se confundan con un descuento. Los pasos se agrupan en cinco movimientos
+  titulados: lo que cuesta tu puesto, lo que se descuenta en la nómina, lo que Hacienda
+  acaba gravando, lo que sale de aplicar la escala y lo que queda.
+- **FIG. 11 usa barras sólidas**, no marcas contables: a esa densidad la trama restaba
+  legibilidad al ranking.
+- **Se retiró la figura de umbrales** (SMI, mínimo exento, umbrales del art. 20). Sus datos
+  siguen completos en la tabla de parámetros del apéndice B.
+- **La deuda pasó de una figura confusa a tres más una introducción**: qué es y qué no es la
+  deuda pública, la serie con dos pistas separadas (por habitante y sobre PIB, nunca en un
+  eje doble), el aumento de cada ejercicio en columnas contables, y tu parte comparada a
+  escala con tu IRPF anual.
+- **En FIG. 21 la media va nombrada** y el salario del lector es una serie de puntos llevada
+  a cada año con el IPC, no una recta horizontal.
+- **The base imponible is a dashed aside inside FIG. 04**, not a step in the cash descent:
+  `neto = bruto − SS − IRPF`, so a thread from the base to the net would be false geometry.
+- **La cascada de la deuda no apila**: cada columna es el aumento de ese ejercicio medido
+  desde cero, así que no se dibuja ningún enlace que insinúe un acumulado.

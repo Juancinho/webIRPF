@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { CURVA_ART20, CURVA_ART20_REAL, ANIOS_ART20_MUESTRA } from '../engine/irpf';
 import Figure from '../figures/Figure';
-import ZoomSvg from '../figures/ZoomSvg';
+import ChartFrame from '../figures/ChartFrame';
+import { useDomainZoom } from '../figures/useDomainZoom';
 import { Label } from '../figures/marks';
-import { linear, polyline, round } from '../figures/scale';
+import { linear, polyline, round, ticks } from '../figures/scale';
 import { eur } from '../utils/format';
 
 const W = 880;
@@ -22,10 +23,13 @@ const Y1 = H - 52;
 export default function Art20Historia() {
   const [real, setReal] = useState(false);
   const [hover, setHover] = useState(null);
+  const [tip, setTip] = useState(null);
   const [activos, setActivos] = useState(() => new Set(ANIOS_ART20_MUESTRA));
 
   const datos = real ? CURVA_ART20_REAL : CURVA_ART20;
-  const x = linear([0, datos[datos.length - 1].rn], [X0, X1]);
+  const zoom = useDomainZoom([0, datos[datos.length - 1].rn], { pxRange: [X0, X1], vbWidth: W, maxZoom: 14 });
+  const x = linear(zoom.domain, [X0, X1]);
+  const clip = useId().replace(/:/g, '');
   const maxY = Math.max(...datos.flatMap(d => ANIOS_ART20_MUESTRA.map(a => d[`red_${a}`])));
   const y = linear([0, maxY], [Y1, Y0]);
 
@@ -45,6 +49,17 @@ export default function Art20Historia() {
     const rn = x.invert(px);
     const p = datos.reduce((best, d) => (Math.abs(d.rn - rn) < Math.abs(best.rn - rn) ? d : best), datos[0]);
     setHover(p);
+    setTip({
+      vx: x(p.rn),
+      vy: y(p[`red_${ANIOS_ART20_MUESTRA[0]}`]),
+      title: eur(p.rn),
+      sub: 'Rendimiento neto previo',
+      rows: ANIOS_ART20_MUESTRA.filter(a => activos.has(a)).map(a => [
+        String(a),
+        eur(p[`red_${a}`]),
+        tono(ANIOS_ART20_MUESTRA.indexOf(a)),
+      ]),
+    });
   };
 
   const tono = i => ['var(--ink)', 'var(--ink-2)', 'var(--ink-3)', 'var(--ink-4)', 'var(--ink-5)', 'var(--counter)'][i % 6];
@@ -95,7 +110,12 @@ export default function Art20Historia() {
         ))}
       </div>
 
-      <ZoomSvg viewBox={`0 0 ${W} ${H}`} label="Reducción del artículo 20 por años">
+      <ChartFrame viewBox={`0 0 ${W} ${H}`} zoom={zoom} tip={tip} label="Reducción del artículo 20 por años">
+        <defs>
+          <clipPath id={clip}>
+            <rect x={X0} y={Y0 - 10} width={X1 - X0} height={Y1 - Y0 + 12} />
+          </clipPath>
+        </defs>
         {[0, 0.25, 0.5, 0.75, 1].map(t => {
           const v = maxY * t;
           return (
@@ -108,6 +128,7 @@ export default function Art20Historia() {
           );
         })}
 
+        <g clipPath={`url(#${clip})`}>
         {ANIOS_ART20_MUESTRA.map((a, i) => {
           const on = activos.has(a);
           const pts = datos.map(d => [x(d.rn), y(d[`red_${a}`])]);
@@ -136,11 +157,15 @@ export default function Art20Historia() {
           </g>
         )}
 
+        </g>
         <line x1={X0} y1={Y1} x2={X1} y2={Y1} stroke="var(--rule)" strokeWidth={0.8} />
-        {[0, 6000, 12000, 18000, 24000].map(v => (
-          <Label key={v} x={round(x(v))} y={Y1 + 22} size={9.5} color="var(--ink-4)" anchor="middle" mono>
-            {v === 0 ? '0 €' : eur(v)}
-          </Label>
+        {ticks(zoom.domain[0], zoom.domain[1], 5).map(v => (
+          <g key={v}>
+            <line x1={round(x(v))} y1={Y1} x2={round(x(v))} y2={Y1 + 5} stroke="var(--ink-5)" strokeWidth={0.7} />
+            <Label x={round(x(v))} y={Y1 + 20} size={9.5} color="var(--ink-4)" anchor="middle" mono>
+              {v === 0 ? '0 €' : eur(v)}
+            </Label>
+          </g>
         ))}
         <Label x={X1} y={Y1 + 40} size={9} color="var(--ink-5)" anchor="end" mono>
           RENDIMIENTO NETO PREVIO →
@@ -153,9 +178,9 @@ export default function Art20Historia() {
           width={X1 - X0}
           height={Y1 - Y0 + 10}
           onMouseMove={onMove}
-          onMouseLeave={() => setHover(null)}
+          onMouseLeave={() => { setHover(null); setTip(null); }}
         />
-      </ZoomSvg>
+      </ChartFrame>
     </Figure>
   );
 }

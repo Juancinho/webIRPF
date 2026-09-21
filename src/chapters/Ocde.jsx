@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { CUNA_OCDE_2025, CUNA_OCDE_META, CARGA_PERSONAL_OCDE_2025 } from '../engine/irpf';
 import Figure from '../figures/Figure';
-import ZoomSvg from '../figures/ZoomSvg';
+import ChartFrame from '../figures/ChartFrame';
 import { Label } from '../figures/marks';
 import { linear, round } from '../figures/scale';
 import { pct } from '../utils/format';
@@ -27,6 +27,7 @@ const SEGMENTOS = [
 export default function Ocde() {
   const [ref, setRef] = useState('DE');
   const [hover, setHover] = useState(null);
+  const [tip, setTip] = useState(null);
   const [orden, setOrden] = useState('neto');
 
   const filas = useMemo(() => {
@@ -47,7 +48,7 @@ export default function Ocde() {
 
   return (
     <Figure
-      id="18"
+      id="17"
       title={`De cada 100 € de coste laboral, en España llegan ${Math.round(100 - ESPANA.total)} € al trabajador: el puesto ${posicion} de ${filas.length} de la OCDE`}
       sub={`${CUNA_OCDE_META.informe} · datos ${CUNA_OCDE_META.ejercicio} · ${CUNA_OCDE_META.supuesto} · cada fila son 100 € de coste laboral`}
       legend="Cada barra suma 100 € · la parte clara es lo que llega al trabajador · las tres oscuras son IRPF, cotización del trabajador y cotización de la empresa"
@@ -106,7 +107,7 @@ export default function Ocde() {
         ))}
       </div>
 
-      <ZoomSvg viewBox={`0 0 ${W} ${H}`} label="Cuña fiscal de los países de la OCDE">
+      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} scroll label="Cuña fiscal de los países de la OCDE">
         {[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map(v => (
           <g key={v}>
             <line x1={round(x(v))} y1={26} x2={round(x(v))} y2={H - 54} stroke="#252c2f" strokeWidth={0.6} />
@@ -174,8 +175,17 @@ export default function Ocde() {
                 y={y - 3}
                 width={W}
                 height={rowH}
-                onMouseEnter={() => setHover(p.code)}
-                onMouseLeave={() => setHover(null)}
+                onMouseEnter={() => {
+                  setHover(p.code);
+                  setTip({
+                    vx: x(p.neto),
+                    vy: y + 6,
+                    title: p.pais,
+                    sub: 'De cada 100 € de coste laboral',
+                    rows: SEGMENTOS.map(([k, label, fill]) => [label, pct(p[k]), fill]),
+                  });
+                }}
+                onMouseLeave={() => { setHover(null); setTip(null); }}
               />
             </g>
           );
@@ -196,7 +206,7 @@ export default function Ocde() {
         <Label x={X0} y={H - 18} size={9} color="#6d7679" mono halo={false}>
           € DE CADA 100 € DE COSTE LABORAL
         </Label>
-      </ZoomSvg>
+      </ChartFrame>
 
       <p className="fs-note" style={{ marginTop: 14, maxWidth: '74ch' }}>
         España reparte su cuña de una forma muy característica: un IRPF comparativamente bajo

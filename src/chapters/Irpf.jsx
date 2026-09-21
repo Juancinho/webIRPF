@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useFiscal } from '../state/fiscalContext';
 import Figure from '../figures/Figure';
-import ZoomSvg from '../figures/ZoomSvg';
+import ChartFrame from '../figures/ChartFrame';
 import { Label, Rule, TickStrip } from '../figures/marks';
 import { linear, round } from '../figures/scale';
 import { eur, pct } from '../utils/format';
@@ -131,7 +131,7 @@ export default function Irpf() {
                 .map(b => `Tramo ${pct(b.tipo * 100)}: ${eur(b.dentro)} dentro, cuota ${eur(b.cuota)}`)
                 .join('. ')}
             >
-              <ZoomSvg viewBox={`0 0 ${W} ${H}`}>
+              <ChartFrame viewBox={`0 0 ${W} ${H}`} scroll>
                 <Rule x1={X0} y1={BASE_Y} x2={X1} y2={BASE_Y} />
 
                 {conDatos.map(b => {
@@ -219,7 +219,7 @@ export default function Irpf() {
                 <Label x={X1} y={BASE_Y + 18} size={9.5} color="var(--ink-4)" anchor="end" mono>
                   {eur(maxShown)}
                 </Label>
-              </ZoomSvg>
+              </ChartFrame>
 
               <p className="fs-note" style={{ marginTop: 14 }}>
                 Cuota íntegra <strong>{eur(nomina.cuotaIntegra)}</strong> − cuota del mínimo personal
@@ -272,7 +272,7 @@ function Poster({ marginal, nomina }) {
           source="Fuente · cálculo propio sobre la escala vigente"
           summary={`Tipo marginal del IRPF ${pct(marg)}; tipo efectivo ${pct(efe)}.`}
         >
-          <ZoomSvg viewBox={`0 0 ${gw + 180} 130`}>
+          <ChartFrame viewBox={`0 0 ${gw + 180} 130`} scroll>
             {[0, max / 2, max].map(v => (
               <g key={v}>
                 <line x1={x(v)} y1={18} x2={x(v)} y2={104} stroke="var(--ink-7)" strokeWidth={0.7} />
@@ -289,7 +289,7 @@ function Poster({ marginal, nomina }) {
             <TickStrip x={0} y={88} width={x(efe)} count={Math.round(efe)} height={18} seed={9} color="var(--signal)" />
             <Label x={x(efe) + 10} y={86} size={10} color="var(--ink-3)" mono>EFECTIVO</Label>
             <Label x={x(efe) + 10} y={100} size={13} weight={800} color="var(--signal)">{pct(efe)}</Label>
-          </ZoomSvg>
+          </ChartFrame>
 
           <p className="fs-note" style={{ marginTop: 12 }}>
             Sobre tu bruto, el IRPF se lleva <strong>{eur(nomina.irpfFinal)}</strong>. Si te subieran

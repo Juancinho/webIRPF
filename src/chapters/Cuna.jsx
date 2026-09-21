@@ -78,7 +78,7 @@ export default function Cuna() {
 
           <div className="fs-field">
             <Figure
-              id="17"
+              id="16"
               title={`${Math.round(netoPct)} € de cada 100 llegan como renta neta`}
               sub={`${anio} · ${vista === 'empresa' ? `sobre el coste laboral total (${eur(nomina.costeLab)})` : `sobre el salario bruto (${eur(bruto)})`} · un bloque = 1 €`}
               legend={`Un bloque = 1 € de cada 100 · ${grupos.map(g => `${g.label} ${g.value}`).join(' + ')} = ${suma}${suma < 100 ? ` · ${100 - suma} € se reparten en el redondeo` : ''}`}
