@@ -94,7 +94,7 @@ export default function Cierre() {
       x.fillStyle = APAGADO;
       x.font = '600 15px Inter, system-ui, sans-serif';
       x.letterSpacing = '2px';
-      x.fillText('TE QUEDAN', 64, 320);
+      x.fillText('RENTA NETA ESTIMADA', 64, 320);
       x.letterSpacing = '0px';
 
       x.fillStyle = SENAL;
@@ -201,7 +201,7 @@ export default function Cierre() {
 
             <p className="fs-label">De un bruto de</p>
             <p className="fs-tarjeta-bruto num">{eur(bruto)}</p>
-            <p className="fs-label" style={{ marginTop: 10 }}>Te quedan</p>
+            <p className="fs-label" style={{ marginTop: 10 }}>Renta neta estimada</p>
             <p className="fs-tarjeta-neto num">{eur(nomina.salarioNeto)}</p>
             <p className="fs-note" style={{ marginTop: 2 }}>
               {eur(nomina.salarioNeto / pagas)} al mes en {pagas} pagas

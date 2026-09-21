@@ -12,9 +12,10 @@ const MESES = [
   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
 ];
 
-/* Los tres destinos del capítulo, con el mismo código de color que el río:
-   las dos figuras cuentan lo mismo en dos unidades, y el lector tiene que
-   poder saltar de una a otra sin volver a aprender la leyenda. */
+/* Los tres grupos COFOG conservan el código de color del río. La parte sin
+   relleno no representa «tiempo libre»: es la proporción equivalente a renta
+   neta cuando la cuña se proyecta, de forma puramente aritmética, sobre 365 o
+   366 días. */
 const COLORES = {
   social: 'var(--signal)',
   servicios: 'var(--ink)',
@@ -36,14 +37,10 @@ const DIAS_MES = a => [31, bisiesto(a) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31
 /**
  * FIG. 23 — EL CALENDARIO FISCAL.
  *
- * El río dice a dónde va el dinero; esta figura dice cuándo. Si la parte de tu
- * coste laboral que no llega a tu cuenta se repartiera a lo largo del año
- * natural, habría una fecha exacta en la que dejarías de trabajar para el
- * sistema y empezarías a cobrar para ti. Cada casilla es un día, y los días
- * que financian algo están pintados con el color de lo que financian.
- *
- * Es una convención de lectura —el método clásico del «día de liberación
- * fiscal»— y la nota lo dice: nadie cobra distinto en junio que en octubre.
+ * La figura no afirma que una parte real del año se trabaje para un destinatario
+ * y otra para otro. Convierte una proporción —cuña / coste laboral— en días
+ * equivalentes. La fecha de corte sólo ayuda a leer esa proporción; no describe
+ * el calendario de cobros, devengo ni pago de los tributos.
  */
 export default function Calendario() {
   const { anio, nomina, pagas } = useFiscal();
@@ -55,10 +52,11 @@ export default function Calendario() {
   const { dias, totalDias, diaLibre, fechaLibre, tramos } = useMemo(() => {
     const lens = DIAS_MES(anio);
     const total = lens.reduce((a, b) => a + b, 0);
-    const paraElSistema = Math.round(parteCuna * total);
+    const diasEquivalentesCuna = Math.round(parteCuna * total);
 
-    /* Los días del sistema se reparten entre los tres destinos en la misma
-       proporción en que se reparte el gasto público real. */
+    /* Los días equivalentes se distribuyen entre los tres grupos con las
+       proporciones COFOG. Es una segunda transformación analítica, no una
+       trazabilidad entre un ingreso concreto y una partida presupuestaria. */
     const grupos = GASTO_COFOG.grupos.map(g => ({
       key: g.key,
       label: g.label,
@@ -70,27 +68,27 @@ export default function Calendario() {
     const cortes = grupos.reduce((acc, g, i) => {
       const repartidos = acc.reduce((a, c) => a + c.n, 0);
       const n = i === grupos.length - 1
-        ? paraElSistema - repartidos
-        : Math.round(g.parte * paraElSistema);
+        ? diasEquivalentesCuna - repartidos
+        : Math.round(g.parte * diasEquivalentesCuna);
       acc.push({ ...g, n });
       return acc;
     }, []);
 
     const destinoDe = indice => {
-      if (indice >= paraElSistema) return { key: 'tuyo', etiqueta: 'Para ti' };
+      if (indice >= diasEquivalentesCuna) return { key: 'tuyo', etiqueta: 'Equivalente a renta neta' };
       let acc = 0;
       for (const c of cortes) {
         acc += c.n;
         if (indice < acc) return { key: c.key, etiqueta: c.label };
       }
-      return { key: 'tuyo', etiqueta: 'Para ti' };
+      return { key: 'tuyo', etiqueta: 'Equivalente a renta neta' };
     };
 
     const out = lens.flatMap((largo, m) =>
       Array.from({ length: largo }, (_, i) => ({ mes: m, dia: i + 1 }))
     ).map((d, indice) => ({ ...d, indice, ...destinoDe(indice) }));
 
-    const libre = paraElSistema; // índice 0-based del primer día que es tuyo
+    const libre = diasEquivalentesCuna; // índice 0-based del corte convencional
     const fecha = out[Math.min(libre, out.length - 1)];
 
     return {
@@ -104,7 +102,7 @@ export default function Calendario() {
 
   const leyenda = [
     ...tramos.map(t => ({ key: t.key, label: t.label, n: t.n, color: COLORES[t.key] })),
-    { key: 'tuyo', label: 'Para ti', n: totalDias - diaLibre, color: COLORES.tuyo },
+    { key: 'tuyo', label: 'Equivalente a renta neta', n: totalDias - diaLibre, color: COLORES.tuyo },
   ];
 
   const mostrar = d =>
@@ -114,7 +112,7 @@ export default function Calendario() {
       title: `${d.dia} de ${MESES[d.mes].toLowerCase()}`,
       sub: `Día ${d.indice + 1} de ${totalDias}`,
       rows: [
-        [d.key === 'tuyo' ? 'Ese día cobras' : 'Ese día financias', d.etiqueta,
+        ['Clasificación analítica', d.etiqueta,
           d.key === 'tuyo' ? 'var(--ink)' : COLORES[d.key]],
         ['Tu cuña fiscal', pct(parteCuna * 100)],
       ],
@@ -123,26 +121,53 @@ export default function Calendario() {
   return (
     <Figure
       id="27"
-      title={`Los primeros ${diaLibre} días del año los trabajas para el sistema: el ${fechaLibre.dia} de ${MESES[fechaLibre.mes].toLowerCase()} empiezas a cobrar para ti`}
-      sub={`${anio} · ${totalDias} casillas, una por día · los ${diaLibre} primeros están pintados con el destino que financian`}
-      legend={`Casilla llena = día que financia gasto público · casilla vacía = día que llega a tu cuenta · el reparto por destino sigue la clasificación funcional de ${GASTO_COFOG.anio}`}
-      source={`Fuente · ${GASTO_COFOG.fuente} · cálculo propio`}
-      note="Es una convención de lectura, no un calendario de cobros: tu nómina no cambia en junio. Reparte sobre el año natural la misma proporción que la cuña fiscal representa sobre el coste de tu puesto, que es el método clásico del «día de liberación fiscal»."
-      summary={`De ${totalDias} días, ${diaLibre} financian gasto público y ${totalDias - diaLibre} llegan a tu renta neta. La fecha de corte es el ${fechaLibre.dia} de ${MESES[fechaLibre.mes].toLowerCase()}.`}
+      title={`La cuña fiscal equivale a ${diaLibre} de los ${totalDias} días de ${anio}`}
+      sub={`Conversión proporcional: cuña fiscal × días del año · la fecha de corte convencional es el ${fechaLibre.dia} de ${MESES[fechaLibre.mes].toLowerCase()}`}
+      legend={`Casilla llena = un día equivalente a la cuña fiscal · casilla vacía = un día equivalente a renta neta · los colores aplican el reparto COFOG de ${GASTO_COFOG.anio}`}
+      source={
+        <>
+          Fuente ·{' '}
+          <a href="https://www.igae.pap.hacienda.gob.es/sitios/igae/es-ES/Contabilidad/ContabilidadNacional/Publicaciones/paginas/iacogof.aspx" target="_blank" rel="noreferrer noopener">
+            IGAE · gasto de las AAPP por funciones (COFOG)
+          </a>
+          {' · '}
+          <a href="https://ec.europa.eu/eurostat/cache/metadata/en/gov_10a_exp_esms.htm" target="_blank" rel="noreferrer noopener">
+            Eurostat · metodología COFOG/SEC 2010
+          </a>
+          {' · cálculo propio'}
+        </>
+      }
+      note="Es una equivalencia temporal, no un calendario fiscal oficial. No indica cuándo se devengan o pagan los impuestos, cuándo se percibe el salario ni a qué partida se destina un ingreso concreto. La fecha depende únicamente de ordenar desde el 1 de enero una proporción que, en la realidad, se genera durante todo el año."
+      summary={`La cuña representa ${diaLibre} días equivalentes y la renta neta ${totalDias - diaLibre}. El corte convencional cae el ${fechaLibre.dia} de ${MESES[fechaLibre.mes].toLowerCase()}.`}
     >
+      <div className="fs-calendar-method" aria-label="Método de la equivalencia temporal">
+        <p>
+          <span>1 · Proporción</span>
+          Se divide la suma de IRPF y cotizaciones entre el coste laboral total.
+        </p>
+        <p>
+          <span>2 · Conversión</span>
+          Esa proporción se multiplica por {totalDias}; el resultado son {diaLibre} días equivalentes.
+        </p>
+        <p>
+          <span>3 · Clasificación</span>
+          Los días llenos se distribuyen según el gasto agregado COFOG, sin atribuir impuestos concretos a partidas concretas.
+        </p>
+      </div>
+
       <div className="fs-readout" style={{ marginBottom: 18 }}>
         <span>
-          <span className="fs-readout-k">Trabajas para el sistema</span>
+          <span className="fs-readout-k">Cuña expresada en días</span>
           <span className="fs-readout-v">{diaLibre} días</span>
         </span>
         <span>
-          <span className="fs-readout-k">Empiezas a cobrar para ti</span>
+          <span className="fs-readout-k">Corte convencional</span>
           <span className="fs-readout-v fs-signal">
             {fechaLibre.dia} de {MESES[fechaLibre.mes].toLowerCase()}
           </span>
         </span>
         <span>
-          <span className="fs-readout-k">Equivale a</span>
+          <span className="fs-readout-k">Importe de la cuña</span>
           <span className="fs-readout-v">{eur(cuna)} · {eur(cuna / pagas)} por paga</span>
         </span>
       </div>
@@ -202,7 +227,7 @@ export default function Calendario() {
               color="var(--signal)"
               mono
             >
-              {fechaLibre.dia} {MESES[fechaLibre.mes].slice(0, 3).toUpperCase()} · A PARTIR DE AQUÍ, PARA TI
+              {fechaLibre.dia} {MESES[fechaLibre.mes].slice(0, 3).toUpperCase()} · CORTE CONVENCIONAL
             </Label>
           </g>
         )}

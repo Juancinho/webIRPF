@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useNumeroAnimado } from '../hooks/useNumeroAnimado';
 import { useFiscal } from '../state/fiscalContext';
+import GuiaRail from '../figures/GuiaRail';
 import Figure from '../figures/Figure';
 import ChartFrame from '../figures/ChartFrame';
 import { Label, Rule, TickStrip } from '../figures/marks';
@@ -70,6 +71,7 @@ export default function Irpf() {
 
         <div className="fs-spread">
           <aside className="fs-rail">
+            <GuiaRail seccion="irpf" />
             <div className="fs-rail-item">
               <span className="fs-stamp">Nota 02</span>
               <p className="fs-note">
@@ -252,6 +254,13 @@ export default function Irpf() {
             </Puente>
 
             <Acantilado />
+
+            <Puente rotulo="De las reglas de un año a su evolución">
+              Los tramos, mínimos, gastos deducibles y reducciones explican el resultado del ejercicio
+              seleccionado, pero esos parámetros han cambiado con sucesivas reformas. Para compararlos
+              sin mezclar fiscalidad e inflación, el capítulo siguiente mantiene constante el poder
+              adquisitivo del salario y aplica a cada año sus reglas correspondientes.
+            </Puente>
           </div>
         </div>
       </div>
@@ -333,7 +342,7 @@ function Poster({ marginal, nomina }) {
           id="06"
           title="Cuenta los euros: el marginal sólo manda sobre los que aún no has ganado"
           sub="Dos veces cien euros, mismo tamaño de cuadro: arriba los cien que ya cobras, abajo los cien siguientes"
-          legend="Cada cuadrado = 1 € · cuadrado lleno = se lo lleva el IRPF · cuadrado hueco = se queda contigo"
+          legend="Cada cuadrado = 1 € · cuadrado lleno = IRPF · cuadrado hueco = renta después del IRPF"
           source="Fuente · cálculo propio sobre la escala vigente"
           summary={`Tipo marginal del IRPF ${pct(marg)}; tipo efectivo ${pct(efe)}.`}
         >
@@ -350,7 +359,7 @@ function Poster({ marginal, nomina }) {
               {pct(efe)}
             </Label>
             <Label x={XT} y={YA + 62} size={10.5} color="var(--ink-4)">
-              {nEfe} € de IRPF · {100 - nEfe} € para ti
+              {nEfe} € de IRPF · {100 - nEfe} € de renta tras IRPF
             </Label>
 
             {/* ── los cien euros siguientes ────────────────────────────── */}
@@ -365,7 +374,7 @@ function Poster({ marginal, nomina }) {
               {pct(marg)}
             </Label>
             <Label x={XT} y={YB + 62} size={10.5} color="var(--ink-4)">
-              {nMarg} € de IRPF · {100 - nMarg} € para ti
+              {nMarg} € de IRPF · {100 - nMarg} € de renta tras IRPF
             </Label>
 
             {/* ── la diferencia, dicha una sola vez ────────────────────── */}

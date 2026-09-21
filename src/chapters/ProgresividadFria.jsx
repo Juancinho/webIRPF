@@ -80,7 +80,14 @@ export default function ProgresividadFria() {
       }
       sub={`Supuesto: tu salario crece cada año justo lo que el IPC, así que tu poder adquisitivo nunca cambia · euros constantes de ${base} · perfil seleccionado`}
       legend="Línea continua = resultado con las reglas aprobadas en cada ejercicio · línea discontinua = referencia con todos los umbrales monetarios indexados al IPC"
-      source="Fuente · cálculo propio sobre parámetros BOE · IPC diciembre INE"
+      source={
+        <>
+          Fuente · cálculo propio sobre{' '}
+          <a href="https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764" target="_blank" rel="noreferrer noopener">parámetros de la LIRPF publicados en el BOE</a>
+          {' · '}
+          <a href="https://www.ine.es/varipc/" target="_blank" rel="noreferrer noopener">IPC del INE</a>
+        </>
+      }
       note="La comparación mantiene constantes el poder adquisitivo y el perfil. No atribuye intención ni valora el resultado: cuantifica únicamente la diferencia entre las reglas vigentes y una referencia de indexación completa."
       summary={`Entre ${base} y 2026 el neto real pasa de ${eur(serie[0].netoReal)} a ${eur(ultimo.netoReal)} manteniendo el poder adquisitivo.`}
     >
@@ -194,7 +201,7 @@ export default function ProgresividadFria() {
           {eur(ultimo.netoDeflactado)}
         </Label>
         <Label x={X1 + 10} y={round(y(ultimo.netoReal)) + 3} size={9} color="var(--ink)" mono>
-          LO QUE COBRAS
+          NETO CON REGLAS VIGENTES
         </Label>
         <Label x={X1 + 10} y={round(y(ultimo.netoReal)) + 16} size={11} weight={800} color="var(--ink)">
           {eur(ultimo.netoReal)}

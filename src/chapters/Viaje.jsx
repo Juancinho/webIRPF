@@ -3,6 +3,7 @@ import { useNumeroAnimado } from '../hooks/useNumeroAnimado';
 import { useFiscal } from '../state/fiscalContext';
 import { useSteps } from '../hooks/useChapters';
 import Figure from '../figures/Figure';
+import Puente from '../figures/Puente';
 import ChartFrame from '../figures/ChartFrame';
 import { TickStrip, Label, Leader } from '../figures/marks';
 import { rnd, round } from '../figures/scale';
@@ -250,6 +251,12 @@ export default function Viaje() {
           parte del líquido de la nómina, pero sí integra el coste laboral y se calcula sobre la base de
           cotización, topada en {eur(params.baseMax)} en {anio}.
         </p>
+        <Puente rotulo="Del recorrido completo a una de sus piezas">
+          El flujo anterior reúne cotizaciones, ajustes de la base e IRPF para reconciliar coste
+          laboral, bruto y renta neta. El capítulo siguiente aísla el IRPF: explica cómo se forma la
+          base, cómo opera la tarifa por tramos y por qué el tipo marginal no coincide con el tipo
+          efectivo aplicado al conjunto del salario.
+        </Puente>
       </div>
     </section>
   );
@@ -277,7 +284,7 @@ function pasos({ bruto, anio, nomina, params, esAutonomo }) {
     },
     {
       id: 'B · Cotización de la empresa',
-      titulo: esAutonomo ? 'Sin cotización patronal' : 'El descuento que no ves',
+      titulo: esAutonomo ? 'Sin cotización patronal' : 'La cotización empresarial',
       cuerpo: esAutonomo
         ? ['Como autónomo asumes íntegramente tu cotización: no existe una parte empresarial equivalente.']
         : [
@@ -299,12 +306,12 @@ function pasos({ bruto, anio, nomina, params, esAutonomo }) {
     },
     {
       id: 'D · Cotización del trabajador',
-      titulo: 'Tu parte de la Seguridad Social',
+      titulo: 'La cotización del trabajador',
       cuerpo: [
         esAutonomo
           ? `Tu cuota de autónomos asciende a ${eur(nomina.cotTra)} en ${anio}, según el tramo de rendimientos netos previstos.`
           : `La cotización del trabajador es el ${pct(params.tipoTra * 100, 2)} de la base: ${eur(nomina.cotTra)} al año. Es la primera deducción visible en la nómina.`,
-        `Lo que queda, ${eur(nomina.rnPrevio)}, es tu rendimiento íntegro del trabajo: el punto de partida del IRPF.`,
+        `El resultado, ${eur(nomina.rnPrevio)}, es el rendimiento íntegro del trabajo: el punto de partida del IRPF.`,
       ],
       formula: `${eur(bruto)} − ${eur(nomina.cotTra)} = ${eur(nomina.rnPrevio)}`,
       fuente: { label: 'BOE — LIRPF art. 19', url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764&p=20260321&tn=1#a19' },
@@ -324,7 +331,7 @@ function pasos({ bruto, anio, nomina, params, esAutonomo }) {
     },
     {
       id: 'F · IRPF y renta neta',
-      titulo: 'Lo que queda',
+      titulo: 'El resultado del cálculo',
       cuerpo: [
         `Aplicada la escala y restado el mínimo${nomina.deduccionSMI > 0 ? ` y la deducción por rendimientos del trabajo (${eur(nomina.deduccionSMI)})` : ''}, el IRPF final es ${eur(nomina.irpfFinal)}: un ${pct(nomina.tipoEfectivoIRPF * 100)} de tu bruto.`,
         `De los ${eur(nomina.costeLab)} que costó tu trabajo, llegan ${eur(nomina.salarioNeto)}: ${pct((nomina.salarioNeto / Math.max(nomina.costeLab, 1)) * 100)} del total.`,

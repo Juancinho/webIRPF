@@ -7,6 +7,7 @@
 
 /* ── figure frame ─────────────────────────────────────────────────────────── */
 .fs-figure {
+  scroll-margin-top: 64px;
   margin: 0 0 clamp(40px, 6vh, 72px);
 }
 
@@ -601,6 +602,125 @@
 
 .fs-night .fs-key-v {
   color: var(--night-ink);
+}
+
+.fs-chart-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin: 0 0 16px;
+}
+
+.fs-calendar-method {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin: 0 0 22px;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--rule);
+}
+
+.fs-calendar-method p {
+  margin: 0;
+  padding: 13px 18px 14px 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--ink-3);
+}
+
+.fs-calendar-method p + p {
+  padding-left: 18px;
+  border-left: 1px solid var(--rule);
+}
+
+.fs-calendar-method span {
+  display: block;
+  margin-bottom: 5px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--counter);
+}
+
+@media (max-width: 680px) {
+  .fs-calendar-method {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .fs-calendar-method p,
+  .fs-calendar-method p + p {
+    padding: 11px 0;
+    border-left: 0;
+  }
+  .fs-calendar-method p + p {
+    border-top: 1px solid var(--rule-soft);
+  }
+}
+
+.fs-readout-wide {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.fs-method-chain {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0 0 22px;
+  padding: 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+
+.fs-method-chain li {
+  min-width: 0;
+  padding: 11px 14px 12px 0;
+}
+
+.fs-method-chain li + li {
+  padding-left: 14px;
+  border-left: 1px solid var(--rule);
+}
+
+.fs-method-chain strong,
+.fs-method-chain span {
+  display: block;
+}
+
+.fs-method-chain strong {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  line-height: 1.3;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--signal);
+}
+
+.fs-method-chain span {
+  margin-top: 5px;
+  font-family: var(--sans);
+  font-size: 11.5px;
+  line-height: 1.42;
+  color: var(--ink-3);
+}
+
+@media (max-width: 760px) {
+  .fs-readout-wide {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fs-method-chain {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fs-method-chain li:nth-child(3) {
+    border-left: 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  .fs-method-chain li:nth-child(4) {
+    border-top: 1px solid var(--rule);
+  }
 }
 
 /* ── narrow screens ──────────────────────────────────────────────────────── */
@@ -1706,4 +1826,202 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .fs-celda { transition: fill 0.2s ease, opacity 0.2s ease; }
+}
+
+/* ── bloque de explicación bajo una figura ────────────────────────────────
+   Cuando la figura necesita que le cuenten qué es lo que se está mirando, la
+   explicación no es una nota al pie: es parte del argumento. Va en un bloque
+   con su propio filete, ancho de lectura y una lista numerada donde cada
+   concepto lleva su cifra real. */
+.fs-explica {
+  margin: 22px 0 0;
+  padding: 18px 0 0;
+  border-top: 1px solid var(--rule);
+}
+.fs-explica > .fs-stamp {
+  display: block;
+  margin-bottom: 10px;
+}
+.fs-explica .fs-body {
+  max-width: 72ch;
+  margin: 0 0 14px;
+}
+.fs-explica-lista {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+}
+.fs-explica-lista > li {
+  max-width: 72ch;
+  padding-left: 16px;
+  border-left: 2px solid var(--rule);
+}
+.fs-explica-k {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  margin-bottom: 5px;
+}
+.fs-explica-lista > li p {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.58;
+  color: var(--ink-2);
+}
+.fs-explica-lista > li:hover {
+  border-left-color: var(--signal);
+}
+@media (max-width: 700px) {
+  .fs-explica-lista > li p { font-size: 14px; }
+}
+
+/* ── las operaciones del desglose, una por línea ──────────────────────────
+   Una cascada fiscal no se entiende si el cálculo queda implícito: cada paso
+   enseña su nombre a la izquierda y su aritmética a la derecha, de forma que
+   se pueda seguir con una calculadora sin reconstruir nada. */
+.fs-formulas {
+  margin: 12px 0;
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border-left: 2px solid var(--rule);
+}
+.fs-formulas .fs-formula-fila {
+  margin: 0;
+  border-left: 0;
+  display: grid;
+  grid-template-columns: minmax(96px, 22%) minmax(0, 1fr);
+  gap: 14px;
+  align-items: baseline;
+}
+.fs-formula-k {
+  font-weight: 700;
+  color: var(--ink-2);
+  letter-spacing: 0.02em;
+}
+.fs-formula-v {
+  color: var(--ink);
+  overflow-x: auto;
+}
+@media (max-width: 620px) {
+  .fs-formulas .fs-formula-fila {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+}
+
+/* El remate de una fila: la consecuencia en una frase, no otra nota al pie. */
+.fs-dfila-remate {
+  margin: 12px 0 0;
+  padding: 9px 12px;
+  border-left: 2px solid var(--signal);
+  background: var(--bone-raised);
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink-2);
+  max-width: 70ch;
+}
+
+/* ── la guía del margen ───────────────────────────────────────────────────
+   En pantalla ancha el margen izquierdo es fijo, así que la explicación de
+   la figura que se está mirando cabe ahí sin interrumpir nada. Por debajo de
+   1200 px ese margen desaparece, y entonces la misma guía viaja plegada
+   dentro de la propia figura: lo que no puede pasar es que se pierda. */
+.fs-guia {
+  /* El margen es un contenedor flex con altura máxima: sin esto, cuando la
+     suma de notas pasa del alto de la pantalla, la guía se encogía y el texto
+     quedaba cortado a media palabra. Que encoja el margen entero, no ella. */
+  flex-shrink: 0;
+}
+
+@media (min-width: 1200px) {
+  /* En una pantalla de 900 px de alto el margen de algunos capítulos no cabe
+     entero y hay que desplazarlo. Lo que no puede caer bajo el pliegue es la
+     explicación de la figura que se está mirando: se queda fija arriba y lo
+     que se desplaza son las notas del capítulo, que son de fondo. */
+  .fs-guia {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--bone);
+    padding-bottom: 10px;
+    margin-bottom: -2px;
+  }
+  .fs-night .fs-guia {
+    background: var(--night);
+  }
+}
+.fs-guia-t {
+  margin: 2px 0 6px;
+  font-family: var(--serif);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--ink);
+}
+.fs-guia-p {
+  margin: 0 0 8px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-3);
+}
+.fs-guia-p:last-child { margin-bottom: 2px; }
+.fs-guia-k {
+  display: block;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-5);
+  margin-bottom: 2px;
+}
+.fs-guia-p.is-ojo {
+  border-left: 2px solid var(--signal);
+  padding-left: 9px;
+  color: var(--ink-2);
+}
+.fs-night .fs-guia-t { color: var(--night-ink); }
+.fs-night .fs-guia-p { color: var(--night-ink); opacity: 0.78; }
+.fs-night .fs-guia-p.is-ojo { border-left-color: var(--night-signal); opacity: 0.92; }
+
+/* plegada dentro de la figura, para cuando no hay margen donde ponerla */
+.fs-guia-plegada {
+  margin: 0 0 18px;
+  border-top: 1px solid var(--rule-soft);
+  border-bottom: 1px solid var(--rule-soft);
+  padding: 8px 0;
+}
+.fs-guia-plegada > summary {
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  list-style: none;
+}
+.fs-guia-plegada > summary::-webkit-details-marker { display: none; }
+.fs-guia-plegada > summary::after {
+  content: ' +';
+  color: var(--signal);
+}
+.fs-guia-plegada[open] > summary::after { content: ' −'; }
+.fs-guia-plegada[open] > summary { margin-bottom: 10px; }
+.fs-guia-plegada .fs-guia-p { max-width: 68ch; }
+.fs-night .fs-guia-plegada > summary { color: var(--night-ink); opacity: 0.66; }
+
+@media (min-width: 1200px) {
+  .fs-guia-plegada { display: none; }
+}
+@media (max-width: 1199px) {
+  .fs-guia { display: none; }
 }

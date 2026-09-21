@@ -151,6 +151,38 @@ function getSSTipos(anio) {
   return { tipoEmp: baseEmp + mei[0], tipoTra: baseTra + mei[1], mei };
 }
 
+/**
+ * Los conceptos que componen cada tipo de cotización, uno a uno.
+ *
+ * El motor sólo necesita el tipo agregado, pero el desglose del capítulo 01
+ * tiene que poder enseñar de dónde sale ese 32,15 %: son seis conceptos con
+ * nombre y norma propios, y esconderlos detrás de un único porcentaje es
+ * justo lo que hace que una nómina resulte incomprensible.
+ *
+ * Los tipos de desempleo corresponden al contrato indefinido, que es el
+ * supuesto estándar de esta publicación; en temporal son más altos.
+ */
+export function conceptosCotizacion(anio) {
+  const { mei, tipoEmp, tipoTra } = getSSTipos(anio);
+  const empresa = [
+    ['Contingencias comunes', 0.236, 'Pensiones, incapacidad temporal y prestaciones del sistema'],
+    ['Desempleo', 0.055, 'Contrato indefinido; en temporal el tipo es mayor'],
+    ['FOGASA', 0.002, 'Fondo de Garantía Salarial'],
+    ['Formación profesional', 0.006, 'Formación para el empleo'],
+    ['Accidentes de trabajo y EP', 0.015, 'Tipo medio; depende de la actividad de la empresa (tarifa de primas)'],
+  ];
+  const trabajador = [
+    ['Contingencias comunes', 0.047, 'La parte del trabajador de la misma contingencia'],
+    ['Desempleo', 0.0155, 'Contrato indefinido'],
+    ['Formación profesional', 0.001, 'Formación para el empleo'],
+  ];
+  if (mei[0] > 0) {
+    empresa.push(['MEI · Mecanismo de Equidad Intergeneracional', mei[0], `Refuerzo del Fondo de Reserva de las pensiones, en vigor desde 2023`]);
+    trabajador.push(['MEI · Mecanismo de Equidad Intergeneracional', mei[1], 'Refuerzo del Fondo de Reserva de las pensiones, en vigor desde 2023']);
+  }
+  return { empresa, trabajador, tipoEmp, tipoTra, desdeMEI: 2023 };
+}
+
 function solidaridadCuota(anio, exceso, baseMax) {
   if (exceso <= 0) return 0;
   const tramos = anio === 2025

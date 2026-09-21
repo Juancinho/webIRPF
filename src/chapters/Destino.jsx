@@ -4,6 +4,7 @@ import { useFiscal } from '../state/fiscalContext';
 import { GASTO_COFOG } from '../engine/irpf';
 import Figure from '../figures/Figure';
 import Puente from '../figures/Puente';
+import GuiaRail from '../figures/GuiaRail';
 import Calendario from './Calendario';
 import ChartFrame from '../figures/ChartFrame';
 import { Label } from '../figures/marks';
@@ -77,10 +78,9 @@ function Particulas({ x0, a0, a1, x1, b0, b1, color, dur = 5, semilla = 0, opaci
 /**
  * FIG. 25 — EL RÍO DE LOS EUROS.
  *
- * La pregunta que el capítulo de la cuña deja abierta: los euros que no llegan
- * a tu cuenta, ¿dónde acaban? Dos afluentes —cotizaciones e IRPF— desembocan en
- * una caja común y esa caja se abre en el reparto real del gasto público, con
- * *tus* euros como unidad.
+ * La pregunta que el capítulo de la cuña deja abierta: ¿cómo se distribuye el
+ * gasto agregado por funciones? Dos magnitudes del caso personal —cotizaciones
+ * e IRPF— se usan como escala y se proyectan sobre el reparto COFOG.
  *
  * La honestidad de la figura está en la nota: el presupuesto no está afectado.
  * Nadie marca tu IRPF con un destino. Lo que se dibuja es el reparto que le
@@ -94,36 +94,61 @@ export default function Destino() {
         <span className="fs-chapter-numeral" aria-hidden="true">07</span>
 
         <div className="fs-chapter-head" data-gesture="APORTACIÓN  →  GASTO PÚBLICO POR FUNCIONES">
-          <span className="fs-stamp">07 / 09 · A dónde va</span>
+          <span className="fs-stamp">07 / 09 · Gasto por funciones</span>
           <h2 id="destino-t" className="fs-title">
-            A dónde va
+            Cómo se distribuye
             <br />
-            lo que no ves
+            el gasto público
           </h2>
           <p className="fs-kicker">
-            Este capítulo es una estimación de correspondencia, no un seguimiento contable de tus
-            impuestos. Como los ingresos públicos no están afectados a partidas concretas, aplicamos
-            a tu aportación la distribución funcional del gasto consolidado y mostramos el resultado
-            en euros y jornadas de trabajo.
+            Este capítulo cambia del cálculo individual a la contabilidad nacional. La clasificación
+            COFOG ordena el gasto consolidado de las administraciones según su finalidad. Para hacer
+            comparable esa estructura con el caso anterior, aplicamos sus porcentajes a la cuña fiscal
+            calculada; el resultado es una correspondencia hipotética, no el seguimiento de unos euros
+            concretos desde la nómina hasta una partida presupuestaria.
           </p>
         </div>
 
-        <RioDeLosEuros />
+        <div className="fs-spread">
+          <aside className="fs-rail">
+            <GuiaRail seccion="destino" />
+            <div className="fs-rail-item">
+              <span className="fs-stamp">Qué es COFOG</span>
+              <p className="fs-note">
+                La clasificación funcional del gasto público que usan Eurostat y la IGAE: ordena el
+                gasto por finalidad —sanidad, pensiones, defensa— en vez de por quién lo ejecuta.
+              </p>
+            </div>
+            <div className="fs-rail-item">
+              <span className="fs-stamp">El límite del método</span>
+              <p className="fs-note">
+                Los ingresos públicos no están afectados: ningún impuesto concreto financia una
+                función concreta. Lo que se dibuja es una correspondencia proporcional, no un
+                seguimiento contable.
+              </p>
+            </div>
+          </aside>
 
-        <Puente rotulo="Lo mismo, contado en días">
-          El reparto anterior está en euros, y los euros se piensan mal. Hay otra forma de contar
-          exactamente la misma cifra: si la parte que no llega a tu cuenta se repartiera a lo largo
-          del año natural, habría <strong>una fecha</strong> en la que dejarías de trabajar para el
-          sistema y empezarías a cobrar para ti.
+          <div className="fs-field">
+            <RioDeLosEuros />
+
+        <Puente rotulo="Una equivalencia temporal, no un calendario de pagos">
+          La figura anterior expresa una proporción en euros. El calendario conserva esa misma
+          proporción y la multiplica por los días del año. La fecha resultante es sólo una frontera
+          gráfica: <strong>no indica que antes de ella se trabaje para una institución y después para
+          uno mismo</strong>, ni coincide con fechas de retención, ingreso o devengo.
         </Puente>
 
         <Calendario />
 
-        <Puente rotulo="Lo que todavía no se ha pagado">
-          La clasificación funcional explica en qué se emplea el gasto, pero no cómo se financia
-          cada ejercicio. Cuando los ingresos son inferiores a los gastos aparece un déficit; su
-          financiación mediante emisiones de deuda se estudia en el capítulo siguiente.
+        <Puente rotulo="Del gasto anual al saldo acumulado">
+          COFOG clasifica el gasto por finalidad, pero no describe por sí sola cómo se financia cada
+          ejercicio. El déficit mide la diferencia entre ingresos y gastos en un periodo; la deuda es
+          un saldo acumulado y puede variar además por operaciones financieras y ajustes. El capítulo
+          siguiente presenta ese saldo en euros, euros constantes, por habitante y como porcentaje del PIB.
         </Puente>
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -223,7 +248,7 @@ function RioDeLosEuros() {
       rows: [
         ['De tu aportación', pct(p.parte * 100), 'var(--signal)'],
         ['Al mes', eur(euros(p.parte) / 12)],
-        ['Días de tu trabajo', UNIDADES.dias.f(p.parte)],
+        ['Equivalencia temporal', UNIDADES.dias.f(p.parte)],
         ['Gasto real ' + GASTO_COFOG.anio, `${Math.round(p.valor / 1000)} mil M€`],
       ],
     });
@@ -236,8 +261,19 @@ function RioDeLosEuros() {
       title={`Aplicando el reparto COFOG, ${eur(euros(social.parte))} de tu aportación equivalen a protección social`}
       sub={`${anio} · correspondencia proporcional de tu cuña fiscal con el gasto público consolidado · clasificación funcional COFOG de ${GASTO_COFOG.anio}`}
       legend={`Dos afluentes —cotizaciones e IRPF— desembocan en una caja común · el ancho de cada cinta es su parte del gasto · los días se cuentan sobre ${DIAS_LABORABLES} jornadas laborables`}
-      source={`Fuente · ${GASTO_COFOG.fuente}`}
-      note="El presupuesto español no está afectado: ningún impuesto concreto financia una función concreta, y las cotizaciones sostienen sobre todo las prestaciones contributivas. Esta figura no dice a dónde fue tu dinero, sino cómo se repartiría tu aportación si siguiera el reparto del gasto público total."
+      source={
+        <>
+          Fuente ·{' '}
+          <a href="https://www.igae.pap.hacienda.gob.es/sitios/igae/es-ES/Contabilidad/ContabilidadNacional/Publicaciones/paginas/iacogof.aspx" target="_blank" rel="noreferrer noopener">
+            IGAE · clasificación funcional del gasto de las AAPP (COFOG)
+          </a>
+          {' · '}
+          <a href="https://ec.europa.eu/eurostat/en/web/products-manuals-and-guidelines/-/ks-gq-19-010" target="_blank" rel="noreferrer noopener">
+            Eurostat · manual COFOG
+          </a>
+        </>
+      }
+      note="Los ingresos públicos se integran, con las excepciones previstas legalmente, en recursos que no permiten atribuir cada euro de IRPF a una función concreta. Las cotizaciones tienen una relación específica con el sistema contributivo, pero tampoco reproducen el reparto general de COFOG. La figura aplica una regla proporcional común para comparar escalas; no describe trazabilidad presupuestaria."
       summary={partidas
         .map(p => `${p.label}: ${eur(euros(p.parte))} (${pct(p.parte * 100)})`)
         .join('. ')}
@@ -252,7 +288,7 @@ function RioDeLosEuros() {
         </span>
         <span className="fs-note" style={{ margin: 0 }}>
           {unidad === 'dias'
-            ? `De tus ${DIAS_LABORABLES} jornadas anuales, ${dec(diasTotales, 0)} las trabajas para el sistema`
+            ? `La cuña equivale a ${dec(diasTotales, 0)} de ${DIAS_LABORABLES} jornadas de referencia`
             : 'La misma cifra, en tres unidades'}
         </span>
       </div>

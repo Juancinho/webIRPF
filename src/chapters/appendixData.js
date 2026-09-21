@@ -172,6 +172,10 @@ export const PREGUNTAS = [
     q: '¿Qué es el tipo marginal y por qué puede superar el 40% en rentas medias?',
     a: 'El tipo marginal efectivo mide cuánto disminuye el incremento de renta neta cuando aumenta el salario bruto. Incluye no solo el IRPF, sino también cotizaciones y la retirada de reducciones o deducciones vinculadas a la renta.\n\nPor eso puede superar el tipo legal del tramo. En la zona de retirada del art. 20, un aumento de salario eleva el rendimiento y, al mismo tiempo, reduce la reducción aplicable. La diferencia entre marginal legal y efectivo procede de esa interacción.'
   },
+  {
+    q: '¿Qué representa el calendario fiscal?',
+    a: 'Es una equivalencia gráfica, no un calendario de cobros o pagos. Primero se divide la cuña fiscal —IRPF y cotizaciones— entre el coste laboral total. Después se multiplica esa proporción por los 365 o 366 días del año. Ordenar esos días desde el 1 de enero produce una fecha de corte convencional.\n\nLa fecha no significa que hasta entonces se trabaje para una administración ni que a partir de ella el salario cambie de destinatario. Tampoco identifica cuándo se devenga o se ingresa cada tributo. Los colores aplican, como segunda operación ilustrativa, la estructura agregada del gasto COFOG a los días equivalentes; no trazan impuestos concretos hasta partidas presupuestarias concretas.'
+  },
 
 ];
 

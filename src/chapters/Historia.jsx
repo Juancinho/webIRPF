@@ -8,6 +8,7 @@ import {
   PRECIOS_REFERENCIA,
   calcularNomina,
 } from '../engine/irpf';
+import GuiaRail from '../figures/GuiaRail';
 import Figure from '../figures/Figure';
 import Epocas from './Epocas';
 import ProgresividadFria from './ProgresividadFria';
@@ -114,11 +115,12 @@ export default function Historia() {
 
         <div className="fs-spread">
           <aside className="fs-rail">
+            <GuiaRail seccion="historia" />
             <div className="fs-rail-item">
               <span className="fs-stamp">Nota 03</span>
               <p className="fs-note">
-                Comparar euros de 2012 con euros de 2026 sin corregir la inflación no dice nada.
-                Aquí se fija el poder adquisitivo: {eur(bruto2026)} de 2026 equivalen a{' '}
+                Comparar importes nominales de 2012 y 2026 no permite separar cambios fiscales de
+                cambios en el nivel de precios. Aquí se fija el poder adquisitivo: {eur(bruto2026)} de 2026 equivalen a{' '}
                 {eur(serie[0].nominal)} de 2012.
               </p>
             </div>
@@ -179,9 +181,9 @@ export default function Historia() {
             <Dumbbells serie={serie} anio={anio} mejor={mejor} elegirAnio={elegirAnio} bruto2026={bruto2026} />
 
             <Puente rotulo="La otra cara de la misma cuenta">
-              La figura anterior mide lo que te queda. Esta mide lo que sale, y lo cuenta en vez de
-              dibujarlo: comparar dos años deja de ser comparar la longitud de dos barras y pasa a
-              ser <strong>contar fichas</strong>.
+              La figura anterior compara la renta neta. Esta separa IRPF y cotización del trabajador
+              mediante unidades contables: la distancia entre dos ejercicios puede leerse en importes
+              y no sólo como diferencia entre longitudes.
             </Puente>
 
             <Monedas bruto2026={bruto2026} elegirAnio={elegirAnio} />
@@ -213,11 +215,11 @@ export default function Historia() {
 
             <Art20Historia />
 
-            <Puente rotulo="Quince años en una sola recta">
-              Cada figura anterior ha medido un año, o un sueldo. Queda la comparación directa entre
-              <strong> dos ejercicios elegidos por ti</strong>, con el mismo poder adquisitivo en
-              ambos: ¿en qué alturas de la escala aumentó la presión y en cuáles disminuyó? Una recta
-              por nivel salarial; la pendiente es la respuesta.
+            <Puente rotulo="Quince años, altura por altura">
+              Cada figura anterior ha medido un año, o un sueldo. Esta recorre los quince ejercicios
+              a la vez, con <strong>una línea por cada altura de la escala</strong> y el mismo poder
+              adquisitivo en todas ellas: lo único que la mueve es la fiscalidad. El par de años que
+              elijas no recorta la serie, marca el tramo que se mide.
             </Puente>
 
             <Pendiente
@@ -236,8 +238,8 @@ export default function Historia() {
             el sitio —y romper la retícula es justo lo que pide el capítulo. */}
         <div className="fs-field" style={{ maxWidth: 'var(--reading-max)', margin: '0 auto' }}>
           <Puente rotulo="Quince años, de una vez">
-            La recta anterior compara los años A y B que has elegido. Esta figura conserva ese par
-            resaltado, pero muestra el contexto completo: quince ejercicios y cien niveles de renta.
+            La figura anterior sigue nueve alturas de la escala. Esta las pone todas: quince
+            ejercicios y cien niveles de renta, con el par A–B resaltado.
             El color representa una única magnitud fiscal y permite localizar periodos o tramos que
             se apartan del patrón general.
           </Puente>
@@ -265,6 +267,15 @@ export default function Historia() {
             onAnioA={elegirComparacionA}
             onAnioB={elegirComparacionB}
           />
+        </div>
+
+        <div className="fs-field" style={{ maxWidth: 'var(--reading-max)', margin: '0 auto' }}>
+          <Puente rotulo="Del tiempo a una medida comparable entre países">
+            Hasta aquí el denominador ha sido el salario bruto equivalente. La cuña fiscal cambia el
+            punto de vista y toma como base el coste laboral total. Esa definición permite reunir IRPF
+            y cotizaciones en una sola proporción y compararla con el supuesto estandarizado que publica
+            la OCDE, sin confundirlo con el caso personal calculado en este informe.
+          </Puente>
         </div>
       </div>
     </section>

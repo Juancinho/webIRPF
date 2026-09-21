@@ -1,4 +1,8 @@
-const es = (opts) => new Intl.NumberFormat('es-ES', opts);
+/* `es-ES` agrupa por defecto a partir de cinco cifras, así que «35.000 €» y
+   «6329 €» convivían en la misma frase. En una publicación que enseña sus
+   operaciones eso se lee como una errata, no como una norma tipográfica: aquí
+   los millares se separan siempre. */
+const es = (opts) => new Intl.NumberFormat('es-ES', { useGrouping: 'always', ...opts });
 
 export const eur = (n, dec = 0) =>
   es({ style: 'currency', currency: 'EUR', minimumFractionDigits: dec, maximumFractionDigits: dec }).format(n);

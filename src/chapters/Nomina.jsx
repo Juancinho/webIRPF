@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useFiscal } from '../state/fiscalContext';
+import GuiaRail from '../figures/GuiaRail';
 import Figure from '../figures/Figure';
 import ChartFrame from '../figures/ChartFrame';
 import Desglose from './Desglose';
@@ -118,6 +119,7 @@ export default function Nomina() {
 
         <div className="fs-spread">
           <aside className="fs-rail">
+            <GuiaRail seccion="nomina" />
             {activa ? (
               <div className="fs-rail-item">
                 <span className="fs-stamp">{activa.detalle.titulo}</span>
@@ -200,7 +202,7 @@ export default function Nomina() {
 
             <Figure
               id="02"
-              title={`De tus ${eur(bruto)} brutos, te quedan ${eur(nomina.salarioNeto)}`}
+              title={`De ${eur(bruto)} brutos, ${eur(nomina.salarioNeto)} corresponden a renta neta`}
               sub={`${anio} · ${esAutonomo ? 'régimen de autónomos' : 'asalariado'} · la barra entera es tu salario bruto, partido en sus tres destinos`}
               legend="La barra completa = 100 % de tu bruto · cada tramo es proporcional a su importe"
               source="Fuente · TGSS · AEAT · BOE"

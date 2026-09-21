@@ -9,12 +9,14 @@ import { dec, eur } from '../utils/format';
 import { round } from '../figures/scale';
 
 const W = 880;
-const FILA = 28;
 const X0 = 62;
 const XG = 84;
 const PASO = 17;
 const GRUPO = 5;
 const HUECO = 8;
+const PORFILA = 30;      // glifos por línea antes de saltar: 30 × 17 px cabe de sobra
+const LINEA = 17;        // separación entre líneas de glifos de un mismo año
+const AIRE = 11;         // aire entre el bloque de un año y el del siguiente
 
 const AÑOS = ANIOS.filter(a => a <= PRECIOS_REFERENCIA.ultimoAnio);
 
@@ -122,17 +124,34 @@ export default function EnCosas({ bruto2026, anios, anioA, anioB, onAnioA, onAni
   const filaA = serie.find(s => s.anio === anioA) || primero;
   const filaB = serie.find(s => s.anio === anioB) || ultimo;
   const diferencia = filaB.unidades - filaA.unidades;
-  const comparadas = [filaA, filaB];
+  /* La serie entera, no dos filas sueltas: el par elegido va en color y el
+     resto de ejercicios queda en gris como contexto. Ver sólo dos años
+     obligaba a fiar de la memoria lo que pasó entre medias. */
+  const comparadas = serie;
   const cambio = `${diferencia > 0.04 ? '+' : diferencia < -0.04 ? '−' : ''}${dec(Math.abs(diferencia), 1)}`;
-  const H = comparadas.length * FILA + 94;
-  const px = i => XG + i * PASO + Math.floor(i / GRUPO) * HUECO;
+
+  /* Los glifos se cuentan, así que no se encogen: cuando no caben en una
+     línea saltan a la siguiente. Un año con muchas unidades ocupa un bloque
+     más alto, y el lienzo crece con él en vez de salirse por el margen. */
+  const bloques = comparadas.reduce((acc, s2) => {
+    const total = Math.ceil(s2.unidades - 0.08);
+    const lineas = Math.max(1, Math.ceil(total / PORFILA));
+    const y = acc.length ? acc[acc.length - 1].y + acc[acc.length - 1].lineas * LINEA + AIRE : 48;
+    acc.push({ s: s2, lineas, y });
+    return acc;
+  }, []);
+  const ultimoBloque = bloques[bloques.length - 1];
+  const H = ultimoBloque.y + ultimoBloque.lineas * LINEA + 52;
+  const col = i => i % PORFILA;
+  const px = i => XG + col(i) * PASO + Math.floor(col(i) / GRUPO) * HUECO;
+  const py = (i, y0) => y0 + Math.floor(i / PORFILA) * LINEA;
 
   return (
     <Figure
       id="18"
       title={`El mismo sueldo daba para ${dec(filaA.unidades, 1)} ${u.enTitulo} en ${filaA.anio} y para ${dec(filaB.unidades, 1)} en ${filaB.anio}`}
       sub={`${eur(bruto2026)} constantes de 2026 · ${u.plural} · ${u.nota}`}
-      legend={`Azul = año A · petróleo = año B · cada figura es ${u.singular === 'm² comprado' ? 'un metro cuadrado' : `${u.singular}`} · van de cinco en cinco para poder contarlas`}
+      legend={`Están los ${AÑOS.length} ejercicios · azul = año A, petróleo = año B, gris = el resto · cada figura es ${u.singular === 'm² comprado' ? 'un metro cuadrado' : `${u.singular}`} · van de cinco en cinco para poder contarlas`}
       source={`Fuente · ${unidad === 'smi' ? 'BOE — SMI de cada ejercicio' : PRECIOS_REFERENCIA.fuente} · cálculo propio`}
       note="Cada fila se mueve por dos motivos a la vez: lo que la fiscalidad dejó en tu bolsillo ese año y lo que costaba esa cosa ese año. El sueldo de partida es siempre el mismo en poder adquisitivo general; lo que cambia es el precio relativo de lo que compras. La serie llega hasta 2025 porque es el último ejercicio cerrado con precios publicados."
       summary={`${filaA.anio}: ${dec(filaA.unidades, 1)}; ${filaB.anio}: ${dec(filaB.unidades, 1)}; diferencia: ${dec(diferencia, 1)}.`}
@@ -156,7 +175,7 @@ export default function EnCosas({ bruto2026, anios, anioA, anioB, onAnioA, onAni
         yearB={anioB}
         onYearA={onAnioA}
         onYearB={onAnioB}
-        note={`Serie de precios cerrada hasta ${PRECIOS_REFERENCIA.ultimoAnio}.`}
+        note={`Se dibujan todos los años; el par elegido es el que se resalta y se mide arriba. Serie cerrada hasta ${PRECIOS_REFERENCIA.ultimoAnio}.`}
       />
 
       <div className="fs-readout">
@@ -185,21 +204,21 @@ export default function EnCosas({ bruto2026, anios, anioA, anioB, onAnioA, onAni
           PRECIO
         </Label>
 
-        {comparadas.map((s, fila) => {
-          const y = 48 + fila * FILA;
+        {bloques.map(({ s, y, lineas }) => {
           const enteros = Math.floor(s.unidades);
           const resto = s.unidades - enteros;
           const esA = s.anio === anioA;
           const esB = s.anio === anioB;
+          const elegido = esA || esB;
           const colorFila = esA ? 'var(--counter)' : esB ? 'var(--signal)' : 'var(--ink-4)';
 
           return (
-            <g key={s.anio} className="fs-group">
+            <g key={s.anio} className="fs-group" opacity={elegido ? 1 : 0.5}>
               <text
                 x={X0}
                 y={y + 3.5}
                 fontSize={10.5}
-                fontWeight={800}
+                fontWeight={elegido ? 800 : 600}
                 textAnchor="end"
                 fill={colorFila}
                 className="fs-t-stamp"
@@ -208,15 +227,17 @@ export default function EnCosas({ bruto2026, anios, anioA, anioB, onAnioA, onAni
               </text>
 
               {Array.from({ length: enteros }, (_, i) => (
-                <Glifo key={i} tipo={u.glifo} x={px(i)} y={y} color={colorFila} />
+                <Glifo key={i} tipo={u.glifo} x={px(i)} y={py(i, y)} color={colorFila} />
               ))}
-              {resto > 0.08 && <Glifo tipo={u.glifo} x={px(enteros)} y={y} lleno={resto} color={colorFila} />}
+              {resto > 0.08 && (
+                <Glifo tipo={u.glifo} x={px(enteros)} y={py(enteros, y)} lleno={resto} color={colorFila} />
+              )}
 
               <text
                 x={W - 104}
                 y={y + 3.5}
-                fontSize={12}
-                fontWeight={800}
+                fontSize={elegido ? 12 : 11}
+                fontWeight={elegido ? 800 : 600}
                 textAnchor="end"
                 fill={colorFila}
                 className="num"
@@ -237,13 +258,13 @@ export default function EnCosas({ bruto2026, anios, anioA, anioB, onAnioA, onAni
               <rect
                 className="fs-hit"
                 x={0}
-                y={y - FILA / 2}
+                y={y - LINEA / 2}
                 width={W}
-                height={FILA}
+                height={lineas * LINEA}
                 onMouseEnter={() =>
                   setTip({
-                    vx: px(Math.max(1, enteros)),
-                    vy: y,
+                    vx: px(Math.max(1, enteros - 1)),
+                    vy: py(Math.max(1, enteros - 1), y),
                     title: `${dec(s.unidades, 1)} ${u.singular}s`,
                     sub: `${s.anio} · con tu neto de ese año`,
                     rows: [
@@ -261,8 +282,8 @@ export default function EnCosas({ bruto2026, anios, anioA, anioB, onAnioA, onAni
           );
         })}
 
-        <Label x={XG} y={H - 26} size={9} color="var(--ink-5)" mono>
-          ← CADA HUECO SEPARA CINCO
+        <Label x={XG} y={H - 22} size={9} color="var(--ink-5)" mono>
+          ← CADA HUECO SEPARA CINCO · LAS FILAS SALTAN CADA {PORFILA}
         </Label>
       </ChartFrame>
     </Figure>

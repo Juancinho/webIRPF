@@ -19,10 +19,10 @@ const BANDAS = 20;       // veinte tramos de cinco percentiles
 /**
  * FIG. 20 — QUIÉN PAGA EL TOTAL.
  *
- * Un mosaico, no un gráfico de barras: el **ancho** de cada columna es la
+ * Un mosaico, no un gráfico de barras: el **ancho** de cada columna estima la
  * parte de toda la masa salarial que cobra ese tramo de asalariados y la
  * **altura** es el tipo efectivo que soporta. Como recaudación = masa × tipo,
- * el **área de cada bloque es exactamente lo que ese tramo aporta al total**.
+ * el **área de cada bloque aproxima lo que ese tramo aporta al total**.
  *
  * Es la única forma de responder a la pregunta que todo el mundo discute sin
  * datos —¿quién sostiene la recaudación?— sin tener que elegir entre mirar
@@ -92,11 +92,19 @@ export default function Mosaico() {
   return (
     <Figure
       id="25"
-      title={`La mitad que más cobra aporta el ${pct(mitadAlta * 100, 0)} de todo lo que se recauda sobre las nóminas`}
-      sub={`${anio} · ancho de cada columna = la parte de la masa salarial que cobra ese tramo · altura = su tipo efectivo · área = lo que aporta al total`}
-      legend="Veinte tramos de cinco percentiles · como recaudación = masa salarial × tipo efectivo, el área de cada bloque es exactamente su aportación · tu tramo va en petróleo"
-      source="Fuente · INE (EAES) para la distribución · cálculo propio para los tipos"
-      note="Incluye IRPF y cotización del trabajador sobre el salario bruto, con el perfil estándar aplicado a todos los tramos: no modeliza hijos, comunidad ni situaciones particulares de cada asalariado. La masa salarial se aproxima con el salario mediano de cada tramo. El último tramo es el más frágil: el INE no publica P95 ni P99, así que su anchura descansa sobre la extrapolación de la cola alta."
+      title={`En este modelo, la mitad superior concentra el ${pct(mitadAlta * 100, 0)} de la recaudación estimada`}
+      sub={`${anio} · ancho = masa salarial estimada del tramo · altura = tipo efectivo calculado · área = participación estimada en IRPF y cotización del trabajador`}
+      legend="Veinte grupos del mismo tamaño, cinco percentiles cada uno · el área combina salario representativo y carga efectiva calculada · tu grupo va en petróleo"
+      source={
+        <>
+          Salarios ·{' '}
+          <a href="https://www.ine.es/jaxiT3/Tabla.htm?t=28191" target="_blank" rel="noreferrer noopener">
+            INE, EAES tabla 28191
+          </a>{' '}
+          · reglas fiscales · AEAT, BOE y TGSS · interpolación y cálculo propios
+        </>
+      }
+      note="No es una estadística observada de recaudación por percentil. El INE publica seis referencias salariales —P10, P25, mediana, media, P75 y P90—, no veinte grupos completos. La figura interpola un salario representativo para cada grupo de cinco percentiles y le aplica el mismo perfil fiscal seleccionado. La cola superior a P90 se extrapola y es la parte con mayor incertidumbre."
       summary={conX.map(b => `Percentil ${Math.round(b.p0)}-${Math.round(b.p1)}: tipo ${pct(b.tipo * 100)}, aporta ${pct(b.parteRec * 100)}`).join('. ')}
     >
       <div className="fs-readout" style={{ marginBottom: 16 }}>
@@ -115,6 +123,13 @@ export default function Mosaico() {
           <span className="fs-readout-v">{pct(miBanda.parteRec * 100)}</span>
         </span>
       </div>
+
+      <ol className="fs-method-chain" aria-label="Cómo se construye la estimación de la figura 25">
+        <li><strong>1 · Datos observados</strong><span>P10, P25, P50, media, P75 y P90 del INE.</span></li>
+        <li><strong>2 · Interpolación</strong><span>Un salario central para cada grupo de cinco percentiles.</span></li>
+        <li><strong>3 · Cálculo fiscal</strong><span>IRPF y cotización del trabajador con un perfil común.</span></li>
+        <li><strong>4 · Normalización</strong><span>Cuota de masa salarial y de recaudación estimada.</span></li>
+      </ol>
 
       <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} scroll minWidth={700} label="Quién sostiene la recaudación">
         {/* rejilla de tipos */}
@@ -143,9 +158,9 @@ export default function Mosaico() {
                   sub: `Percentil ${Math.round(b.p0)}–${Math.round(b.p1)}`,
                   rows: [
                     ['Salario del tramo', eur(b.salario), 'var(--signal)'],
-                    ['Paga al año', eur(b.pagado)],
-                    ['De la masa salarial', pct(b.parteMasa * 100)],
-                    ['De la recaudación', pct(b.parteRec * 100)],
+                    ['Pago estimado', eur(b.pagado)],
+                    ['Masa salarial estimada', pct(b.parteMasa * 100)],
+                    ['Recaudación estimada', pct(b.parteRec * 100)],
                   ],
                 });
               }}
@@ -232,10 +247,10 @@ export default function Mosaico() {
       </ChartFrame>
 
       <p className="fs-note" style={{ marginTop: 14, maxWidth: '74ch' }}>
-        Con tu sueldo de <strong>{eur(bruto)}</strong> estás en el percentil{' '}
-        <strong>{Math.round(percentil)}</strong>. Los tramos altos tienen las columnas más anchas
-        —cobran más masa salarial— y también las más altas, así que su área manda; pero la suma de
-        la mitad baja no es despreciable: son columnas bajas repetidas veinte veces.
+        Con un salario de <strong>{eur(bruto)}</strong>, el modelo te sitúa en torno al percentil{' '}
+        <strong>{Math.round(percentil)}</strong>. El área compara la aportación estimada de grupos
+        con igual número de asalariados; no permite identificar contribuyentes ni sustituye una
+        tabulación de recaudación observada de la AEAT.
       </p>
     </Figure>
   );

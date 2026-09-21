@@ -177,6 +177,33 @@ export default function Acantilado() {
               </line>
             );
           })}
+
+          {/* ── el punto que estás leyendo ─────────────────────────────
+              El recuadro decía la cifra pero no señalaba de dónde salía:
+              sin marca sobre la curva y sobre la barra, el lector tiene que
+              adivinar qué punto está mirando. */}
+          {tip && (() => {
+            const p = serie.reduce(
+              (best, c) => (Math.abs(x(c.b) - tip.vx) < Math.abs(x(best.b) - tip.vx) ? c : best),
+              serie[0]
+            );
+            const h = (p.marg / margMax) * BAR_H;
+            return (
+              <g pointerEvents="none">
+                <line className="fs-crosshair" x1={round(x(p.b))} y1={CURVA_Y0 - 16} x2={round(x(p.b))} y2={BAR_Y} />
+                <circle cx={round(x(p.b))} cy={round(yRed(p.red))} r={3.8} fill="var(--ink)" stroke="var(--bone)" strokeWidth={1.2} />
+                <line
+                  x1={round(x(p.b))}
+                  y1={BAR_Y}
+                  x2={round(x(p.b))}
+                  y2={round(BAR_Y - h)}
+                  stroke="var(--counter)"
+                  strokeWidth={2.2}
+                />
+                <circle cx={round(x(p.b))} cy={round(BAR_Y - h)} r={3.8} fill="var(--counter)" stroke="var(--bone)" strokeWidth={1.2} />
+              </g>
+            );
+          })()}
           </g>
           <line x1={X0} y1={BAR_Y} x2={X1} y2={BAR_Y} stroke="var(--ink)" strokeWidth={0.9} />
 
@@ -235,7 +262,6 @@ export default function Acantilado() {
         medir una cuestión práctica: <strong>qué parte de una subida bruta se convierte en renta neta.</strong>
       </Puente>
 
-      <span id="fig-09" className="fs-ancla" aria-hidden="true" />
       <CienEuros />
       <p className="fs-body" style={{ marginTop: 8 }}>
         Este efecto no es un error del cálculo ni una opinión: es la consecuencia aritmética de
@@ -444,8 +470,8 @@ function ComoFunciona() {
           <span className="fs-stamp">01 · La zona plana</span>
           <p className="fs-note">
             Por debajo de {eur(params.art20Meta.uInf ?? 0)} de rendimiento neto, la reducción del
-            art. 20 está al máximo ({eur(params.art20Meta.rMax ?? 0)}) y no se mueva lo que se mueva
-            tu sueldo. Cada euro extra tributa al tipo normal del tramo.
+            art. 20 está al máximo ({eur(params.art20Meta.rMax ?? 0)}) y permanece constante dentro
+            de ese intervalo. Cada euro adicional tributa al tipo ordinario del tramo.
           </p>
         </li>
         <li>
@@ -453,8 +479,8 @@ function ComoFunciona() {
           <p className="fs-note">
             A partir de ese umbral la reducción empieza a disminuir. Por cada euro adicional de
             rendimiento se reduce una fracción del beneficio, así que la base imponible sube{' '}
-            <strong>más de un euro por cada euro ganado</strong>. El tipo que notas no es el del
-            tramo: es el del tramo más el efecto de la reducción que desaparece.
+            <strong>más de un euro por cada euro adicional de rendimiento</strong>. El tipo marginal
+            efectivo combina el tipo del tramo con el efecto de la reducción que deja de aplicarse.
           </p>
         </li>
         <li>

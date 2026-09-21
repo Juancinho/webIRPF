@@ -7,15 +7,14 @@ import { Label } from '../figures/marks';
 import { round } from '../figures/scale';
 import { eur, sign } from '../utils/format';
 
-const MONEDA = 250;      // euros de 2026 por ficha
-const R = 4.2;
-const PASO = 10.4;
 const GRUPO = 5;         // las fichas se agrupan de cinco en cinco: así se cuentan
-const HUECO_GRUPO = 5;
 const W = 880;
 const FILA = 26;
 const X0 = 62;
-const XC = 82;
+const XC = 88;
+const X_TOTAL = W - 104;
+const X_FIN_CAMPO = X_TOTAL - 72;
+const UNIDADES = [250, 500, 1000, 2000, 2500, 5000, 10000, 20000, 25000, 50000];
 
 /**
  * FIG. 11 — LO QUE PAGAS, CONTADO EN FICHAS.
@@ -49,8 +48,20 @@ export default function Monedas({ bruto2026, elegirAnio }) {
   const menor = serie.reduce((a, c) => (c.total < a.total ? c : a), serie[0]);
   const H = serie.length * FILA + 78;
 
+  /* Mantiene el campo de fichas entre la columna de años y la de totales.
+     Para rentas altas aumenta la unidad antes de comprimir las marcas: las
+     etiquetas conservan siempre su espacio y la figura sigue siendo legible. */
+  const maxTotal = Math.max(...serie.map(s => s.total));
+  const unidad = UNIDADES.find(u => Math.round(maxTotal / u) <= 64)
+    ?? Math.ceil(maxTotal / 64000) * 1000;
+  const maxFichas = Math.max(...serie.map(s => Math.round(s.total / unidad)));
+  const grupos = Math.floor(Math.max(0, maxFichas - 1) / GRUPO);
+  const huecoGrupo = Math.min(5, Math.max(1.6, (X_FIN_CAMPO - XC) / Math.max(28, maxFichas) * 0.48));
+  const paso = Math.min(10.4, (X_FIN_CAMPO - XC - grupos * huecoGrupo) / Math.max(1, maxFichas - 1));
+  const radio = Math.min(4.2, Math.max(1.5, paso * 0.39));
+
   /* La posición de la ficha número i, con su hueco cada cinco. */
-  const px = i => XC + i * PASO + Math.floor(i / GRUPO) * HUECO_GRUPO;
+  const px = i => XC + i * paso + Math.floor(i / GRUPO) * huecoGrupo;
 
   return (
     <Figure
@@ -60,17 +71,17 @@ export default function Monedas({ bruto2026, elegirAnio }) {
           ? `Con el mismo sueldo real, hoy pagas ${eur(hoy.total - menor.total)} más que en ${menor.anio}`
           : `Con el mismo sueldo real, hoy pagas menos que en ningún otro año`
       }
-      sub={`${eur(bruto2026)} constantes de 2026 · una ficha = ${eur(MONEDA)} · sólo lo que sale de tu nómina: IRPF y cotización del trabajador`}
-      legend={`Fichas oscuras = IRPF · fichas petróleo = cotización del trabajador · van de cinco en cinco para poder contarlas · cada ficha son ${eur(MONEDA)} de 2026`}
+      sub={`${eur(bruto2026)} constantes de 2026 · una ficha = ${eur(unidad)} · sólo lo que sale de tu nómina: IRPF y cotización del trabajador`}
+      legend={`Fichas oscuras = IRPF · fichas petróleo = cotización del trabajador · van de cinco en cinco · la unidad se ajusta al nivel salarial para reservar las columnas de año y total`}
       source="Fuente · cálculo propio · IPC INE"
-      note="No incluye la cotización que paga la empresa, que no aparece en tu recibo aunque forme parte del coste de tu puesto; esa parte se mide en el capítulo 05. El resto de una ficha se redondea, así que la fila puede quedarse a menos de 250 € del total exacto."
+      note={`No incluye la cotización que paga la empresa, que no aparece como descuento en la nómina aunque forme parte del coste laboral; esa parte se mide en el capítulo 05. Las fichas son una cuantización visual: por el redondeo, la fila puede diferir del total exacto en menos de ${eur(unidad)}.`}
       summary={serie.map(s => `${s.anio}: ${eur(s.total)}`).join('; ')}
     >
       <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} scroll minWidth={700} label="Lo que pagas cada año, contado en fichas">
         <Label x={XC} y={22} size={9} color="var(--ink-5)" mono>
-          UNA FICHA = {eur(MONEDA)} DE 2026
+          UNA FICHA = {eur(unidad)} DE 2026
         </Label>
-        <Label x={W - 96} y={22} size={8.5} color="var(--ink-5)" anchor="end" mono>
+        <Label x={X_TOTAL} y={22} size={8.5} color="var(--ink-5)" anchor="end" mono>
           TOTAL
         </Label>
         <Label x={W - 2} y={22} size={8.5} color="var(--ink-5)" anchor="end" mono>
@@ -79,8 +90,8 @@ export default function Monedas({ bruto2026, elegirAnio }) {
 
         {serie.map((s, fila) => {
           const y = 44 + fila * FILA;
-          const nIrpf = Math.round(s.irpf / MONEDA);
-          const nSs = Math.round(s.ss / MONEDA);
+          const nIrpf = Math.round(s.irpf / unidad);
+          const nSs = Math.round(s.ss / unidad);
           const esSel = s.anio === anio;
           const esHover = hover === s.anio;
           const apagado = hover && !esHover && !esSel;
@@ -105,14 +116,14 @@ export default function Monedas({ bruto2026, elegirAnio }) {
                   key={i}
                   cx={round(px(i))}
                   cy={y}
-                  r={R}
+                  r={radio}
                   fill={i < nIrpf ? 'var(--ink)' : 'var(--signal)'}
                   opacity={esSel || !hover ? 1 : 0.9}
                 />
               ))}
 
               <text
-                x={W - 96}
+                x={X_TOTAL}
                 y={y + 3.5}
                 fontSize={11.5}
                 fontWeight={esSel ? 800 : 600}
@@ -145,14 +156,14 @@ export default function Monedas({ bruto2026, elegirAnio }) {
                 onMouseEnter={() => {
                   setHover(s.anio);
                   setTip({
-                    vx: px(nIrpf + nSs),
+                    vx: px(Math.max(0, nIrpf + nSs - 1)),
                     vy: y,
                     title: eur(s.total),
                     sub: `Lo que salió de tu nómina en ${s.anio}`,
                     rows: [
                       ['IRPF', eur(s.irpf), 'var(--ink)'],
                       ['Cotización', eur(s.ss), 'var(--signal)'],
-                      ['Fichas', `${nIrpf + nSs} × ${eur(MONEDA)}`],
+                      ['Fichas', `${nIrpf + nSs} × ${eur(unidad)}`],
                     ],
                   });
                 }}
@@ -167,7 +178,7 @@ export default function Monedas({ bruto2026, elegirAnio }) {
         })}
 
         <Label x={XC} y={H - 26} size={9} color="var(--ink-5)" mono>
-          ← CADA HUECO SEPARA CINCO FICHAS · {eur(MONEDA * 5)}
+          ← CADA HUECO SEPARA CINCO FICHAS · {eur(unidad * 5)}
         </Label>
       </ChartFrame>
 

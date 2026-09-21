@@ -217,8 +217,25 @@ export default function Apendice() {
                   </td>
                 </tr>
                 <tr>
+                  <th scope="row">Gasto público por funciones</th>
+                  <td>
+                    <a href="https://www.igae.pap.hacienda.gob.es/sitios/igae/es-ES/Contabilidad/ContabilidadNacional/Publicaciones/paginas/iacogof.aspx" target="_blank" rel="noreferrer noopener">
+                      IGAE — Clasificación funcional del gasto de las AAPP (COFOG)
+                    </a>
+                    {' · '}
+                    <a href="https://ec.europa.eu/eurostat/en/web/products-manuals-and-guidelines/-/ks-gq-19-010" target="_blank" rel="noreferrer noopener">
+                      Eurostat — Manual COFOG 2019
+                    </a>
+                  </td>
+                </tr>
+                <tr>
                   <th scope="row">Deuda pública</th>
-                  <td>Banco de España (Protocolo de Déficit Excesivo) · INE (población)</td>
+                  <td>
+                    <a href="https://datos.bde.es/datos/es/datasets/000/033.html" target="_blank" rel="noreferrer noopener">
+                      Banco de España — Deuda de las AAPP según el PDE
+                    </a>
+                    {' · INE (población e IPC)'}
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -253,6 +270,14 @@ export default function Apendice() {
             <li>
               La cuña fiscal de la OCDE responde a un supuesto estandarizado (persona soltera sin
               hijos al 100 % del salario medio) y no es directamente comparable con tu caso.
+            </li>
+            <li>
+              Las figuras de gasto aplican el reparto agregado COFOG a la cuña estimada. No existe
+              trazabilidad entre el IRPF de una persona y una función concreta del gasto público.
+            </li>
+            <li>
+              El calendario convierte una proporción en días consecutivos desde el 1 de enero. Su
+              fecha de corte es una convención visual, no una fecha oficial ni un calendario de devengo.
             </li>
           </ul>
         </Seccion>

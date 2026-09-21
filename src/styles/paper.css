@@ -260,6 +260,113 @@ input,
   border-top: 0;
 }
 
+/* Umbral entre la portada y el informe. Es una nota de lectura, no otro
+   capítulo: introduce las tres escalas analíticas sin competir con el índice. */
+.fs-prologo {
+  padding: clamp(54px, 8vh, 96px) 0;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--rule);
+}
+
+.fs-prologo-grid {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.55fr) minmax(0, 1.45fr);
+  gap: clamp(28px, 6vw, 88px);
+  align-items: start;
+}
+
+.fs-prologo-grid header {
+  position: sticky;
+  top: 72px;
+}
+
+.fs-prologo-grid header .fs-title-sm {
+  margin-top: 12px;
+  max-width: 12ch;
+}
+
+.fs-prologo-intro {
+  max-width: 74ch;
+}
+
+.fs-prologo-ruta {
+  grid-column: 2;
+  list-style: none;
+  margin: 28px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--ink);
+}
+
+.fs-prologo-ruta li {
+  padding: 14px 18px 4px 0;
+  border-right: 1px solid var(--rule);
+}
+
+.fs-prologo-ruta li + li {
+  padding-left: 18px;
+}
+
+.fs-prologo-ruta li:last-child {
+  border-right: 0;
+}
+
+.fs-prologo-ruta span,
+.fs-prologo-ruta strong {
+  display: block;
+}
+
+.fs-prologo-ruta span {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  color: var(--counter);
+  margin-bottom: 8px;
+}
+
+.fs-prologo-ruta strong {
+  font-family: var(--serif);
+  font-size: clamp(18px, 1.7vw, 24px);
+  font-weight: 500;
+  line-height: 1.15;
+}
+
+.fs-prologo-ruta p {
+  margin: 8px 0 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--ink-3);
+}
+
+.fs-prologo-fuentes {
+  grid-column: 2;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule-soft);
+}
+
+@media (max-width: 760px) {
+  .fs-prologo-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .fs-prologo-grid header {
+    position: static;
+  }
+  .fs-prologo-ruta,
+  .fs-prologo-fuentes {
+    grid-column: 1;
+  }
+  .fs-prologo-ruta {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .fs-prologo-ruta li,
+  .fs-prologo-ruta li + li {
+    padding: 13px 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+}
+
 /* chapter numeral: a large pale marker that opens the chapter — in the flow,
    never behind the title (it used to overlap chapters 02, 05 and 07) */
 .fs-chapter-numeral {
@@ -305,7 +412,14 @@ input,
     top: 84px;
     align-self: start;
     max-height: calc(100vh - 140px);
-    overflow: visible;
+    /* Si las notas del margen pasan del alto de la pantalla, se desplaza el
+       margen: antes se recortaba el último bloque sin avisar. */
+    overflow-y: auto;
+    scrollbar-width: thin;
+    padding-right: 6px;
+  }
+  .fs-rail > * {
+    flex-shrink: 0;
   }
 }
 

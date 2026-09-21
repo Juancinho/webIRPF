@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNumeroAnimado } from '../hooks/useNumeroAnimado';
+import GuiaRail from '../figures/GuiaRail';
 import Puente from '../figures/Puente';
 import { useFiscal } from '../state/fiscalContext';
 import {
@@ -34,6 +35,7 @@ export default function Lugar() {
 
         <div className="fs-spread">
           <aside className="fs-rail">
+            <GuiaRail seccion="lugar" />
             <div className="fs-rail-item">
               <span className="fs-stamp">Nota 04</span>
               <p className="fs-note">
@@ -70,11 +72,11 @@ export default function Lugar() {
 
           <div className="fs-field">
             <div className="fs-chapter-head" data-gesture={`PERCENTIL ${Math.round(percentil)} · POSICIÓN, NO RIQUEZA`}>
-              <span className="fs-stamp">06 / 09 · Tu lugar</span>
+              <span className="fs-stamp">06 / 09 · Distribución salarial</span>
               <h2 id="lugar-t" className="fs-title">
-                Dónde te coloca
+                Tu posición en la
                 <br />
-                el sistema
+                distribución salarial
               </h2>
               <p className="fs-kicker">
                 Dejamos el cálculo fiscal y pasamos a la distribución salarial. El percentil sitúa
@@ -96,9 +98,9 @@ export default function Lugar() {
             <CurvaDistribucion />
 
             <Puente rotulo="De la curva a tu casilla">
-              La curva dice cuánta gente hay en cada altura de la escala. No dice dónde estás tú,
-              y ese es el dato que convierte una estadística en algo personal: un número entre uno
-              y cien.
+              La curva representa la concentración de salarios en distintos niveles. El percentil
+              añade la posición relativa del salario seleccionado: un número entre uno y cien que
+              resume cuántos salarios observados quedan por debajo.
             </Puente>
 
             <Percentiles />
@@ -106,9 +108,9 @@ export default function Lugar() {
             <Enjambre />
 
             <Puente rotulo="La escalera también se mueve">
-              Una foto de un solo año no dice si la escalera sube contigo o sin ti. Esta es la
-              misma distribución repetida quince veces: no sólo cambia tu sueldo,{' '}
-              <strong>cambia la fila en la que te deja</strong>.
+              Una observación aislada no muestra cómo evoluciona la posición relativa. La figura
+              repite la distribución durante quince años y permite distinguir entre el cambio del
+              salario seleccionado y el desplazamiento del conjunto de salarios.
             </Puente>
 
             <EvolucionDistribucion />
@@ -116,10 +118,10 @@ export default function Lugar() {
             {anio > 2012 && <Escenario bruto={bruto} anio={anio} />}
 
             <Puente rotulo="De dónde sale el dinero">
-              Ya sabes dónde cae tu sueldo. Queda la pregunta que se discute todos los días sin
-              mirar los números: <strong>de qué parte de la escala sale lo que se recauda</strong>.
-              La figura siguiente la responde con una regla sencilla —cuánto cobra cada tramo por
-              cuánto paga— de manera que la superficie de cada bloque sea su aportación.
+              La posición salarial no determina por sí sola la aportación fiscal. La figura siguiente
+              combina, para cada tramo estimado, masa salarial y tipo efectivo calculado. La superficie
+              resultante aproxima su peso relativo en el IRPF y la cotización del trabajador bajo un
+              perfil común; no es una tabulación observada de la Agencia Tributaria.
             </Puente>
 
             <Mosaico />

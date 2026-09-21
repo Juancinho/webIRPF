@@ -1,3 +1,5 @@
+import { GUIAS } from './guias';
+
 /**
  * The figure frame: FIG. nn · conclusion title · subtitle · field · unit
  * legend · source. No borders, no background, no rounded corners — the page
@@ -14,13 +16,33 @@ export default function Figure({
   children,
   className = '',
 }) {
+  const guia = id ? GUIAS[id] : null;
+
   return (
-    <figure className={`fs-figure ${className}`.trim()}>
+    <figure id={id ? `fig-${id}` : undefined} className={`fs-figure ${className}`.trim()}>
       <div className="fs-figure-head">
         {id && <span className="fs-figure-id">FIG. {id}</span>}
         <figcaption className="fs-figure-title">{title}</figcaption>
         {sub && <p className="fs-figure-sub">{sub}</p>}
       </div>
+
+      {/* La misma guía que vive en el margen izquierdo, plegada aquí para
+          cuando no hay margen: por debajo de 1200 px la columna lateral
+          desaparece y la explicación no puede desaparecer con ella. */}
+      {guia && (
+        <details className="fs-guia-plegada">
+          <summary>Cómo se lee esta figura</summary>
+          <p className="fs-guia-p">{guia.que}</p>
+          <p className="fs-guia-p is-lee">
+            <span className="fs-guia-k">Los ejes</span>
+            {guia.lee}
+          </p>
+          <p className="fs-guia-p is-ojo">
+            <span className="fs-guia-k">Ojo</span>
+            {guia.ojo}
+          </p>
+        </details>
+      )}
 
       <div className="fs-figure-body">{children}</div>
 

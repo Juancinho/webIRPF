@@ -9,6 +9,7 @@ import Indice from './shell/Indice';
 import Cinta from './shell/Cinta';
 import Colofon from './shell/Colofon';
 import Portada from './chapters/Portada';
+import Prologo from './chapters/Prologo';
 import Nomina from './chapters/Nomina';
 import Viaje from './chapters/Viaje';
 import Irpf from './chapters/Irpf';
@@ -76,6 +77,7 @@ function Publicacion() {
 
       <main>
         <Portada />
+        <Prologo />
         <Nomina />
         <Viaje />
         <Irpf />

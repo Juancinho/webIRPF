@@ -96,7 +96,7 @@ export default function Portada() {
           <p className="fs-source" style={{ margin: 0 }}>
             Fuente · BOE · AEAT · TGSS · INE
           </p>
-          <a className="fs-cover-scroll" href="#nomina">
+          <a className="fs-cover-scroll" href="#prologo">
             Sigue leyendo ↓
           </a>
         </div>

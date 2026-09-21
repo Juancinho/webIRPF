@@ -3,6 +3,7 @@ import { useFiscal } from '../state/fiscalContext';
 import { CUNA_OCDE_2025 } from '../engine/irpf';
 import Ocde from './Ocde';
 import CampoCuna from './CampoCuna';
+import GuiaRail from '../figures/GuiaRail';
 import Puente from '../figures/Puente';
 import { pct } from '../utils/format';
 
@@ -25,8 +26,8 @@ export default function Cuna() {
   const grupos = useMemo(() => {
     const base = [
       { key: 'neto', label: 'Renta neta', value: p(nomina.salarioNeto), color: 'var(--night-ink)' },
-      { key: 'irpf', label: 'IRPF', value: p(nomina.irpfFinal), color: '#9aa0a2' },
-      { key: 'ssTra', label: 'SS trabajador', value: p(nomina.cotTra), color: '#5f686b' },
+      { key: 'irpf', label: 'IRPF', value: p(nomina.irpfFinal), color: 'var(--night-counter)' },
+      { key: 'ssTra', label: 'SS trabajador', value: p(nomina.cotTra), color: 'var(--series-violet)' },
     ];
     if (vista === 'empresa') {
       base.push({ key: 'ssEmp', label: 'SS empresa', value: p(nomina.cotEmp), color: 'var(--night-signal)' });
@@ -67,6 +68,7 @@ export default function Cuna() {
 
         <div className="fs-spread">
           <aside className="fs-rail">
+            <GuiaRail seccion="cuna" />
             <div className="fs-rail-item">
               <span className="fs-stamp">Qué mide</span>
               <p className="fs-note">
@@ -96,12 +98,20 @@ export default function Cuna() {
             </p>
 
             <Puente rotulo="¿Mucho comparado con qué?">
-              Un {pct(nomina.cunaFiscal * 100)} no significa nada por sí solo: hace falta un patrón
-              de medida. La OCDE publica exactamente esta cifra, calculada igual para treinta y
-              ocho países, con el mismo supuesto estandarizado para todos.
+              Una proporción del {pct(nomina.cunaFiscal * 100)} necesita una referencia para
+              interpretarse. La OCDE publica una cuña calculada con un supuesto estandarizado común
+              para sus países miembros. Ese dato permite comparación internacional, pero no sustituye
+              al resultado personalizado de esta página, cuyo salario y perfil pueden ser distintos.
             </Puente>
 
             <Ocde />
+
+            <Puente rotulo="De un caso fiscal a la población asalariada">
+              La comparación internacional mantiene fijo un hogar tipo; no indica en qué parte de la
+              distribución salarial se encuentra el sueldo seleccionado. El capítulo siguiente cambia
+              de fuente y de pregunta: utiliza la Encuesta Anual de Estructura Salarial del INE para
+              situar el bruto entre los salarios observados en España.
+            </Puente>
           </div>
         </div>
       </div>

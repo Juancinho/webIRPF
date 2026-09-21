@@ -11,17 +11,38 @@ import { eur, pct } from '../utils/format';
 const W = 880;
 const H = 400;
 const X0 = 46;
-const X1 = W - 116;
+const X1 = W - 196;   // el margen derecho sostiene tres rótulos de dos líneas
 const Y0 = 26;
 const Y1 = H - 52;
 const MAXB = 80000;
 const STEP = 250;
+const SUBIDA = 1000;   // la subida de sueldo con la que se explica el marginal
 
 const LINEAS = [
-  { k: 'marg', label: 'Marginal total', color: 'var(--counter)', width: 1.6, nota: 'carga aplicable al siguiente euro' },
-  { k: 'efTotal', label: 'Efectivo total', color: 'var(--ink)', width: 1.4, nota: 'IRPF + cotizaciones sobre el bruto' },
-  { k: 'efIrpf', label: 'Efectivo IRPF', color: 'var(--series-jade)', width: 1.35, nota: 'sólo IRPF sobre el bruto' },
+  { k: 'marg', label: 'Marginal total', color: 'var(--counter)', width: 1.6, nota: ['lo que se lleva', 'el euro siguiente'] },
+  { k: 'efTotal', label: 'Efectivo total', color: 'var(--ink)', width: 1.4, nota: ['IRPF + cotización', 'sobre todo el bruto'] },
+  { k: 'efIrpf', label: 'Efectivo IRPF', color: 'var(--series-jade)', width: 1.35, nota: ['sólo IRPF', 'sobre todo el bruto'] },
 ];
+
+const SEP_ROTULO = 36;   // alto de un rótulo de tres líneas
+
+/** Separa los rótulos del margen derecho cuando las curvas llegan juntas. */
+function separarRotulos(items, y0, y1) {
+  const orden = [...items].sort((a, b) => a.y - b.y);
+  const bajados = orden.reduce((acc, it) => {
+    const previo = acc[acc.length - 1];
+    acc.push({ ...it, y: previo ? Math.max(it.y, previo.y + SEP_ROTULO) : Math.max(it.y, y0) });
+    return acc;
+  }, []);
+  const exceso = bajados[bajados.length - 1].y - y1;
+  if (exceso > 0) {
+    for (let i = bajados.length - 1; i >= 0; i--) {
+      const sig = bajados[i + 1];
+      bajados[i].y = sig ? Math.min(bajados[i].y, sig.y - SEP_ROTULO) : bajados[i].y - exceso;
+    }
+  }
+  return Object.fromEntries(bajados.map(b => [b.k, b.y]));
+}
 
 /**
  * FIG. 07 — LA CURVA DE TIPOS.
@@ -71,6 +92,12 @@ export default function CurvaTipos() {
   };
 
   const marcasX = ticks(zoom.domain[0], zoom.domain[1], 6);
+
+  const rotulos = separarRotulos(
+    LINEAS.map(l => ({ k: l.k, y: y(serie[serie.length - 1][l.k]) })),
+    Y0 + 14,
+    Y1 - 4
+  );
 
   return (
     <Figure
@@ -124,16 +151,30 @@ export default function CurvaTipos() {
           )}
         </g>
 
-        {/* etiquetas directas, siempre fuera del área recortada */}
+        {/* etiquetas directas, siempre fuera del área recortada y separadas
+            entre sí: a la derecha del eje las tres curvas llegan muy juntas */}
         {LINEAS.map(l => {
           const ultimo = serie[serie.length - 1][l.k];
+          const yR = rotulos[l.k];
           return (
             <g key={l.k}>
-              <Label x={X1 + 8} y={round(y(ultimo)) - 3} size={9.5} weight={700} color={l.color} mono>
+              <line
+                x1={X1 + 2}
+                y1={round(y(ultimo))}
+                x2={X1 + 14}
+                y2={round(yR) - 4}
+                stroke={l.color}
+                strokeWidth={0.7}
+                strokeDasharray="1.5 2"
+              />
+              <Label x={X1 + 18} y={round(yR) - 12} size={9.5} weight={800} color={l.color} mono>
                 {l.label.toUpperCase()}
               </Label>
-              <Label x={X1 + 8} y={round(y(ultimo)) + 9} size={8.5} color="var(--ink-5)">
-                {l.nota}
+              <Label x={X1 + 18} y={round(yR)} size={8.5} color="var(--ink-4)">
+                {l.nota[0]}
+              </Label>
+              <Label x={X1 + 18} y={round(yR) + 11} size={8.5} color="var(--ink-4)">
+                {l.nota[1]}
               </Label>
             </g>
           );
@@ -169,12 +210,89 @@ export default function CurvaTipos() {
         />
       </ChartFrame>
 
-      <p className="fs-note" style={{ marginTop: 12, maxWidth: '72ch' }}>
-        La distancia vertical entre la línea azul y la negra es exactamente la confusión que
-        genera hablar de «estar en el tramo del {pct(nomina.tipoMargIRPF * 100, 0)}»: ese tipo
-        se aplica sólo al último euro, mientras que sobre el conjunto de tu sueldo pagas{' '}
-        <strong>{pct(nomina.tipoEfectivoIRPF * 100)}</strong> de IRPF.
-      </p>
+      <div className="fs-readout" style={{ marginTop: 18 }}>
+        <span>
+          <span className="fs-readout-k" style={{ color: 'var(--counter)' }}>Marginal total</span>
+          <span className="fs-readout-v">{pct(marginal.tipoMarginalTotal * 100)}</span>
+        </span>
+        <span>
+          <span className="fs-readout-k">Efectivo total</span>
+          <span className="fs-readout-v">{pct(nomina.tipoEfectivoTotal * 100)}</span>
+        </span>
+        <span>
+          <span className="fs-readout-k">Efectivo IRPF</span>
+          <span className="fs-readout-v">{pct(nomina.tipoEfectivoIRPF * 100)}</span>
+        </span>
+        <span>
+          <span className="fs-readout-k">De cada euro nuevo te quedas</span>
+          <span className="fs-readout-v fs-signal">{eur(marginal.netoMarginal, 2)}</span>
+        </span>
+      </div>
+
+      <div className="fs-explica">
+        <span className="fs-stamp">Cómo se lee esta figura</span>
+        <p className="fs-body">
+          El eje horizontal recorre todos los salarios brutos posibles, de cero a {eur(MAXB)}. Para
+          cada uno se calcula una nómina completa con las normas de {anio} y se dibujan{' '}
+          <strong>tres formas distintas de medir lo mismo</strong>. No son alternativas: las tres
+          son ciertas a la vez, y confundirlas es la causa de casi todas las discusiones sobre
+          impuestos.
+        </p>
+
+        <ol className="fs-explica-lista">
+          <li>
+            <span className="fs-explica-k" style={{ color: 'var(--counter)' }}>Marginal total</span>
+            <p>
+              Qué pasa con <strong>el euro siguiente</strong>, no con los que ya has ganado. Si
+              cobraras {eur(SUBIDA)} más al año, no te llegarían {eur(SUBIDA)}: te llegarían{' '}
+              <strong>{eur(SUBIDA * marginal.netoMarginal)}</strong> y se irían{' '}
+              {eur(SUBIDA * marginal.tipoMarginalTotal)} entre IRPF y cotización. Ese reparto —
+              {pct(marginal.tipoMarginalTotal * 100)} frente a {pct(marginal.netoMarginal * 100)}—
+              es tu tipo marginal, y es el número que decide si compensa una hora extra o un
+              ascenso.
+            </p>
+          </li>
+          <li>
+            <span className="fs-explica-k">Efectivo IRPF</span>
+            <p>
+              Todo el IRPF de un año dividido entre todo el bruto de ese año:{' '}
+              {eur(nomina.irpfFinal)} ÷ {eur(bruto)} ={' '}
+              <strong>{pct(nomina.tipoEfectivoIRPF * 100)}</strong>. No hay ningún tramo que se
+              aplique a tu sueldo entero, así que esta cifra siempre queda por debajo del tipo que
+              aparece en la tabla de la escala.
+            </p>
+          </li>
+          <li>
+            <span className="fs-explica-k">Efectivo total</span>
+            <p>
+              Lo mismo, sumando tu cotización a la Seguridad Social: ({eur(nomina.irpfFinal)} +{' '}
+              {eur(nomina.cotTra)}) ÷ {eur(bruto)} ={' '}
+              <strong>{pct(nomina.tipoEfectivoTotal * 100)}</strong>. Es la parte de tu bruto que
+              no llega a tu cuenta. No incluye la cotización que paga la empresa: esa vive en el
+              capítulo 05.
+            </p>
+          </li>
+        </ol>
+
+        <p className="fs-body">
+          <strong>Por qué las tres líneas se separan.</strong> Con una escala progresiva, cada
+          tramo grava sólo la porción de base que cae dentro de él. La línea azul salta de golpe
+          cada vez que cruzas un tramo —por eso tiene escalones— mientras que las otras dos suben
+          despacio, porque reparten la factura entre todos tus euros, incluidos los primeros, que
+          apenas pagan. La distancia vertical entre ellas es exactamente la confusión que genera
+          decir «estoy en el tramo del {pct(nomina.tipoMargIRPF * 100, 0)}»: ese tipo sólo toca al
+          último euro, mientras que sobre el conjunto del sueldo pagas{' '}
+          <strong>{pct(nomina.tipoEfectivoIRPF * 100)}</strong> de IRPF.
+        </p>
+
+        <p className="fs-note" style={{ maxWidth: '72ch' }}>
+          Dos detalles que conviene ver en la propia curva: la línea azul <em>no</em> sube siempre —
+          en los salarios bajos tiene un pico, porque al retirarse la reducción del artículo 20 la
+          base crece más deprisa que el sueldo (es la figura siguiente)— y, pasada la base máxima
+          de cotización, deja de crecer por el lado de la Seguridad Social, así que a partir de ahí
+          el marginal lo mueve sólo el IRPF.
+        </p>
+      </div>
     </Figure>
   );
 }

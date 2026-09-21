@@ -21,13 +21,13 @@ const ORDEN = ['ssEmp', 'ssTra', 'irpf', 'neto'];
 /** Lo que hay que decir de cada destino, con su cifra dentro. */
 const TEXTO = {
   ssEmp: (n, e) =>
-    `${n} € de cada cien no aparecen en ningún sitio de tu nómina: son la cotización que la empresa paga a la Seguridad Social antes de escribir tu salario bruto. En euros de tu caso, ${e} al año.`,
+    `${n} € de cada cien corresponden a la cotización de la empresa a la Seguridad Social. No forman parte del salario bruto ni aparecen como descuento del trabajador. En este supuesto son ${e} al año.`,
   ssTra: (n, e) =>
-    `Otros ${n} € son tu propia cotización. Esos sí figuran en la nómina, como descuento: ${e} al año.`,
+    `${n} € corresponden a la cotización del trabajador. Figuran en la nómina como descuento y, en este supuesto, suman ${e} al año.`,
   irpf: (n, e) =>
-    `${n} € son IRPF retenido. Es la única parte de las tres que depende de tus circunstancias personales —hijos, comunidad, situación familiar— y la única que se ajusta en la declaración: ${e} al año.`,
+    `${n} € corresponden a la retención estimada de IRPF. Su importe depende de la renta y de las circunstancias incluidas en el cálculo; la liquidación definitiva se regulariza en la declaración. Aquí son ${e} al año.`,
   neto: (n, e) =>
-    `Quedan ${n} € de cada cien. Eso es lo que llega a la cuenta: ${e} al año. La distancia entre los cien de arriba y estos es la cuña fiscal.`,
+    `${n} € de cada cien constituyen la renta neta estimada: ${e} al año. La diferencia entre el coste laboral y esta cuantía es la cuña fiscal.`,
 };
 
 /**
@@ -118,6 +118,16 @@ export default function CampoCuna({ grupos, anio, bruto, nomina, vista, setVista
             </span>
           </div>
 
+          <div className="fs-keys fs-keys-night" style={{ marginBottom: 16 }} aria-label="Leyenda de componentes">
+            {orden.map(g => (
+              <span className="fs-key" key={g.key} style={{ cursor: 'default' }}>
+                <span className="fs-key-swatch" style={{ background: g.color }} />
+                {g.label}
+                <span className="fs-key-v">{g.value} / 100</span>
+              </span>
+            ))}
+          </div>
+
           <svg className="fs-svg" viewBox={`0 0 ${W} ${Math.max(H, alto + 26)}`} style={{ maxHeight: '58vh' }}>
             <Label x={X0} y={26} size={10} weight={800} color="var(--night-ink)" mono>
               {abierto ? 'CADA BLOQUE, EN SU DESTINO' : `100 BLOQUES · 100 € · ${eur(total)}`}
@@ -131,7 +141,7 @@ export default function CampoCuna({ grupos, anio, bruto, nomina, vista, setVista
                   className="fs-celda"
                   width={CELDA}
                   height={CELDA}
-                  fill={abierto ? c.color : '#5f686b'}
+                  fill={abierto ? c.color : 'var(--series-steel)'}
                   opacity={apagado ? 0.16 : 1}
                   style={{ transform: `translate(${round(abierto ? c.bx : c.mx)}px, ${round(abierto ? c.by : c.my)}px)` }}
                 />
