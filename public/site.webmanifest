@@ -1,0 +1,16 @@
+{
+  "name": "FiscalScope · Informe fiscal interactivo",
+  "short_name": "FiscalScope",
+  "description": "Presión fiscal en España: IRPF, salario neto y cuña fiscal, de 2012 a 2026.",
+  "lang": "es-ES",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#edebe4",
+  "theme_color": "#edebe4",
+  "categories": ["finance", "education", "news"],
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}

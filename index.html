@@ -3,33 +3,128 @@
   <!-- FiscalScope Nº 01 — informe fiscal interactivo -->
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Presión fiscal en España · IRPF, salario neto y cuña fiscal</title>
+    <meta name="description" content="Calcula tu salario neto y tu IRPF con los parámetros oficiales de cada año y compara la presión fiscal en España de 2012 a 2026, con la inflación descontada. Datos del BOE, AEAT, TGSS, INE y OCDE." />
+    <link rel="canonical" href="https://fiscalscope.info/" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <link rel="alternate" hreflang="es-ES" href="https://fiscalscope.info/" />
+    <link rel="alternate" hreflang="x-default" href="https://fiscalscope.info/" />
+    <meta name="author" content="FiscalScope" />
+    <meta name="application-name" content="FiscalScope" />
+
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./site.webmanifest" />
     <meta name="theme-color" content="#edebe4" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0e1214" media="(prefers-color-scheme: dark)" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <title>FiscalScope · Informe fiscal interactivo · España 2012—2026</title>
-    <meta name="description" content="Calcula tu nómina real, compara 15 años de reformas fiscales con la inflación descontada y descubre cómo los mecanismos ocultos del IRPF afectan a tu bolsillo. Datos oficiales del BOE, INE y TGSS." />
 
-    <!-- Open Graph (WhatsApp, Facebook, LinkedIn, Telegram) -->
-    <meta property="og:type"        content="website" />
-    <meta property="og:site_name"   content="FiscalScope" />
-    <meta property="og:title"       content="FiscalScope · Radiografía del IRPF en España" />
-    <meta property="og:description" content="Calcula tu nómina real, compara 15 años de reformas fiscales con la inflación descontada y descubre cómo el IRPF ha cambiado desde 2012." />
-    <meta property="og:image"       content="./og-image.png" />
-    <meta property="og:image:width"  content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt"   content="FiscalScope — Radiografía del IRPF en España 2012–2026" />
-    <meta property="og:locale"      content="es_ES" />
+    <!-- Open Graph · las URL tienen que ser absolutas o WhatsApp, Facebook,
+         LinkedIn y Telegram no encuentran la imagen al compartir el enlace. -->
+    <meta property="og:type"          content="website" />
+    <meta property="og:site_name"     content="FiscalScope" />
+    <meta property="og:url"           content="https://fiscalscope.info/" />
+    <meta property="og:title"         content="Presión fiscal en España · IRPF, salario neto y cuña fiscal" />
+    <meta property="og:description"   content="De cada 100 € que cuestas a tu empresa, ¿cuántos llegan a tu cuenta? Calcula tu nómina real y compara quince años de fiscalidad española con la inflación descontada." />
+    <meta property="og:image"         content="https://fiscalscope.info/og-image.png" />
+    <meta property="og:image:secure_url" content="https://fiscalscope.info/og-image.png" />
+    <meta property="og:image:type"    content="image/png" />
+    <meta property="og:image:width"   content="1200" />
+    <meta property="og:image:height"  content="630" />
+    <meta property="og:image:alt"     content="FiscalScope · de cada 100 € de coste laboral, cuántos llegan al trabajador en España" />
+    <meta property="og:locale"        content="es_ES" />
 
-    <!-- Twitter / X Card -->
-    <meta name="twitter:card"        content="summary_large_image" />
-    <meta name="twitter:title"       content="FiscalScope · Radiografía del IRPF en España" />
-    <meta name="twitter:description" content="Calcula tu nómina real, compara 15 años de reformas fiscales con la inflación descontada y descubre cómo el IRPF ha cambiado desde 2012." />
-    <meta name="twitter:image"       content="./og-image.png" />
-    <meta name="twitter:image:alt"   content="FiscalScope — Radiografía del IRPF en España 2012–2026" />
+    <!-- Twitter / X -->
+    <meta name="twitter:card"         content="summary_large_image" />
+    <meta name="twitter:url"          content="https://fiscalscope.info/" />
+    <meta name="twitter:title"        content="Presión fiscal en España · IRPF, salario neto y cuña fiscal" />
+    <meta name="twitter:description"  content="De cada 100 € que cuestas a tu empresa, ¿cuántos llegan a tu cuenta? Quince años de fiscalidad española, con la inflación descontada." />
+    <meta name="twitter:image"        content="https://fiscalscope.info/og-image.png" />
+    <meta name="twitter:image:alt"    content="FiscalScope · de cada 100 € de coste laboral, cuántos llegan al trabajador en España" />
+
+    <!-- Qué es esto, para que el buscador no tenga que adivinarlo -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://fiscalscope.info/#sitio",
+          "url": "https://fiscalscope.info/",
+          "name": "FiscalScope",
+          "alternateName": "FiscalScope · Informe fiscal interactivo",
+          "description": "Informe interactivo sobre la presión fiscal en España: IRPF, cotizaciones, cuña fiscal y distribución salarial entre 2012 y 2026.",
+          "inLanguage": "es-ES",
+          "publisher": { "@id": "https://fiscalscope.info/#editor" }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://fiscalscope.info/#editor",
+          "name": "FiscalScope",
+          "url": "https://fiscalscope.info/",
+          "logo": "https://fiscalscope.info/apple-touch-icon.png",
+          "description": "Proyecto independiente de divulgación fiscal, sin afiliación política."
+        },
+        {
+          "@type": "WebApplication",
+          "@id": "https://fiscalscope.info/#aplicacion",
+          "name": "Calculadora de IRPF y salario neto · FiscalScope",
+          "url": "https://fiscalscope.info/",
+          "applicationCategory": "FinanceApplication",
+          "operatingSystem": "Web",
+          "inLanguage": "es-ES",
+          "browserRequirements": "Requiere JavaScript",
+          "isAccessibleForFree": true,
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+          "description": "Calcula el salario neto, la retención de IRPF, las cotizaciones a la Seguridad Social y la cuña fiscal para cualquier salario bruto y cualquier ejercicio entre 2012 y 2026, con el detalle de cada operación y su norma.",
+          "featureList": [
+            "Cálculo del salario neto y la retención de IRPF",
+            "Desglose operación a operación con la norma aplicable",
+            "Tipo marginal y tipo efectivo sobre el mismo salario",
+            "Comparación de quince ejercicios con la inflación descontada",
+            "Cuña fiscal comparada con los 38 países de la OCDE",
+            "Percentil salarial dentro de la distribución española"
+          ]
+        },
+        {
+          "@type": "Dataset",
+          "@id": "https://fiscalscope.info/#datos",
+          "name": "Presión fiscal sobre las rentas del trabajo en España, 2012—2026",
+          "description": "Parámetros del IRPF, tipos de cotización, salario mínimo, distribución salarial, gasto público por funciones y deuda pública de España entre 2012 y 2026, aplicados al cálculo de nóminas.",
+          "url": "https://fiscalscope.info/",
+          "inLanguage": "es-ES",
+          "license": "https://creativecommons.org/licenses/by/4.0/",
+          "creator": { "@id": "https://fiscalscope.info/#editor" },
+          "temporalCoverage": "2012/2026",
+          "spatialCoverage": { "@type": "Place", "name": "España" },
+          "keywords": [
+            "presión fiscal",
+            "IRPF",
+            "salario neto",
+            "cuña fiscal",
+            "cotizaciones a la Seguridad Social",
+            "distribución salarial",
+            "fiscalidad España",
+            "salarios España",
+            "tipo marginal",
+            "tipo efectivo"
+          ],
+          "isBasedOn": [
+            { "@type": "CreativeWork", "name": "BOE — Ley 35/2006 del IRPF", "url": "https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764" },
+            { "@type": "CreativeWork", "name": "TGSS — Bases y tipos de cotización", "url": "https://www.seg-social.es/" },
+            { "@type": "CreativeWork", "name": "INE — Encuesta Anual de Estructura Salarial", "url": "https://www.ine.es/jaxiT3/Tabla.htm?t=28191" },
+            { "@type": "CreativeWork", "name": "OCDE — Taxing Wages", "url": "https://www.oecd.org/tax/taxing-wages.htm" },
+            { "@type": "CreativeWork", "name": "Banco de España — Deuda de las AAPP", "url": "https://www.bde.es/" }
+          ]
+        }
+      ]
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -1,0 +1,22 @@
+# FiscalScope · https://fiscalscope.info
+# Informe fiscal interactivo sobre el IRPF, las cotizaciones y la presión
+# fiscal en España. Todo el contenido es público y rastreable.
+
+User-agent: *
+Allow: /
+
+# Los modelos de lenguaje también pueden leerlo: el objetivo del informe es
+# que las cifras circulen, no encerrarlas.
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://fiscalscope.info/sitemap.xml

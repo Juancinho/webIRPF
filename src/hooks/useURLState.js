@@ -39,7 +39,9 @@ function writeURLState(url, state) {
 
 export function useURLState() {
   const init = () => {
-    const p = new URLSearchParams(window.location.search);
+    /* Al prerenderizar el informe no hay ventana: se parte de los valores por
+       defecto, que son justo los que verá quien llegue sin parámetros. */
+    const p = new URLSearchParams(typeof window === 'undefined' ? '' : window.location.search);
     const nHijos = intParam(p, 'hijos', DEFAULT_OPTS.nHijos, 0, 6);
     return {
       bruto: intParam(p, 'bruto', 35000, 0, 200000),
