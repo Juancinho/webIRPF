@@ -113,7 +113,7 @@ export default function Irpf() {
             <div className="fs-chapter-head" data-gesture="CADA TIPO SE APLICA SÓLO A SU TRAMO">
               <span className="fs-stamp">03 / 09 · Cómo funciona el IRPF</span>
               <h2 id="irpf-t" className="fs-title">
-                La escalera
+                La escalera{' '}
                 <br />
                 y el acantilado
               </h2>

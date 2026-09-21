@@ -189,7 +189,7 @@ export default function Nomina() {
             <div className="fs-chapter-head" data-gesture="BRUTO  −  COTIZACIÓN  −  IRPF  =  NETO">
               <span className="fs-stamp">01 / 09 · Tu nómina</span>
               <h2 id="nomina-t" className="fs-title">
-                Lo que ves
+                Lo que ves{' '}
                 <br />
                 en la nómina
               </h2>

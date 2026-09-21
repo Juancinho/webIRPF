@@ -128,7 +128,7 @@ export default function CampoCuna({ grupos, anio, bruto, nomina, vista, setVista
             ))}
           </div>
 
-          <svg className="fs-svg" viewBox={`0 0 ${W} ${Math.max(H, alto + 26)}`} style={{ maxHeight: '58vh' }}>
+          <svg className="fs-svg" role="img" aria-label="Cien euros de coste laboral, repartidos por destino" viewBox={`0 0 ${W} ${Math.max(H, alto + 26)}`} style={{ maxHeight: '58vh' }}>
             <Label x={X0} y={26} size={10} weight={800} color="var(--night-ink)" mono>
               {abierto ? 'CADA BLOQUE, EN SU DESTINO' : `100 BLOQUES · 100 € · ${eur(total)}`}
             </Label>

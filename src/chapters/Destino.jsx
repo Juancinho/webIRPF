@@ -96,7 +96,7 @@ export default function Destino() {
         <div className="fs-chapter-head" data-gesture="APORTACIÓN  →  GASTO PÚBLICO POR FUNCIONES">
           <span className="fs-stamp">07 / 09 · Gasto por funciones</span>
           <h2 id="destino-t" className="fs-title">
-            Cómo se distribuye
+            Cómo se distribuye{' '}
             <br />
             el gasto público
           </h2>

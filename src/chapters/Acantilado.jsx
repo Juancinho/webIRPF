@@ -398,7 +398,7 @@ function CienEuros() {
         </table>
       </div>
 
-      <svg className="fs-svg" viewBox="0 0 430 130" style={{ maxWidth: 430, marginTop: 22 }}>
+      <svg className="fs-svg" role="img" aria-label="Reparto de cien euros de subida bruta" viewBox="0 0 430 130" style={{ maxWidth: 430, marginTop: 22 }}>
         <HundredField groups={grupos} columns={20} size={14} gap={5} x={2} y={6} focus={focus} onFocus={setFocus} />
       </svg>
 

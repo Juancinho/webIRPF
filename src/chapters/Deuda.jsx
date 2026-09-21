@@ -79,7 +79,7 @@ export default function Deuda() {
         <div className="fs-chapter-head" data-gesture="SALDO ACUMULADO · EUROS · POR HABITANTE · % DEL PIB">
           <span className="fs-stamp">08 / 09 · La deuda</span>
           <h2 id="deuda-t" className="fs-title">
-            La deuda pública,
+            La deuda pública,{' '}
             <br />
             en varias escalas
           </h2>

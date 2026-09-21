@@ -165,7 +165,7 @@ export default function Cierre() {
           <div>
             <span className="fs-stamp">Tu resumen · {anio}</span>
             <h2 id="cierre-t" className="fs-title" style={{ marginTop: 14 }}>
-              Llévatelo
+              Llévatelo{' '}
               <br />
               contigo
             </h2>

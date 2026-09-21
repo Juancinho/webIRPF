@@ -45,7 +45,7 @@ export default function Cuna() {
         <div className="fs-chapter-head" data-gesture="COSTE LABORAL = NETO + IRPF + COTIZACIONES">
           <span className="fs-stamp">05 / 09 · La cuña fiscal</span>
           <h2 id="cuna-t" className="fs-title">
-            De cada 100 €
+            De cada 100 €{' '}
             <br />
             de coste laboral
           </h2>

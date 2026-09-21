@@ -144,7 +144,7 @@ export default function Historia() {
             <div className="fs-chapter-head" data-gesture="2012   2015   2019   2023   2026">
               <span className="fs-stamp">04 / 09 · Quince años de fiscalidad</span>
               <h2 id="historia-t" className="fs-title">
-                El mismo sueldo,
+                El mismo sueldo,{' '}
                 <br />
                 quince años
               </h2>

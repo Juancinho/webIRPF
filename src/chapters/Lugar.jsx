@@ -67,7 +67,7 @@ export default function Lugar() {
             <div className="fs-chapter-head" data-gesture={`PERCENTIL ${Math.round(percentil)} · POSICIÓN, NO RIQUEZA`}>
               <span className="fs-stamp">06 / 09 · Distribución salarial</span>
               <h2 id="lugar-t" className="fs-title">
-                Tu posición en la
+                Tu posición en la{' '}
                 <br />
                 distribución salarial
               </h2>

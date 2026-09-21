@@ -48,11 +48,11 @@ export default function Portada() {
 
         <div className="fs-cover-main">
           <h1 id="portada-t" className="fs-title">
-            Tu sueldo
+            Tu sueldo{' '}
             <br />
-            bajo el
+            bajo el{' '}
             <br />
-            microscopio
+            microscopio{' '}
             <br />
             fiscal
           </h1>

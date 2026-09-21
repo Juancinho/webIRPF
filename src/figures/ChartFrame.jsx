@@ -49,7 +49,15 @@ export default function ChartFrame({
       {...(zoom ? zoom.bind : {})}
       {...rest}
     >
-      <svg className="fs-svg" viewBox={viewBox} style={{ minWidth: scroll && narrow ? minWidth : undefined, ...style }}>
+      {/* El lienzo se nombra: sin esto llega sin identificar a un lector de
+          pantalla y a cualquier rastreador que mire el documento sin pintarlo. */}
+      <svg
+        className="fs-svg"
+        role="img"
+        aria-label={label}
+        viewBox={viewBox}
+        style={{ minWidth: scroll && narrow ? minWidth : undefined, ...style }}
+      >
         {children}
       </svg>
 

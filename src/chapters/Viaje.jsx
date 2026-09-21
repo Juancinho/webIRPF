@@ -58,7 +58,7 @@ export default function Viaje() {
         <div className="fs-chapter-head">
           <span className="fs-stamp">02 / 09 · El viaje de cada euro</span>
           <h2 id="viaje-t" className="fs-title">
-            Lo que cuestas
+            Lo que cuestas{' '}
             <br />
             y lo que te llega
           </h2>

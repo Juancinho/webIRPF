@@ -44,7 +44,7 @@ export default function Apendice() {
         <div className="fs-chapter-head" data-gesture="SUPUESTOS · PARÁMETROS · NORMAS · FUENTES · LÍMITES">
           <span className="fs-stamp">09 / 09 · Apéndice</span>
           <h2 id="apendice-t" className="fs-title">
-            Cómo está
+            Cómo está{' '}
             <br />
             calculado
           </h2>
