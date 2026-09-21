@@ -4,6 +4,7 @@ import { useFiscal } from '../state/fiscalContext';
 import { GASTO_COFOG } from '../engine/irpf';
 import Figure from '../figures/Figure';
 import Puente from '../figures/Puente';
+import Calendario from './Calendario';
 import ChartFrame from '../figures/ChartFrame';
 import { Label } from '../figures/marks';
 import { round } from '../figures/scale';
@@ -68,6 +69,15 @@ export default function Destino() {
         </div>
 
         <RioDeLosEuros />
+
+        <Puente rotulo="Lo mismo, contado en días">
+          El reparto anterior está en euros, y los euros se piensan mal. Hay otra forma de contar
+          exactamente la misma cifra: si la parte que no llega a tu cuenta se repartiera a lo largo
+          del año natural, habría <strong>una fecha</strong> en la que dejarías de trabajar para el
+          sistema y empezarías a cobrar para ti.
+        </Puente>
+
+        <Calendario />
 
         <Puente rotulo="Lo que todavía no se ha pagado">
           La clasificación funcional explica en qué se emplea el gasto, pero no cómo se financia

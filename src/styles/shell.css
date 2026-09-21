@@ -432,7 +432,7 @@
 
 @media (min-width: 900px) {
   .fs-cinta-inner {
-    grid-template-columns: minmax(230px, auto) minmax(140px, 1fr) auto;
+    grid-template-columns: minmax(216px, auto) minmax(168px, 1fr) auto;
     padding: 10px var(--gutter);
   }
 }
@@ -572,17 +572,29 @@
     min-width: 0;
   }
 
-  .fs-cinta-range {
+  /* la regla vive ahora envuelta para poder llevar sus referencias: es el
+     envoltorio, y no el input, el que ocupa la celda */
+  .fs-cinta-regla {
     grid-area: range;
     min-width: 0;
+    padding-bottom: 0;
+  }
+
+  .fs-cinta-range {
+    min-width: 0;
     height: 24px;
+  }
+
+  /* con 88 px de ancho no caben los rótulos de SMI y mediana */
+  .fs-cinta-marca {
+    display: none;
   }
 
   .fs-cinta-controls {
     grid-area: controls;
     justify-content: flex-start;
-    flex-wrap: nowrap;
-    gap: 5px;
+    flex-wrap: wrap;
+    gap: 6px 8px;
   }
 
   .fs-cinta-pair {
@@ -610,7 +622,13 @@
     padding: 7px 9px;
   }
 
+  @media (max-width: 1100px) {
   .fs-profile-label {
+    display: none;
+  }
+}
+
+.fs-profile-label {
     display: none;
   }
 }
@@ -717,4 +735,227 @@
   margin-top: clamp(34px, 5vh, 56px);
   border-top: 1px solid var(--rule);
   padding-top: 18px;
+}
+
+/* ══ LA CINTA, CON MÁS PRESENCIA ═══════════════════════════════════════════
+   Es el instrumento del que lee toda la publicación: tenía el contraste de
+   una nota al pie. */
+.fs-cinta {
+  border-top: 1px solid var(--ink);
+  box-shadow: 0 -1px 0 var(--rule-soft), 0 -14px 26px -22px rgba(22, 25, 27, 0.5);
+}
+
+.fs-cinta-k {
+  color: var(--ink-3);
+}
+
+.fs-cinta-v {
+  font-size: 19px;
+}
+
+.fs-cinta-v.is-net {
+  font-weight: 800;
+  letter-spacing: -0.015em;
+}
+
+.fs-cinta-note {
+  color: var(--ink-3);
+}
+
+/* ── la regla de sueldo: recorrido visible y dos referencias reales ────── */
+.fs-cinta-regla {
+  position: relative;
+  padding-bottom: 22px;
+}
+
+.fs-cinta-range::-webkit-slider-runnable-track {
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(
+    to right,
+    var(--signal) 0 var(--recorrido, 0%),
+    var(--ink-6) var(--recorrido, 0%) 100%
+  );
+}
+
+.fs-cinta-range::-moz-range-track {
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(
+    to right,
+    var(--signal) 0 var(--recorrido, 0%),
+    var(--ink-6) var(--recorrido, 0%) 100%
+  );
+}
+
+.fs-cinta-range::-webkit-slider-thumb {
+  width: 16px;
+  height: 16px;
+  margin-top: -6.5px;
+  border: 2px solid var(--bone-raised);
+  box-shadow: 0 0 0 1px var(--signal);
+}
+
+.fs-cinta-range::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--bone-raised);
+  box-shadow: 0 0 0 1px var(--signal);
+}
+
+.fs-cinta-range:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.fs-cinta-marca {
+  position: absolute;
+  bottom: 0;
+  transform: translateX(-50%);
+  pointer-events: none;
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+}
+
+.fs-cinta-marca::before {
+  content: '';
+  width: 1px;
+  height: 7px;
+  background: var(--ink-5);
+}
+
+.fs-cinta-marca.is-baja {
+  bottom: -11px;
+}
+
+.fs-cinta-marca.is-baja::before {
+  height: 18px;
+}
+
+.fs-cinta-marca b {
+  font-family: var(--mono);
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  white-space: nowrap;
+}
+
+/* ── el año: quince casillas, no un contador ──────────────────────────── */
+.fs-anios {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 11px 4px 10px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+}
+
+.fs-anios:focus-within {
+  border-color: var(--signal);
+}
+
+.fs-anios-regla {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 20px;
+}
+
+.fs-anios-regla button {
+  width: 9px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  display: grid;
+  align-content: end;
+  justify-items: center;
+}
+
+.fs-anios-regla button::after {
+  content: '';
+  width: 2px;
+  height: 9px;
+  border-radius: 1px;
+  background: var(--ink-6);
+  transition: height var(--t-ui) var(--ease), background var(--t-ui);
+}
+
+.fs-anios-regla button:hover::after {
+  background: var(--ink-3);
+  height: 13px;
+}
+
+.fs-anios-regla button.is-reforma::after {
+  background: var(--ink-4);
+  height: 13px;
+}
+
+.fs-anios-regla button.is-on::after {
+  background: var(--signal);
+  height: 20px;
+  width: 3px;
+}
+
+.fs-anios-regla button:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 1px;
+  border-radius: 2px;
+}
+
+.fs-anios-v {
+  font-family: var(--sans);
+  font-size: 16px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums lining-nums;
+  color: var(--ink);
+  min-width: 4ch;
+}
+
+@media (max-width: 899px) {
+  .fs-anios-regla button {
+    width: 12px;
+    height: 26px;
+  }
+  .fs-anios-regla {
+    height: 26px;
+  }
+}
+
+/* En pantalla estrecha los mandos se apilan en vez de aplastarse: la regleta
+   de años ocupa su propia fila y el resto cae debajo, entero. */
+.fs-cinta-controls > * {
+  flex: none;
+}
+
+@media (max-width: 719px) {
+  .fs-cinta-controls {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 8px 10px;
+  }
+  .fs-anios {
+    flex: 1 0 100%;
+    justify-content: space-between;
+  }
+  .fs-anios-regla {
+    flex: 1;
+    justify-content: space-between;
+  }
+}
+
+/* Las referencias de la regla sólo caben cuando la regla tiene ancho: por
+   debajo de 560 px comparte fila con las cifras y se quedan fuera. */
+@media (max-width: 560px) {
+  .fs-cinta-marca {
+    display: none;
+  }
+  .fs-cinta-regla {
+    padding-bottom: 0;
+  }
 }

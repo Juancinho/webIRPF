@@ -111,7 +111,9 @@ function Comparador({ serie, anioActual, bruto2026, setAnio }) {
                 <th scope="row">{k}</th>
                 <td>{va}</td>
                 <td>{vb}</td>
-                <td>{d === null ? '—' : sign(d)}</td>
+                <td className={d === null ? undefined : d < 0 ? 'is-neg' : 'is-pos'}>
+                  {d === null ? '—' : sign(d)}
+                </td>
               </tr>
             ))}
           </tbody>

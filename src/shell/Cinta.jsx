@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useFiscal } from '../state/fiscalContext';
-import { REGIONES } from '../engine/irpf';
+import { ANIOS, DISTRIBUCION_SALARIAL, REFORMA_ANIOS, REGIONES, SMI_ANUAL } from '../engine/irpf';
 import { dec, eur, num } from '../utils/format';
 
 /**
@@ -40,6 +40,16 @@ export default function Cinta({ visible }) {
   const pctCoste = nomina.costeLab > 0 ? (nomina.salarioNeto / nomina.costeLab) * 100 : 0;
   const setOpt = (k, v) => setOpts({ ...opts, [k]: v });
 
+  /* La regla de sueldo con dos referencias reales: sin ellas el mando es un
+     número abstracto y nadie sabe si 35.000 € es mucho o poco. */
+  const TOPE = 150000;
+  const posicion = v => `${Math.min(100, Math.max(0, (v / TOPE) * 100))}%`;
+  const smi = SMI_ANUAL[anio] || 0;
+  const mediana = DISTRIBUCION_SALARIAL[anio]?.p50 || 0;
+  const recorrido = Math.min(100, Math.max(0, (Math.min(bruto, TOPE) / TOPE) * 100));
+
+  const irAnio = paso => setAnio(Math.min(2026, Math.max(2012, anio + paso)));
+
   return (
     <>
       {perfilOpen && (
@@ -75,24 +85,69 @@ export default function Cinta({ visible }) {
             </div>
           </div>
 
-          <input
-            className="fs-cinta-range"
-            type="range"
-            min="0"
-            max="150000"
-            step="500"
-            value={Math.min(bruto, 150000)}
-            onChange={e => setBruto(+e.target.value)}
-            aria-label="Salario bruto anual"
-            aria-valuetext={`${num(bruto)} euros`}
-          />
+          <div className="fs-cinta-regla">
+            <input
+              className="fs-cinta-range"
+              type="range"
+              min="0"
+              max={TOPE}
+              step="500"
+              value={Math.min(bruto, TOPE)}
+              onChange={e => setBruto(+e.target.value)}
+              aria-label="Salario bruto anual"
+              aria-valuetext={`${num(bruto)} euros`}
+              style={{ '--recorrido': `${recorrido}%` }}
+            />
+            {/* SMI y mediana caen muy cerca en una escala de 0 a 150.000: van
+                en dos alturas distintas para no pisarse nunca. */}
+            {smi > 0 && (
+              <span className="fs-cinta-marca" style={{ left: posicion(smi) }} title={`SMI ${num(smi)} €`}>
+                <b>SMI</b>
+              </span>
+            )}
+            {mediana > 0 && (
+              <span
+                className="fs-cinta-marca is-baja"
+                style={{ left: posicion(mediana) }}
+                title={`Mediana salarial ${num(mediana)} €`}
+              >
+                <b>Mediana</b>
+              </span>
+            )}
+          </div>
 
           <div className="fs-cinta-controls">
-            <span className="fs-year">
-              <button type="button" onClick={() => setAnio(anio - 1)} disabled={anio <= 2012} aria-label="Año anterior">−</button>
-              <span className="fs-year-v" aria-live="polite">{anio}</span>
-              <button type="button" onClick={() => setAnio(anio + 1)} disabled={anio >= 2026} aria-label="Año siguiente">+</button>
-            </span>
+            <div
+              className="fs-anios"
+              role="group"
+              aria-label="Ejercicio fiscal"
+              onKeyDown={e => {
+                if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { irAnio(-1); e.preventDefault(); }
+                if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { irAnio(1); e.preventDefault(); }
+                if (e.key === 'Home') { setAnio(2012); e.preventDefault(); }
+                if (e.key === 'End') { setAnio(2026); e.preventDefault(); }
+              }}
+            >
+              <span className="fs-cinta-k">Año</span>
+              <span className="fs-anios-regla">
+                {ANIOS.map(a => (
+                  <button
+                    key={a}
+                    type="button"
+                    className={[
+                      a === anio ? 'is-on' : '',
+                      REFORMA_ANIOS.some(r => r.anio === a) ? 'is-reforma' : '',
+                    ].filter(Boolean).join(' ')}
+                    aria-pressed={a === anio}
+                    onClick={() => setAnio(a)}
+                    title={`Fiscalidad de ${a}`}
+                  >
+                    <span className="fs-sr">{a}</span>
+                  </button>
+                ))}
+              </span>
+              <span className="fs-anios-v" aria-live="polite">{anio}</span>
+            </div>
 
             <span className="fs-seg">
               {[12, 14].map(n => (
@@ -108,7 +163,7 @@ export default function Cinta({ visible }) {
             aria-expanded={perfilOpen}
             onClick={() => setPerfilOpen(o => !o)}
           >
-              Perfil<span className="fs-profile-label"> · {region.name}</span>
+              Perfil<span className="fs-profile-label"> · {region.name.split('/')[0].trim()}</span>
           </button>
           </div>
         </div>

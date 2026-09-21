@@ -80,7 +80,7 @@ export default function Apendice() {
         {/* ── B ─────────────────────────────────────────────────────────── */}
         <Seccion letra="B" titulo="Parámetros, 2012—2026">
           <div className="fs-table-scroll">
-            <table className="fs-table">
+            <table className="fs-table is-fija">
               <caption>
                 Escala, cotización y umbrales de cada ejercicio · euros nominales del año
               </caption>
@@ -177,7 +177,7 @@ export default function Apendice() {
         {/* ── E ─────────────────────────────────────────────────────────── */}
         <Seccion letra="E" titulo="Fuentes">
           <div className="fs-table-scroll">
-            <table className="fs-table">
+            <table className="fs-table is-texto">
               <caption>Cada parámetro del motor, con su norma de origen</caption>
               <thead>
                 <tr>

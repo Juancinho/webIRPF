@@ -471,7 +471,8 @@ function ComoFunciona() {
         <p className="fs-label" style={{ marginBottom: 10 }}>
           El caso más extremo de {anio}: una subida de 1.000 € sobre {eur(caso.b)}
         </p>
-        <table className="fs-table">
+        <div className="fs-table-scroll">
+          <table className="fs-table">
           <tbody>
             <tr>
               <th scope="row">Aumento del bruto</th>
@@ -499,6 +500,7 @@ function ComoFunciona() {
             </tr>
           </tbody>
         </table>
+        </div>
         <p className="fs-note" style={{ marginTop: 10, maxWidth: '68ch' }}>
           Mil euros brutos más dejan {eur(caso.dNeto)} netos: un tipo marginal del{' '}
           <strong>{pct((1 - caso.dNeto / 1000) * 100)}</strong>. La base sube {eur(caso.dBase)} —{' '}
