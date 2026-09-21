@@ -1254,3 +1254,200 @@
   text-align: right;
   padding-top: 5px;
 }
+
+/* ── FIG. 01 · la regla se anuncia ────────────────────────────────────────
+   Es el mando de toda la publicación. Hasta que se toca, el tirador respira;
+   después se queda quieto y no vuelve a llamar la atención. */
+.fs-regla:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 6px;
+  border-radius: 4px;
+}
+
+.fs-regla-tirador circle {
+  transition: r var(--t-ui) var(--ease);
+}
+
+.fs-regla:hover .fs-regla-tirador circle {
+  r: 13;
+}
+
+.fs-regla-tirador:not(.is-tocada) {
+  animation: fs-respira 2.4s var(--ease) infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes fs-respira {
+  0%, 70%, 100% { opacity: 1; transform: scale(1); }
+  35% { opacity: 0.82; transform: scale(1.14); }
+}
+
+/* ── el recálculo se ve, no salta ─────────────────────────────────────────
+   Al mover la regla o cambiar de año, las magnitudes viajan a su nuevo valor:
+   así se percibe cuánto han cambiado, no sólo que han cambiado. */
+.fs-anim-rect {
+  transition: x var(--t-value) var(--ease), width var(--t-value) var(--ease);
+}
+
+.fs-anim-text {
+  transition: x var(--t-value) var(--ease);
+}
+
+.fs-dfila-bar {
+  transition: left var(--t-value) var(--ease), width var(--t-value) var(--ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fs-regla-tirador:not(.is-tocada) {
+    animation: none;
+  }
+  .fs-anim-rect,
+  .fs-anim-text,
+  .fs-dfila-bar {
+    transition: none;
+  }
+}
+
+/* ══ EL CIERRE · la contraportada ══════════════════════════════════════════
+   Segunda —y última— inversión de la publicación. Después de veintitrés
+   figuras, una página que resume y se deja llevar. */
+.fs-cierre {
+  padding-bottom: clamp(88px, 13vh, 170px);
+}
+
+.fs-cierre-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(32px, 5vw, 64px);
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .fs-cierre-grid {
+    grid-template-columns: minmax(0, 0.85fr) minmax(360px, 0.9fr);
+  }
+}
+
+.fs-cierre-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 30px;
+}
+
+.fs-night .fs-btn {
+  color: var(--night-ink);
+  border-color: var(--night-rule);
+}
+
+.fs-night .fs-btn:hover {
+  border-color: var(--night-signal);
+  color: var(--night-signal);
+}
+
+.fs-btn-fuerte {
+  background: var(--night-signal);
+  border-color: var(--night-signal);
+  color: var(--night);
+}
+
+.fs-night .fs-btn-fuerte {
+  background: var(--night-signal);
+  border-color: var(--night-signal);
+  color: var(--night);
+}
+
+.fs-night .fs-btn-fuerte:hover {
+  background: var(--night-ink);
+  border-color: var(--night-ink);
+  color: var(--night);
+}
+
+/* la tarjeta: lo mismo que se descarga, compuesto en la página */
+.fs-tarjeta {
+  margin: 0;
+  padding: clamp(22px, 3vw, 34px);
+  border: 1px solid var(--night-rule);
+  background: #11161a;
+}
+
+.fs-tarjeta-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 1px solid var(--night-rule);
+  padding-bottom: 12px;
+  margin-bottom: 22px;
+}
+
+.fs-night .fs-tarjeta-head .fs-masthead-name {
+  color: var(--night-ink);
+}
+
+.fs-tarjeta-bruto {
+  font-family: var(--sans);
+  font-size: clamp(30px, 3.4vw, 44px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--night-ink);
+  margin: 2px 0 0;
+  white-space: nowrap;
+}
+
+.fs-tarjeta-neto {
+  font-family: var(--sans);
+  font-size: clamp(38px, 4.6vw, 62px);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1;
+  color: var(--night-signal);
+  margin: 2px 0 0;
+  white-space: nowrap;
+}
+
+.fs-tarjeta-cifras {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 20px;
+  margin: 26px 0 0;
+  padding: 18px 0 0;
+  border-top: 1px solid var(--night-rule);
+}
+
+.fs-tarjeta-cifras dt {
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+.fs-tarjeta-cifras dd {
+  margin: 4px 0 0;
+  font-family: var(--sans);
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--night-ink);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.fs-tarjeta-cien {
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid var(--night-rule);
+}
+
+/* ── apéndice: dos columnas donde la lectura lo agradece ─────────────────── */
+@media (min-width: 900px) {
+  .fs-cols-2 {
+    column-count: 2;
+    column-gap: clamp(28px, 4vw, 56px);
+  }
+  .fs-cols-2 > li,
+  .fs-cols-2 > div {
+    break-inside: avoid;
+  }
+}

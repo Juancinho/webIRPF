@@ -5,8 +5,9 @@ export const CAPITULOS = [
   { id: 'viaje', n: '02', titulo: 'El viaje de cada euro', desc: 'De coste laboral a renta neta' },
   { id: 'irpf', n: '03', titulo: 'Cómo funciona el IRPF', desc: 'Tramos, marginal y el acantilado' },
   { id: 'historia', n: '04', titulo: 'Quince años', desc: 'Mismo sueldo real, 2012–2026' },
-  { id: 'cuna', n: '05', titulo: 'La cuña fiscal', desc: 'De cada 100 € de coste laboral' },
+  { id: 'cuna', n: '05', titulo: 'La cuña fiscal', desc: 'De cada 100 € de coste laboral', noche: true },
   { id: 'lugar', n: '06', titulo: 'Tu lugar y tu parte', desc: 'La distribución y la deuda' },
+  { id: 'cierre', n: '·', titulo: 'Tu resumen', desc: 'La tarjeta para llevarte', noche: true, fueraDelRail: true },
   { id: 'apendice', n: '07', titulo: 'Apéndice', desc: 'Método, parámetros, normativa y fuentes' },
 ];
 

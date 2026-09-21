@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { useNumeroAnimado } from '../hooks/useNumeroAnimado';
 import { useFiscal } from '../state/fiscalContext';
 import { useSteps } from '../hooks/useChapters';
 import Figure from '../figures/Figure';
@@ -26,6 +27,7 @@ export default function Viaje() {
 
   const esAutonomo = nomina.regimen === 'autonomo';
   const total = Math.max(nomina.costeLab, 1);
+  const cotEmpAnimada = useNumeroAnimado(nomina.cotEmp);
   const w = v => Math.max(0, (v / total) * MAXW);
 
   // the cash spine: every drop below is money that actually leaves
@@ -226,7 +228,7 @@ export default function Viaje() {
 
       <div className="fs-page">
         <p className="fs-statement fs-statement-rule fs-statement-neg" style={{ marginTop: 40, maxWidth: '16ch' }}>
-          {num(nomina.cotEmp)} <span className="fs-u fs-u-neg">€</span>
+          {num(cotEmpAnimada)} <span className="fs-u fs-u-neg">€</span>
         </p>
         <p className="fs-title-sm" style={{ marginTop: 16, maxWidth: '22ch' }}>
           nunca aparecen

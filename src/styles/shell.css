@@ -191,6 +191,7 @@
 }
 
 .fs-rail-nav a {
+  position: relative;
   font-family: var(--mono);
   font-size: 10.5px;
   letter-spacing: 0.08em;
@@ -216,17 +217,48 @@
   color: var(--ink);
 }
 
+.fs-rail-nav.is-night a {
+  color: var(--night-rule);
+}
+
+.fs-rail-nav.is-night a:hover,
+.fs-rail-nav.is-night a.is-on {
+  color: var(--night-ink);
+}
+
+.fs-rail-nav.is-night a.is-on::before {
+  background: var(--night-signal);
+}
+
+.fs-rail-nav.is-night a .fs-rail-label {
+  background: var(--night);
+}
+
 .fs-rail-nav a.is-on::before {
   width: 20px;
   background: var(--signal);
 }
 
+/* El rótulo se sale del flujo: si ocupa ancho —aunque sea invisible— el raíl
+   mide 190 px y se monta encima de las notas del margen. */
 .fs-rail-nav a .fs-rail-label {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 8px;
+  padding: 2px 6px;
+  background: var(--bone);
   opacity: 0;
+  pointer-events: none;
   transition: opacity var(--t-ui);
   white-space: nowrap;
   text-transform: uppercase;
   font-size: 9.5px;
+}
+
+.fs-night .fs-rail-nav a .fs-rail-label {
+  background: var(--night);
 }
 
 .fs-rail-nav:hover a .fs-rail-label,

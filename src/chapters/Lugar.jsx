@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useNumeroAnimado } from '../hooks/useNumeroAnimado';
 import { useFiscal } from '../state/fiscalContext';
 import {
   ANIOS,
@@ -27,6 +28,8 @@ import { dec, eur, pct } from '../utils/format';
 export default function Lugar() {
   const { bruto, anio, percentil } = useFiscal();
   const dist = DISTRIBUCION_SALARIAL[anio];
+
+  const percentilAnimado = useNumeroAnimado(percentil);
 
   return (
     <section id="lugar" className="fs-chapter" aria-labelledby="lugar-t">
@@ -84,7 +87,7 @@ export default function Lugar() {
             </div>
 
             <p className="fs-statement fs-statement-rule fs-signal" style={{ maxWidth: '10ch' }}>
-              {Math.round(percentil)}
+              {Math.round(percentilAnimado)}
               <span className="fs-u fs-u-muted" style={{ fontSize: '0.3em', letterSpacing: '0.1em' }}> DE 100</span>
             </p>
             <p className="fs-body" style={{ marginTop: 12, marginBottom: 36 }}>

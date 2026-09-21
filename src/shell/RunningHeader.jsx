@@ -13,7 +13,7 @@ export default function RunningHeader({ active, progress, visible, anio, onIndic
         <span className="fs-running-name">FiscalScope</span>
 
         <span className="fs-running-chapter">
-          {cap.n} / {cap.titulo}
+          {cap.n === '·' ? cap.titulo : `${cap.n} / ${cap.titulo}`}
         </span>
 
         <span style={{ display: 'flex', alignItems: 'center', gap: 16 }}>

@@ -15,6 +15,7 @@ import Irpf from './chapters/Irpf';
 import Historia from './chapters/Historia';
 import Cuna from './chapters/Cuna';
 import Lugar from './chapters/Lugar';
+import Cierre from './chapters/Cierre';
 import Apendice from './chapters/Apendice';
 import './styles/paper.css';
 import './styles/figures.css';
@@ -79,6 +80,7 @@ function Publicacion() {
         <Historia />
         <Cuna />
         <Lugar />
+        <Cierre />
         <Apendice />
       </main>
 

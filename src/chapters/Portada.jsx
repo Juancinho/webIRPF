@@ -1,6 +1,7 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useFiscal } from '../state/fiscalContext';
 import { useNarrow } from '../hooks/useNarrow';
+import { useNumeroAnimado } from '../hooks/useNumeroAnimado';
 import { linear, clamp, round } from '../figures/scale';
 import { TickFloor, Label, HundredField } from '../figures/marks';
 import { dec, eur, num } from '../utils/format';
@@ -23,6 +24,8 @@ export default function Portada() {
     { key: 'neto', label: 'Llega como renta neta', value: Math.round(pctCoste), color: 'var(--ink)' },
     { key: 'resto', label: 'IRPF y cotizaciones', value: 100 - Math.round(pctCoste), color: 'var(--ink-6)' },
   ];
+
+  const netoAnimado = useNumeroAnimado(nomina.salarioNeto);
 
   return (
     <section id="portada" className="fs-chapter fs-cover" aria-labelledby="portada-t">
@@ -70,7 +73,7 @@ export default function Portada() {
             <div style={{ marginTop: 26, display: 'flex', flexWrap: 'wrap', gap: '24px 44px', alignItems: 'flex-end' }}>
               <div>
                 <p className="fs-label" style={{ marginBottom: 4 }}>Neto anual</p>
-                <p className="fs-data-md fs-signal num" style={{ margin: 0 }}>{eur(nomina.salarioNeto)}</p>
+                <p className="fs-data-md fs-signal num" style={{ margin: 0 }}>{eur(netoAnimado)}</p>
                 <p className="fs-note" style={{ marginTop: 6 }}>
                   {eur(porPaga)} al mes · {pagas} pagas
                 </p>
@@ -109,6 +112,9 @@ export default function Portada() {
  */
 function Regla({ bruto, setBruto, narrow, nota }) {
   const svgRef = useRef(null);
+  // La regla es el mando de toda la publicación y no lo parecía: hasta que se
+  // toca, el tirador respira y una pista dice qué hacer con él.
+  const [tocada, setTocada] = useState(false);
 
   const W = narrow ? 300 : 720;
   const H = narrow ? 360 : 132;
@@ -143,7 +149,7 @@ function Regla({ bruto, setBruto, narrow, nota }) {
   return (
     <svg
       ref={svgRef}
-      className="fs-svg"
+      className="fs-svg fs-regla"
       viewBox={`0 0 ${W} ${H}`}
       role="slider"
       tabIndex={0}
@@ -154,12 +160,13 @@ function Regla({ bruto, setBruto, narrow, nota }) {
       aria-valuetext={`${num(bruto)} euros brutos anuales`}
       onPointerDown={e => {
         e.currentTarget.setPointerCapture(e.pointerId);
+        setTocada(true);
         fromPointer(e);
       }}
       onPointerMove={e => {
         if (e.buttons === 1) fromPointer(e);
       }}
-      onKeyDown={onKeyDown}
+      onKeyDown={e => { setTocada(true); onKeyDown(e); }}
       style={{
         marginTop: 18,
         cursor: narrow ? 'ns-resize' : 'ew-resize',
@@ -190,8 +197,23 @@ function Regla({ bruto, setBruto, narrow, nota }) {
             </Label>
           ))}
 
+          <line x1={AXIS} y1={A0} x2={AXIS} y2={round(marca)} stroke="var(--signal)" strokeWidth={2.5} />
+
           <line x1={AXIS - 16} y1={round(marca)} x2={AXIS + 46} y2={round(marca)} stroke="var(--signal)" strokeWidth={1.5} />
-          <circle cx={AXIS} cy={round(marca)} r={5} fill="var(--signal)" />
+          <g className={`fs-regla-tirador ${tocada ? 'is-tocada' : ''}`}>
+            <circle cx={AXIS} cy={round(marca)} r={11} fill="var(--bone)" stroke="var(--signal)" strokeWidth={1.5} />
+            {[-3, 0, 3].map(d => (
+              <line
+                key={d}
+                x1={AXIS - 4}
+                y1={round(marca) + d}
+                x2={AXIS + 4}
+                y2={round(marca) + d}
+                stroke="var(--signal)"
+                strokeWidth={1}
+              />
+            ))}
+          </g>
           <Label x={AXIS + 52} y={round(marca) + 3.5} size={10} color="var(--signal)" mono>
             {nota}
           </Label>
@@ -214,8 +236,29 @@ function Regla({ bruto, setBruto, narrow, nota }) {
             </Label>
           ))}
 
+          {/* el rastro: cuánto de la escala llevas recorrido */}
+          <line x1={A0} y1={AXIS} x2={round(marca)} y2={AXIS} stroke="var(--signal)" strokeWidth={2.5} />
+
           <line x1={round(marca)} y1={AXIS - 42} x2={round(marca)} y2={AXIS + 8} stroke="var(--signal)" strokeWidth={1.5} />
-          <circle cx={round(marca)} cy={AXIS} r={5} fill="var(--signal)" />
+          <g className={`fs-regla-tirador ${tocada ? 'is-tocada' : ''}`}>
+            <circle cx={round(marca)} cy={AXIS} r={11} fill="var(--bone)" stroke="var(--signal)" strokeWidth={1.5} />
+            {[-3, 0, 3].map(d => (
+              <line
+                key={d}
+                x1={round(marca) + d}
+                y1={AXIS - 4}
+                x2={round(marca) + d}
+                y2={AXIS + 4}
+                stroke="var(--signal)"
+                strokeWidth={1}
+              />
+            ))}
+          </g>
+          {!tocada && (
+            <Label x={marca} y={AXIS + 42} size={9.5} color="var(--signal)" anchor="middle" mono>
+              ← ARRASTRA PARA CAMBIAR TU SUELDO →
+            </Label>
+          )}
           <Label
             x={marca}
             y={AXIS - 50}

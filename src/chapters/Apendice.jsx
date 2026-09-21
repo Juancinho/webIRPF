@@ -226,7 +226,7 @@ export default function Apendice() {
 
         {/* ── F ─────────────────────────────────────────────────────────── */}
         <Seccion letra="F" titulo="Limitaciones">
-          <ul className="fs-body" style={{ paddingLeft: '1.1em' }}>
+          <ul className="fs-body fs-cols-2" style={{ paddingLeft: '1.1em', maxWidth: 'none' }}>
             <li>
               Es una herramienta orientativa de divulgación, no asesoramiento fiscal ni un
               simulador oficial. No sustituye al borrador de la AEAT.

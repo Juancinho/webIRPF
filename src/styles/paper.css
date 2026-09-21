@@ -177,7 +177,10 @@ input,
 .fs-data {
   font-family: var(--sans);
   font-weight: 800;
-  font-size: clamp(48px, 11vw, 168px);
+  /* la cifra y su unidad no se separan nunca: el € huérfano en la línea de
+     abajo era lo primero que se veía al entrar */
+  white-space: nowrap;
+  font-size: clamp(44px, 8.4vw, 140px);
   line-height: 0.9;
   letter-spacing: -0.035em;
   color: var(--ink);
@@ -224,10 +227,19 @@ input,
 }
 
 /* ── page canvas ──────────────────────────────────────────────────────────── */
+/* Entre 1280 y 1580 px el raíl de capítulos vive en el margen izquierdo y no
+   cabe: ahí la página le cede sitio. Por encima, el propio centrado de la caja
+   de 1500 px ya deja hueco y el margen vuelve a ser simétrico. */
+@media (min-width: 1280px) and (max-width: 1579px) {
+  :root {
+    --gutter-izq: 92px;
+  }
+}
+
 .fs-page {
   max-width: var(--page-max);
   margin: 0 auto;
-  padding: 0 var(--gutter);
+  padding: 0 var(--gutter) 0 var(--gutter-izq, var(--gutter));
 }
 
 .fs-chapter {
@@ -319,7 +331,7 @@ input,
 .fs-bleed {
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
-  padding: 0 var(--gutter);
+  padding: 0 var(--gutter) 0 var(--gutter-izq, var(--gutter));
   width: 100vw;
 }
 

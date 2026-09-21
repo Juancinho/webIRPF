@@ -263,9 +263,10 @@ export default function Nomina() {
                         />
                       )}
 
-                      <rect x={round(seg.x)} y={BAR_Y} width={round(seg.ancho)} height={BAR_H} fill={seg.color} rx={2} />
+                      <rect className="fs-anim-rect" x={round(seg.x)} y={BAR_Y} width={round(seg.ancho)} height={BAR_H} fill={seg.color} rx={2} />
                       {seg.ancho > 44 && (
                         <text
+                          className="fs-anim-text"
                           x={round(centro)}
                           y={BAR_Y + BAR_H / 2 + 5}
                           fontSize={14}

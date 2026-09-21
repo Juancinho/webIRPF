@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useNumeroAnimado } from '../hooks/useNumeroAnimado';
 import { useFiscal } from '../state/fiscalContext';
 import Figure from '../figures/Figure';
 import ChartFrame from '../figures/ChartFrame';
@@ -282,6 +283,7 @@ function CampoCien({ x, y, llenos, color, cols = 25, size = 12, gap = 4 }) {
 function Poster({ marginal, nomina }) {
   const marg = marginal.tipoMarginalIRPF * 100;
   const efe = nomina.tipoEfectivoIRPF * 100;
+  const margAnimado = useNumeroAnimado(marg);
   const nEfe = Math.max(0, Math.min(100, Math.round(efe)));
   const nMarg = Math.max(0, Math.min(100, Math.round(marg)));
 
@@ -304,7 +306,7 @@ function Poster({ marginal, nomina }) {
       <div style={{ display: 'grid', gap: 28, gridTemplateColumns: 'minmax(0, 1fr)' }}>
         <div>
           <p className="fs-statement fs-statement-rule fs-statement-neg fs-counter" style={{ maxWidth: '14ch' }}>
-            {pct(marg)}
+            {pct(margAnimado)}
           </p>
           <p className="fs-title-sm" style={{ marginTop: 14, maxWidth: '18ch' }}>
             no es lo que pagas
