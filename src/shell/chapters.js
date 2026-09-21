@@ -1,6 +1,6 @@
 /** The publication's table of contents — ten movements, one argument. */
 export const CAPITULOS = [
-  { id: 'portada', n: '00', titulo: 'Portada', desc: 'La regla que gobierna todo el papel', preview: 'ruler' },
+  { id: 'portada', n: '00', titulo: 'Portada', desc: 'La regla que gobierna todo el informe', preview: 'ruler' },
   { id: 'nomina', n: '01', titulo: 'Tu nómina', desc: 'Qué conceptos separan el bruto del neto', preview: 'split' },
   { id: 'viaje', n: '02', titulo: 'El coste completo', desc: 'Del coste laboral a la renta neta', preview: 'flow' },
   { id: 'irpf', n: '03', titulo: 'Cómo funciona el IRPF', desc: 'Base, tramos, tipos y reducción del art. 20', preview: 'steps' },

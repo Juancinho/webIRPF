@@ -119,9 +119,13 @@ export default function Historia() {
             <div className="fs-rail-item">
               <span className="fs-stamp">Nota 03</span>
               <p className="fs-note">
-                Comparar importes nominales de 2012 y 2026 no permite separar cambios fiscales de
-                cambios en el nivel de precios. Aquí se fija el poder adquisitivo: {eur(bruto2026)} de 2026 equivalen a{' '}
-                {eur(serie[0].nominal)} de 2012.
+                El poder adquisitivo se fija: {eur(bruto2026)} de 2026 equivalen a{' '}
+                {eur(serie[0].nominal)} de 2012. IPC de diciembre, INE; 2026 es estimación.
+              </p>
+              <p className="fs-source">
+                <a href="https://www.ine.es/varipc/" target="_blank" rel="noreferrer noopener">
+                  INE — Variación del IPC
+                </a>
               </p>
             </div>
             <div className="fs-rail-item">
@@ -132,18 +136,6 @@ export default function Historia() {
                 2019 · ampliación del art. 20
                 <br />
                 2023 · MEI y tramo del 47 %
-              </p>
-            </div>
-            <div className="fs-rail-item">
-              <span className="fs-stamp">Fuente</span>
-              <p className="fs-note">
-                IPC de diciembre, INE. El dato de 2026 es una estimación hasta que el INE publique
-                el cierre del año.
-              </p>
-              <p className="fs-source">
-                <a href="https://www.ine.es/varipc/" target="_blank" rel="noreferrer noopener">
-                  INE — Variación del IPC
-                </a>
               </p>
             </div>
           </aside>
@@ -612,7 +604,7 @@ function Atlas({ anio, bruto2026, elegirAnio }) {
           : 'La carga real del IRPF por nivel de renta, año a año'
       }
       sub={`${medida === 'neto' ? 'Euros constantes de 2026' : modo === 'real' ? 'Euros constantes de 2026' : 'Euros nominales de cada año'} · perfil estándar: individual, sin hijos, escala estatal`}
-      legend="Año en curso en petróleo · años seleccionados en tonos minerales · contexto en gris · al pasar el cursor, la lectura se ordena de mayor a menor"
+      legend="Año en curso en verde · años comparados en gris oscuro · contexto en gris · al pasar el cursor, la lectura se ordena de mayor a menor"
       source="Fuente · cálculo propio sobre parámetros BOE · IPC INE"
       summary={`Curvas de ${medida === 'neto' ? 'salario neto' : 'tipo efectivo de IRPF'} para ${ANIOS.length} años entre ${eur(xs[0])} y ${eur(xs[xs.length - 1])} de bruto.`}
     >

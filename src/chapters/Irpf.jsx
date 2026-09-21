@@ -75,8 +75,7 @@ export default function Irpf() {
             <div className="fs-rail-item">
               <span className="fs-stamp">Nota 02</span>
               <p className="fs-note">
-                El tipo marginal y el tipo efectivo miden cosas distintas. El marginal se aplica al
-                siguiente euro que ganas; el efectivo es el resultado sobre el total.
+                El marginal se aplica al euro siguiente; el efectivo, al sueldo entero.
               </p>
             </div>
             {activa && (
@@ -85,9 +84,8 @@ export default function Irpf() {
                 <p className="fs-note">
                   De {eur(activa.desde)} a {Number.isFinite(activa.hasta) ? eur(activa.hasta) : '∞'}
                   <br />
-                  Tu base dentro de este tramo: <strong>{eur(activa.dentro)}</strong>
-                  <br />
-                  Cuota que genera: <strong>{eur(activa.cuota)}</strong>
+                  Tu base dentro: <strong>{eur(activa.dentro)}</strong> · cuota{' '}
+                  <strong>{eur(activa.cuota)}</strong>
                 </p>
               </div>
             )}
@@ -95,8 +93,8 @@ export default function Irpf() {
               <span className="fs-stamp">Escala aplicada</span>
               <p className="fs-note">
                 {anio >= 2024
-                  ? 'Escala combinada estatal + autonómica del perfil seleccionado.'
-                  : 'Escala estatal estándar; antes de 2024 las divergencias autonómicas eran menores.'}
+                  ? 'Estatal + autonómica, según el perfil.'
+                  : 'Estatal estándar: antes de 2024 las divergencias autonómicas eran menores.'}
               </p>
               <p className="fs-source">
                 Fuente ·{' '}

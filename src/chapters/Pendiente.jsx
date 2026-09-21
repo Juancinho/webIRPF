@@ -116,7 +116,7 @@ export default function Pendiente({ anios, anioA, anioB, onAnioA, onAnioB }) {
       id="16"
       title={titular}
       sub={`Los quince ejercicios completos · cada línea es una altura fija de la escala, en euros constantes de ${ULTIMO} · la altura es el tipo efectivo total`}
-      legend="Una línea que sube es más presión fiscal sobre el mismo poder de compra; una que baja, menos · las dos verticales son los años que has elegido comparar · la línea en petróleo es la altura más cercana a tu sueldo"
+      legend="Una línea que sube es más presión fiscal sobre el mismo poder de compra; una que baja, menos · las dos verticales son los años que has elegido comparar · la línea verde es la altura más cercana a tu sueldo"
       source="Fuente · cálculo propio con los parámetros de cada año · IPC INE para reexpresar los niveles"
       note="El tipo efectivo total incluye IRPF y cotización del trabajador sobre el salario bruto, con el perfil que tengas seleccionado. Los nueve niveles son cortes fijos elegidos para cubrir la escala, no percentiles ni casos representativos, y por eso la figura compara fiscalidades, no personas. El selector no recorta la serie: elige el tramo que se mide en la columna de la derecha."
       summary={lineas

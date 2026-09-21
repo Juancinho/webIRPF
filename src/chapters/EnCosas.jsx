@@ -151,7 +151,7 @@ export default function EnCosas({ bruto2026, anios, anioA, anioB, onAnioA, onAni
       id="18"
       title={`El mismo sueldo daba para ${dec(filaA.unidades, 1)} ${u.enTitulo} en ${filaA.anio} y para ${dec(filaB.unidades, 1)} en ${filaB.anio}`}
       sub={`${eur(bruto2026)} constantes de 2026 · ${u.plural} · ${u.nota}`}
-      legend={`Están los ${AÑOS.length} ejercicios · azul = año A, petróleo = año B, gris = el resto · cada figura es ${u.singular === 'm² comprado' ? 'un metro cuadrado' : `${u.singular}`} · van de cinco en cinco para poder contarlas`}
+      legend={`Están los ${AÑOS.length} ejercicios · azul = año A, verde = año B, gris = el resto · cada figura es ${u.singular === 'm² comprado' ? 'un metro cuadrado' : `${u.singular}`} · van de cinco en cinco para poder contarlas`}
       source={`Fuente · ${unidad === 'smi' ? 'BOE — SMI de cada ejercicio' : PRECIOS_REFERENCIA.fuente} · cálculo propio`}
       note="Cada fila se mueve por dos motivos a la vez: lo que la fiscalidad dejó en tu bolsillo ese año y lo que costaba esa cosa ese año. El sueldo de partida es siempre el mismo en poder adquisitivo general; lo que cambia es el precio relativo de lo que compras. La serie llega hasta 2025 porque es el último ejercicio cerrado con precios publicados."
       summary={`${filaA.anio}: ${dec(filaA.unidades, 1)}; ${filaB.anio}: ${dec(filaB.unidades, 1)}; diferencia: ${dec(diferencia, 1)}.`}

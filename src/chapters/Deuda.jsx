@@ -180,7 +180,7 @@ function Serie({ anioActual }) {
       id="28"
       title={`${nombre[0].toUpperCase()}${nombre.slice(1)}: ${formatoMetrica(valorSerie(ultimo, metrica, modo), metrica)} en 2026 (estimación)`}
       sub={`España · 2012—2025 observado · 2026 estimado · ${unidad} · selecciona una magnitud para evitar superponer unidades distintas`}
-      legend="Una marca por año · líneas verticales = distancia al cero · petróleo = año seleccionado · pasa el cursor para inspeccionar"
+      legend="Una marca por año · líneas verticales = distancia al cero · verde = año seleccionado · pasa el cursor para inspeccionar"
       source={<FuenteDeuda ipc poblacion />}
       note="La serie real multiplica cada importe nominal por el factor de IPC que lo expresa en euros de 2026. La ratio deuda/PIB no se deflacta: ya relaciona dos magnitudes nominales del mismo ejercicio. El PIB mostrado se infiere del saldo y de la ratio. El punto de 2026 es una estimación, no un cierre anual observado."
       summary={SERIE.map(d => `${d.anio}: ${formatoMetrica(valorSerie(d, metrica, modo), metrica)}`).join('; ')}
@@ -421,7 +421,7 @@ function TuParte({ anio, irpf }) {
       id="30"
       title={anios ? `La deuda por habitante equivale a ${dec(anios)} años de tu IRPF anual` : 'Sin IRPF positivo no existe una equivalencia anual comparable'}
       sub={`${anio}${anio === 2026 ? ' · estimación' : ''} · ${modo === 'real' ? 'euros constantes de 2026' : 'euros corrientes'} · deuda por habitante ${eur(deuda)} frente a IRPF anual ${eur(irpfComparable)}`}
-      legend={`Un bloque = ${eur(UNIT)} · arriba, deuda por habitante; abajo, tu IRPF de un año · los bloques en petróleo son la parte que cubrirían los ${anioSel} ${anioSel === 1 ? 'año' : 'años'} elegidos abajo`}
+      legend={`Un bloque = ${eur(UNIT)} · arriba, deuda por habitante; abajo, tu IRPF de un año · los bloques verdes son la parte que cubrirían los ${anioSel} ${anioSel === 1 ? 'año' : 'años'} elegidos abajo`}
       source={<FuenteDeuda ipc poblacion />}
       note={`Es una comparación de escala, no una asignación individual de deuda ni una previsión de amortización. La deuda se sostiene y refinancia con el conjunto de ingresos y activos de la economía; el IRPF de una persona es sólo una referencia cuantitativa.${anio === 2026 ? ' Para 2026, la deuda y la población proceden de la estimación incorporada al modelo.' : ''}`}
       summary={`Deuda por habitante ${eur(deuda)}; IRPF anual comparable ${eur(irpfComparable)}.`}
@@ -502,7 +502,7 @@ function TuParte({ anio, irpf }) {
         </div>
         <p className="fs-note" style={{ marginTop: 10, maxWidth: '70ch' }}>
           {restante > 0
-            ? `Los bloques en petróleo de la fila de arriba son la parte que quedaría cubierta: ${anioSel} ${anioSel === 1 ? 'año entero' : 'años enteros'} de tu IRPF ${anioSel === 1 ? 'llega' : 'llegan'} hasta ahí. Harían falta ${anios ? dec(anios) : '—'} años para llegar al final.`
+            ? `Los bloques verdes de la fila de arriba son la parte que quedaría cubierta: ${anioSel} ${anioSel === 1 ? 'año entero' : 'años enteros'} de tu IRPF ${anioSel === 1 ? 'llega' : 'llegan'} hasta ahí. Harían falta ${anios ? dec(anios) : '—'} años para llegar al final.`
             : `Con ${anioSel} ${anioSel === 1 ? 'año' : 'años'} ya está cubierta entera: bastaban ${anios ? dec(anios) : '—'}. Sigue siendo una comparación de escala, no una deuda que te corresponda pagar.`}
         </p>
       </div>

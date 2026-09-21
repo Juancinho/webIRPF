@@ -119,14 +119,6 @@ export default function Destino() {
                 gasto por finalidad —sanidad, pensiones, defensa— en vez de por quién lo ejecuta.
               </p>
             </div>
-            <div className="fs-rail-item">
-              <span className="fs-stamp">El límite del método</span>
-              <p className="fs-note">
-                Los ingresos públicos no están afectados: ningún impuesto concreto financia una
-                función concreta. Lo que se dibuja es una correspondencia proporcional, no un
-                seguimiento contable.
-              </p>
-            </div>
           </aside>
 
           <div className="fs-field">

@@ -72,7 +72,7 @@ export default function Monedas({ bruto2026, elegirAnio }) {
           : `Con el mismo sueldo real, hoy pagas menos que en ningún otro año`
       }
       sub={`${eur(bruto2026)} constantes de 2026 · una ficha = ${eur(unidad)} · sólo lo que sale de tu nómina: IRPF y cotización del trabajador`}
-      legend={`Fichas oscuras = IRPF · fichas petróleo = cotización del trabajador · van de cinco en cinco · la unidad se ajusta al nivel salarial para reservar las columnas de año y total`}
+      legend={`Fichas oscuras = IRPF · fichas verdes = cotización del trabajador · van de cinco en cinco · la unidad se ajusta al nivel salarial para reservar las columnas de año y total`}
       source="Fuente · cálculo propio · IPC INE"
       note={`No incluye la cotización que paga la empresa, que no aparece como descuento en la nómina aunque forme parte del coste laboral; esa parte se mide en el capítulo 05. Las fichas son una cuantización visual: por el redondeo, la fila puede diferir del total exacto en menos de ${eur(unidad)}.`}
       summary={serie.map(s => `${s.anio}: ${eur(s.total)}`).join('; ')}

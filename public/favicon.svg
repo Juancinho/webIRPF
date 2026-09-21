@@ -1,14 +1,25 @@
-<?xml version="1.0" ?>
-<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
-<svg width="800px" height="800px" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-<defs>
-<style>.cls-1{fill:none;}.cls-2{fill:#02a0e1;}.cls-3{fill:#bdeeff;}</style>
-</defs>
-<title/>
-<g id="diagram">
-<rect class="cls-1" height="32" id="wrapper" width="32"/>
-<path class="cls-2" d="M16,29.89h-.54a13.91,13.91,0,0,1-.65-27.76,2,2,0,0,1,1.55.53A2,2,0,0,1,17,4.11V15H27.89a2,2,0,0,1,1.46.64,2,2,0,0,1,.53,1.55h0A13.89,13.89,0,0,1,16,29.89ZM15,4.11A11.9,11.9,0,0,0,4.12,16.44,12.1,12.1,0,0,0,15.56,27.88,11.89,11.89,0,0,0,27.89,17s0,0,0,0H17a2,2,0,0,1-2-2Z"/>
-<rect class="cls-3" height="7.55" rx="1" ry="1" width="7.25" x="19.44" y="4.95"/>
-<path class="cls-2" d="M25.68,13.5H20.44a2,2,0,0,1-2-2V6a2,2,0,0,1,2-2h5.24a2,2,0,0,1,2,2V11.5A2,2,0,0,1,25.68,13.5Zm0-2v0ZM20.44,6V11.5h5.24V6Z"/>
-</g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="FiscalScope">
+  <!--
+    La escala progresiva, que es el asunto de la publicación: tres tramos que
+    suben y el último en el verde de la casa. Dibujado con los mismos colores
+    del papel, no con los de una librería de iconos.
+    Se adapta al modo oscuro del sistema; donde no se soporte, se queda en claro.
+  -->
+  <style>
+    .fondo { fill: #edebe4; }
+    .linea { fill: #c4c8c8; }
+    .tramo { fill: #16191b; }
+    .alto  { fill: #0b5560; }
+    @media (prefers-color-scheme: dark) {
+      .fondo { fill: #0e1214; }
+      .linea { fill: #232a2d; }
+      .tramo { fill: #e8e6df; }
+      .alto  { fill: #58a4af; }
+    }
+  </style>
+  <rect class="fondo" width="32" height="32" rx="6" />
+  <rect class="tramo" x="5"    y="19" width="6.6" height="7" />
+  <rect class="tramo" x="12.7" y="14" width="6.6" height="12" />
+  <rect class="alto"  x="20.4" y="8"  width="6.6" height="18" />
+  <rect class="linea" x="4"    y="26" width="24"  height="1.4" />
+</svg>

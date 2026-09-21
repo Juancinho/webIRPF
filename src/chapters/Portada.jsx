@@ -34,7 +34,7 @@ export default function Portada() {
           <div>
             <p className="fs-masthead-name">FiscalScope</p>
             <p className="fs-masthead-sub">
-              Papel fiscal interactivo
+              Informe fiscal interactivo
               <br />
               España · 2012—2026
             </p>

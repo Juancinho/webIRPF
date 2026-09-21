@@ -98,7 +98,7 @@ export default function Indice({ onClose }) {
           <div>
             <span className="fs-masthead-name">FiscalScope</span>
             <p className="fs-masthead-sub" style={{ marginBottom: 0 }}>
-              Papel fiscal interactivo · España · 2012—2026
+              Informe fiscal interactivo · España · 2012—2026
             </p>
           </div>
           <button type="button" className="fs-btn fs-btn-quiet" onClick={onClose}>

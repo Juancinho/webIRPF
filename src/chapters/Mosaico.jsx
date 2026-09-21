@@ -94,7 +94,7 @@ export default function Mosaico() {
       id="25"
       title={`En este modelo, la mitad superior concentra el ${pct(mitadAlta * 100, 0)} de la recaudación estimada`}
       sub={`${anio} · ancho = masa salarial estimada del tramo · altura = tipo efectivo calculado · área = participación estimada en IRPF y cotización del trabajador`}
-      legend="Veinte grupos del mismo tamaño, cinco percentiles cada uno · el área combina salario representativo y carga efectiva calculada · tu grupo va en petróleo"
+      legend="Veinte grupos del mismo tamaño, cinco percentiles cada uno · el área combina salario representativo y carga efectiva calculada · tu grupo va en verde"
       source={
         <>
           Salarios ·{' '}

@@ -87,7 +87,7 @@ export function CurvaDistribucion() {
       id="21"
       title={`La mitad de los asalariados cobra menos de ${eur(dist.p50)}`}
       sub={`${anio} frente a ${comparar} · distribución estimada de la ganancia bruta anual · euros corrientes de cada año`}
-      legend="El área es la densidad de trabajadores en cada nivel de salario · la marca de petróleo eres tú"
+      legend="El área es la densidad de trabajadores en cada nivel de salario · la marca verde eres tú"
       source="Fuente · INE · EAES tabla 28191 · ajuste log-normal propio"
       note="La curva es un ajuste log-normal calibrado con los percentiles publicados: reproduce la forma del reparto, no el censo exacto de cada tramo."
       summary={`Mediana ${eur(dist.p50)}, media ${eur(dist.media)}, P10 ${eur(dist.p10)}, P90 ${eur(dist.p90)} en ${anio}.`}
@@ -233,7 +233,7 @@ export function Percentiles() {
       id="22"
       title={`Tu salario supera al ${Math.round(percentil)} % de los asalariados`}
       sub={`${anio} · percentiles publicados de la ganancia bruta anual · una marca = ${eur(UNIT)}`}
-      legend={`Una marca = ${eur(UNIT)} · la línea vertical de petróleo es tu salario`}
+      legend={`Una marca = ${eur(UNIT)} · la línea vertical verde es tu salario`}
       source="Fuente · INE · EAES tabla 28191"
       note={
         anio > ULTIMO_ANIO_SALARIAL_OFICIAL
@@ -349,7 +349,7 @@ export function EvolucionDistribucion() {
           : `En euros corrientes, la mediana salarial ha pasado de ${eur(primero.p50)} a ${eur(ultimo.p50)}`
       }
       sub={`${real ? 'Euros constantes de 2026' : 'Euros nominales de cada año'} · banda P10–P90, cuartiles y mediana · pulsa un año para llevar la publicación a él`}
-      legend="Banda clara = del percentil 10 al 90 · banda oscura = del 25 al 75 · línea continua = mediana · línea de puntos azul = media · puntos de petróleo = tu salario llevado a cada año con el IPC"
+      legend="Banda clara = del percentil 10 al 90 · banda oscura = del 25 al 75 · línea continua = mediana · línea de puntos azul = media · puntos verdes = tu salario llevado a cada año con el IPC"
       source="Fuente · INE · EAES tabla 28191"
       note={`Los años posteriores a ${ULTIMO_ANIO_SALARIAL_OFICIAL} son proyección propia, no dato publicado.`}
       summary={datos.map(d => `${d.anio}: mediana ${eur(d.p50)}`).join('; ')}
@@ -476,7 +476,7 @@ export function EvolucionDistribucion() {
         La <strong style={{ color: 'var(--counter)' }}>media</strong> —los puntos azules— va
         siempre por encima de la mediana porque los salarios más altos tiran de ella hacia
         arriba; la mediana, en cambio, parte la población exactamente por la mitad. Los puntos
-        de petróleo son <strong style={{ color: 'var(--signal)' }}>tu salario llevado a cada
+        verdes son <strong style={{ color: 'var(--signal)' }}>tu salario llevado a cada
         año con el IPC</strong>: el mismo poder adquisitivo que tienes hoy, expresado en los
         euros de aquel año. Sirve para situar un mismo poder adquisitivo dentro de la distribución
         observada en cada ejercicio.

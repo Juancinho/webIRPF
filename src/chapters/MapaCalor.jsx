@@ -7,7 +7,7 @@ import { Label } from '../figures/marks';
 import { linear, round } from '../figures/scale';
 import { dec, eur, pct } from '../utils/format';
 
-/* Rampa secuencial de un solo tono: del papel al petróleo de la publicación.
+/* Rampa secuencial de un solo tono: del papel al verde de la publicación.
    Un solo tono porque lo que se compara es intensidad, no categorías. */
 const RAMPA = ['#eae8e1', '#d3dad8', '#b4c4c4', '#93aeb0', '#70979b', '#4d7f85', '#2c666e', '#0b5560'];
 

@@ -39,26 +39,19 @@ export default function Lugar() {
             <div className="fs-rail-item">
               <span className="fs-stamp">Nota 04</span>
               <p className="fs-note">
-                El percentil no mide riqueza: mide salario bruto anual entre los asalariados que
-                cubre la Encuesta Anual de Estructura Salarial del INE.
-              </p>
-            </div>
-            <div className="fs-rail-item">
-              <span className="fs-stamp">Progresividad en frío</span>
-              <p className="fs-note">
-                Si tu salario sube exactamente con el IPC, tu poder adquisitivo no mejora — y aun
-                así puedes caer en la escala relativa si el resto sube más.
+                El percentil no mide riqueza: mide salario bruto entre los asalariados que cubre
+                la Encuesta de Estructura Salarial del INE.
               </p>
             </div>
             <div className="fs-rail-item">
               <span className="fs-stamp">Fuente</span>
               <p className="fs-note">
-                INE · EAES, tabla 28191, ambos sexos, total nacional.
+                INE · EAES, tabla 28191, ambos sexos.
                 {anio > ULTIMO_ANIO_SALARIAL_OFICIAL && (
                   <>
                     {' '}
-                    Los años posteriores a {ULTIMO_ANIO_SALARIAL_OFICIAL} son proyección propia
-                    (+{pct(CRECIMIENTO_PROYECCION_SALARIAL * 100, 1)} anual), no dato publicado.
+                    Desde {ULTIMO_ANIO_SALARIAL_OFICIAL} es proyección propia
+                    (+{pct(CRECIMIENTO_PROYECCION_SALARIAL * 100, 1)} anual).
                   </>
                 )}
               </p>

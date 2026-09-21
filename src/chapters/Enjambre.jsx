@@ -113,7 +113,7 @@ export default function Enjambre() {
       id="23"
       title={`Mil asalariados, uno por punto: por delante de ${Math.round(percentil)} de cada cien`}
       sub={`${anio} · cada punto es una milésima de los asalariados · cuanto más alto el montón, más gente cobra ese sueldo`}
-      legend="Los puntos se apilan cuando coinciden: la altura del montón es cuánta gente cobra ese sueldo · el punto en petróleo eres tú · los escalones son de la interpolación entre los cinco percentiles publicados, no de la realidad"
+      legend="Los puntos se apilan cuando coinciden: la altura del montón es cuánta gente cobra ese sueldo · el punto verde eres tú · los escalones son de la interpolación entre los cinco percentiles publicados, no de la realidad"
       source="Fuente · INE — Encuesta Anual de Estructura Salarial, tabla 28191"
       note={`El eje llega hasta ${eur(TOPE)}; los ${cola} de cada mil que cobran más van contados aparte, a la derecha, para no aplastarlos contra el margen. El INE no publica P95 ni P99 en esta tabla, así que por encima del percentil 90 la curva es una extrapolación suave, no dato censal.`}
       summary={hitos.map(h => `${h.label}: ${eur(h.s)}`).concat(`Por encima de ${eur(TOPE)}: ${cola} de cada 1.000`).join('; ')}

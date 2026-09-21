@@ -401,7 +401,7 @@ input,
 .fs-rail {
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 18px;
   padding-top: 6px;
   min-width: 0;
 }
@@ -1207,7 +1207,7 @@ select.fs-select {
 }
 
 /* ── acentos en las cifras grandes ────────────────────────────────────────
-   Los números son material gráfico: la unidad va en petróleo y las cifras
+   Los números son material gráfico: la unidad va en verde y las cifras
    que sostienen el argumento del capítulo llevan una regla de acento debajo.
    El color nunca es el único canal — siempre hay un rótulo al lado.        */
 .fs-u {

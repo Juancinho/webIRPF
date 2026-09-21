@@ -7,7 +7,7 @@ export default function Colofon() {
           <div>
             <span className="fs-masthead-name">FiscalScope</span>
             <p className="fs-note" style={{ marginTop: 8 }}>
-              Papel fiscal interactivo.<br />
+              Informe fiscal interactivo.<br />
               Herramienta independiente, sin afiliación política.
             </p>
           </div>
