@@ -8,6 +8,7 @@ import { linear, round } from '../figures/scale';
 import { eur, pct } from '../utils/format';
 import CurvaTipos from './CurvaTipos';
 import Acantilado from './Acantilado';
+import Puente from '../figures/Puente';
 
 const W = 880;
 const H = 330;
@@ -110,7 +111,7 @@ export default function Irpf() {
 
           <div className="fs-field">
             <div className="fs-chapter-head">
-              <span className="fs-stamp">03 / 07 · Cómo funciona el IRPF</span>
+              <span className="fs-stamp">03 / 09 · Cómo funciona el IRPF</span>
               <h2 id="irpf-t" className="fs-title">
                 La escalera
                 <br />
@@ -235,7 +236,21 @@ export default function Irpf() {
 
             <Poster marginal={marginal} nomina={nomina} />
 
+            <Puente rotulo="De un sueldo a todos los sueldos">
+              Con un solo salario, el marginal y el efectivo son dos cifras que se pueden contar
+              con los dedos. Con todos los salarios a la vez son dos curvas, y lo único que
+              importa de ellas es <strong>cuánto se separan</strong>: esa distancia es,
+              literalmente, la confusión que genera la palabra «tramo».
+            </Puente>
+
             <CurvaTipos />
+
+            <Puente rotulo="Donde la escalera se rompe">
+              Las dos curvas suben de forma ordenada en casi toda la escala. Casi. Hay una franja
+              —entre los quince y los veintiún mil euros— en la que el tipo marginal se dispara
+              por encima de cualquier tipo que aparezca en el BOE. No hay ningún tramo que lo
+              explique, porque no es un tramo: es <strong>una reducción que se retira</strong>.
+            </Puente>
 
             <Acantilado />
           </div>

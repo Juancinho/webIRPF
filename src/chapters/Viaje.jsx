@@ -55,7 +55,7 @@ export default function Viaje() {
         <span className="fs-chapter-numeral" aria-hidden="true">02</span>
 
         <div className="fs-chapter-head">
-          <span className="fs-stamp">02 / 07 · El viaje de cada euro</span>
+          <span className="fs-stamp">02 / 09 · El viaje de cada euro</span>
           <h2 id="viaje-t" className="fs-title">
             Lo que cuestas
             <br />

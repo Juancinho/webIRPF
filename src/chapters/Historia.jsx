@@ -11,6 +11,8 @@ import Figure from '../figures/Figure';
 import Epocas from './Epocas';
 import ProgresividadFria from './ProgresividadFria';
 import Art20Historia from './Art20Historia';
+import MapaCalor from './MapaCalor';
+import Puente from '../figures/Puente';
 import ChartFrame from '../figures/ChartFrame';
 import { useDomainZoom } from '../figures/useDomainZoom';
 import { Label, Series } from '../figures/marks';
@@ -20,8 +22,8 @@ import { eur, pct, sign } from '../utils/format';
 /**
  * 04 · QUINCE AÑOS DE FISCALIDAD
  * FIG. 10 los quince años, en serie o en clasificación · FIG. 11 el comparador
- * de dos años · FIG. 12 el atlas · FIG. 13 la progresividad fría ·
- * FIG. 14 el art. 20 reescrito seis veces.
+ * de dos años · FIG. 12 el atlas · FIG. 13 la progresividad fría · FIG. 14 el
+ * art. 20 reescrito seis veces · FIG. 15 los quince años en una sola imagen.
  */
 export default function Historia() {
   const { bruto, anio, opts, setAnio, setBruto } = useFiscal();
@@ -107,7 +109,7 @@ export default function Historia() {
 
           <div className="fs-field">
             <div className="fs-chapter-head">
-              <span className="fs-stamp">04 / 07 · Quince años de fiscalidad</span>
+              <span className="fs-stamp">04 / 09 · Quince años de fiscalidad</span>
               <h2 id="historia-t" className="fs-title">
                 El mismo sueldo,
                 <br />
@@ -136,7 +138,19 @@ export default function Historia() {
 
             <Dumbbells serie={serie} anio={anio} mejor={mejor} elegirAnio={elegirAnio} bruto2026={bruto2026} />
 
+            <Puente rotulo="De la serie al caso concreto">
+              La serie ordena quince años, pero ordenar no es medir. Para saber qué separa de
+              verdad a un ejercicio de otro hay que ponerlos uno al lado del otro y bajar al
+              detalle: cuánto IRPF, cuánta cotización, cuánto neto.
+            </Puente>
+
             <Epocas bruto2026={bruto2026} />
+
+            <Puente rotulo="Y ahora, todos los sueldos">
+              Todo lo anterior fija <strong>tu</strong> sueldo y recorre los años. Cambiemos la
+              pregunta: ¿le ha pasado lo mismo a quien cobra la mitad, o el doble? Para eso hace
+              falta recorrer la escala entera, año por año.
+            </Puente>
 
             <Atlas anio={anio} bruto2026={bruto2026} elegirAnio={elegirAnio} />
 
@@ -145,6 +159,22 @@ export default function Historia() {
             <Art20Historia />
 
           </div>
+        </div>
+
+        {/* El mapa sale de la columna de lectura y ocupa el ancho entero de la
+            página: es la única figura con dos dimensiones de datos y necesita
+            el sitio —y romper la retícula es justo lo que pide el capítulo. */}
+        <div className="fs-field" style={{ maxWidth: 'var(--reading-max)', margin: '0 auto' }}>
+          <Puente rotulo="Quince años, de una vez">
+            Cada figura de este capítulo ha fijado algo: un sueldo, un año, dos años. La última no
+            fija nada. Quince ejercicios y cien niveles de renta en una sola imagen, con el color
+            como única medida — y una advertencia: la columna que te toca <strong>se lee de
+            arriba abajo</strong>.
+          </Puente>
+        </div>
+
+        <div className="fs-ancho">
+          <MapaCalor />
         </div>
       </div>
     </section>

@@ -785,3 +785,49 @@ select.fs-select {
 .fs-statement-neg::after {
   background: var(--counter);
 }
+
+/* ── el puente entre figuras ───────────────────────────────────────────────
+   Ni pie de figura ni entradilla de capítulo: una pausa de lectura que enlaza
+   una figura con la siguiente. Vive en la columna de texto, nunca a lo ancho. */
+.fs-puente {
+  max-width: 62ch;
+  margin: clamp(38px, 6vh, 72px) 0 clamp(30px, 4.5vh, 54px);
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
+}
+
+.fs-puente-r {
+  display: block;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-5);
+  margin-bottom: 10px;
+}
+
+.fs-puente-t {
+  font-family: var(--serif);
+  font-size: clamp(17px, 1.25vw, 21px);
+  line-height: 1.52;
+  color: var(--ink-2);
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.fs-puente-t strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.fs-night .fs-puente {
+  border-top-color: var(--night-rule);
+}
+
+.fs-night .fs-puente-t {
+  color: #c9c7c0;
+}
+
+.fs-night .fs-puente-t strong {
+  color: var(--night-ink);
+}

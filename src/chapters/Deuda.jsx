@@ -19,7 +19,23 @@ export default function Deuda() {
   const { anio, nomina } = useFiscal();
 
   return (
-    <>
+    <section id="deuda" className="fs-chapter" aria-labelledby="deuda-t">
+      <div className="fs-page">
+        <span className="fs-chapter-numeral" aria-hidden="true">08</span>
+
+        <div className="fs-chapter-head">
+          <span className="fs-stamp">08 / 09 · La deuda</span>
+          <h2 id="deuda-t" className="fs-title">
+            Lo que ya se debe
+            <br />
+            en tu nombre
+          </h2>
+          <p className="fs-kicker">
+            Hasta aquí, lo que se recauda y a dónde va. Falta la parte que no se ha pagado todavía:
+            el saldo que se arrastra de los años en que el Estado gastó más de lo que ingresó.
+          </p>
+        </div>
+
       <div className="fs-explica" style={{ borderTop: 0, paddingTop: 0, marginBottom: 32 }}>
         <h3 className="fs-title-sm">Qué es —y qué no es— la deuda pública</h3>
         <p className="fs-body" style={{ marginTop: 14 }}>
@@ -38,10 +54,11 @@ export default function Deuda() {
         </p>
       </div>
 
-      <Serie anioActual={anio} />
-      <Cascada />
-      <TuParte anio={anio} irpf={nomina.irpfFinal} />
-    </>
+        <Serie anioActual={anio} />
+        <Cascada />
+        <TuParte anio={anio} irpf={nomina.irpfFinal} />
+      </div>
+    </section>
   );
 }
 
@@ -70,7 +87,7 @@ function Serie({ anioActual }) {
 
   return (
     <Figure
-      id="22"
+      id="23"
       title={`España debe ${dec(SERIE[SERIE.length - 1].totalMM / 1000, 2)} billones de euros, el ${pct(SERIE[SERIE.length - 1].pctPIB)} de su PIB`}
       sub="2012—2026 · arriba, deuda por habitante en euros · abajo, la misma deuda como porcentaje del PIB · dos escalas separadas, nunca superpuestas"
       legend="Área = deuda por habitante · línea inferior = deuda sobre PIB · el año en curso va en petróleo"
@@ -219,7 +236,7 @@ function Cascada() {
 
   return (
     <Figure
-      id="23"
+      id="24"
       title={`De dónde salió: la deuda creció ${total.toLocaleString('es-ES')} mM € desde 2012, y ${mayor.inc.toLocaleString('es-ES')} de ellos en un solo año`}
       sub={`Aumento de la deuda total en cada ejercicio · miles de millones de euros · una marca = ${UNIT}.000 millones`}
       legend={`Una marca = ${UNIT}.000 M € · marcas llenas = la deuda sube · marcas discontinuas = la deuda baja`}
@@ -332,7 +349,7 @@ function TuParte({ anio, irpf }) {
 
   return (
     <Figure
-      id="24"
+      id="25"
       title={
         anios
           ? `Tu parte de la deuda equivale a ${dec(anios)} años de tu IRPF completo`

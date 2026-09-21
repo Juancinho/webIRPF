@@ -39,10 +39,10 @@ export default function Apendice() {
   return (
     <section id="apendice" className="fs-chapter" aria-labelledby="apendice-t">
       <div className="fs-page">
-        <span className="fs-chapter-numeral" aria-hidden="true">07</span>
+        <span className="fs-chapter-numeral" aria-hidden="true">09</span>
 
         <div className="fs-chapter-head">
-          <span className="fs-stamp">07 / 07 · Apéndice</span>
+          <span className="fs-stamp">09 / 09 · Apéndice</span>
           <h2 id="apendice-t" className="fs-title">
             Cómo está
             <br />

@@ -1451,3 +1451,16 @@
     break-inside: avoid;
   }
 }
+
+/* ── una figura que se sale de la columna de lectura ──────────────────────
+   No es sangre completa —eso obligaría a pelearse con el margen del raíl—
+   sino el ancho entero de la página: suficiente para que el ritmo cambie. */
+.fs-ancho {
+  margin-top: clamp(40px, 6vh, 80px);
+}
+
+@media (min-width: 1000px) {
+  .fs-ancho {
+    margin-top: clamp(56px, 8vh, 104px);
+  }
+}

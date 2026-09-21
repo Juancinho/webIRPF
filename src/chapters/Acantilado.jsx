@@ -6,6 +6,7 @@ import ChartFrame from '../figures/ChartFrame';
 import { useDomainZoom } from '../figures/useDomainZoom';
 import { Label, HundredField, YouMark } from '../figures/marks';
 import { clamp, linear, polyline, round, ticks } from '../figures/scale';
+import Puente from '../figures/Puente';
 import { eur, pct } from '../utils/format';
 
 const W = 880;
@@ -227,6 +228,12 @@ export default function Acantilado() {
       </Figure>
 
       <ComoFunciona />
+
+      <Puente rotulo="La pregunta práctica">
+        Hasta aquí, la mecánica: de dónde sale la cuota, qué tipo se aplica a qué y por qué hay un
+        escalón donde no debería haberlo. Queda la única pregunta que se hace todo el mundo cuando
+        negocia un sueldo: <strong>si mañana te suben, ¿cuánto llega de verdad?</strong>
+      </Puente>
 
       <span id="fig-09" className="fs-ancla" aria-hidden="true" />
       <CienEuros />

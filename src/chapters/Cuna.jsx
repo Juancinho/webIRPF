@@ -3,6 +3,7 @@ import { useFiscal } from '../state/fiscalContext';
 import { CUNA_OCDE_2025 } from '../engine/irpf';
 import Figure from '../figures/Figure';
 import Ocde from './Ocde';
+import Puente from '../figures/Puente';
 import { HundredField } from '../figures/marks';
 import { eur, pct } from '../utils/format';
 
@@ -44,7 +45,7 @@ export default function Cuna() {
         <span className="fs-chapter-numeral" aria-hidden="true">05</span>
 
         <div className="fs-chapter-head">
-          <span className="fs-stamp">05 / 07 · La cuña fiscal</span>
+          <span className="fs-stamp">05 / 09 · La cuña fiscal</span>
           <h2 id="cuna-t" className="fs-title">
             De cada 100 €
             <br />
@@ -78,7 +79,7 @@ export default function Cuna() {
 
           <div className="fs-field">
             <Figure
-              id="15"
+              id="16"
               title={`${Math.round(netoPct)} € de cada 100 llegan como renta neta`}
               sub={`${anio} · ${vista === 'empresa' ? `sobre el coste laboral total (${eur(nomina.costeLab)})` : `sobre el salario bruto (${eur(bruto)})`} · un bloque = 1 €`}
               legend={`Un bloque = 1 € de cada 100 · ${grupos.map(g => `${g.label} ${g.value}`).join(' + ')} = ${suma}${suma < 100 ? ` · ${100 - suma} € se reparten en el redondeo` : ''}`}
@@ -136,6 +137,12 @@ export default function Cuna() {
               no llega a tu cuenta. En la misma medida estandarizada, España se sitúa en el{' '}
               {pct(ESPANA.total)} y la media de la OCDE en el {pct(MEDIA.total)}.
             </p>
+
+            <Puente rotulo="¿Mucho comparado con qué?">
+              Un {pct(nomina.cunaFiscal * 100)} no significa nada por sí solo: hace falta un patrón
+              de medida. La OCDE publica exactamente esta cifra, calculada igual para treinta y
+              ocho países, con el mismo supuesto estandarizado para todos.
+            </Puente>
 
             <Ocde />
           </div>

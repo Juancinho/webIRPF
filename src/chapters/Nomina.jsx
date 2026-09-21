@@ -3,6 +3,7 @@ import { useFiscal } from '../state/fiscalContext';
 import Figure from '../figures/Figure';
 import ChartFrame from '../figures/ChartFrame';
 import Desglose from './Desglose';
+import Puente from '../figures/Puente';
 import { Label } from '../figures/marks';
 import { linear, round } from '../figures/scale';
 import { dec, eur, pct } from '../utils/format';
@@ -184,7 +185,7 @@ export default function Nomina() {
 
           <div className="fs-field">
             <div className="fs-chapter-head">
-              <span className="fs-stamp">01 / 07 · Tu nómina</span>
+              <span className="fs-stamp">01 / 09 · Tu nómina</span>
               <h2 id="nomina-t" className="fs-title">
                 Lo que ves
                 <br />
@@ -342,13 +343,13 @@ export default function Nomina() {
               </div>
             </Figure>
 
-            <p className="fs-body" style={{ marginTop: 36, marginBottom: 48 }}>
-              El recibo de la nómina enseña esos dos descuentos. Pero tu trabajo no le cuesta a la
-              empresa <strong>{eur(bruto)}</strong>: le cuesta{' '}
-              <strong>{eur(nomina.costeLab)}</strong>. La diferencia nunca aparece en ningún papel
-              que tú firmes. Y entre el bruto y lo que Hacienda grava hay otra docena de pasos,
-              cada uno con su artículo:
-            </p>
+            <Puente rotulo="Lo que el recibo no enseña">
+              El recibo de la nómina enseña esos dos descuentos y se queda ahí. Pero tu trabajo no
+              le cuesta a la empresa <strong>{eur(bruto)}</strong>: le cuesta{' '}
+              <strong>{eur(nomina.costeLab)}</strong>, y esa diferencia no aparece en ningún papel
+              que tú firmes. Entre el bruto y la cifra que Hacienda acaba gravando hay, además,
+              otra docena de pasos: cada uno con su artículo y su resta.
+            </Puente>
 
             <Desglose />
           </div>

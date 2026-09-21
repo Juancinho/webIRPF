@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNumeroAnimado } from '../hooks/useNumeroAnimado';
+import Puente from '../figures/Puente';
 import { useFiscal } from '../state/fiscalContext';
 import {
   ANIOS,
@@ -10,8 +11,6 @@ import {
   percentilDe,
 } from '../engine/irpf';
 import Figure from '../figures/Figure';
-import Deuda from './Deuda';
-import Destino from './Destino';
 import { CurvaDistribucion, Percentiles, EvolucionDistribucion } from './Distribucion';
 import ChartFrame from '../figures/ChartFrame';
 import { Label, YouMark } from '../figures/marks';
@@ -74,15 +73,15 @@ export default function Lugar() {
 
           <div className="fs-field">
             <div className="fs-chapter-head">
-              <span className="fs-stamp">06 / 07 · Tu lugar y tu parte</span>
+              <span className="fs-stamp">06 / 09 · Tu lugar</span>
               <h2 id="lugar-t" className="fs-title">
                 Dónde te coloca
                 <br />
                 el sistema
               </h2>
               <p className="fs-kicker">
-                Hasta aquí, tu dinero. Queda situarte: entre los demás asalariados y frente a la
-                deuda que el Estado ya ha contraído en tu nombre.
+                Hasta aquí, tu dinero. Queda situarte: no frente a la ley, sino frente a los demás
+                asalariados. Un mismo sueldo pesa distinto según dónde caiga en la escala.
               </p>
             </div>
 
@@ -98,17 +97,25 @@ export default function Lugar() {
 
             <CurvaDistribucion />
 
+            <Puente rotulo="De la curva a tu casilla">
+              La curva dice cuánta gente hay en cada altura de la escala. No dice dónde estás tú,
+              y ese es el dato que convierte una estadística en algo personal: un número entre uno
+              y cien.
+            </Puente>
+
             <Percentiles />
 
             <CienTrabajadores bruto={bruto} anio={anio} dist={dist} percentil={percentil} />
 
+            <Puente rotulo="La escalera también se mueve">
+              Una foto de un solo año no dice si la escalera sube contigo o sin ti. Esta es la
+              misma distribución repetida quince veces: no sólo cambia tu sueldo,{' '}
+              <strong>cambia la fila en la que te deja</strong>.
+            </Puente>
+
             <EvolucionDistribucion />
 
             {anio > 2012 && <Escenario bruto={bruto} anio={anio} />}
-
-            <Destino />
-
-            <Deuda />
           </div>
         </div>
       </div>
@@ -162,7 +169,7 @@ function CienTrabajadores({ bruto, anio, dist, percentil }) {
 
   return (
     <Figure
-      id="19"
+      id="20"
       title="Cien asalariados de España, puestos en fila por salario"
       sub={`${anio} · una marca = un trabajador de cada cien · altura = su salario bruto anual`}
       legend="Una marca = un asalariado de cada cien · las líneas verticales son los percentiles publicados por el INE"

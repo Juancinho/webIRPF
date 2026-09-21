@@ -84,7 +84,7 @@ export function CurvaDistribucion() {
 
   return (
     <Figure
-      id="17"
+      id="18"
       title={`La mitad de los asalariados cobra menos de ${eur(dist.p50)}`}
       sub={`${anio} frente a ${comparar} · distribución estimada de la ganancia bruta anual · euros corrientes de cada año`}
       legend="El área es la densidad de trabajadores en cada nivel de salario · la marca de petróleo eres tú"
@@ -223,7 +223,7 @@ export function Percentiles() {
 
   return (
     <Figure
-      id="18"
+      id="19"
       title={`Tu salario supera al ${Math.round(percentil)} % de los asalariados`}
       sub={`${anio} · percentiles publicados de la ganancia bruta anual · una marca = ${eur(UNIT)}`}
       legend={`Una marca = ${eur(UNIT)} · la línea vertical de petróleo es tu salario`}
@@ -335,7 +335,7 @@ export function EvolucionDistribucion() {
 
   return (
     <Figure
-      id="20"
+      id="21"
       title={
         real
           ? `En euros de hoy, la mediana salarial ha pasado de ${eur(primero.p50)} a ${eur(ultimo.p50)}`

@@ -3,6 +3,7 @@ import { useNarrow } from '../hooks/useNarrow';
 import { useFiscal } from '../state/fiscalContext';
 import { GASTO_COFOG } from '../engine/irpf';
 import Figure from '../figures/Figure';
+import Puente from '../figures/Puente';
 import ChartFrame from '../figures/ChartFrame';
 import { Label } from '../figures/marks';
 import { round } from '../figures/scale';
@@ -44,7 +45,40 @@ function cinta(x0, a0, a1, x1, b0, b1) {
  * Nadie marca tu IRPF con un destino. Lo que se dibuja es el reparto que le
  * correspondería a tu aportación si se repartiera como se reparte el gasto.
  */
+/** El capítulo: la figura del río con su cabecera y su margen. */
 export default function Destino() {
+  return (
+    <section id="destino" className="fs-chapter" aria-labelledby="destino-t">
+      <div className="fs-page">
+        <span className="fs-chapter-numeral" aria-hidden="true">07</span>
+
+        <div className="fs-chapter-head">
+          <span className="fs-stamp">07 / 09 · A dónde va</span>
+          <h2 id="destino-t" className="fs-title">
+            A dónde va
+            <br />
+            lo que no ves
+          </h2>
+          <p className="fs-kicker">
+            El capítulo 05 midió el tamaño del hueco entre lo que cuesta tu puesto y lo que
+            cobras. Queda la pregunta incómoda: ese dinero no desaparece, va a alguna parte. Esta
+            es esa parte, con tus euros y con tus jornadas de trabajo como unidad.
+          </p>
+        </div>
+
+        <RioDeLosEuros />
+
+        <Puente rotulo="Lo que todavía no se ha pagado">
+          Este reparto sólo cuenta el dinero que existe: lo que se recauda un año y se gasta ese
+          mismo año. Falta la otra mitad de la contabilidad — los ejercicios en que el gasto fue
+          mayor que el ingreso y la diferencia se financió pidiéndola prestada.
+        </Puente>
+      </div>
+    </section>
+  );
+}
+
+function RioDeLosEuros() {
   const { bruto, anio, nomina, pagas } = useFiscal();
   const estrecho = useNarrow();
   const [unidad, setUnidad] = useState('anual');
@@ -147,7 +181,7 @@ export default function Destino() {
 
   return (
     <Figure
-      id="21"
+      id="22"
       title={`De los ${eur(cuna)} que tu puesto aporta al sistema, ${eur(euros(social.parte))} vuelven como protección social`}
       sub={`${anio} · tu cuña fiscal repartida como se reparte el gasto público real · clasificación funcional COFOG de ${GASTO_COFOG.anio}`}
       legend={`Dos afluentes —cotizaciones e IRPF— desembocan en una caja común · el ancho de cada cinta es su parte del gasto · los días se cuentan sobre ${DIAS_LABORABLES} jornadas laborables`}
