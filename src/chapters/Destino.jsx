@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { useNarrow } from '../hooks/useNarrow';
 import { useFiscal } from '../state/fiscalContext';
 import { GASTO_COFOG } from '../engine/irpf';
@@ -6,7 +6,7 @@ import Figure from '../figures/Figure';
 import ChartFrame from '../figures/ChartFrame';
 import { Label } from '../figures/marks';
 import { round } from '../figures/scale';
-import { eur, pct } from '../utils/format';
+import { dec, eur, pct } from '../utils/format';
 
 const W = 880;
 const TOP = 40;
@@ -20,6 +20,7 @@ const XT0 = 152, XT1 = 166;     // el tronco
 const XG0 = 300, XG1 = 314;     // los tres destinos grandes
 const XP0 = 440, XP1 = 454;     // las dieciséis partidas
 const XL = 470;                 // rótulos de las partidas
+const DIAS_LABORABLES = 220;    // jornadas de un año en España, descontando fines de semana, festivos y vacaciones
 const H = TOP + FH + 34;
 
 /** Una cinta de Sankey: dos bordes en curva entre dos tramos verticales. */
@@ -46,6 +47,8 @@ function cinta(x0, a0, a1, x1, b0, b1) {
 export default function Destino() {
   const { bruto, anio, nomina, pagas } = useFiscal();
   const estrecho = useNarrow();
+  const [unidad, setUnidad] = useState('anual');
+  const grad = useId().replace(/:/g, '');
   const [activa, setActiva] = useState(null);
   const [tip, setTip] = useState(null);
 
@@ -109,6 +112,23 @@ export default function Destino() {
 
   const euros = parte => cuna * parte;
 
+  /* Tres unidades para la misma cifra. Los euros al año dicen el tamaño; los
+     euros al mes lo hacen comparable con una nómina; los días de trabajo lo
+     sacan del dinero y lo ponen en tiempo, que es lo que de verdad cuesta. */
+  const UNIDADES = {
+    anual: { k: 'Al año', f: parte => eur(euros(parte)) },
+    mensual: { k: 'Al mes', f: parte => eur(euros(parte) / 12) },
+    dias: {
+      k: 'En días de trabajo',
+      f: parte => {
+        const d = parte * (cuna / Math.max(nomina.costeLab, 1)) * DIAS_LABORABLES;
+        return d >= 1 ? `${dec(d, 1)} d` : `${dec(d * 8, 1)} h`;
+      },
+    },
+  };
+  const medir = UNIDADES[unidad].f;
+  const diasTotales = (cuna / Math.max(nomina.costeLab, 1)) * DIAS_LABORABLES;
+
   const mostrar = (p, vy) =>
     setTip({
       vx: XP1,
@@ -118,6 +138,7 @@ export default function Destino() {
       rows: [
         ['De tu aportación', pct(p.parte * 100), 'var(--signal)'],
         ['Al mes', eur(euros(p.parte) / 12)],
+        ['Días de tu trabajo', UNIDADES.dias.f(p.parte)],
         ['Gasto real ' + GASTO_COFOG.anio, `${Math.round(p.valor / 1000)} mil M€`],
       ],
     });
@@ -129,19 +150,34 @@ export default function Destino() {
       id="21"
       title={`De los ${eur(cuna)} que tu puesto aporta al sistema, ${eur(euros(social.parte))} vuelven como protección social`}
       sub={`${anio} · tu cuña fiscal repartida como se reparte el gasto público real · clasificación funcional COFOG de ${GASTO_COFOG.anio}`}
-      legend="Dos afluentes —cotizaciones e IRPF— desembocan en una caja común · el ancho de cada cinta es su parte del gasto · a la derecha, tus euros en cada destino"
+      legend={`Dos afluentes —cotizaciones e IRPF— desembocan en una caja común · el ancho de cada cinta es su parte del gasto · los días se cuentan sobre ${DIAS_LABORABLES} jornadas laborables`}
       source={`Fuente · ${GASTO_COFOG.fuente}`}
       note="El presupuesto español no está afectado: ningún impuesto concreto financia una función concreta, y las cotizaciones sostienen sobre todo las prestaciones contributivas. Esta figura no dice a dónde fue tu dinero, sino cómo se repartiría tu aportación si siguiera el reparto del gasto público total."
       summary={partidas
         .map(p => `${p.label}: ${eur(euros(p.parte))} (${pct(p.parte * 100)})`)
         .join('. ')}
     >
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center', marginBottom: 14 }}>
+        <span className="fs-seg">
+          {Object.entries(UNIDADES).map(([k, u]) => (
+            <button key={k} type="button" aria-pressed={unidad === k} onClick={() => setUnidad(k)}>
+              {u.k}
+            </button>
+          ))}
+        </span>
+        <span className="fs-note" style={{ margin: 0 }}>
+          {unidad === 'dias'
+            ? `De tus ${DIAS_LABORABLES} jornadas anuales, ${dec(diasTotales, 0)} las trabajas para el sistema`
+            : 'La misma cifra, en tres unidades'}
+        </span>
+      </div>
+
       <div className="fs-readout" style={{ marginBottom: 18 }}>
         {grupos.map(g => (
           <span key={g.key}>
             <span className="fs-readout-k">{g.label}</span>
             <span className="fs-readout-v" style={{ color: g.key === 'social' ? 'var(--signal)' : undefined }}>
-              {eur(euros(g.parte))} · {pct(g.parte * 100, 0)}
+              {medir(g.parte)} · {pct(g.parte * 100, 0)}
             </span>
           </span>
         ))}
@@ -161,14 +197,14 @@ export default function Destino() {
               <header className="fs-rio-head">
                 <h4>{g.label}</h4>
                 <span className={g.key === 'social' ? 'fs-signal' : undefined}>
-                  {eur(euros(g.parte))} · {pct(g.parte * 100, 0)}
+                  {medir(g.parte)} · {pct(g.parte * 100, 0)}
                 </span>
               </header>
               <ol className="fs-rio-lista">
                 {g.hojas.map(p => (
                   <li key={p.key}>
                     <span className="fs-rio-k">{p.label}</span>
-                    <span className="fs-rio-v">{eur(euros(p.parte))}</span>
+                    <span className="fs-rio-v">{medir(p.parte)}</span>
                     <span
                       className="fs-rio-bar"
                       style={{ '--w': `${(p.parte / partidas[0].parte) * 100}%` }}
@@ -183,6 +219,20 @@ export default function Destino() {
         </div>
       ) : (
       <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} label="El destino de tu aportación">
+        <defs>
+          {[
+            ['cot', 'var(--signal)', 'var(--ink-4)'],
+            ['irpf', 'var(--counter)', 'var(--ink-4)'],
+            ['tronco', 'var(--ink-4)', 'var(--ink-5)'],
+            ['hoja', 'var(--ink-5)', 'var(--ink-3)'],
+            ['viva', 'var(--signal)', 'var(--signal)'],
+          ].map(([k, a, b]) => (
+            <linearGradient key={k} id={`${grad}-${k}`} x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor={a} />
+              <stop offset="100%" stopColor={b} />
+            </linearGradient>
+          ))}
+        </defs>
         {/* ── los dos afluentes ──────────────────────────────────────────── */}
         {[
           { key: 'cot', label: 'COTIZACIONES', valor: cot, color: 'var(--signal)', y0: TOP },
@@ -196,7 +246,11 @@ export default function Destino() {
           const t1 = i === 0 ? yCorte : TOP + FH;
           return (
             <g key={f.key}>
-              <path d={cinta(XS1, y0, y1, XT0, t0, t1)} fill={f.color} opacity={activa ? 0.14 : 0.26} />
+              <path
+                d={cinta(XS1, y0, y1, XT0, t0, t1)}
+                fill={`url(#${grad}-${f.key})`}
+                opacity={activa ? 0.2 : 0.4}
+              />
               <rect x={XS0} y={round(y0)} width={XS1 - XS0} height={round(y1 - y0)} fill={f.color} />
               <Label x={XS0} y={round(y0) - 8} size={9.5} weight={700} color={f.color} mono>
                 {f.label} · {eur(f.valor)}
@@ -222,8 +276,8 @@ export default function Destino() {
             <g key={g.key}>
               <path
                 d={cinta(XT1, a0, a1, XG0, g.y0, g.y1)}
-                fill="var(--ink-5)"
-                opacity={dim ? 0.12 : 0.34}
+                fill={`url(#${grad}-${dim ? 'tronco' : activa ? 'viva' : 'tronco'})`}
+                opacity={dim ? 0.12 : activa ? 0.3 : 0.42}
               />
               <rect x={XG0} y={round(g.y0)} width={XG1 - XG0} height={round(g.y1 - g.y0)} fill="var(--ink-3)" opacity={dim ? 0.4 : 1} />
               <g transform={`translate(${XG0 - 8} ${round((g.y0 + g.y1) / 2)}) rotate(-90)`}>
@@ -238,7 +292,7 @@ export default function Destino() {
                 weight={800}
                 color={g.key === 'social' ? 'var(--signal)' : 'var(--ink)'}
               >
-                {eur(euros(g.parte))}
+                {medir(g.parte)}
               </Label>
             </g>
           );
@@ -263,8 +317,8 @@ export default function Destino() {
               >
                 <path
                   d={cinta(XG1, a0, a1, XP0, p.y0, p.y1)}
-                  fill={on ? 'var(--signal)' : 'var(--ink-5)'}
-                  opacity={on ? 0.55 : dim ? 0.1 : 0.3}
+                  fill={on ? `url(#${grad}-viva)` : `url(#${grad}-hoja)`}
+                  opacity={on ? 0.62 : dim ? 0.1 : 0.38}
                 />
                 <rect
                   x={XP0}
@@ -289,6 +343,15 @@ export default function Destino() {
                 <Label x={XL} y={round(yR)} size={10} weight={on ? 800 : 500} color={on ? 'var(--signal)' : 'var(--ink-2)'}>
                   {p.label}
                 </Label>
+                {/* una barra fina bajo cada nombre: la columna deja de ser una
+                    lista y vuelve a ser una medida */}
+                <rect
+                  x={XL}
+                  y={round(yR) + 4}
+                  width={round((p.parte / partidas[0].parte) * 150)}
+                  height={2}
+                  fill={on ? 'var(--signal)' : 'var(--ink-6)'}
+                />
                 <text
                   x={W - 52}
                   y={round(yR)}
@@ -298,7 +361,7 @@ export default function Destino() {
                   fill={on ? 'var(--signal)' : 'var(--ink)'}
                   className="num"
                 >
-                  {eur(euros(p.parte))}
+                  {medir(p.parte)}
                 </text>
                 <text
                   x={W - 2}
