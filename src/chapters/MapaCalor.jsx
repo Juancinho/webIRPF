@@ -41,7 +41,7 @@ const FILA = 24;
  * —una columna es el mismo poder adquisitivo— cuenta lo que ninguna ley
  * anunció nunca: cómo cambió la carga de un sueldo que no se movió.
  */
-export default function MapaCalor() {
+export default function MapaCalor({ anioA, anioB }) {
   const { anio, bruto } = useFiscal();
   const [medida, setMedida] = useState('irpf');
   const [tip, setTip] = useState(null);
@@ -70,8 +70,8 @@ export default function MapaCalor() {
   const yDe = a => Y0 + ANIOS.indexOf(a) * FILA;
 
   const fin = columnas[columnas.length - 1];
-  const primero = ANIOS[0];
-  const ultimo = ANIOS[ANIOS.length - 1];
+  const primero = anioA;
+  const ultimo = anioB;
   const celdaTuya = columnas.reduce(
     (best, d) => (Math.abs(d.bruto - marcado) < Math.abs(best.bruto - marcado) ? d : best),
     columnas[0]
@@ -80,8 +80,8 @@ export default function MapaCalor() {
 
   return (
     <Figure
-      id="15"
-      title={`Para un sueldo real constante, la carga de ${ultimo} difiere en ${dec(Math.abs(deltaTuyo))} puntos respecto a ${primero}`}
+      id="17"
+      title={`Para tu sueldo real, la carga de ${ultimo} difiere en ${dec(Math.abs(deltaTuyo))} puntos respecto a ${primero}`}
       sub={`${ANIOS.length} ejercicios × ${columnas.length} niveles de renta · euros constantes de 2026 · cada celda es ${MEDIDAS[medida].nota}`}
       legend="Una fila es un año · cada columna mantiene el mismo poder adquisitivo · una celda más oscura indica una carga efectiva mayor"
       source="Fuente · cálculo propio sobre parámetros BOE · IPC INE"
@@ -123,13 +123,25 @@ export default function MapaCalor() {
                 fill={color(d[`${campo}_${a}`])}
               />
             ))}
+            {(a === primero || a === ultimo) && (
+              <rect
+                x={X0 - 3}
+                y={yDe(a) - 1.5}
+                width={X1 - X0 + 6}
+                height={alto + 3}
+                fill="none"
+                stroke={a === primero ? 'var(--counter)' : 'var(--signal)'}
+                strokeWidth={1.5}
+                pointerEvents="none"
+              />
+            )}
             <text
               x={X0 - 12}
               y={yDe(a) + alto / 2 + 3.5}
               fontSize={10}
-              fontWeight={a === anio ? 800 : 500}
+              fontWeight={a === primero || a === ultimo || a === anio ? 800 : 500}
               textAnchor="end"
-              fill={a === anio ? 'var(--signal)' : 'var(--ink-4)'}
+              fill={a === primero ? 'var(--counter)' : a === ultimo ? 'var(--signal)' : a === anio ? 'var(--ink)' : 'var(--ink-4)'}
               className="fs-t-stamp"
             >
               {a}
@@ -212,7 +224,7 @@ export default function MapaCalor() {
               rows: [
                 ['Tipo efectivo IRPF', pct(d[`irpf_${a}`]), 'var(--signal)'],
                 ['Carga total', pct(d[`total_${a}`])],
-                [`Frente a ${primero}`, `${d[`${campo}_${a}`] >= d[`${campo}_${primero}`] ? '+' : '−'}${dec(Math.abs(d[`${campo}_${a}`] - d[`${campo}_${primero}`]))} p.p.`],
+                [`Frente al año A (${primero})`, `${d[`${campo}_${a}`] >= d[`${campo}_${primero}`] ? '+' : '−'}${dec(Math.abs(d[`${campo}_${a}`] - d[`${campo}_${primero}`]))} p.p.`],
               ],
             });
           }}

@@ -72,7 +72,7 @@ export default function ProgresividadFria() {
 
   return (
     <Figure
-      id="13"
+      id="14"
       title={
         perdida < -1
           ? `Sin indexación completa, el neto real queda ${eur(Math.abs(perdida))} por debajo del punto de partida de ${base}`

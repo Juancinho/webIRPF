@@ -88,7 +88,7 @@ function Serie({ anioActual }) {
 
   return (
     <Figure
-      id="24"
+      id="28"
       title={`España debe ${dec(SERIE[SERIE.length - 1].totalMM / 1000, 2)} billones de euros, el ${pct(SERIE[SERIE.length - 1].pctPIB)} de su PIB`}
       sub="2012—2026 · arriba, deuda por habitante en euros · abajo, la misma deuda como porcentaje del PIB · dos escalas separadas, nunca superpuestas"
       legend="Área = deuda por habitante · línea inferior = deuda sobre PIB · el año en curso va en petróleo"
@@ -237,7 +237,7 @@ function Cascada() {
 
   return (
     <Figure
-      id="25"
+      id="29"
       title={`De dónde salió: la deuda creció ${total.toLocaleString('es-ES')} mM € desde 2012, y ${mayor.inc.toLocaleString('es-ES')} de ellos en un solo año`}
       sub={`Aumento de la deuda total en cada ejercicio · miles de millones de euros · una marca = ${UNIT}.000 millones`}
       legend={`Una marca = ${UNIT}.000 M € · marcas llenas = la deuda sube · marcas discontinuas = la deuda baja`}
@@ -350,7 +350,7 @@ function TuParte({ anio, irpf }) {
 
   return (
     <Figure
-      id="26"
+      id="30"
       title={
         anios
           ? `La deuda por habitante equivale a ${dec(anios)} años de tu IRPF anual`

@@ -5,13 +5,17 @@ import {
   DATOS_CHART,
   DATOS_CHART_NOMINAL,
   INFLACION_A_2026,
+  PRECIOS_REFERENCIA,
   calcularNomina,
 } from '../engine/irpf';
 import Figure from '../figures/Figure';
 import Epocas from './Epocas';
 import ProgresividadFria from './ProgresividadFria';
 import Art20Historia from './Art20Historia';
+import Pendiente from './Pendiente';
 import MapaCalor from './MapaCalor';
+import Monedas from './Monedas';
+import EnCosas from './EnCosas';
 import Puente from '../figures/Puente';
 import ChartFrame from '../figures/ChartFrame';
 import { useDomainZoom } from '../figures/useDomainZoom';
@@ -45,6 +49,23 @@ const atlasColor = (year, currentYear) =>
  */
 export default function Historia() {
   const { bruto, anio, opts, setAnio, setBruto } = useFiscal();
+  const aniosComparables = useMemo(
+    () => ANIOS.filter(a => a <= PRECIOS_REFERENCIA.ultimoAnio),
+    []
+  );
+  const [comparacion, setComparacion] = useState(() => ({
+    a: aniosComparables[0],
+    b: aniosComparables[aniosComparables.length - 1],
+  }));
+
+  /* Si el lector elige el mismo año en los dos extremos, intercambiamos el
+     otro. Así nunca queda una comparación vacía y el gesto sigue siendo A→B. */
+  const elegirComparacionA = useCallback(a => {
+    setComparacion(actual => a === actual.b ? { a, b: actual.a } : { ...actual, a });
+  }, []);
+  const elegirComparacionB = useCallback(b => {
+    setComparacion(actual => b === actual.a ? { a: actual.b, b } : { ...actual, b });
+  }, []);
 
   const bruto2026 = useMemo(
     () => Math.round(bruto * (INFLACION_A_2026[anio] || 1)),
@@ -157,13 +178,28 @@ export default function Historia() {
 
             <Dumbbells serie={serie} anio={anio} mejor={mejor} elegirAnio={elegirAnio} bruto2026={bruto2026} />
 
+            <Puente rotulo="La otra cara de la misma cuenta">
+              La figura anterior mide lo que te queda. Esta mide lo que sale, y lo cuenta en vez de
+              dibujarlo: comparar dos años deja de ser comparar la longitud de dos barras y pasa a
+              ser <strong>contar fichas</strong>.
+            </Puente>
+
+            <Monedas bruto2026={bruto2026} elegirAnio={elegirAnio} />
+
             <Puente rotulo="De la serie al caso concreto">
               La serie ordena quince años, pero ordenar no es medir. Para saber qué separa de
               verdad a un ejercicio de otro hay que ponerlos uno al lado del otro y bajar al
               detalle: cuánto IRPF, cuánta cotización, cuánto neto.
             </Puente>
 
-            <Epocas bruto2026={bruto2026} />
+            <Epocas
+              bruto2026={bruto2026}
+              anios={aniosComparables}
+              anioA={comparacion.a}
+              anioB={comparacion.b}
+              onAnioA={elegirComparacionA}
+              onAnioB={elegirComparacionB}
+            />
 
             <Puente rotulo="Y ahora, todos los sueldos">
               Hasta aquí hemos mantenido fijo un nivel salarial. El atlas amplía la comparación a
@@ -177,6 +213,21 @@ export default function Historia() {
 
             <Art20Historia />
 
+            <Puente rotulo="Quince años en una sola recta">
+              Cada figura anterior ha medido un año, o un sueldo. Queda la comparación directa entre
+              <strong> dos ejercicios elegidos por ti</strong>, con el mismo poder adquisitivo en
+              ambos: ¿en qué alturas de la escala aumentó la presión y en cuáles disminuyó? Una recta
+              por nivel salarial; la pendiente es la respuesta.
+            </Puente>
+
+            <Pendiente
+              anios={aniosComparables}
+              anioA={comparacion.a}
+              anioB={comparacion.b}
+              onAnioA={elegirComparacionA}
+              onAnioB={elegirComparacionB}
+            />
+
           </div>
         </div>
 
@@ -185,14 +236,35 @@ export default function Historia() {
             el sitio —y romper la retícula es justo lo que pide el capítulo. */}
         <div className="fs-field" style={{ maxWidth: 'var(--reading-max)', margin: '0 auto' }}>
           <Puente rotulo="Quince años, de una vez">
-            La última figura reúne las dos dimensiones anteriores: quince ejercicios y cien niveles
-            de renta. El color representa una única magnitud fiscal y permite localizar periodos o
-            tramos salariales que se apartan del patrón general.
+            La recta anterior compara los años A y B que has elegido. Esta figura conserva ese par
+            resaltado, pero muestra el contexto completo: quince ejercicios y cien niveles de renta.
+            El color representa una única magnitud fiscal y permite localizar periodos o tramos que
+            se apartan del patrón general.
           </Puente>
         </div>
 
         <div className="fs-ancho">
-          <MapaCalor />
+          <MapaCalor anioA={comparacion.a} anioB={comparacion.b} />
+        </div>
+
+        <div className="fs-field" style={{ maxWidth: 'var(--reading-max)', margin: '0 auto' }}>
+          <Puente rotulo="Y en cosas que se pueden señalar">
+            Todo el capítulo mide en euros constantes, que es lo correcto y a la vez una
+            abstracción: el IPC general mezcla la vivienda con los electrodomésticos. La última
+            figura cambia el denominador por algo que se puede señalar con el dedo y cuenta
+            cuántos caben en el mismo sueldo.
+          </Puente>
+        </div>
+
+        <div className="fs-ancho">
+          <EnCosas
+            bruto2026={bruto2026}
+            anios={aniosComparables}
+            anioA={comparacion.a}
+            anioB={comparacion.b}
+            onAnioA={elegirComparacionA}
+            onAnioB={elegirComparacionB}
+          />
         </div>
       </div>
     </section>
@@ -522,7 +594,7 @@ function Atlas({ anio, bruto2026, elegirAnio }) {
 
   return (
     <Figure
-      id="12"
+      id="13"
       title={
         medida === 'neto'
           ? 'El neto real por nivel de renta, año a año'

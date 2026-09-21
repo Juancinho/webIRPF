@@ -10,19 +10,16 @@ import {
   inflacionAcumulada,
   percentilDe,
 } from '../engine/irpf';
-import Figure from '../figures/Figure';
 import { CurvaDistribucion, Percentiles, EvolucionDistribucion } from './Distribucion';
-import ChartFrame from '../figures/ChartFrame';
-import { Label, YouMark } from '../figures/marks';
-import { linear, round } from '../figures/scale';
+import Enjambre from './Enjambre';
+import Mosaico from './Mosaico';
 import { dec, eur, pct } from '../utils/format';
 
 /**
  * 06 · TU LUGAR Y TU PARTE
- * FIG. 17 la curva de la distribución · FIG. 18 los percentiles · FIG. 19 cien
- * trabajadores · FIG. 20 la distribución en el tiempo · FIG. 21 el destino de
- * tu aportación · FIG. 22–24 la
- * public debt.
+ * FIG. 20 la curva de la distribución · FIG. 21 los percentiles · FIG. 22 mil
+ * asalariados punto a punto · FIG. 23 la distribución en el tiempo ·
+ * FIG. 24 quién sostiene la recaudación.
  */
 export default function Lugar() {
   const { bruto, anio, percentil } = useFiscal();
@@ -106,7 +103,7 @@ export default function Lugar() {
 
             <Percentiles />
 
-            <CienTrabajadores bruto={bruto} anio={anio} dist={dist} percentil={percentil} />
+            <Enjambre />
 
             <Puente rotulo="La escalera también se mueve">
               Una foto de un solo año no dice si la escalera sube contigo o sin ti. Esta es la
@@ -118,6 +115,15 @@ export default function Lugar() {
 
             {anio > 2012 && <Escenario bruto={bruto} anio={anio} />}
 
+            <Puente rotulo="De dónde sale el dinero">
+              Ya sabes dónde cae tu sueldo. Queda la pregunta que se discute todos los días sin
+              mirar los números: <strong>de qué parte de la escala sale lo que se recauda</strong>.
+              La figura siguiente la responde con una regla sencilla —cuánto cobra cada tramo por
+              cuánto paga— de manera que la superficie de cada bloque sea su aportación.
+            </Puente>
+
+            <Mosaico />
+
             <Puente rotulo="Cambio de pregunta">
               La distribución termina aquí: responde <strong>dónde está tu salario</strong>. El
               capítulo siguiente no continúa esta escala ni describe tu percentil; cambia de objeto
@@ -127,121 +133,6 @@ export default function Lugar() {
         </div>
       </div>
     </section>
-  );
-}
-
-/** Display-only inverse of the engine's published percentile curve. */
-function salarioEnPercentil(p, dist) {
-  const pts = [
-    [10, dist.p10],
-    [25, dist.p25],
-    [50, dist.p50],
-    [75, dist.p75],
-    [90, dist.p90],
-  ];
-  if (p <= 10) return dist.p10 * Math.pow(p / 10, 1 / 0.7);
-  for (let i = 0; i < pts.length - 1; i++) {
-    const [p0, s0] = pts[i];
-    const [p1, s1] = pts[i + 1];
-    if (p >= p0 && p <= p1) return s0 + ((p - p0) / (p1 - p0)) * (s1 - s0);
-  }
-  const q = Math.min(p, 99.4);
-  return dist.p90 * (1 - Math.log(Math.max(1e-3, 1 - (q - 90) / 10)));
-}
-
-/* ── FIG. 19 · cien trabajadores ─────────────────────────────────────────── */
-function CienTrabajadores({ bruto, anio, dist, percentil }) {
-  const W = 880;
-  const H = 300;
-  const X0 = 20;
-  const X1 = W - 130;
-  const BASE = 236;
-
-  const marcas = useMemo(
-    () => Array.from({ length: 100 }, (_, i) => ({ p: i + 1, s: salarioEnPercentil(i + 1, dist) })),
-    [dist]
-  );
-
-  const hi = Math.max(...marcas.map(m => m.s));
-  const x = linear([0, 100], [X0, X1]);
-  const y = linear([0, hi], [BASE, 30]);
-
-  const hitos = [
-    ['P10', 10, dist.p10],
-    ['P25', 25, dist.p25],
-    ['P50', 50, dist.p50],
-    ['P75', 75, dist.p75],
-    ['P90', 90, dist.p90],
-  ];
-
-  return (
-    <Figure
-      id="20"
-      title="Cien asalariados de España, puestos en fila por salario"
-      sub={`${anio} · una marca = un trabajador de cada cien · altura = su salario bruto anual`}
-      legend="Una marca = un asalariado de cada cien · las líneas verticales son los percentiles publicados por el INE"
-      source="Fuente · INE · EAES tabla 28191"
-      note={
-        anio > ULTIMO_ANIO_SALARIAL_OFICIAL
-          ? `Los percentiles de ${anio} son proyección propia a partir de ${ULTIMO_ANIO_SALARIAL_OFICIAL}; el INE tampoco publica P95 ni P99, así que la cola se dibuja como extrapolación suave.`
-          : 'El INE no publica P95 ni P99 en esta tabla: la cola alta se dibuja como una extrapolación suave, no como dato censal.'
-      }
-      summary={hitos.map(([l, , v]) => `${l}: ${eur(v)}`).join('; ')}
-    >
-      <ChartFrame viewBox={`0 0 ${W} ${H}`} scroll>
-        <line x1={X0} y1={BASE} x2={X1} y2={BASE} stroke="var(--rule)" strokeWidth={0.8} />
-
-        {marcas.map(m => {
-          const mio = Math.abs(m.p - Math.round(percentil)) < 0.5;
-          return (
-            <line
-              key={m.p}
-              x1={round(x(m.p))}
-              y1={BASE}
-              x2={round(x(m.p))}
-              y2={round(y(m.s))}
-              stroke={mio ? 'var(--signal)' : 'var(--ink-3)'}
-              strokeWidth={mio ? 2 : 1}
-              opacity={mio ? 1 : 0.62}
-            >
-              <title>{`Percentil ${m.p} — ${eur(m.s)}`}</title>
-            </line>
-          );
-        })}
-
-        {hitos.map(([label, p, v]) => (
-          <g key={label}>
-            <line x1={round(x(p))} y1={22} x2={round(x(p))} y2={BASE + 6} stroke="var(--ink-6)" strokeWidth={0.7} strokeDasharray="2 4" />
-            <Label x={x(p)} y={18} size={9} color="var(--ink-4)" anchor="middle" mono>
-              {label}
-            </Label>
-            <Label x={x(p)} y={BASE + 20} size={9.5} color="var(--ink-4)" anchor="middle">
-              {eur(v)}
-            </Label>
-          </g>
-        ))}
-
-        <YouMark
-        x={x(Math.min(99.5, Math.max(1, percentil)))}
-        y={Math.max(48, y(Math.min(bruto, hi)) - 4)}
-        height={26}
-        label={`TÚ · ${eur(bruto)}`}
-      />
-
-        <Label x={X1 + 10} y={y(hi) + 4} size={9.5} color="var(--ink-4)" mono>
-          {eur(hi)}
-        </Label>
-        <Label x={X1 + 10} y={BASE + 4} size={9.5} color="var(--ink-4)" mono>
-          0 €
-        </Label>
-        <Label x={X0} y={H - 6} size={9} color="var(--ink-5)" mono>
-          MENOS SALARIO
-        </Label>
-        <Label x={X1} y={H - 6} size={9} color="var(--ink-5)" anchor="end" mono>
-          MÁS SALARIO →
-        </Label>
-      </ChartFrame>
-    </Figure>
   );
 }
 

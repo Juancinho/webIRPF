@@ -122,7 +122,7 @@ export default function Calendario() {
 
   return (
     <Figure
-      id="23"
+      id="27"
       title={`Los primeros ${diaLibre} días del año los trabajas para el sistema: el ${fechaLibre.dia} de ${MESES[fechaLibre.mes].toLowerCase()} empiezas a cobrar para ti`}
       sub={`${anio} · ${totalDias} casillas, una por día · los ${diaLibre} primeros están pintados con el destino que financian`}
       legend={`Casilla llena = día que financia gasto público · casilla vacía = día que llega a tu cuenta · el reparto por destino sigue la clasificación funcional de ${GASTO_COFOG.anio}`}

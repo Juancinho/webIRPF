@@ -7,7 +7,7 @@ import Puente from '../figures/Puente';
 import Calendario from './Calendario';
 import ChartFrame from '../figures/ChartFrame';
 import { Label } from '../figures/marks';
-import { round } from '../figures/scale';
+import { rnd, round } from '../figures/scale';
 import { dec, eur, pct } from '../utils/format';
 
 const W = 880;
@@ -35,7 +35,47 @@ function cinta(x0, a0, a1, x1, b0, b1) {
 }
 
 /**
- * FIG. 21 — EL RÍO DE LOS EUROS.
+ * El caudal, hecho visible: unos cuantos puntos recorriendo la cinta de punta
+ * a punta. No añaden dato ninguno —la cifra ya está en el ancho— pero
+ * convierten un diagrama estático en algo que se lee como lo que es, un
+ * movimiento de dinero con una dirección. Se reparten por el grosor de la
+ * cinta, arrancan desfasados de forma determinista (nunca `Math.random`, para
+ * que la figura salga idéntica en cada carga) y desaparecen por completo si el
+ * sistema pide menos animación.
+ */
+function Particulas({ x0, a0, a1, x1, b0, b1, color, dur = 5, semilla = 0, opacidad = 0.55 }) {
+  const n = Math.max(2, Math.min(14, Math.round((a1 - a0) / 24)));
+  const m = (x0 + x1) / 2;
+  return (
+    <g pointerEvents="none" opacity={opacidad}>
+      {Array.from({ length: n }, (_, i) => {
+        const t = (i + 0.5) / n;
+        const ac = a0 + t * (a1 - a0);
+        const bc = b0 + t * (b1 - b0);
+        const d =
+          `M${round(x0)} ${round(ac)} C${round(m)} ${round(ac)} ${round(m)} ${round(bc)} ${round(x1)} ${round(bc)}`;
+        return (
+          <circle
+            key={i}
+            className="fs-particula"
+            r={1.6}
+            cx={0}
+            cy={0}
+            fill={color}
+            style={{
+              offsetPath: `path("${d}")`,
+              animationDuration: `${dur}s`,
+              animationDelay: `${-(rnd(i + 1, semilla + 7) * dur).toFixed(2)}s`,
+            }}
+          />
+        );
+      })}
+    </g>
+  );
+}
+
+/**
+ * FIG. 25 — EL RÍO DE LOS EUROS.
  *
  * La pregunta que el capítulo de la cuña deja abierta: los euros que no llegan
  * a tu cuenta, ¿dónde acaban? Dos afluentes —cotizaciones e IRPF— desembocan en
@@ -192,7 +232,7 @@ function RioDeLosEuros() {
 
   return (
     <Figure
-      id="22"
+      id="26"
       title={`Aplicando el reparto COFOG, ${eur(euros(social.parte))} de tu aportación equivalen a protección social`}
       sub={`${anio} · correspondencia proporcional de tu cuña fiscal con el gasto público consolidado · clasificación funcional COFOG de ${GASTO_COFOG.anio}`}
       legend={`Dos afluentes —cotizaciones e IRPF— desembocan en una caja común · el ancho de cada cinta es su parte del gasto · los días se cuentan sobre ${DIAS_LABORABLES} jornadas laborables`}
@@ -296,6 +336,18 @@ function RioDeLosEuros() {
                 fill={`url(#${grad}-${f.key})`}
                 opacity={activa ? 0.2 : 0.4}
               />
+              <Particulas
+                x0={XS1}
+                a0={y0}
+                a1={y1}
+                x1={XT0}
+                b0={t0}
+                b1={t1}
+                color={f.color}
+                dur={5.4}
+                semilla={i}
+                opacidad={activa ? 0.22 : 0.7}
+              />
               <rect x={XS0} y={round(y0)} width={XS1 - XS0} height={round(y1 - y0)} fill={f.color} />
               <Label x={XS0} y={round(y0) - 8} size={9.5} weight={700} color={f.color} mono>
                 {f.label} · {eur(f.valor)}
@@ -323,6 +375,18 @@ function RioDeLosEuros() {
                 d={cinta(XT1, a0, a1, XG0, g.y0, g.y1)}
                 fill={`url(#${grad}-${dim ? 'tronco' : activa ? 'viva' : 'tronco'})`}
                 opacity={dim ? 0.12 : activa ? 0.3 : 0.42}
+              />
+              <Particulas
+                x0={XT1}
+                a0={a0}
+                a1={a1}
+                x1={XG0}
+                b0={g.y0}
+                b1={g.y1}
+                color={activa && !dim ? 'var(--signal)' : 'var(--ink-2)'}
+                dur={6.2}
+                semilla={i + 3}
+                opacidad={dim ? 0.08 : 0.5}
               />
               <rect x={XG0} y={round(g.y0)} width={XG1 - XG0} height={round(g.y1 - g.y0)} fill="var(--ink-3)" opacity={dim ? 0.4 : 1} />
               <g transform={`translate(${XG0 - 8} ${round((g.y0 + g.y1) / 2)}) rotate(-90)`}>

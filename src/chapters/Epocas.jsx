@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useFiscal } from '../state/fiscalContext';
 import { ANIOS, INFLACION_A_2026, calcularNomina, calcularTipoMarginal } from '../engine/irpf';
 import Figure from '../figures/Figure';
+import YearComparator from '../figures/YearComparator';
 import { eur, pct, sign } from '../utils/format';
 
 /**
@@ -12,8 +13,8 @@ import { eur, pct, sign } from '../utils/format';
  * datos dibujados dos veces. Aquí queda lo que aquella figura no hacía —
  * comparar dos años concretos, línea a línea.
  */
-export default function Epocas({ bruto2026 }) {
-  const { anio, opts, setAnio } = useFiscal();
+export default function Epocas({ bruto2026, anios, anioA, anioB, onAnioA, onAnioB }) {
+  const { opts } = useFiscal();
 
   const serie = useMemo(
     () =>
@@ -37,13 +38,21 @@ export default function Epocas({ bruto2026 }) {
     [bruto2026, opts]
   );
 
-  return <Comparador serie={serie} anioActual={anio} bruto2026={bruto2026} setAnio={setAnio} />;
+  return (
+    <Comparador
+      serie={serie}
+      bruto2026={bruto2026}
+      anios={anios}
+      anioA={anioA}
+      anioB={anioB}
+      onAnioA={onAnioA}
+      onAnioB={onAnioB}
+    />
+  );
 }
 
 /* ── head-to-head comparator ──────────────────────────────────────────────── */
-function Comparador({ serie, anioActual, bruto2026, setAnio }) {
-  const [a, setA] = useState(2016);
-  const b = anioActual;
+function Comparador({ serie, bruto2026, anios, anioA: a, anioB: b, onAnioA, onAnioB }) {
 
   const A = serie.find(s => s.anio === a) || serie[0];
   const B = serie.find(s => s.anio === b) || serie[serie.length - 1];
@@ -63,30 +72,21 @@ function Comparador({ serie, anioActual, bruto2026, setAnio }) {
 
   return (
     <Figure
-      id="11"
+      id="12"
       title={`${a} frente a ${b}, con el mismo poder adquisitivo`}
       sub={`${eur(bruto2026)} constantes de 2026 pasados por la fiscalidad de cada año · elige los dos años que quieras comparar`}
       legend="Todas las cifras monetarias están en euros de 2026 para que sean comparables"
       source="Fuente · cálculo propio · IPC INE"
       summary={`En ${a} el neto real era ${eur(A.neto)} y en ${b} ${eur(B.neto)}.`}
     >
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, alignItems: 'center', marginBottom: 18 }}>
-        <label className="fs-label" htmlFor="cmp-a">Año A</label>
-        <select id="cmp-a" className="fs-select" value={a} onChange={e => setA(+e.target.value)}>
-          {ANIOS.map(y => (
-            <option key={y} value={y}>{y}</option>
-          ))}
-        </select>
-
-        <label className="fs-label" htmlFor="cmp-b">Año B</label>
-        <select id="cmp-b" className="fs-select" value={b} onChange={e => setAnio(+e.target.value)}>
-          {ANIOS.map(y => (
-            <option key={y} value={y}>{y}</option>
-          ))}
-        </select>
-
-        <span className="fs-note">El año B es el de toda la publicación.</span>
-      </div>
+      <YearComparator
+        years={anios}
+        yearA={a}
+        yearB={b}
+        onYearA={onAnioA}
+        onYearB={onAnioB}
+        note="Este par se conserva en las FIG. 16, 17 y 18."
+      />
 
       <p className="fs-data-md num" style={{ color: dif >= 0 ? 'var(--signal)' : 'var(--ink)', margin: '0 0 6px' }}>
         {sign(dif)}

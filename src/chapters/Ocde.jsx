@@ -48,7 +48,7 @@ export default function Ocde() {
 
   return (
     <Figure
-      id="17"
+      id="20"
       title={`De cada 100 € de coste laboral, en España llegan ${Math.round(100 - ESPANA.total)} € al trabajador: el puesto ${posicion} de ${filas.length} de la OCDE`}
       sub={`${CUNA_OCDE_META.informe} · datos ${CUNA_OCDE_META.ejercicio} · ${CUNA_OCDE_META.supuesto} · cada fila son 100 € de coste laboral`}
       legend="Cada barra suma 100 € · la parte clara es lo que llega al trabajador · las tres oscuras son IRPF, cotización del trabajador y cotización de la empresa"

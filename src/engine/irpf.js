@@ -671,4 +671,34 @@ export const GASTO_COFOG = Object.freeze({
   ],
 });
 
+
+// ── Precios de referencia para medir el poder adquisitivo ───────────────────
+// Sólo entran series anuales completas y publicadas. El coche y el menú del
+// día, que serían más gráficos, no tienen serie anual pública desde 2012: el
+// precio medio del coche nuevo sólo está publicado desde 2019 y la encuesta
+// del menú del día arranca en 2016, así que quedan fuera antes que entrar a
+// medias.
+//
+// Vivienda: idealista, informe de precios, valor de diciembre de cada año.
+// SMI: BOE, Real Decreto de cada ejercicio (ya en SMI_ANUAL).
+export const PRECIOS_REFERENCIA = Object.freeze({
+  fuente: 'idealista — informes de precio de vivienda (valores de diciembre)',
+  url: 'https://www.idealista.com/sala-de-prensa/informes-precio-vivienda/',
+  ultimoAnio: 2025,
+  // euros por metro cuadrado de vivienda en venta
+  venta: {
+    2012: 1801, 2013: 1613, 2014: 1590, 2015: 1549, 2016: 1547, 2017: 1600,
+    2018: 1730, 2019: 1792, 2020: 1795, 2021: 1856, 2022: 1951, 2023: 2124,
+    2024: 2324, 2025: 2725,
+  },
+  // euros por metro cuadrado y mes de alquiler
+  alquiler: {
+    2012: 7.7, 2013: 7.4, 2014: 7.4, 2015: 7.6, 2016: 8.4, 2017: 9.8,
+    2018: 10.5, 2019: 10.8, 2020: 10.9, 2021: 10.5, 2022: 11.3, 2023: 12.3,
+    2024: 13.5, 2025: 14.4,
+  },
+  // el piso de referencia para convertir €/m² en una mensualidad
+  pisoM2: 80,
+});
+
 function r2(n) { return Math.round(n * 100) / 100; }

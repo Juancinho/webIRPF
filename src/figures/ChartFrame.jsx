@@ -68,7 +68,11 @@ export default function ChartFrame({
                   {color && <span className="fs-tip-dot" style={{ background: color }} />}
                   {k}
                 </dt>
-                <dd style={color ? { color } : undefined}>{v}</dd>
+                {/* El valor va siempre en el color del texto: pintarlo con el de
+                    la serie lo dejaba ilegible sobre el fondo oscuro del recuadro
+                    (tinta sobre tinta, azul sobre casi negro). Quien identifica la
+                    serie es el punto de color, no la cifra. */}
+                <dd>{v}</dd>
               </div>
             ))}
           </dl>

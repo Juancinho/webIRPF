@@ -1,11 +1,10 @@
 import { useMemo, useState } from 'react';
 import { useFiscal } from '../state/fiscalContext';
 import { CUNA_OCDE_2025 } from '../engine/irpf';
-import Figure from '../figures/Figure';
 import Ocde from './Ocde';
+import CampoCuna from './CampoCuna';
 import Puente from '../figures/Puente';
-import { HundredField } from '../figures/marks';
-import { eur, pct } from '../utils/format';
+import { pct } from '../utils/format';
 
 const MEDIA = CUNA_OCDE_2025.find(p => p.code === 'OECD');
 const ESPANA = CUNA_OCDE_2025.find(p => p.code === 'ES');
@@ -17,7 +16,7 @@ const ESPANA = CUNA_OCDE_2025.find(p => p.code === 'ES');
  * gráfico). FIG. 16 los mismos cien euros, país a país, en la OCDE.
  */
 export default function Cuna() {
-  const { bruto, anio, nomina, focus, setFocus } = useFiscal();
+  const { bruto, anio, nomina } = useFiscal();
   const [vista, setVista] = useState('empresa');
 
   const total = vista === 'empresa' ? nomina.costeLab : bruto;
@@ -36,8 +35,6 @@ export default function Cuna() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vista, nomina, total]);
 
-  const suma = grupos.reduce((a, g) => a + g.value, 0);
-  const netoPct = p(nomina.salarioNeto);
 
   return (
     <section id="cuna" className="fs-chapter fs-night fs-open-wedge" aria-labelledby="cuna-t">
@@ -57,6 +54,16 @@ export default function Cuna() {
             indicador, con una metodología homogénea, entre países.
           </p>
         </div>
+
+        <CampoCuna
+          grupos={grupos}
+          anio={anio}
+          bruto={bruto}
+          nomina={nomina}
+          vista={vista}
+          setVista={setVista}
+          total={total}
+        />
 
         <div className="fs-spread">
           <aside className="fs-rail">
@@ -79,57 +86,6 @@ export default function Cuna() {
           </aside>
 
           <div className="fs-field">
-            <Figure
-              id="16"
-              title={`${Math.round(netoPct)} € de cada 100 llegan como renta neta`}
-              sub={`${anio} · ${vista === 'empresa' ? `sobre el coste laboral total (${eur(nomina.costeLab)})` : `sobre el salario bruto (${eur(bruto)})`} · un bloque = 1 €`}
-              legend={`Un bloque = 1 € de cada 100 · ${grupos.map(g => `${g.label} ${g.value}`).join(' + ')} = ${suma}${suma < 100 ? ` · ${100 - suma} € se reparten en el redondeo` : ''}`}
-              source={`Fuente · TGSS · AEAT · cálculo propio`}
-              summary={grupos.map(g => `${g.label}: ${g.value} de cada 100`).join('; ')}
-            >
-              <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
-                <span className="fs-seg">
-                  <button type="button" aria-pressed={vista === 'trabajador'} onClick={() => setVista('trabajador')}>
-                    Trabajador
-                  </button>
-                  <button type="button" aria-pressed={vista === 'empresa'} onClick={() => setVista('empresa')}>
-                    Coste empresarial
-                  </button>
-                </span>
-              </div>
-
-              <svg className="fs-svg" viewBox="0 0 440 240" style={{ maxWidth: 520 }}>
-                <HundredField
-                  groups={grupos}
-                  columns={20}
-                  size={16}
-                  gap={5}
-                  x={2}
-                  y={6}
-                  focus={focus}
-                  onFocus={setFocus}
-                />
-              </svg>
-
-              <div className="fs-keys">
-                {grupos.map(g => (
-                  <button
-                    key={g.key}
-                    type="button"
-                    className={`fs-key ${focus && focus !== g.key ? 'is-dim' : ''}`}
-                    onMouseEnter={() => setFocus(g.key)}
-                    onMouseLeave={() => setFocus(null)}
-                    onFocus={() => setFocus(g.key)}
-                    onBlur={() => setFocus(null)}
-                  >
-                    <span className="fs-key-swatch" style={{ background: g.color }} />
-                    {g.label}
-                    <span className="fs-key-v">{g.value} €</span>
-                  </button>
-                ))}
-              </div>
-            </Figure>
-
             <p className="fs-data fs-data-rule" style={{ color: 'var(--night-signal)', marginTop: 8 }}>
               {pct(nomina.cunaFiscal * 100)}
             </p>
