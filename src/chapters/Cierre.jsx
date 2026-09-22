@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useFiscal } from '../state/fiscalContext';
 import { GASTO_COFOG } from '../engine/irpf';
 import { HundredField } from '../figures/marks';
+import Fuente from '../figures/Fuente';
 import { dec, eur, pct } from '../utils/format';
 
 const NOCHE = '#0e1214';
@@ -227,6 +228,9 @@ export default function Cierre() {
                 según la correspondencia COFOG, {pct(parteSocial * 100, 0)} se asignaría a protección social.
               </p>
             </div>
+            <figcaption className="fs-source" style={{ marginTop: 18 }}>
+              <Fuente>Fuente · BOE · AEAT · TGSS · INE · cálculo propio</Fuente>
+            </figcaption>
           </figure>
         </div>
       </div>

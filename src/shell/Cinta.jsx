@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useFiscal } from '../state/fiscalContext';
 import { ANIOS, DISTRIBUCION_SALARIAL, REFORMA_ANIOS, REGIONES, SMI_ANUAL } from '../engine/irpf';
 import { dec, eur, num } from '../utils/format';
+import Fuente from '../figures/Fuente';
 
 /**
  * LA CINTA — the persistent instrument (VISUAL_PLAN_V4 §6).
@@ -253,7 +254,7 @@ function PerfilSheet({ opts, anio, setOpt, setOpts, onClose }) {
       />
 
       <p className="fs-source" style={{ marginTop: 14 }}>
-        Fuente · BOE · LIRPF arts. 56–61 · Leyes autonómicas de medidas tributarias
+        <Fuente>Fuente · BOE · LIRPF arts. 56–61 · Leyes autonómicas de medidas tributarias</Fuente>
       </p>
     </div>
   );

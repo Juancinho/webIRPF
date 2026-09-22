@@ -1,4 +1,5 @@
 import { GUIAS } from './guias';
+import Fuente from './Fuente';
 
 /**
  * The figure frame: FIG. nn · conclusion title · subtitle · field · unit
@@ -53,7 +54,7 @@ export default function Figure({
       {(source || note) && (
         <div className="fs-figure-foot">
           {note && <p className="fs-note" style={{ margin: 0, maxWidth: '62ch' }}>{note}</p>}
-          {source && <p className="fs-source" style={{ margin: 0 }}>{source}</p>}
+          {source && <p className="fs-source" style={{ margin: 0 }}><Fuente>{source}</Fuente></p>}
         </div>
       )}
     </figure>

@@ -4,6 +4,7 @@ import { useNarrow } from '../hooks/useNarrow';
 import { useNumeroAnimado } from '../hooks/useNumeroAnimado';
 import { linear, clamp, round } from '../figures/scale';
 import { TickFloor, Label, HundredField } from '../figures/marks';
+import Fuente from '../figures/Fuente';
 import { dec, eur, num } from '../utils/format';
 
 const MAX = 150000;
@@ -94,7 +95,7 @@ export default function Portada() {
 
         <div className="fs-cover-foot">
           <p className="fs-source" style={{ margin: 0 }}>
-            Fuente · BOE · AEAT · TGSS · INE
+            <Fuente>Fuente · BOE · AEAT · TGSS · INE</Fuente>
           </p>
           <a className="fs-cover-scroll" href="#prologo">
             Sigue leyendo ↓

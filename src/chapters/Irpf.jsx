@@ -135,6 +135,26 @@ export default function Irpf() {
                 .map(b => `Tramo ${pct(b.tipo * 100)}: ${eur(b.dentro)} dentro, cuota ${eur(b.cuota)}`)
                 .join('. ')}
             >
+              {activa && (
+                <div className="fs-tramo-readout" role="status" aria-live="polite">
+                  <span>
+                    <span className="fs-readout-k">Tipo del tramo</span>
+                    <strong>{pct(activa.tipo * 100)}</strong>
+                  </span>
+                  <span>
+                    <span className="fs-readout-k">Intervalo</span>
+                    <strong>{eur(activa.desde)} — {Number.isFinite(activa.hasta) ? eur(activa.hasta) : 'sin límite'}</strong>
+                  </span>
+                  <span>
+                    <span className="fs-readout-k">Tu base aquí</span>
+                    <strong>{eur(activa.dentro)}</strong>
+                  </span>
+                  <span>
+                    <span className="fs-readout-k">Tributa en este tramo</span>
+                    <strong>{eur(activa.cuota)}</strong>
+                  </span>
+                </div>
+              )}
               <ChartFrame viewBox={`0 0 ${W} ${H}`} scroll>
                 <Rule x1={X0} y1={BASE_Y} x2={X1} y2={BASE_Y} />
 
@@ -191,8 +211,13 @@ export default function Irpf() {
                         y={BASE_Y - 170}
                         width={Math.max(6, bx1 - bx0)}
                         height={200}
+                        tabIndex={0}
+                        role="button"
+                        aria-label={`Tramo al ${pct(b.tipo * 100)}. Tu base dentro: ${eur(b.dentro)}. Cuota generada: ${eur(b.cuota)}.`}
                         onMouseEnter={() => setHover(b.i)}
                         onMouseLeave={() => setHover(null)}
+                        onFocus={() => setHover(b.i)}
+                        onBlur={() => setHover(null)}
                       >
                         <title>{`Tramo al ${pct(b.tipo * 100)} — ${eur(b.dentro)} de tu base, ${eur(b.cuota)} de cuota`}</title>
                       </rect>

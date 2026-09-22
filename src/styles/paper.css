@@ -1101,6 +1101,122 @@ select.fs-select {
   scrollbar-color: var(--ink-5) transparent;
 }
 
+/* ══ LIBRO DE MÉTODO ════════════════════════════════════════════════════════
+   La trazabilidad no vive en un modal: es una página contable abierta, con
+   cada operación y su norma en la misma línea de lectura. */
+.fs-method-ledger {
+  margin: clamp(28px, 5vh, 52px) 0 34px;
+  border-top: 2px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+}
+
+.fs-method-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 5px;
+  padding: 16px 0 18px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.fs-method-head .fs-title-sm,
+.fs-method-head .fs-note { margin: 0; }
+
+.fs-method-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.fs-method-steps > li {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 14px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--rule-soft);
+}
+
+.fs-method-steps > li:last-child { border-bottom: 0; }
+
+.fs-method-n {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--signal);
+}
+
+.fs-method-steps h5 {
+  margin: 0 0 4px;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 750;
+  color: var(--ink);
+}
+
+.fs-method-steps p {
+  margin: 5px 0 0;
+  max-width: 78ch;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-3);
+}
+
+.fs-method-steps .fs-method-formula {
+  margin: 0;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.fs-method-ledger a,
+.fs-method-families a,
+.fs-q .fs-stamp a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--signal-soft);
+}
+
+.fs-method-ledger a:hover,
+.fs-method-families a:hover,
+.fs-q .fs-stamp a:hover { color: var(--signal); }
+
+.fs-method-families {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 28px;
+  border-top: 1px solid var(--ink);
+}
+
+.fs-method-families article {
+  scroll-margin-top: 72px;
+  padding: 16px 0 20px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.fs-method-families h4 {
+  margin: 6px 0 7px;
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 750;
+  color: var(--ink);
+}
+
+.fs-method-families p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.58;
+  color: var(--ink-3);
+}
+
+@media (max-width: 700px) {
+  .fs-method-families { grid-template-columns: minmax(0, 1fr); }
+}
+
 @media (max-width: 640px) {
   .fs-table {
     min-width: 620px;

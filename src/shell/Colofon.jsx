@@ -1,3 +1,5 @@
+import Fuente from '../figures/Fuente';
+
 /** The publication ends like a paper, not like a website footer (DESIGN.md §57). */
 export default function Colofon() {
   return (
@@ -14,8 +16,7 @@ export default function Colofon() {
           <div>
             <span className="fs-stamp">Datos</span>
             <p className="fs-note" style={{ marginTop: 6 }}>
-              BOE · AEAT · TGSS · INE<br />
-              OCDE · Banco de España
+              <Fuente>BOE · AEAT · TGSS · INE<br />OCDE · Banco de España</Fuente>
             </p>
           </div>
           <div>
@@ -28,7 +29,7 @@ export default function Colofon() {
           <div>
             <span className="fs-stamp">Método</span>
             <p className="fs-note" style={{ marginTop: 6 }}>
-              Cálculo propio sobre parámetros oficiales.<br />
+              <Fuente>Cálculo propio sobre parámetros oficiales.</Fuente><br />
               Estimación orientativa, no asesoramiento fiscal.
             </p>
           </div>

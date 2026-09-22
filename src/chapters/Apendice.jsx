@@ -3,13 +3,14 @@ import { useFiscal } from '../state/fiscalContext';
 import { ANIOS, obtenerParametros, INFLACION_A_2026, ULTIMO_ANIO_SALARIAL_OFICIAL } from '../engine/irpf';
 import { CRONOLOGIA, PREGUNTAS, FUENTES } from './appendixData';
 import { dec, eur, pct } from '../utils/format';
+import Fuente from '../figures/Fuente';
 
 /**
  * 07 · APÉNDICE — a research appendix, not a marketing footer.
  * A methodology · B parameters · C law · D questions · E sources · F limits.
  */
 export default function Apendice() {
-  const { anio } = useFiscal();
+  const { anio, bruto, nomina, marginal, params } = useFiscal();
 
   const parametros = useMemo(
     () =>
@@ -56,7 +57,7 @@ export default function Apendice() {
         </div>
 
         {/* ── A ─────────────────────────────────────────────────────────── */}
-        <Seccion letra="A" titulo="Metodología">
+        <Seccion letra="A" titulo="Metodología y trazabilidad" id="metodo-calculos">
           <p className="fs-body">
             El motor calcula, para cada año entre 2012 y 2026, la secuencia completa: coste laboral,
             cotizaciones de empresa y trabajador, rendimiento íntegro, gastos deducibles del art.
@@ -75,6 +76,90 @@ export default function Apendice() {
             cargo y escala estándar. Las figuras que usan series precalculadas para los quince años
             lo indican en su subtítulo.
           </p>
+
+          <div className="fs-method-ledger" aria-labelledby="metodo-actual-t">
+            <div className="fs-method-head">
+              <span className="fs-stamp">Cálculo reproducible · estado actual</span>
+              <h4 id="metodo-actual-t" className="fs-title-sm">
+                De {eur(bruto)} brutos a {eur(nomina.salarioNeto)} netos, paso a paso
+              </h4>
+              <p className="fs-note">
+                Año {anio} · {nomina.regimen === 'autonomo' ? 'régimen de autónomos' : 'régimen general'} ·
+                cada cifra procede del estado que estás viendo en la publicación.
+              </p>
+            </div>
+            <ol className="fs-method-steps">
+              <PasoMetodo n="01" titulo="Base y cotización" formula={`${eur(bruto)} de bruto → ${eur(nomina.cotTra)} de cotización del trabajador`}>
+                En régimen general se toma como base hasta {eur(params.baseMax)}; por encima se aplica,
+                cuando corresponde, la cotización adicional de solidaridad. Los tipos y topes salen de la{' '}
+                <a href="https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/CotizacionRecaudacionTrabajadores/36537" target="_blank" rel="noreferrer noopener">TGSS</a>
+                {' '}y de las órdenes anuales de cotización.
+              </PasoMetodo>
+              <PasoMetodo n="02" titulo="Rendimiento previo" formula={`${eur(bruto)} − ${eur(nomina.cotTra)} = ${eur(nomina.rnPrevio)}`}>
+                La cotización del trabajador reduce el rendimiento íntegro antes de aplicar los gastos y
+                reducciones del trabajo.
+              </PasoMetodo>
+              <PasoMetodo n="03" titulo="Gastos y reducciones" formula={`${eur(nomina.rnPrevio)} − ${eur(nomina.gastosFijos)} − ${eur(nomina.redTrabajo)}${nomina.reduccionConjunta > 0 ? ` − ${eur(nomina.reduccionConjunta)}` : ''} = ${eur(nomina.baseImponible)}`}>
+                Se aplican los gastos deducibles del{' '}
+                <a href="https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764#a19" target="_blank" rel="noreferrer noopener">art. 19 LIRPF</a>
+                {' '}y, si procede, la reducción del{' '}
+                <a href="https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764#a20" target="_blank" rel="noreferrer noopener">art. 20 LIRPF</a>.
+              </PasoMetodo>
+              <PasoMetodo n="04" titulo="Cuota por tramos" formula={`${eur(nomina.cuotaIntegra)} − ${eur(nomina.cuotaMinimo)} = ${eur(nomina.cuotaTeorica)}`}>
+                La escala progresiva se aplica a la base y, por separado, al mínimo personal y familiar.
+                La diferencia es la cuota teórica. Consulta la{' '}
+                <a href="https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764#a63" target="_blank" rel="noreferrer noopener">escala del art. 63 LIRPF</a>
+                {' '}y los <a href="https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764#a56" target="_blank" rel="noreferrer noopener">arts. 56–61</a>.
+              </PasoMetodo>
+              <PasoMetodo n="05" titulo="Deducciones y límite" formula={`${eur(nomina.cuotaTeorica)} − ${eur(nomina.deduccionSMI)} → ${eur(nomina.irpfFinal)} de IRPF`}>
+                Se resta la deducción por rendimientos del trabajo cuando existe y se aplica el límite de
+                retención modelizado. El resultado nunca baja de cero.
+              </PasoMetodo>
+              <PasoMetodo n="06" titulo="Neto disponible" formula={`${eur(bruto)} − ${eur(nomina.cotTra)} − ${eur(nomina.irpfFinal)} = ${eur(nomina.salarioNeto)}`}>
+                El neto anual se divide entre 12 o 14 pagas sólo para mostrar la periodicidad; la suma anual
+                no cambia.
+              </PasoMetodo>
+            </ol>
+          </div>
+
+          <div className="fs-method-families">
+            <article id="metodo-marginal">
+              <span className="fs-stamp">Método M1 · marginal</span>
+              <h4>Dos cálculos separados por 100 €</h4>
+              <p>
+                Se calcula la nómina con {eur(bruto)} y con {eur(bruto + 100)}. El marginal total es
+                1 − (Δ neto / 100), hoy {pct(marginal.tipoMarginalTotal * 100)}; el marginal de IRPF es
+                Δ IRPF / 100, hoy {pct(marginal.tipoMarginalIRPF * 100)}.
+              </p>
+            </article>
+            <article id="metodo-historico">
+              <span className="fs-stamp">Método M2 · historia</span>
+              <h4>Mismo poder adquisitivo, reglas de cada año</h4>
+              <p>
+                Se reexpresa el salario de referencia con el IPC acumulado de diciembre del INE y se vuelve
+                a ejecutar toda la cadena fiscal con los parámetros del año comparado. El contrafactual
+                indexado mueve también los umbrales monetarios con ese mismo factor.
+              </p>
+            </article>
+            <article id="metodo-distribucion">
+              <span className="fs-stamp">Método M3 · distribución</span>
+              <h4>Cinco percentiles observados; el resto se estima</h4>
+              <p>
+                P10, P25, P50, P75 y P90 proceden de la tabla 28191 del INE. Entre ellos se interpola
+                linealmente. Por debajo de P10 y por encima de P90 se extrapola con curvas suaves; P95 y P99
+                no son observaciones publicadas. Las figuras señalan esa incertidumbre y enlazan la tabla.
+              </p>
+            </article>
+            <article id="metodo-equivalencias">
+              <span className="fs-stamp">Método M4 · equivalencias</span>
+              <h4>De una proporción a días, euros o unidades</h4>
+              <p>
+                Calendario, monedas y poder de compra transforman una magnitud ya calculada mediante una
+                división y una multiplicación declaradas en cada figura. Son equivalencias editoriales, no
+                nuevos datos oficiales ni una trazabilidad del impuesto hacia partidas de gasto.
+              </p>
+            </article>
+          </div>
         </Seccion>
 
         {/* ── B ─────────────────────────────────────────────────────────── */}
@@ -127,7 +212,7 @@ export default function Apendice() {
             </table>
           </div>
           <p className="fs-source" style={{ marginTop: 10 }}>
-            Fuente · BOE · TGSS · órdenes anuales de cotización · INE (IPC)
+            <Fuente>Fuente · BOE · TGSS · órdenes anuales de cotización · INE (IPC)</Fuente>
           </p>
           <p className="fs-note" style={{ marginTop: 8 }}>
             2018 aplica el régimen transitorio del art. 20 (media aritmética entre la redacción de
@@ -150,7 +235,16 @@ export default function Apendice() {
                     <h4 className="fs-title-sm" style={{ fontSize: 'clamp(18px, 1.6vw, 23px)' }}>
                       {e.titulo}
                     </h4>
-                    <p className="fs-stamp" style={{ marginTop: 4 }}>{e.subtitulo}</p>
+                    <p className="fs-stamp" style={{ marginTop: 4 }}>
+                      {e.urls ? e.urls.map((f, j) => (
+                        <span key={f.url}>
+                          {j > 0 && ' · '}
+                          <a href={f.url} target="_blank" rel="noreferrer noopener">{f.label}</a>
+                        </span>
+                      )) : e.url ? (
+                        <a href={e.url} target="_blank" rel="noreferrer noopener">{e.subtitulo}</a>
+                      ) : e.subtitulo}
+                    </p>
                     <p className="fs-note" style={{ marginTop: 8, maxWidth: '72ch' }}>{e.descripcion}</p>
                     {e.metricas?.length > 0 && (
                       <p className="fs-note" style={{ marginTop: 8, color: 'var(--ink-4)' }}>
@@ -286,9 +380,22 @@ export default function Apendice() {
   );
 }
 
-function Seccion({ letra, titulo, children }) {
+function PasoMetodo({ n, titulo, formula, children }) {
   return (
-    <section style={{ marginBottom: 'clamp(48px, 8vh, 96px)' }} aria-labelledby={`ap-${letra}`}>
+    <li>
+      <span className="fs-method-n">{n}</span>
+      <div>
+        <h5>{titulo}</h5>
+        <p className="fs-method-formula">{formula}</p>
+        <p>{children}</p>
+      </div>
+    </li>
+  );
+}
+
+function Seccion({ letra, titulo, children, id }) {
+  return (
+    <section id={id} style={{ marginBottom: 'clamp(48px, 8vh, 96px)', scrollMarginTop: 72 }} aria-labelledby={`ap-${letra}`}>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 16, borderBottom: '1px solid var(--ink)', paddingBottom: 8, marginBottom: 24 }}>
         <span className="fs-stamp" style={{ fontSize: 13 }}>{letra}</span>
         <h3 id={`ap-${letra}`} className="fs-title-sm">{titulo}</h3>

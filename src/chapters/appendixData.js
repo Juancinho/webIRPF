@@ -10,6 +10,7 @@ export const CRONOLOGIA = [
     tipo: 'irpf',
     titulo: 'Tipos adicionales temporales IRPF',
     subtitulo: 'RDL 20/2011 — Plan de estabilidad',
+    url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2011-20638',
     descripcion: 'Se añaden tipos adicionales "temporales" de 0,75% a 7% sobre los tramos ordinarios. El tipo marginal máximo sube hasta el 52%. Tenía que durar dos años; duró cuatro.',
     metricas: [
       { label: 'Tipo marginal máximo', valor: '52%' },
@@ -22,6 +23,7 @@ export const CRONOLOGIA = [
     tipo: 'ss',
     titulo: 'Subida cotizaciones SS',
     subtitulo: 'RDL 20/2012 — Medidas de ajuste',
+    url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2012-9364',
     descripcion: 'Se suben las bases máximas de cotización y se incrementan los tipos de SS en varios epígrafes. Congelación del SMI.',
     metricas: [
       { label: 'SS trabajador', valor: '6,35%' },
@@ -33,6 +35,7 @@ export const CRONOLOGIA = [
     tipo: 'irpf',
     titulo: 'Reforma del IRPF — fase 1',
     subtitulo: 'Ley 26/2014 — Reforma LIRPF',
+    url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2014-12327',
     descripcion: 'La Ley 26/2014 reduce los tramos de 7 a 5, modifica los tipos, amplía la reducción por rendimientos del trabajo del art. 20 e introduce 2.000 € de otros gastos deducibles en el art. 19. El mínimo personal pasa a 5.550 €.',
     metricas: [
       { label: 'Tramos IRPF', valor: '5 tramos' },
@@ -47,6 +50,7 @@ export const CRONOLOGIA = [
     tipo: 'irpf',
     titulo: 'Reforma del IRPF — fase 2',
     subtitulo: 'Segunda parte de la Ley 26/2014',
+    url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2014-12327',
     descripcion: 'La segunda fase de la Ley 26/2014 sitúa el tipo mínimo en el 19% y el máximo en el 45%, y aplica los umbrales previstos para la nueva redacción del art. 20.',
     metricas: [
       { label: 'Tipo mínimo', valor: '19%' },
@@ -59,7 +63,8 @@ export const CRONOLOGIA = [
     mes: 'Ene',
     tipo: 'mixto',
     titulo: 'Actualización del SMI y del art. 20',
-    subtitulo: 'RDL 28/2018 — Revalorización SMI',
+    subtitulo: 'Ley 6/2018, art. 59 — ampliación del art. 20',
+    url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2018-9268#a59',
     descripcion: 'El SMI aumenta un 22,3% y el umbral inferior del art. 20 pasa a 16.825 €. En el cálculo del IRPF, esta ampliación incrementa la reducción aplicable a parte de las rentas del trabajo más bajas.',
     metricas: [
       { label: 'SMI anual', valor: '12.600 €' },
@@ -73,6 +78,7 @@ export const CRONOLOGIA = [
     tipo: 'irpf',
     titulo: 'Nuevo tramo 47% para rentas muy altas',
     subtitulo: 'PGE 2021 / Ley 11/2020',
+    url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2020-17339',
     descripcion: 'Se crea un tipo marginal del 47% para bases liquidables superiores a 300.000 €. Su alcance depende del número de contribuyentes cuya base supera ese umbral. El SMI pasa a 13.300 € anuales.',
     metricas: [
       { label: 'Nuevo tramo', valor: '>300k€ → 47%' },
@@ -85,6 +91,7 @@ export const CRONOLOGIA = [
     tipo: 'ss',
     titulo: 'MEI + cuotas autónomos por ingresos reales',
     subtitulo: 'Ley 21/2021 — Sistema de cuotas progresivo autónomos',
+    url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2021-21652#df-4',
     descripcion: 'La cotización de los trabajadores autónomos pasa a vincularse a sus rendimientos netos mediante 15 tramos. Además, el Mecanismo de Equidad Intergeneracional añade 0,6 puntos porcentuales a la cotización total destinada al sistema de pensiones.',
     metricas: [
       { label: 'MEI', valor: '+0,6% SS' },
@@ -98,6 +105,7 @@ export const CRONOLOGIA = [
     tipo: 'irpf',
     titulo: 'Tramo 47% baja a 200.000 €',
     subtitulo: 'Ley de PGE 2023',
+    url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2022-22128',
     descripcion: 'El umbral del tramo marginal del 47% desciende de 300.000 € a 200.000 €, ampliando su aplicación. El Art.20 se amplía nuevamente: el umbral inferior sube a 19.747,50 €, el más alto de la serie.',
     metricas: [
       { label: 'Tramo 47%', valor: 'desde 200k€' },
@@ -110,6 +118,7 @@ export const CRONOLOGIA = [
     tipo: 'ccaa',
     titulo: 'Reformas autonómicas: Madrid, Andalucía, Cataluña',
     subtitulo: 'Divergencia fiscal territorial',
+    url: 'https://www.boe.es/diario_boe/txt.php?id=BOE-A-2024-5610',
     descripcion: 'Las escalas autonómicas mantienen diferencias relevantes. En los parámetros incluidos, Madrid aplica un mínimo del 18% y un máximo del 45,5%, Cataluña alcanza el 50% y Andalucía incorpora los cambios de su reforma de 2022. El resultado para un mismo salario depende también de mínimos y deducciones autonómicas.',
     metricas: [
       { label: 'Madrid máx.', valor: '45,5%' },
@@ -123,6 +132,7 @@ export const CRONOLOGIA = [
     tipo: 'smi',
     titulo: 'SMI de 16.576 €',
     subtitulo: 'Real Decreto SMI 2025',
+    url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2025-2576',
     descripcion: 'El SMI alcanza 16.576 € anuales, un 60,9% más que en 2018 en términos nominales. Su relación con el IRPF depende de los umbrales de retención, de la reducción del art. 20 y del resto de parámetros vigentes.',
     metricas: [
       { label: 'SMI anual', valor: '16.576 €' },
@@ -135,6 +145,11 @@ export const CRONOLOGIA = [
     tipo: 'smi',
     titulo: 'SMI 17.094 € — nueva deducción en cuota',
     subtitulo: 'RD 126/2026 y RDL 5/2026',
+    url: 'https://www.boe.es/eli/es/rd/2026/02/18/126',
+    urls: [
+      { label: 'RD 126/2026 · SMI', url: 'https://www.boe.es/eli/es/rd/2026/02/18/126' },
+      { label: 'RDL 5/2026 · deducción', url: 'https://www.boe.es/eli/es/rdl/2026/02/17/5' },
+    ],
     descripcion: 'El SMI queda fijado en 1.221 € mensuales en 14 pagas. La deducción por rendimientos del trabajo sube a 590,89 € y desaparece progresivamente hasta 20.048,45 €. El IPC usado para las comparaciones en euros constantes de 2026 sigue siendo una estimación hasta que el INE publique el dato de diciembre.',
     metricas: [
       { label: 'SMI anual', valor: '17.094 €' },
@@ -192,8 +207,8 @@ export const FUENTES = [
   },
   {
     concepto: 'Reducción Art.20 — redacción 2019',
-    fuente: 'RDL 28/2018, art. 59 (BOE-A-2018-9268)',
-    url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2018-9268#ar-59'
+    fuente: 'Ley 6/2018, art. 59 (BOE-A-2018-9268)',
+    url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2018-9268#a59'
   },
   {
     concepto: 'Gastos deducibles Art.19.2.f',
@@ -228,11 +243,11 @@ export const FUENTES = [
   {
     concepto: 'MEI y cotización de solidaridad',
     fuente: 'RDL 2/2023, art. 127 bis y 19 bis LGSS',
-    url: null
+    url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2023-6967'
   },
   {
-    concepto: 'SMI histórico',
-    fuente: 'RD aprobado cada año (BOE oficial de cada ejercicio)',
-    url: null
+    concepto: 'SMI 2025 y 2026',
+    fuente: 'RD 87/2025 y RD 126/2026 (BOE)',
+    url: 'https://www.boe.es/eli/es/rd/2026/02/18/126'
   },
 ];
