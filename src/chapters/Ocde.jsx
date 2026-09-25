@@ -5,6 +5,7 @@ import ChartFrame from '../figures/ChartFrame';
 import { Label } from '../figures/marks';
 import { linear, round } from '../figures/scale';
 import { pct } from '../utils/format';
+import { ANCHO_MOVIL, useNarrow } from '../hooks/useNarrow';
 
 const PAISES = CUNA_OCDE_2025.filter(p => !p.media);
 const MEDIA = CUNA_OCDE_2025.find(p => p.code === 'OECD');
@@ -36,11 +37,14 @@ export default function Ocde() {
     return arr;
   }, [orden]);
 
-  const W = 880;
-  const rowH = 17;
+  // En móvil las filas son algo más altas —se tocan con el dedo— y la barra
+  // ocupa el ancho que dejan el nombre del país y su porcentaje.
+  const narrow = useNarrow();
+  const W = narrow ? ANCHO_MOVIL : 880;
+  const rowH = narrow ? 20 : 17;
   const H = filas.length * rowH + 96;
-  const X0 = 152;
-  const X1 = W - 108;
+  const X0 = narrow ? 96 : 152;
+  const X1 = W - (narrow ? 38 : 108);
   const x = linear([0, 100], [X0, X1]);
 
   const activo = filas.find(p => p.code === (hover || ref)) || filas[0];
@@ -107,8 +111,8 @@ export default function Ocde() {
         ))}
       </div>
 
-      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} scroll label="Cuña fiscal de los países de la OCDE">
-        {[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map(v => (
+      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} label="Cuña fiscal de los países de la OCDE">
+        {(narrow ? [0, 20, 40, 60, 80, 100] : [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]).map(v => (
           <g key={v}>
             <line x1={round(x(v))} y1={26} x2={round(x(v))} y2={H - 54} stroke="#252c2f" strokeWidth={0.6} />
             <Label x={round(x(v))} y={20} size={8.5} color="#6d7679" anchor="middle" mono halo={false}>
@@ -128,7 +132,7 @@ export default function Ocde() {
           return (
             <g key={p.code} opacity={hover && !esHover && !esES ? 0.55 : 1}>
               <Label
-                x={X0 - 12}
+                x={X0 - (narrow ? 6 : 12)}
                 y={y + 8}
                 size={esES ? 10 : 9}
                 weight={destacada ? 800 : 500}
@@ -147,7 +151,7 @@ export default function Ocde() {
                     x={round(cx)}
                     y={y}
                     width={round(Math.max(0, w))}
-                    height={11}
+                    height={narrow ? 12 : 11}
                     fill={fill}
                     opacity={k === 'neto' && !destacada ? 0.58 : 1}
                   >
@@ -159,7 +163,7 @@ export default function Ocde() {
               })}
 
               <Label
-                x={X1 + 10}
+                x={X1 + (narrow ? 6 : 10)}
                 y={y + 8}
                 size={esES ? 10.5 : 9.5}
                 weight={destacada ? 800 : 500}
@@ -203,7 +207,7 @@ export default function Ocde() {
         <Label x={round(x(100 - MEDIA.total))} y={H - 40} size={9} color="#c9c7c0" anchor="middle" mono halo={false}>
           MEDIA OCDE · LLEGAN {pct(100 - MEDIA.total, 0)}
         </Label>
-        <Label x={X0} y={H - 18} size={9} color="#6d7679" mono halo={false}>
+        <Label x={narrow ? 2 : X0} y={H - 18} size={narrow ? 8 : 9} color="#6d7679" mono halo={false}>
           € DE CADA 100 € DE COSTE LABORAL
         </Label>
       </ChartFrame>

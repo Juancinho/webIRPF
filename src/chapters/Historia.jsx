@@ -23,6 +23,7 @@ import { useDomainZoom } from '../figures/useDomainZoom';
 import { Label, Series } from '../figures/marks';
 import { linear, polyline, round, ticks } from '../figures/scale';
 import { eur, pct, sign } from '../utils/format';
+import { ANCHO_MOVIL, useNarrow } from '../hooks/useNarrow';
 
 /* A compact cold spectrum for explicitly selected years. Context years stay
    grey; the publication's active year always remains petrol. Fixed assignment
@@ -292,12 +293,16 @@ function Dumbbells({ serie, anio, mejor, elegirAnio, bruto2026 }) {
   const [orden, setOrden] = useState('cronologico');
   const [hover, setHover] = useState(null);
   const [tip, setTip] = useState(null);
+  const narrow = useNarrow();
 
-  const W = 880;
-  const rowH = 30;
+  // En móvil caben las dos columnas que responden a la pregunta —neto real y
+  // distancia a hoy—; el IRPF efectivo y la cuña quedan en la lectura de arriba
+  // y en el recuadro de cada año.
+  const W = narrow ? ANCHO_MOVIL : 880;
+  const rowH = narrow ? 32 : 30;
   const H = serie.length * rowH + 76;
-  const X0 = 78;
-  const X1 = W - 366;
+  const X0 = narrow ? 62 : 78;
+  const X1 = narrow ? 232 : W - 366;
 
   const ref = serie[serie.length - 1].neto;
   const difs = serie.map(s => s.neto - ref);
@@ -311,10 +316,11 @@ function Dumbbells({ serie, anio, mejor, elegirAnio, bruto2026 }) {
   const peor = [...serie].sort((p, q) => p.neto - q.neto)[0];
   const activo = serie.find(s => s.anio === (hover ?? anio)) || serie[serie.length - 1];
 
-  const COL_NETO = W - 300;
-  const COL_DIF = W - 208;
+  const COL_NETO = narrow ? W - 66 : W - 300;
+  const COL_DIF = narrow ? W - 2 : W - 208;
   const COL_IRPF = W - 104;
   const COL_CUNA = W - 2;
+  const anchoFila = narrow ? COL_DIF : COL_CUNA;
 
   return (
     <Figure
@@ -325,7 +331,7 @@ function Dumbbells({ serie, anio, mejor, elegirAnio, bruto2026 }) {
           : `Mismo poder adquisitivo, ${serie.length} fiscalidades distintas`
       }
       sub={`${eur(bruto2026)} constantes de 2026 · cada barra mide lo que ese año dejaba de más o de menos que ${serie[serie.length - 1].anio} · pulsa un año para llevar la publicación a él`}
-      legend={`La vertical es el neto de ${serie[serie.length - 1].anio} · a la derecha, años que dejaban más · a la izquierda, años que dejaban menos · las dos últimas columnas son el tipo efectivo de IRPF y la cuña fiscal`}
+      legend={`La vertical es el neto de ${serie[serie.length - 1].anio} · a la derecha, años que dejaban más · a la izquierda, años que dejaban menos${narrow ? ' · el IRPF efectivo y la cuña de cada año aparecen al tocarlo' : ' · las dos últimas columnas son el tipo efectivo de IRPF y la cuña fiscal'}`}
       source="Fuente · cálculo propio · IPC INE"
       note="Al elegir un año se mantiene tu poder adquisitivo: el bruto se reexpresa en euros de ese año, por eso las cifras de esta figura no se mueven al cambiar de año."
       summary={serie.map(s => `${s.anio}: ${eur(s.neto)}`).join('; ')}
@@ -363,12 +369,16 @@ function Dumbbells({ serie, anio, mejor, elegirAnio, bruto2026 }) {
         </span>
       </div>
 
-      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} scroll>
+      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip}>
         {/* cabeceras de las columnas numéricas */}
         <Label x={COL_NETO} y={20} size={8.5} color="var(--ink-5)" anchor="end" mono>NETO REAL</Label>
         <Label x={COL_DIF} y={20} size={8.5} color="var(--ink-5)" anchor="end" mono>VS. HOY</Label>
-        <Label x={COL_IRPF} y={20} size={8.5} color="var(--ink-5)" anchor="end" mono>IRPF EF.</Label>
-        <Label x={COL_CUNA} y={20} size={8.5} color="var(--ink-5)" anchor="end" mono>CUÑA</Label>
+        {!narrow && (
+          <>
+            <Label x={COL_IRPF} y={20} size={8.5} color="var(--ink-5)" anchor="end" mono>IRPF EF.</Label>
+            <Label x={COL_CUNA} y={20} size={8.5} color="var(--ink-5)" anchor="end" mono>CUÑA</Label>
+          </>
+        )}
 
         {/* la vertical de referencia: el neto de hoy */}
         <line x1={round(cero)} y1={34} x2={round(cero)} y2={H - 40} stroke="var(--ink)" strokeWidth={1} />
@@ -388,10 +398,10 @@ function Dumbbells({ serie, anio, mejor, elegirAnio, bruto2026 }) {
           const color = esSel ? 'var(--signal)' : esHover ? 'var(--ink)' : dif >= 0 ? 'var(--ink-2)' : 'var(--ink-4)';
           return (
             <g key={s.anio} className="fs-group" opacity={apagado ? 0.45 : 1}>
-              <line x1={X0} y1={y + 11} x2={COL_CUNA} y2={y + 11} stroke="var(--ink-7)" strokeWidth={0.6} />
+              <line x1={X0} y1={y + 11} x2={anchoFila} y2={y + 11} stroke="var(--ink-7)" strokeWidth={0.6} />
 
               {orden === 'ranking' && (
-                <Label x={X0 - 42} y={y + 4} size={8.5} color="var(--ink-5)" anchor="end" mono>
+                <Label x={narrow ? 20 : X0 - 42} y={y + 4} size={8.5} color="var(--ink-5)" anchor="end" mono>
                   {i + 1}.º
                 </Label>
               )}
@@ -429,12 +439,16 @@ function Dumbbells({ serie, anio, mejor, elegirAnio, bruto2026 }) {
                   {sign(dif)}
                 </text>
               )}
-              <text x={COL_IRPF} y={y + 4} fontSize={10} textAnchor="end" fill="var(--ink-4)" className="num">
-                {pct(s.efectivo)}
-              </text>
-              <text x={COL_CUNA} y={y + 4} fontSize={10} textAnchor="end" fill="var(--ink-4)" className="num">
-                {pct(s.cuna)}
-              </text>
+              {!narrow && (
+                <>
+                  <text x={COL_IRPF} y={y + 4} fontSize={10} textAnchor="end" fill="var(--ink-4)" className="num">
+                    {pct(s.efectivo)}
+                  </text>
+                  <text x={COL_CUNA} y={y + 4} fontSize={10} textAnchor="end" fill="var(--ink-4)" className="num">
+                    {pct(s.cuna)}
+                  </text>
+                </>
+              )}
               {esMejor && (
                 <text x={COL_DIF} y={y - 8} fontSize={8} textAnchor="end" fill="var(--ink-4)" className="fs-t-stamp">
                   MÁXIMO
@@ -473,17 +487,17 @@ function Dumbbells({ serie, anio, mejor, elegirAnio, bruto2026 }) {
         })}
 
         {lo < 0 && (
-          <Label x={X0} y={H - 16} size={9} color="var(--ink-5)" mono>
-            ← MENOS NETO REAL QUE HOY
+          <Label x={X0} y={H - 16} size={narrow ? 8.5 : 9} color="var(--ink-5)" mono>
+            {narrow ? '← MENOS QUE HOY' : '← MENOS NETO REAL QUE HOY'}
           </Label>
         )}
-        <Label x={X1} y={H - 16} size={9} color="var(--ink-5)" anchor="end" mono>
-          MÁS NETO REAL QUE HOY →
+        <Label x={X1} y={H - 16} size={narrow ? 8.5 : 9} color="var(--ink-5)" anchor="end" mono>
+          {narrow ? 'MÁS QUE HOY →' : 'MÁS NETO REAL QUE HOY →'}
         </Label>
       </ChartFrame>
 
       <p className="fs-note" style={{ marginTop: 12, maxWidth: '72ch' }}>
-        Pulsa cualquier año para leer el resto del informe con su fiscalidad. Tu poder adquisitivo
+        {narrow ? 'Toca' : 'Pulsa'} cualquier año para leer el resto del informe con su fiscalidad. Tu poder adquisitivo
         se mantiene: {eur(bruto2026)} de 2026 equivalen a {eur(serie[0].nominal)} de {serie[0].anio}.
       </p>
     </Figure>
@@ -512,10 +526,11 @@ function Atlas({ anio, bruto2026, elegirAnio }) {
   const datos = medida === 'neto' || modo === 'real' ? DATOS_CHART : DATOS_CHART_NOMINAL;
   const key = medida === 'neto' ? 'neto' : 'irpf';
 
-  const W = 880;
-  const H = 400;
-  const X0 = 62;
-  const X1 = W - 92;
+  const narrow = useNarrow();
+  const W = narrow ? ANCHO_MOVIL : 880;
+  const H = narrow ? 380 : 400;
+  const X0 = narrow ? 50 : 62;
+  const X1 = W - (narrow ? 36 : 92);
   const Y0 = 20;
   const Y1 = H - 46;
 
@@ -638,8 +653,6 @@ function Atlas({ anio, bruto2026, elegirAnio }) {
         viewBox={`0 0 ${W} ${H}`}
         zoom={zoom}
         tip={tip}
-        scroll
-        minWidth={620}
         label="El atlas de la renta"
       >
         <defs>
@@ -650,7 +663,7 @@ function Atlas({ anio, bruto2026, elegirAnio }) {
         {ticks(0, hi, 5).map(v => (
           <g key={v}>
             <line x1={X0} y1={round(y(v))} x2={X1} y2={round(y(v))} stroke="var(--ink-7)" strokeWidth={0.6} />
-            <Label x={X0 - 8} y={round(y(v)) + 3} size={9} color="var(--ink-5)" anchor="end" mono>
+            <Label x={X0 - 6} y={round(y(v)) + 3} size={narrow ? 8 : 9} color="var(--ink-5)" anchor="end" mono>
               {medida === 'neto' ? eur(v) : pct(v, 0)}
             </Label>
           </g>
@@ -707,20 +720,27 @@ function Atlas({ anio, bruto2026, elegirAnio }) {
                 strokeDasharray="1.5 2"
               />
             )}
-            <Label x={X1 + 9} y={round(e.y)} size={10} weight={e.a === anio ? 800 : 700} color={e.color} mono>
+            <Label x={X1 + (narrow ? 7 : 9)} y={round(e.y)} size={narrow ? 9 : 10} weight={e.a === anio ? 800 : 700} color={e.color} mono>
               {e.a}
             </Label>
           </g>
         ))}
 
-        <Label x={round(x(marcado))} y={Y0 - 8} size={9} color="var(--counter)" anchor="middle" mono>
+        <Label
+          x={round(x(marcado))}
+          y={Y0 - 8}
+          size={9}
+          color="var(--counter)"
+          anchor={x(marcado) > X1 - 36 ? 'end' : x(marcado) < X0 + 36 ? 'start' : 'middle'}
+          mono
+        >
           TU SALARIO
         </Label>
 
-        {ticks(zoom.domain[0], zoom.domain[1], 6).map(v => (
+        {ticks(zoom.domain[0], zoom.domain[1], narrow ? 4 : 6).map(v => (
           <g key={v}>
             <line x1={round(x(v))} y1={Y1} x2={round(x(v))} y2={Y1 + 5} stroke="var(--ink-5)" strokeWidth={0.7} />
-            <Label x={round(x(v))} y={Y1 + 20} size={9.5} color="var(--ink-4)" anchor="middle" mono>
+            <Label x={round(x(v))} y={Y1 + 20} size={narrow ? 8.5 : 9.5} color="var(--ink-4)" anchor={narrow && x(v) > X1 - 24 ? 'end' : 'middle'} mono>
               {eur(v)}
             </Label>
           </g>

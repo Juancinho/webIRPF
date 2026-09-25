@@ -8,6 +8,7 @@ import ChartFrame from '../figures/ChartFrame';
 import { Label } from '../figures/marks';
 import { linear, polyline, round } from '../figures/scale';
 import { dec, eur, pct } from '../utils/format';
+import { ANCHO_MOVIL, useNarrow } from '../hooks/useNarrow';
 
 const SERIE = ANIOS.map(anio => {
   const d = DEUDA_ESPANA[anio];
@@ -153,11 +154,13 @@ function Serie({ anioActual }) {
   const [modo, setModo] = useState('nominal');
   const [hover, setHover] = useState(null);
   const [tip, setTip] = useState(null);
+  const narrow = useNarrow();
 
-  const W = 880;
+  const W = narrow ? ANCHO_MOVIL : 880;
   const H = 390;
-  const X0 = 54;
-  const X1 = W - 128;
+  const X0 = narrow ? 36 : 54;
+  const X1 = W - (narrow ? 76 : 128);
+  const hitW = narrow ? 20 : 28;
   const Y0 = 48;
   const Y1 = H - 58;
   const x = linear([2012, 2026], [X0, X1]);
@@ -208,13 +211,13 @@ function Serie({ anioActual }) {
         <span><span className="fs-readout-k">PIB implícito</span><span className="fs-readout-v">{Math.round(act.pibMM).toLocaleString('es-ES')} mM €</span></span>
       </div>
 
-      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} scroll label={`${nombre}, ${unidad}`}>
+      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} label={`${nombre}, ${unidad}`}>
         {[0, 0.25, 0.5, 0.75, 1].map(fr => {
           const v = max * fr;
           return (
             <g key={fr}>
               <line x1={X0} y1={round(y(v))} x2={X1} y2={round(y(v))} stroke="var(--ink-7)" strokeWidth={0.6} />
-              <Label x={X0 - 8} y={round(y(v)) + 3} size={8.5} color="var(--ink-5)" anchor="end" mono>
+              <Label x={X0 - (narrow ? 5 : 8)} y={round(y(v)) + 3} size={8.5} color="var(--ink-5)" anchor="end" mono>
                 {metrica === 'total' ? `${Math.round(v / 100) * 100}` : metrica === 'perCapita' ? `${Math.round(v / 1000)}k` : `${Math.round(v)} %`}
               </Label>
             </g>
@@ -230,9 +233,9 @@ function Serie({ anioActual }) {
               <circle cx={round(x(d.anio))} cy={round(y(v))} r={activa ? 5 : 2.7} fill={activa ? 'var(--signal)' : color} />
               <rect
                 className="fs-hit"
-                x={round(x(d.anio)) - 14}
+                x={round(x(d.anio)) - hitW / 2}
                 y={Y0 - 16}
-                width={28}
+                width={hitW}
                 height={Y1 - Y0 + 30}
                 onMouseEnter={() => {
                   setHover(d.anio);
@@ -261,11 +264,11 @@ function Serie({ anioActual }) {
         <path d={polyline(SERIE.map((d, i) => [x(d.anio), y(valores[i])]))} fill="none" stroke={color} strokeWidth={2.2} />
         <line x1={round(x(2020))} y1={Y0 - 12} x2={round(x(2020))} y2={Y1} stroke="var(--ink-5)" strokeWidth={0.7} strokeDasharray="2 4" />
         <Label x={round(x(2020))} y={Y0 - 17} size={8.5} color="var(--ink-4)" anchor="middle" mono>2020</Label>
-        <Label x={X1 + 10} y={round(y(valorSerie(ultimo, metrica, modo))) - 4} size={9} color={color} mono>2026 · EST.</Label>
-        <Label x={X1 + 10} y={round(y(valorSerie(ultimo, metrica, modo))) + 13} size={12} weight={800} color={color}>{formatoMetrica(valorSerie(ultimo, metrica, modo), metrica)}</Label>
+        <Label x={X1 + (narrow ? 7 : 10)} y={round(y(valorSerie(ultimo, metrica, modo))) - 4} size={narrow ? 8.5 : 9} color={color} mono>2026 · EST.</Label>
+        <Label x={X1 + (narrow ? 7 : 10)} y={round(y(valorSerie(ultimo, metrica, modo))) + 13} size={narrow ? 10.5 : 12} weight={800} color={color}>{formatoMetrica(valorSerie(ultimo, metrica, modo), metrica)}</Label>
         <line x1={X0} y1={Y1} x2={X1} y2={Y1} stroke="var(--ink)" strokeWidth={0.9} />
-        {[2012, 2014, 2016, 2018, 2020, 2022, 2024, 2026].map(a => (
-          <Label key={a} x={round(x(a))} y={Y1 + 22} size={9} color="var(--ink-4)" anchor="middle" mono>{a}</Label>
+        {(narrow ? [2012, 2016, 2020, 2024] : [2012, 2014, 2016, 2018, 2020, 2022, 2024, 2026]).map(a => (
+          <Label key={a} x={round(x(a))} y={Y1 + 22} size={narrow ? 8.5 : 9} color="var(--ink-4)" anchor="middle" mono>{a}</Label>
         ))}
         {variacion !== null && (
           <Label x={X0} y={H - 10} size={9} color="var(--ink-4)" mono>
@@ -297,10 +300,11 @@ function Cascada() {
   const total = final - inicial;
   const mayor = pasos.reduce((a, c) => (Math.abs(c.inc) > Math.abs(a.inc) ? c : a), pasos[0]);
   const act = hover ? pasos.find(p => p.anio === hover) : mayor;
-  const W = 880;
+  const narrow = useNarrow();
+  const W = narrow ? ANCHO_MOVIL : 880;
   const H = 370;
-  const X0 = 42;
-  const X1 = W - 34;
+  const X0 = narrow ? 8 : 42;
+  const X1 = W - (narrow ? 4 : 34);
   const BASE = 220;
   const pasoX = (X1 - X0) / pasos.length;
   const hiInc = Math.max(...pasos.map(p => Math.abs(p.inc)));
@@ -330,7 +334,7 @@ function Cascada() {
         <span><span className="fs-readout-k">Cambio desde 2012</span><span className="fs-readout-v fs-signal">{conSigno(total)} mM €</span></span>
       </div>
 
-      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} scroll label={`Variación anual ${modo === 'real' ? 'real' : 'nominal'} de la deuda`}>
+      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} label={`Variación anual ${modo === 'real' ? 'real' : 'nominal'} de la deuda`}>
         <line x1={X0 - 10} y1={BASE} x2={X1 + 8} y2={BASE} stroke="var(--ink)" strokeWidth={0.9} />
         {pasos.map((p, i) => {
           const cx = X0 + pasoX * (i + 0.5);
@@ -347,7 +351,7 @@ function Cascada() {
                 const yy = BASE + (fin - BASE) * ((j + 1) / marcas);
                 return <line key={j} x1={cx - (activa ? 7 : 5)} y1={yy} x2={cx + (activa ? 7 : 5)} y2={yy} stroke={color} strokeWidth={activa ? 1.5 : 0.9} />;
               })}
-              <Label x={cx} y={fin + (sube ? -10 : 17)} size={activa ? 11 : 9.5} weight={800} color={color} anchor="middle">{conSigno(p.inc)}</Label>
+              <Label x={cx} y={fin + (sube ? -10 : 17)} size={narrow ? (activa ? 10 : 8.5) : activa ? 11 : 9.5} weight={800} color={color} anchor="middle">{conSigno(p.inc)}</Label>
               <Label x={cx} y={BASE + 18} size={8.7} color="var(--ink-4)" anchor="middle" mono>{String(p.anio).slice(2)}</Label>
               <rect
                 className="fs-hit"
@@ -374,7 +378,7 @@ function Cascada() {
             </g>
           );
         })}
-        <Label x={X0} y={H - 14} size={9} color="var(--ink-5)" mono>
+        <Label x={X0} y={H - 14} size={narrow ? 8 : 9} color="var(--ink-5)" mono>
           12—26 · CAMBIO ANUAL DEL SALDO · {modo === 'real' ? 'EUROS DE 2026' : 'EUROS CORRIENTES'}
         </Label>
       </ChartFrame>
@@ -391,8 +395,9 @@ function TuParte({ anio, irpf }) {
   const anios = irpfComparable > 0 ? deuda / irpfComparable : null;
   const previo = SERIE.find(item => item.anio === anio - 1);
   const UNIT = 500;
-  const W = 880;
-  const COLS = 24;
+  const narrow = useNarrow();
+  const W = narrow ? ANCHO_MOVIL : 880;
+  const COLS = narrow ? 20 : 24;
   const SIZE = 13;
   const GAP = 4;
   const bloquesDeuda = Math.round(deuda / UNIT);
@@ -442,7 +447,7 @@ function TuParte({ anio, irpf }) {
         <span><span className="fs-readout-k">Cambio anual por habitante</span><span className="fs-readout-v">{previo ? `${conSigno(deuda - (modo === 'real' ? previo.perCapitaReal : previo.perCapita))} €` : '—'}</span></span>
       </div>
 
-      <ChartFrame viewBox={`0 0 ${W} ${H}`} scroll label="Deuda por habitante frente a IRPF anual">
+      <ChartFrame viewBox={`0 0 ${W} ${H}`} label="Deuda por habitante frente a IRPF anual">
         <Label x={0} y={14} size={10} color="var(--ink-3)" mono>DEUDA POR HABITANTE · {eur(deuda)}</Label>
         {Array.from({ length: bloquesDeuda }, (_, i) => {
           const [cx, cy] = cell(i, 0, 26);

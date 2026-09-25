@@ -7,13 +7,9 @@ import ChartFrame from '../figures/ChartFrame';
 import { Label } from '../figures/marks';
 import { linear, round } from '../figures/scale';
 import { eur, pct } from '../utils/format';
+import { ANCHO_MOVIL, useNarrow } from '../hooks/useNarrow';
 
-const W = 880;
-const H = 476;
-const X0 = 54;
-const X1 = W - 18;
 const Y0 = 34;
-const Y1 = H - 98;
 const BANDAS = 20;       // veinte tramos de cinco percentiles
 
 /**
@@ -33,6 +29,12 @@ export default function Mosaico() {
   const { anio, opts, bruto, percentil } = useFiscal();
   const [hover, setHover] = useState(null);
   const [tip, setTip] = useState(null);
+  const narrow = useNarrow();
+  const W = narrow ? ANCHO_MOVIL : 880;
+  const H = narrow ? 440 : 476;
+  const X0 = narrow ? 30 : 54;
+  const X1 = W - (narrow ? 4 : 18);
+  const Y1 = H - 98;
 
   const dist = DISTRIBUCION_SALARIAL[anio];
 
@@ -131,12 +133,12 @@ export default function Mosaico() {
         <li><strong>4 · Normalización</strong><span>Cuota de masa salarial y de recaudación estimada.</span></li>
       </ol>
 
-      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} scroll minWidth={700} label="Quién sostiene la recaudación">
+      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} label="Quién sostiene la recaudación">
         {/* rejilla de tipos */}
         {[0, 0.1, 0.2, 0.3, 0.4, 0.5].filter(v => v <= techo).map(v => (
           <g key={v}>
             <line x1={X0} y1={round(y(v))} x2={X1} y2={round(y(v))} stroke="var(--ink-7)" strokeWidth={0.6} />
-            <Label x={X0 - 8} y={round(y(v)) + 3} size={9} color="var(--ink-5)" anchor="end" mono>
+            <Label x={X0 - (narrow ? 4 : 8)} y={round(y(v)) + 3} size={narrow ? 8.5 : 9} color="var(--ink-5)" anchor="end" mono>
               {pct(v * 100, 0)}
             </Label>
           </g>
@@ -176,11 +178,11 @@ export default function Mosaico() {
                 opacity={dim ? 0.3 : on ? 1 : esMio ? 1 : 0.82}
               />
               {/* la aportación, escrita sólo donde cabe */}
-              {b.x1 - b.x0 > 26 && (
+              {b.x1 - b.x0 > (narrow ? 17 : 26) && (
                 <Label
                   x={round((b.x0 + b.x1) / 2)}
                   y={round(y(b.tipo)) - 6}
-                  size={9}
+                  size={narrow ? 7.5 : 9}
                   weight={esMio ? 800 : 600}
                   color={esMio ? 'var(--signal)' : 'var(--ink-4)'}
                   anchor="middle"
@@ -199,7 +201,7 @@ export default function Mosaico() {
         {conX.filter((_, i) => i % 4 === 0).concat([conX[conX.length - 1]]).map(b => (
           <g key={`e${b.i}`}>
             <line x1={round(b.x0)} y1={Y1} x2={round(b.x0)} y2={Y1 + 5} stroke="var(--ink-5)" strokeWidth={0.7} />
-            <Label x={round(b.x0)} y={Y1 + 17} size={9} color="var(--ink-4)" anchor="middle" mono>
+            <Label x={round(b.x0)} y={Y1 + 17} size={narrow ? 8.5 : 9} color="var(--ink-4)" anchor={narrow && b.x0 > X1 - 10 ? 'end' : 'middle'} mono>
               P{Math.round(b.p0)}
             </Label>
           </g>
@@ -217,30 +219,43 @@ export default function Mosaico() {
               height={7}
               fill={m.parte === mitadAlta ? 'var(--ink-2)' : 'var(--ink-5)'}
             />
-            <Label
-              x={round((m.x0 + m.x1) / 2)}
-              y={Y1 + 54}
-              size={9.5}
-              weight={800}
-              color="var(--ink-2)"
-              anchor="middle"
-              mono
-            >
-              {m.texto} · APORTA {pct(m.parte * 100, 0)}
-            </Label>
+            {narrow ? (
+              <>
+                <Label x={round((m.x0 + m.x1) / 2)} y={Y1 + 54} size={8.5} weight={800} color="var(--ink-2)" anchor="middle" mono>
+                  {m.parte === mitadAlta ? 'MITAD QUE MÁS COBRA' : 'MITAD QUE MENOS'}
+                </Label>
+                <Label x={round((m.x0 + m.x1) / 2)} y={Y1 + 67} size={8.5} weight={800} color="var(--ink-2)" anchor="middle" mono>
+                  APORTA {pct(m.parte * 100, 0)}
+                </Label>
+              </>
+            ) : (
+              <Label
+                x={round((m.x0 + m.x1) / 2)}
+                y={Y1 + 54}
+                size={9.5}
+                weight={800}
+                color="var(--ink-2)"
+                anchor="middle"
+                mono
+              >
+                {m.texto} · APORTA {pct(m.parte * 100, 0)}
+              </Label>
+            )}
           </g>
         ))}
 
-        <Label x={X0} y={Y1 + 76} size={9} color="var(--ink-5)" mono>
-          ← MENOS SUELDO · EL ANCHO ES LA PARTE DE LA MASA SALARIAL QUE COBRA CADA TRAMO · MÁS SUELDO →
+        <Label x={narrow ? 2 : X0} y={Y1 + (narrow ? 86 : 76)} size={narrow ? 8 : 9} color="var(--ink-5)" mono>
+          {narrow
+            ? '← MENOS SUELDO · ANCHO = PARTE DE LA MASA SALARIAL →'
+            : '← MENOS SUELDO · EL ANCHO ES LA PARTE DE LA MASA SALARIAL QUE COBRA CADA TRAMO · MÁS SUELDO →'}
         </Label>
-        <Label x={X0 - 8} y={Y0 - 14} size={9} color="var(--ink-5)" mono>
+        <Label x={narrow ? 2 : X0 - 8} y={Y0 - 14} size={narrow ? 8.5 : 9} color="var(--ink-5)" mono>
           TIPO EFECTIVO
         </Label>
 
         {hover !== null && (
-          <Label x={X1} y={Y0 - 14} size={10} weight={700} color="var(--ink)" anchor="end">
-            Percentil {Math.round(activo.p0)}–{Math.round(activo.p1)} · {eur(activo.salario)} · aporta{' '}
+          <Label x={X1} y={Y0 - 14} size={narrow ? 9.5 : 10} weight={700} color="var(--ink)" anchor="end">
+            {narrow ? 'P' : 'Percentil '}{Math.round(activo.p0)}–{Math.round(activo.p1)} · {eur(activo.salario)} · aporta{' '}
             {pct(activo.parteRec * 100)}
           </Label>
         )}

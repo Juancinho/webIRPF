@@ -23,6 +23,7 @@ import Apendice from './chapters/Apendice';
 import './styles/paper.css';
 import './styles/figures.css';
 import './styles/shell.css';
+import './styles/mobile.css';
 
 export default function App() {
   return (

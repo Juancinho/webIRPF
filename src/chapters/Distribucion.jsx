@@ -14,6 +14,7 @@ import { useDomainZoom } from '../figures/useDomainZoom';
 import { Label, TickStrip, YouMark } from '../figures/marks';
 import { linear, polyline, round, ticks } from '../figures/scale';
 import { eur, sign } from '../utils/format';
+import { ANCHO_MOVIL, useNarrow } from '../hooks/useNarrow';
 
 const MAX_S = 90000;
 
@@ -28,12 +29,14 @@ export function CurvaDistribucion() {
   const [hoverS, setHoverS] = useState(null);
   const [tip, setTip] = useState(null);
 
-  const W = 880;
+  const narrow = useNarrow();
+  const W = narrow ? ANCHO_MOVIL : 880;
   const H = 410;
-  const X0 = 26;
-  const X1 = W - 120;
+  const X0 = narrow ? 6 : 26;
+  const X1 = W - (narrow ? 40 : 120);
   const Y1 = H - 66;
-  const Y0 = 54;
+  // en móvil los hitos van en dos alturas: la marca «TÚ» baja para no pisarlos
+  const Y0 = narrow ? 76 : 54;
 
   const curva = useMemo(() => {
     const pts = [];
@@ -123,7 +126,7 @@ export function CurvaDistribucion() {
         </span>
       </div>
 
-      <ChartFrame viewBox={`0 0 ${W} ${H}`} zoom={zoom} tip={tip} scroll minWidth={620} label="Curva de distribución salarial">
+      <ChartFrame viewBox={`0 0 ${W} ${H}`} zoom={zoom} tip={tip} label="Curva de distribución salarial">
         <defs>
           <clipPath id={clip}>
             <rect x={X0} y={Y0 - 5} width={X1 - X0} height={Y1 - Y0 + 10} />
@@ -162,12 +165,13 @@ export function CurvaDistribucion() {
 
         {/* Labels live outside the clipping window: the former implementation
             cut their ascenders at the top and their values at the baseline. */}
-        {hitos.filter(([, v]) => v >= zoom.domain[0] && v <= zoom.domain[1]).map(([k, v]) => (
+        {/* En móvil los cinco hitos caen muy juntos: se escalonan en dos alturas. */}
+        {hitos.filter(([, v]) => v >= zoom.domain[0] && v <= zoom.domain[1]).map(([k, v], i) => (
           <g key={`label-${k}`}>
-            <Label x={round(x(v))} y={28} size={9.5} weight={700} color="var(--ink-3)" anchor="middle" mono>
+            <Label x={round(x(v))} y={narrow ? 24 + (i % 2) * 14 : 28} size={narrow ? 8.5 : 9.5} weight={700} color="var(--ink-3)" anchor="middle" mono>
               {k}
             </Label>
-            <Label x={round(x(v))} y={Y1 + 19} size={9} color="var(--ink-4)" anchor="middle">
+            <Label x={round(x(v))} y={narrow ? Y1 + 15 + (i % 2) * 12 : Y1 + 19} size={narrow ? 8.5 : 9} color="var(--ink-4)" anchor="middle">
               {eur(v)}
             </Label>
           </g>
@@ -184,15 +188,22 @@ export function CurvaDistribucion() {
         </Label>
 
         <line x1={X0} y1={Y1} x2={X1} y2={Y1} stroke="var(--rule)" strokeWidth={0.8} />
-        {ticks(zoom.domain[0], zoom.domain[1], 5).map(v => (
+        {ticks(zoom.domain[0], zoom.domain[1], narrow ? 4 : 5).map(v => (
           <g key={v}>
             <line x1={round(x(v))} y1={Y1} x2={round(x(v))} y2={Y1 + 5} stroke="var(--ink-5)" strokeWidth={0.7} />
-            <Label x={round(x(v))} y={Y1 + 34} size={9} color="var(--ink-5)" anchor="middle" mono>
+            <Label
+              x={round(x(v))}
+              y={Y1 + (narrow ? 44 : 34)}
+              size={narrow ? 8.5 : 9}
+              color="var(--ink-5)"
+              anchor={narrow && x(v) < X0 + 20 ? 'start' : narrow && x(v) > X1 - 24 ? 'end' : 'middle'}
+              mono
+            >
               {v === 0 ? '0 €' : eur(v)}
             </Label>
           </g>
         ))}
-        <Label x={X1} y={Y1 + 50} size={9} color="var(--ink-5)" anchor="end" mono>
+        <Label x={X1} y={Y1 + (narrow ? 58 : 50)} size={narrow ? 8.5 : 9} color="var(--ink-5)" anchor="end" mono>
           SALARIO BRUTO ANUAL
         </Label>
 
@@ -219,14 +230,15 @@ export function Percentiles() {
     ['P90', dist.p90, 'el 90 % gana menos'],
   ];
 
-  const W = 880;
+  const narrow = useNarrow();
+  const W = narrow ? ANCHO_MOVIL : 880;
   const rowH = 44;
   const H = filas.length * rowH + 60;
-  const X0 = 128;
-  const X1 = W - 150;
+  const X0 = narrow ? 66 : 128;
+  const X1 = W - (narrow ? 64 : 150);
   const hi = Math.max(dist.p90, bruto) * 1.06;
   const x = linear([0, hi], [X0, X1]);
-  const UNIT = 500;
+  const UNIT = narrow ? 1000 : 500;
 
   return (
     <Figure
@@ -242,13 +254,13 @@ export function Percentiles() {
       }
       summary={filas.map(([k, v]) => `${k}: ${eur(v)}`).join('; ')}
     >
-      <ChartFrame viewBox={`0 0 ${W} ${H}`} scroll label="Percentiles salariales">
+      <ChartFrame viewBox={`0 0 ${W} ${H}`} label="Percentiles salariales">
         {filas.map(([k, v, nota], i) => {
           const y = 26 + i * rowH;
           const encima = bruto >= v;
           return (
             <g key={k}>
-              <Label x={X0 - 14} y={y + 4} size={11} weight={700} color="var(--ink-2)" anchor="end" mono>
+              <Label x={X0 - (narrow ? 8 : 14)} y={y + 4} size={narrow ? 10 : 11} weight={700} color="var(--ink-2)" anchor="end" mono>
                 {k.toUpperCase()}
               </Label>
               <TickStrip
@@ -261,7 +273,7 @@ export function Percentiles() {
                 color={encima ? 'var(--ink-4)' : 'var(--ink)'}
                 dot={false}
               />
-              <Label x={x(v) + 10} y={y + 4} size={12} weight={700} color="var(--ink)">
+              <Label x={x(v) + (narrow ? 6 : 10)} y={y + 4} size={narrow ? 11 : 12} weight={700} color="var(--ink)">
                 {eur(v)}
               </Label>
               <Label x={X0} y={y + 22} size={9.5} color="var(--ink-5)">
@@ -275,7 +287,15 @@ export function Percentiles() {
         {bruto > 0 && (
           <g>
             <line x1={round(x(bruto))} y1={8} x2={round(x(bruto))} y2={H - 40} stroke="var(--signal)" strokeWidth={1.5} />
-            <Label x={round(x(bruto))} y={H - 26} size={10} weight={700} color="var(--signal)" anchor="middle" mono>
+            <Label
+              x={round(x(bruto))}
+              y={H - 26}
+              size={narrow ? 9 : 10}
+              weight={700}
+              color="var(--signal)"
+              anchor={x(bruto) > W - 70 ? 'end' : x(bruto) < 70 ? 'start' : 'middle'}
+              mono
+            >
               TU SALARIO · {eur(bruto)}
             </Label>
           </g>
@@ -322,12 +342,14 @@ export function EvolucionDistribucion() {
     [real, bruto2026]
   );
 
-  const W = 880;
+  const narrow = useNarrow();
+  const W = narrow ? ANCHO_MOVIL : 880;
   const H = 400;
-  const X0 = 30;
-  const X1 = W - 130;
+  const X0 = narrow ? 8 : 30;
+  const X1 = W - (narrow ? 62 : 130);
   const Y0 = 28;
   const Y1 = H - 52;
+  const hitW = narrow ? 20 : 26;
 
   const hi = Math.max(...datos.flatMap(d => [d.p90, d.tuyo])) * 1.04;
   const x = linear([2012, 2026], [X0, X1]);
@@ -382,7 +404,7 @@ export function EvolucionDistribucion() {
         <button type="button" aria-pressed={real} onClick={() => setReal(true)}>Real (€2026)</button>
       </span>
 
-      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} scroll label="Evolución de la distribución salarial">
+      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} label="Evolución de la distribución salarial">
         <path d={banda('p10', 'p90')} fill="var(--ink)" opacity={0.08} />
         <path d={banda('p25', 'p75')} fill="var(--ink)" opacity={0.14} />
 
@@ -416,9 +438,9 @@ export function EvolucionDistribucion() {
             )}
             <rect
               className="fs-hit"
-              x={round(x(d.anio)) - 13}
+              x={round(x(d.anio)) - hitW / 2}
               y={Y0 - 10}
-              width={26}
+              width={hitW}
               height={Y1 - Y0 + 16}
               onMouseEnter={() => {
                 setHover(d.anio);
@@ -448,20 +470,20 @@ export function EvolucionDistribucion() {
 
         {[['p90', 'P90', 'var(--ink-4)'], ['p75', 'P75', 'var(--ink-4)'], ['p50', 'MEDIANA', 'var(--ink)'],
           ['media', 'MEDIA', 'var(--counter)'], ['p25', 'P25', 'var(--ink-4)'], ['p10', 'P10', 'var(--ink-4)']].map(([k, l, c]) => (
-          <Label key={k} x={X1 + 8} y={round(y(ultimo[k])) + 3} size={9} weight={k === 'p50' || k === 'media' ? 700 : 500} color={c} mono>
+          <Label key={k} x={X1 + (narrow ? 6 : 8)} y={round(y(ultimo[k])) + 3} size={narrow ? 8.5 : 9} weight={k === 'p50' || k === 'media' ? 700 : 500} color={c} mono>
             {l}
           </Label>
         ))}
 
         {bruto > 0 && (
-          <Label x={X1 + 8} y={round(y(ultimo.tuyo)) + 3} size={9.5} weight={800} color="var(--signal)" mono>
-            TU SALARIO
+          <Label x={X1 + (narrow ? 6 : 8)} y={round(y(ultimo.tuyo)) + 3} size={narrow ? 9 : 9.5} weight={800} color="var(--signal)" mono>
+            {narrow ? 'TÚ' : 'TU SALARIO'}
           </Label>
         )}
 
         <line x1={X0} y1={Y1} x2={X1} y2={Y1} stroke="var(--rule)" strokeWidth={0.8} />
-        {[2012, 2016, 2020, 2024, 2026].map(a => (
-          <Label key={a} x={round(x(a))} y={Y1 + 22} size={9.5} color="var(--ink-4)" anchor="middle" mono>
+        {(narrow ? [2012, 2016, 2020, 2024] : [2012, 2016, 2020, 2024, 2026]).map(a => (
+          <Label key={a} x={round(x(a))} y={Y1 + 22} size={narrow ? 8.5 : 9.5} color="var(--ink-4)" anchor={narrow && a === 2012 ? 'start' : 'middle'} mono>
             {a}
           </Label>
         ))}

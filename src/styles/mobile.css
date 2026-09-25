@@ -1,0 +1,698 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   MÓVIL Y TÁCTIL
+   Todo lo que cambia cuando se lee con el dedo o en una pantalla estrecha.
+   Va en su propio archivo y se carga el último: lo de escritorio no se toca,
+   aquí sólo se corrige lo que en el teléfono no funcionaba.
+
+   Dos ejes distintos, que no hay que mezclar:
+   · (hover: none) / (pointer: coarse) — se lee con el dedo, sea cual sea el
+     ancho (una tableta apaisada es ancha y táctil).
+   · max-width — la pantalla es estrecha, sea cual sea el puntero.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── gestos sobre las figuras ─────────────────────────────────────────────── */
+
+/* Por defecto una figura deja hacer todo lo que hace la página: desplazar en
+   las dos direcciones y pellizcar para ampliar. Antes el lienzo llevaba
+   `pan-y`, que prohibía pellizcar encima de cualquier gráfico y, dentro de un
+   lienzo desplazable, impedía deslizarlo de lado con el dedo. */
+.fs-svg,
+.fs-chart {
+  touch-action: manipulation;
+}
+
+/* Las figuras con eje ampliable se quedan el gesto horizontal y el pellizco:
+   el arrastre lateral lee (o desplaza el eje ampliado) y el pellizco reescala
+   el dominio. El desplazamiento vertical de la página sigue intacto. */
+.fs-chart-zoom,
+.fs-chart-zoom .fs-svg {
+  touch-action: pan-y;
+}
+
+/* Mantener el dedo sobre un gráfico no debe abrir el menú de selección. */
+.fs-chart {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── recuadro de lectura con el dedo: encima del punto, nunca debajo ──────── */
+.fs-tip.is-touch {
+  transition: left 60ms linear, top 60ms linear;
+}
+
+.fs-tip.is-touch.is-tc { transform: translate(-50%, calc(-100% - 26px)); }
+.fs-tip.is-touch.is-tl { transform: translate(-18px, calc(-100% - 26px)); }
+.fs-tip.is-touch.is-tr { transform: translate(calc(-100% + 18px), calc(-100% - 26px)); }
+
+@media (max-width: 700px) {
+  .fs-tip {
+    min-width: 0;
+    max-width: min(250px, 72vw);
+    padding: 8px 10px 9px;
+  }
+
+  .fs-tip-row { gap: 12px; }
+}
+
+/* ── pistas de uso: la del ratón o la del dedo, nunca las dos ─────────────── */
+.fs-hint-dedo { display: none; }
+
+@media (hover: none) and (pointer: coarse) {
+  .fs-hint-raton { display: none; }
+  .fs-hint-dedo { display: inline; }
+  p.fs-hint-dedo { display: block; }
+
+  /* los controles del eje, siempre visibles y del tamaño de un dedo; bajo el
+     dibujo, para no tapar leyendas ni rótulos de la cabecera */
+  .fs-zoom-controls {
+    top: calc(100% + 8px);
+    right: 0;
+    opacity: 1;
+    gap: 8px;
+    z-index: 2;
+  }
+
+  /* la pista comparte fila con los botones: se aparta de ellos */
+  .fs-chart-wrap:has(.fs-chart-zoom) > .fs-zoom-hint {
+    min-height: 44px;
+    margin-top: 8px;
+    padding-right: 150px;
+    display: flex;
+    align-items: center;
+  }
+
+  .fs-chart-wrap:has(.fs-chart-zoom:not(.is-zoomed)) > .fs-zoom-hint {
+    padding-right: 54px;
+  }
+
+  .fs-zoom-controls button {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    font-size: 16px;
+  }
+
+  .fs-zoom-controls button:disabled { opacity: 0.45; }
+
+  /* sin ampliar sólo hace falta el «+»; los otros dos aparecen al ampliar */
+  .fs-chart-zoom:not(.is-zoomed) .fs-zoom-controls button:disabled { display: none; }
+}
+
+/* ── lienzos que siguen siendo más anchos que la pantalla ─────────────────── */
+.fs-scrollx {
+  overscroll-behavior-x: contain;
+  scroll-snap-type: none;
+  scrollbar-width: thin;
+}
+
+/* ── la cinta en el teléfono: una línea, y los mandos a demanda ───────────── */
+.fs-cm {
+  border-top: 1px solid var(--rule);
+}
+
+.fs-cm-barra {
+  padding: 0 var(--gutter);
+}
+
+.fs-cm-cifras {
+  width: 100%;
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.fs-cm-par {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.fs-cm-v {
+  font-family: var(--sans);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums lining-nums;
+  white-space: nowrap;
+}
+
+.fs-cm-v.is-net {
+  color: var(--signal);
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.fs-cm-flecha {
+  color: var(--ink-5);
+  font-size: 14px;
+  align-self: flex-end;
+  padding-bottom: 3px;
+}
+
+.fs-cm-accion {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  background: var(--bone);
+  flex: none;
+}
+
+.fs-cm.is-open .fs-cm-accion {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--bone);
+}
+
+.fs-cm-chev {
+  width: 7px;
+  height: 7px;
+  border-left: 1.5px solid currentColor;
+  border-top: 1.5px solid currentColor;
+  transform: translateY(2px) rotate(45deg);
+  transition: transform var(--t-ui) var(--ease);
+}
+
+.fs-cm.is-open .fs-cm-chev {
+  transform: translateY(-2px) rotate(225deg);
+}
+
+@media (max-width: 359px) {
+  .fs-cm-flecha { display: none; }
+  .fs-cm-v { font-size: 15px; }
+  .fs-cm-v.is-net { font-size: 17px; }
+  .fs-cm-accion { padding: 0 11px; }
+}
+
+/* el panel se abre por encima de la barra, sin empujar la página */
+.fs-cm-panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  max-height: calc(100dvh - 120px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--bone-raised);
+  border-top: 1px solid var(--rule);
+  border-radius: 16px 16px 0 0;
+  padding: 18px var(--gutter) 10px;
+  box-shadow: 0 -10px 30px rgba(22, 25, 27, 0.08);
+  animation: fs-cm-sube 200ms var(--ease) both;
+  display: grid;
+  gap: 14px;
+}
+
+@keyframes fs-cm-sube {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fs-cm-panel { animation: none; }
+}
+
+.fs-cm-fila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.fs-cm-bruto {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.fs-cm-bruto .fs-input {
+  width: 8.5ch;
+  font-size: 22px;
+  font-weight: 800;
+  text-align: right;
+  padding: 6px 8px;
+  min-height: 44px;
+}
+
+.fs-cm-euro {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink-3);
+}
+
+/* la regla del sueldo a todo lo ancho: ya caben sus dos referencias */
+.fs-cm .fs-cinta-regla {
+  grid-area: auto;
+  position: relative;
+  padding-bottom: 30px;
+  margin-top: -6px;
+}
+
+.fs-cm .fs-cinta-marca b {
+  font-size: 10px;
+}
+
+.fs-cm .fs-cinta-range {
+  height: 44px;
+}
+
+.fs-cm .fs-cinta-range::-webkit-slider-thumb {
+  width: 26px;
+  height: 26px;
+  margin-top: -12.5px;
+  box-shadow: 0 0 0 5px var(--bone-raised);
+}
+
+.fs-cm .fs-cinta-range::-moz-range-thumb {
+  width: 26px;
+  height: 26px;
+}
+
+.fs-cm .fs-cinta-marca {
+  display: grid;
+  bottom: 12px;
+}
+
+.fs-cm .fs-cinta-marca.is-baja {
+  bottom: 0;
+}
+
+/* el año: pasos a los lados y la regleta con dianas del alto de un dedo */
+.fs-cm-anio .fs-anios {
+  flex: 1;
+  min-width: 0;
+  justify-content: space-between;
+  padding: 0 12px;
+  min-height: 48px;
+}
+
+.fs-cm-anio .fs-anios > .fs-cinta-k { display: none; }
+
+.fs-cm-anio .fs-anios-regla {
+  flex: 1;
+  height: 40px;
+  justify-content: space-between;
+  gap: 0;
+}
+
+.fs-cm-anio .fs-anios-regla button {
+  flex: 1;
+  width: auto;
+  height: 40px;
+}
+
+.fs-cm-anio .fs-anios-v { font-size: 17px; }
+
+.fs-cm-paso {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: 50%;
+  border: 1px solid var(--rule);
+  background: var(--bone);
+  color: var(--ink);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.fs-cm-paso:disabled { color: var(--ink-6); cursor: default; }
+
+.fs-cm-mandos { flex-wrap: wrap; }
+
+.fs-cm-mandos .fs-seg button,
+.fs-cm-mandos > .fs-btn {
+  min-height: 44px;
+  padding: 0 14px;
+}
+
+.fs-cm-nota {
+  margin: 0;
+  font-size: 12px;
+  color: var(--ink-4);
+  line-height: 1.5;
+  border-top: 1px solid var(--rule-soft);
+  padding-top: 10px;
+}
+
+/* velo: tocar fuera cierra */
+.fs-cm-velo {
+  position: fixed;
+  inset: 0;
+  z-index: 44;
+  border: 0;
+  padding: 0;
+  background: rgba(22, 25, 27, 0.18);
+  cursor: default;
+  animation: fs-fade 160ms ease both;
+}
+
+/* el perfil, como hoja inferior a todo lo ancho */
+@media (max-width: 719px) {
+  .fs-perfil {
+    left: 0;
+    right: 0;
+    width: auto;
+    bottom: var(--cinta-h);
+    max-height: calc(100dvh - 130px);
+    border-radius: 16px 16px 0 0;
+    border-width: 1px 0 0;
+    padding: 18px var(--gutter) 20px;
+    overscroll-behavior: contain;
+  }
+
+  .fs-perfil .fs-seg button,
+  .fs-perfil .fs-btn,
+  .fs-perfil .fs-select {
+    min-height: 44px;
+  }
+
+  .fs-stepper button {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* ── tablas en pantalla estrecha: filas con sus rótulos, no columnas cortadas ─
+   Una tabla de tres o cuatro columnas no cabe en 340 px sin esconder justo la
+   columna de las cifras. En el teléfono cada fila se lee como un pequeño
+   asiento: el concepto arriba y, debajo, cada valor con el nombre de su
+   columna encima. Nada queda fuera de la pantalla. */
+@media (max-width: 560px) {
+  .fs-table.is-apilable thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  /* paper.css obligaba a 620 px a toda tabla por debajo de 640: justo lo que
+     escondía la columna de las cifras. Sólo la tabla de parámetros del
+     apéndice (quince columnas, primera fija) conserva el desplazamiento. */
+  .fs-table:not(.is-fija) {
+    min-width: 0;
+  }
+
+  .fs-table:not(.is-fija),
+  .fs-table:not(.is-fija) tbody {
+    display: block;
+    width: 100%;
+  }
+
+  .fs-table:not(.is-fija) caption {
+    display: block;
+    position: static;
+    max-width: none;
+    width: auto;
+  }
+
+  .fs-table.is-apilable tr {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 14px;
+    row-gap: 4px;
+    padding: 11px 0 12px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+
+  .fs-table.is-apilable tbody th {
+    flex: 1 0 100%;
+    padding: 0;
+    border: 0;
+    white-space: normal;
+  }
+
+  .fs-table.is-apilable td {
+    flex: 1 1 0;
+    min-width: 0;
+    display: grid;
+    gap: 1px;
+    align-content: start;
+    padding: 0;
+    border: 0;
+    text-align: left;
+    white-space: normal;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .fs-table.is-apilable td::before {
+    content: attr(data-label);
+    font-family: var(--sans);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--ink-4);
+  }
+
+  .fs-table.is-apilable tr.is-current > th,
+  .fs-table.is-apilable tr.is-current > td {
+    color: var(--signal);
+    border: 0;
+  }
+
+  /* tabla de texto (norma, fuente): un único valor, a todo lo ancho */
+  .fs-table.is-texto.is-apilable td {
+    font-size: 12.5px;
+    font-weight: 400;
+    line-height: 1.45;
+  }
+
+  /* tablas de dos columnas sin cabecera: el concepto se parte, la cifra no */
+  .fs-table:not(.is-apilable):not(.is-fija) tbody th {
+    white-space: normal;
+  }
+
+  .fs-table:not(.is-apilable):not(.is-fija) td {
+    white-space: nowrap;
+    padding-left: 8px;
+    padding-right: 0;
+  }
+
+  /* y si llevan una tercera columna de comentario, baja a su propia línea */
+  .fs-table:not(.is-apilable):not(.is-fija) tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: baseline;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+
+  .fs-table:not(.is-apilable):not(.is-fija) tr > * {
+    border-bottom: 0;
+    border-top: 0;
+  }
+
+  .fs-table:not(.is-apilable):not(.is-fija) td:nth-child(3) {
+    grid-column: 1 / -1;
+    text-align: left;
+    white-space: normal;
+    padding: 0 0 8px 12px;
+    font-size: 11.5px;
+    color: var(--ink-4);
+  }
+
+  .fs-table:not(.is-apilable):not(.is-fija) tbody th {
+    padding-left: 12px;
+  }
+}
+
+/* detalle de un elemento elegido, cuando no hay margen donde mostrarlo */
+.fs-detalle-movil {
+  margin-top: 16px;
+  padding: 14px 0 4px 14px;
+  border-left: 2px solid var(--signal);
+  display: grid;
+  gap: 8px;
+}
+
+.fs-detalle-movil > * { margin: 0; }
+
+/* ── dianas del tamaño de un dedo (WCAG 2.5.5 · VISUAL_PLAN §8: ≥ 44 px) ───── */
+@media (pointer: coarse) {
+  .fs-btn,
+  .fs-seg button,
+  select.fs-select {
+    min-height: 44px;
+  }
+
+  .fs-btn {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .fs-seg button {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  /* los selectores de año de las figuras llevaban un alto fijo en línea */
+  .fs-btn[style*='--year-color'] {
+    min-height: 40px !important;
+    padding: 8px 12px !important;
+    font-size: 11px !important;
+  }
+
+  button.fs-key {
+    min-height: 40px;
+  }
+
+  .fs-guia-plegada > summary {
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+
+  /* reglas deslizantes de las figuras: el pulgar necesita algo que agarrar */
+  .fs-scrub input[type='range'] {
+    height: 44px;
+  }
+
+  .fs-scrub input[type='range']::-webkit-slider-thumb {
+    width: 26px;
+    height: 26px;
+    margin-top: -12.5px;
+    box-shadow: 0 0 0 5px var(--bone);
+  }
+
+  .fs-scrub input[type='range']::-moz-range-thumb {
+    width: 26px;
+    height: 26px;
+  }
+
+  .fs-enlace,
+  .fs-source a {
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+}
+
+/* ── el libro de cálculo (FIG. 03) en pantalla estrecha ───────────────────────
+   La cifra de cada fila bajaba a una línea propia que empezaba en el borde
+   izquierdo, por fuera de la espina y del nombre al que pertenece. Ahora se
+   alinea con el nombre, y el carril de la barra conserva su sangría. */
+@media (max-width: 640px) {
+  .fs-dfila-head {
+    grid-template-areas:
+      'k main'
+      '. val'
+      'track track';
+  }
+
+  .fs-dfila-body {
+    padding-left: calc(var(--sangria) + 18px);
+  }
+}
+
+/* la lectura del tramo (FIG. 05) en dos por dos, con la misma sangría */
+@media (max-width: 700px) {
+  .fs-tramo-readout > span,
+  .fs-tramo-readout > span + span {
+    padding: 10px 10px 10px 0;
+    border-left: 0;
+  }
+
+  .fs-tramo-readout > span:nth-child(even) {
+    padding-left: 12px;
+    border-left: 1px solid var(--rule-soft);
+  }
+}
+
+/* ── figuras fijas del móvil (capítulos 02 y 05) ─────────────────────────────
+   La figura se clava bajo la cabecera y los pasos pasan por debajo. Tenía que
+   caber con sitio de sobra para leer los pasos: el dibujo se limita en alto y
+   el pie (leyenda y fuente) se escribe después del último paso. */
+@media (max-width: 999px) {
+  .fs-sticky-fig {
+    top: 44px;
+    padding-top: 6px;
+    box-shadow: 0 10px 14px -12px rgba(22, 25, 27, 0.18);
+  }
+
+  .fs-sticky-fig .fs-svg {
+    max-height: min(38dvh, 360px) !important;
+    margin: 0 auto;
+  }
+
+  .fs-sticky-fig .fs-figure-sub {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .fs-sticky-fig .fs-zoom-hint { display: none; }
+
+  .fs-sticky-fig .fs-figure { margin-bottom: 0; }
+
+  .fs-pie-aparte {
+    padding-top: 18px;
+    border-top: 1px solid var(--rule-soft);
+  }
+
+  /* un paso ocupa lo que la franja de lectura que queda bajo la figura */
+  .fs-sticky .fs-step {
+    min-height: 34dvh;
+  }
+}
+
+/* ── la cabecera corrida en el teléfono ───────────────────────────────────────
+   El nombre de la publicación y el año ya están en la portada y en la cinta;
+   aquí el sitio es para el capítulo en curso y para dos botones que se puedan
+   tocar sin apuntar. */
+@media (max-width: 560px) {
+  .fs-running {
+    height: 44px;
+  }
+
+  .fs-running-name,
+  .fs-running .num {
+    display: none;
+  }
+
+  .fs-running-inner {
+    gap: 6px;
+  }
+
+  .fs-running-chapter {
+    text-align: left;
+    font-size: 10.5px;
+  }
+
+  .fs-running button {
+    min-height: 44px;
+    padding: 0 8px;
+    font-size: 10.5px;
+  }
+
+  .fs-running button:last-of-type {
+    margin-right: -8px;
+  }
+}
+
+@media (max-width: 999px) {
+  /* en la figura fija, la leyenda repetía los rótulos del propio dibujo */
+  .fs-sticky-fig .fs-keys-night { display: none; }
+}

@@ -65,7 +65,14 @@ export function useSteps(refs, count) {
           }
         });
       },
-      { rootMargin: '-48% 0px -48% 0px', threshold: 0 }
+      // En móvil la figura se clava en la mitad de arriba y los pasos se leen
+      // en la de abajo: la línea que decide el paso activo baja con ellos.
+      {
+        rootMargin: window.matchMedia('(max-width: 999px)').matches
+          ? '-72% 0px -24% 0px'
+          : '-48% 0px -48% 0px',
+        threshold: 0,
+      }
     );
     nodes.forEach(n => io.observe(n));
     return () => io.disconnect();

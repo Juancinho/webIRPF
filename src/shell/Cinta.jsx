@@ -3,6 +3,7 @@ import { useFiscal } from '../state/fiscalContext';
 import { ANIOS, DISTRIBUCION_SALARIAL, REFORMA_ANIOS, REGIONES, SMI_ANUAL } from '../engine/irpf';
 import { dec, eur, num } from '../utils/format';
 import Fuente from '../figures/Fuente';
+import { useNarrow } from '../hooks/useNarrow';
 
 /**
  * LA CINTA — the persistent instrument (VISUAL_PLAN_V4 §6).
@@ -17,7 +18,9 @@ export default function Cinta({ visible }) {
 
   const [perfilOpen, setPerfilOpen] = useState(false);
   const [draft, setDraft] = useState(null);
+  const [abierta, setAbierta] = useState(false);
   const ref = useRef(null);
+  const movil = useNarrow('(max-width: 719px)');
 
   // keep the page bottom clear of the tape
   useEffect(() => {
@@ -29,7 +32,14 @@ export default function Cinta({ visible }) {
     apply();
     window.addEventListener('resize', apply);
     return () => window.removeEventListener('resize', apply);
-  }, [visible, perfilOpen]);
+  }, [visible, perfilOpen, movil]);
+
+  useEffect(() => {
+    if (!abierta) return undefined;
+    const onKey = e => e.key === 'Escape' && setAbierta(false);
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [abierta]);
 
   useEffect(() => {
     if (!perfilOpen) return undefined;
@@ -51,6 +61,184 @@ export default function Cinta({ visible }) {
 
   const irAnio = paso => setAnio(Math.min(2026, Math.max(2012, anio + paso)));
 
+  const entradaBruto = (
+    <input
+      id="cinta-bruto"
+      className="fs-input"
+      inputMode="numeric"
+      enterKeyHint="done"
+      value={draft ?? num(bruto)}
+      onChange={e => {
+        setDraft(e.target.value);
+        const v = parseInt(e.target.value.replace(/\D/g, ''), 10);
+        if (Number.isFinite(v)) setBruto(v);
+      }}
+      onFocus={e => e.target.select()}
+      onBlur={() => setDraft(null)}
+    />
+  );
+
+  const reglaSueldo = (
+    <div className="fs-cinta-regla">
+      <input
+        className="fs-cinta-range"
+        type="range"
+        min="0"
+        max={TOPE}
+        step="500"
+        value={Math.min(bruto, TOPE)}
+        onChange={e => setBruto(+e.target.value)}
+        aria-label="Salario bruto anual"
+        aria-valuetext={`${num(bruto)} euros`}
+        style={{ '--recorrido': `${recorrido}%` }}
+      />
+      {/* SMI y mediana caen muy cerca en una escala de 0 a 150.000: van
+          en dos alturas distintas para no pisarse nunca. */}
+      {smi > 0 && (
+        <span className="fs-cinta-marca" style={{ left: posicion(smi) }} title={`SMI ${num(smi)} €`}>
+          <b>SMI</b>
+        </span>
+      )}
+      {mediana > 0 && (
+        <span
+          className="fs-cinta-marca is-baja"
+          style={{ left: posicion(mediana) }}
+          title={`Mediana salarial ${num(mediana)} €`}
+        >
+          <b>Mediana</b>
+        </span>
+      )}
+    </div>
+  );
+
+  const reglaAnios = (
+    <div
+      className="fs-anios"
+      role="group"
+      aria-label="Ejercicio fiscal"
+      onKeyDown={e => {
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { irAnio(-1); e.preventDefault(); }
+        if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { irAnio(1); e.preventDefault(); }
+        if (e.key === 'Home') { setAnio(2012); e.preventDefault(); }
+        if (e.key === 'End') { setAnio(2026); e.preventDefault(); }
+      }}
+    >
+      <span className="fs-cinta-k">Año</span>
+      <span className="fs-anios-regla">
+        {ANIOS.map(a => (
+          <button
+            key={a}
+            type="button"
+            className={[
+              a === anio ? 'is-on' : '',
+              REFORMA_ANIOS.some(r => r.anio === a) ? 'is-reforma' : '',
+            ].filter(Boolean).join(' ')}
+            aria-pressed={a === anio}
+            onClick={() => setAnio(a)}
+            title={`Fiscalidad de ${a}`}
+          >
+            <span className="fs-sr">{a}</span>
+          </button>
+        ))}
+      </span>
+      <span className="fs-anios-v" aria-live="polite">{anio}</span>
+    </div>
+  );
+
+  const pagasSeg = (
+    <span className="fs-seg">
+      {[12, 14].map(n => (
+        <button key={n} type="button" aria-pressed={pagas === n} onClick={() => setPagas(n)}>
+          {n} pagas
+        </button>
+      ))}
+    </span>
+  );
+
+  /* En el teléfono la cinta ocupaba casi una quinta parte de la pantalla con
+     tres filas de mandos. Ahora es una sola línea con las dos cifras que
+     importan —bruto y neto— y un botón; los mandos se despliegan encima,
+     al alcance del pulgar, sólo cuando se quieren tocar. */
+  if (movil) {
+    return (
+      <>
+        {perfilOpen && (
+          <PerfilSheet opts={opts} anio={anio} setOpt={setOpt} setOpts={setOpts} onClose={() => setPerfilOpen(false)} />
+        )}
+
+        {(abierta || perfilOpen) && visible && (
+          <button
+            type="button"
+            className="fs-cm-velo"
+            aria-label="Cerrar los ajustes"
+            onClick={() => { setAbierta(false); setPerfilOpen(false); }}
+          />
+        )}
+
+        <div className={`fs-cinta fs-cm ${visible ? 'is-on' : ''} ${abierta ? 'is-open' : ''}`} ref={ref}>
+          {abierta && !perfilOpen && (
+            <div className="fs-cm-panel" id="fs-cm-panel" role="region" aria-label="Ajustes del cálculo">
+              <div className="fs-cm-fila">
+                <label className="fs-cinta-k" htmlFor="cinta-bruto">Bruto anual</label>
+                <span className="fs-cm-bruto">
+                  {entradaBruto}
+                  <span className="fs-cm-euro">€</span>
+                </span>
+              </div>
+              {reglaSueldo}
+
+              <div className="fs-cm-fila fs-cm-anio">
+                <button type="button" className="fs-cm-paso" onClick={() => irAnio(-1)} disabled={anio <= 2012} aria-label="Año anterior">‹</button>
+                {reglaAnios}
+                <button type="button" className="fs-cm-paso" onClick={() => irAnio(1)} disabled={anio >= 2026} aria-label="Año siguiente">›</button>
+              </div>
+
+              <div className="fs-cm-fila fs-cm-mandos">
+                {pagasSeg}
+                <button
+                  type="button"
+                  className="fs-btn"
+                  aria-expanded={perfilOpen}
+                  onClick={() => setPerfilOpen(o => !o)}
+                >
+                  Perfil · {region.name.split('/')[0].trim()}
+                </button>
+              </div>
+
+              <p className="fs-cm-nota">
+                {eur(porPaga)} al mes en {pagas} pagas · {dec(pctCoste)} € de cada 100 € de coste laboral
+              </p>
+            </div>
+          )}
+
+          <div className="fs-cm-barra">
+            <button
+              type="button"
+              className="fs-cm-cifras"
+              aria-expanded={abierta}
+              aria-controls="fs-cm-panel"
+              onClick={() => { setAbierta(o => !o); setPerfilOpen(false); }}
+            >
+              <span className="fs-cm-par">
+                <span className="fs-cinta-k">Bruto</span>
+                <span className="fs-cm-v">{eur(bruto)}</span>
+              </span>
+              <span className="fs-cm-flecha" aria-hidden="true">→</span>
+              <span className="fs-cm-par">
+                <span className="fs-cinta-k">Neto {anio}</span>
+                <span className="fs-cm-v is-net">{eur(nomina.salarioNeto)}</span>
+              </span>
+              <span className="fs-cm-accion">
+                {abierta ? 'Listo' : 'Ajustar'}
+                <span className="fs-cm-chev" aria-hidden="true" />
+              </span>
+            </button>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       {perfilOpen && (
@@ -63,18 +251,7 @@ export default function Cinta({ visible }) {
             <div className="fs-cinta-pair">
               <span className="fs-cinta-k">Bruto</span>
               <label className="fs-sr" htmlFor="cinta-bruto">Salario bruto anual en euros</label>
-              <input
-                id="cinta-bruto"
-                className="fs-input"
-                inputMode="numeric"
-                value={draft ?? num(bruto)}
-                onChange={e => {
-                  setDraft(e.target.value);
-                  const v = parseInt(e.target.value.replace(/\D/g, ''), 10);
-                  if (Number.isFinite(v)) setBruto(v);
-                }}
-                onBlur={() => setDraft(null)}
-              />
+              {entradaBruto}
               <span className="fs-cinta-k">€</span>
             </div>
             <div className="fs-cinta-pair" style={{ marginTop: 2 }}>
@@ -86,77 +263,12 @@ export default function Cinta({ visible }) {
             </div>
           </div>
 
-          <div className="fs-cinta-regla">
-            <input
-              className="fs-cinta-range"
-              type="range"
-              min="0"
-              max={TOPE}
-              step="500"
-              value={Math.min(bruto, TOPE)}
-              onChange={e => setBruto(+e.target.value)}
-              aria-label="Salario bruto anual"
-              aria-valuetext={`${num(bruto)} euros`}
-              style={{ '--recorrido': `${recorrido}%` }}
-            />
-            {/* SMI y mediana caen muy cerca en una escala de 0 a 150.000: van
-                en dos alturas distintas para no pisarse nunca. */}
-            {smi > 0 && (
-              <span className="fs-cinta-marca" style={{ left: posicion(smi) }} title={`SMI ${num(smi)} €`}>
-                <b>SMI</b>
-              </span>
-            )}
-            {mediana > 0 && (
-              <span
-                className="fs-cinta-marca is-baja"
-                style={{ left: posicion(mediana) }}
-                title={`Mediana salarial ${num(mediana)} €`}
-              >
-                <b>Mediana</b>
-              </span>
-            )}
-          </div>
+          {reglaSueldo}
 
           <div className="fs-cinta-controls">
-            <div
-              className="fs-anios"
-              role="group"
-              aria-label="Ejercicio fiscal"
-              onKeyDown={e => {
-                if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { irAnio(-1); e.preventDefault(); }
-                if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { irAnio(1); e.preventDefault(); }
-                if (e.key === 'Home') { setAnio(2012); e.preventDefault(); }
-                if (e.key === 'End') { setAnio(2026); e.preventDefault(); }
-              }}
-            >
-              <span className="fs-cinta-k">Año</span>
-              <span className="fs-anios-regla">
-                {ANIOS.map(a => (
-                  <button
-                    key={a}
-                    type="button"
-                    className={[
-                      a === anio ? 'is-on' : '',
-                      REFORMA_ANIOS.some(r => r.anio === a) ? 'is-reforma' : '',
-                    ].filter(Boolean).join(' ')}
-                    aria-pressed={a === anio}
-                    onClick={() => setAnio(a)}
-                    title={`Fiscalidad de ${a}`}
-                  >
-                    <span className="fs-sr">{a}</span>
-                  </button>
-                ))}
-              </span>
-              <span className="fs-anios-v" aria-live="polite">{anio}</span>
-            </div>
+            {reglaAnios}
 
-            <span className="fs-seg">
-              {[12, 14].map(n => (
-                <button key={n} type="button" aria-pressed={pagas === n} onClick={() => setPagas(n)}>
-                  {n} pagas
-                </button>
-              ))}
-            </span>
+            {pagasSeg}
 
             <button
               type="button"

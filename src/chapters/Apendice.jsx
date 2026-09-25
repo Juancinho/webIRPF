@@ -378,7 +378,7 @@ export default function Apendice() {
         {/* ── E ─────────────────────────────────────────────────────────── */}
         <Seccion letra="E" titulo="Fuentes">
           <div className="fs-table-scroll">
-            <table className="fs-table is-texto">
+            <table className="fs-table is-texto is-apilable">
               <caption>Cada parámetro del motor, con su norma de origen</caption>
               <thead>
                 <tr>
@@ -390,7 +390,7 @@ export default function Apendice() {
                 {FUENTES.map(f => (
                   <tr key={f.concepto}>
                     <th scope="row">{f.concepto}</th>
-                    <td>
+                    <td data-label="Norma o publicación">
                       {f.url ? (
                         <a href={f.url} target="_blank" rel="noreferrer noopener">
                           {f.fuente}

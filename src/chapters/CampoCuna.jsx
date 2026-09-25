@@ -1,19 +1,17 @@
 import { useMemo, useRef } from 'react';
 import { useSteps } from '../hooks/useChapters';
-import Figure from '../figures/Figure';
+import Figure, { FiguraPie } from '../figures/Figure';
 import { Label } from '../figures/marks';
 import { round } from '../figures/scale';
 import { eur } from '../utils/format';
+import { ANCHO_MOVIL, useNarrow } from '../hooks/useNarrow';
 
-const COLS = 20;
 const CELDA = 14;
 const HUECO = 4;
 const S = CELDA + HUECO;
 const X0 = 10;
 const Y0 = 46;
 const SEP = 26;          // aire entre bandas cuando el campo se abre
-const XL = X0 + COLS * S + 18;
-const W = 880;
 const H = 300;
 
 const ORDEN = ['ssEmp', 'ssTra', 'irpf', 'neto'];
@@ -50,6 +48,11 @@ export default function CampoCuna({ grupos, anio, bruto, nomina, vista, setVista
     [grupos]
   );
   const paso = useSteps(refs, orden.length + 2);
+  // Móvil: diez filas de diez, con los rótulos a la derecha (STORYBOARD_V2).
+  const narrow = useNarrow();
+  const COLS = narrow ? 10 : 20;
+  const W = narrow ? ANCHO_MOVIL : 880;
+  const XL = X0 + COLS * S + (narrow ? 14 : 18);
 
   const abierto = paso >= 1;
   const foco = paso >= 2 ? orden[Math.min(paso - 2, orden.length - 1)] : null;
@@ -58,7 +61,7 @@ export default function CampoCuna({ grupos, anio, bruto, nomina, vista, setVista
   const { celdas, bandas, alto } = useMemo(() => {
     const bandas = orden.reduce((acc, g) => {
       const filas = Math.max(1, Math.ceil(g.value / COLS));
-      const yTop = acc.length ? acc[acc.length - 1].yTop + acc[acc.length - 1].filas * S + SEP : Y0;
+      const yTop = acc.length ? acc[acc.length - 1].yTop + Math.max(acc[acc.length - 1].filas * S, narrow ? 34 : 0) + SEP : Y0;
       acc.push({ ...g, filas, yTop });
       return acc;
     }, []);
@@ -85,10 +88,12 @@ export default function CampoCuna({ grupos, anio, bruto, nomina, vista, setVista
     });
 
     return { celdas, bandas, alto };
-  }, [orden]);
+  }, [orden, COLS, narrow]);
 
   const euros = g => (g.key === 'neto' ? nomina.salarioNeto : g.key === 'irpf' ? nomina.irpfFinal : g.key === 'ssTra' ? nomina.cotTra : nomina.cotEmp);
   const suma = grupos.reduce((a, g) => a + g.value, 0);
+  const leyenda19 = `Un bloque = 1 € de cada 100 · ${grupos.map(g => `${g.label} ${g.value}`).join(' + ')} = ${suma}${suma < 100 ? ` · ${100 - suma} € se reparten en el redondeo` : ''}`;
+  const fuente19 = 'Fuente · TGSS · AEAT · cálculo propio';
 
   const titulo = foco
     ? `${foco.value} € de cada 100 · ${foco.label.toLowerCase()}`
@@ -103,8 +108,9 @@ export default function CampoCuna({ grupos, anio, bruto, nomina, vista, setVista
           id="19"
           title={titulo}
           sub={`${anio} · ${vista === 'empresa' ? `sobre el coste laboral total (${eur(nomina.costeLab)})` : `sobre el salario bruto (${eur(bruto)})`} · un bloque = 1 €`}
-          legend={`Un bloque = 1 € de cada 100 · ${grupos.map(g => `${g.label} ${g.value}`).join(' + ')} = ${suma}${suma < 100 ? ` · ${100 - suma} € se reparten en el redondeo` : ''}`}
-          source="Fuente · TGSS · AEAT · cálculo propio"
+          legend={leyenda19}
+          source={fuente19}
+          sinPie={narrow}
           summary={grupos.map(g => `${g.label}: ${g.value} de cada 100`).join('; ')}
         >
           <div style={{ display: 'flex', gap: 10, marginBottom: 14, flexWrap: 'wrap' }}>
@@ -155,9 +161,20 @@ export default function CampoCuna({ grupos, anio, bruto, nomina, vista, setVista
                   <Label x={XL} y={round(b.yTop + 11)} size={11.5} weight={800} color={b.key === 'neto' ? 'var(--night-ink)' : b.color}>
                     {b.label}
                   </Label>
-                  <Label x={XL} y={round(b.yTop + 27)} size={11} weight={700} color="var(--night-ink)" mono>
-                    {b.value} € de cada 100 · {eur(euros(b))}
-                  </Label>
+                  {narrow ? (
+                    <>
+                      <Label x={XL} y={round(b.yTop + 27)} size={10.5} weight={700} color="var(--night-ink)" mono>
+                        {b.value} € de cada 100
+                      </Label>
+                      <Label x={XL} y={round(b.yTop + 42)} size={10.5} color="var(--night-ink)" mono>
+                        {eur(euros(b))} al año
+                      </Label>
+                    </>
+                  ) : (
+                    <Label x={XL} y={round(b.yTop + 27)} size={11} weight={700} color="var(--night-ink)" mono>
+                      {b.value} € de cada 100 · {eur(euros(b))}
+                    </Label>
+                  )}
                 </g>
               );
             })}
@@ -183,6 +200,11 @@ export default function CampoCuna({ grupos, anio, bruto, nomina, vista, setVista
             <p className="fs-body">{TEXTO[g.key](g.value, eur(euros(g)))}</p>
           </div>
         ))}
+        {narrow && (
+          <div className="fs-pie-aparte">
+            <FiguraPie legend={leyenda19} source={fuente19} />
+          </div>
+        )}
       </div>
     </div>
   );

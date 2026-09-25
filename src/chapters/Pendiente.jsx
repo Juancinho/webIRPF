@@ -7,11 +7,9 @@ import YearComparator from '../figures/YearComparator';
 import { Label } from '../figures/marks';
 import { linear, polyline, round } from '../figures/scale';
 import { dec, eur, pct } from '../utils/format';
+import { ANCHO_MOVIL, useNarrow } from '../hooks/useNarrow';
 
-const W = 880;
 const H = 480;
-const X0 = 46;
-const X1 = W - 214;      // a la derecha, el nombre de cada recta y su cambio
 const Y0 = 46;
 const Y1 = H - 76;
 const MIN_SEP = 15;      // separación mínima entre rótulos de la derecha
@@ -58,6 +56,13 @@ export default function Pendiente({ anios, anioA, anioB, onAnioA, onAnioB }) {
   const { bruto, anio, opts } = useFiscal();
   const [hover, setHover] = useState(null);
   const [tip, setTip] = useState(null);
+  // A la derecha, el nombre de cada recta y su cambio. En móvil se quedan el
+  // nivel y los puntos de diferencia; el tipo del año B va en el recuadro.
+  const narrow = useNarrow();
+  const W = narrow ? ANCHO_MOVIL : 880;
+  const X0 = narrow ? 30 : 46;
+  const X1 = W - (narrow ? 104 : 214);
+  const XN = X1 + (narrow ? 16 : 30);
 
   const desde = Math.min(anioA, anioB);
   const hasta = Math.max(anioA, anioB);
@@ -153,14 +158,14 @@ export default function Pendiente({ anios, anioA, anioB, onAnioA, onAnioB }) {
         </span>
       </div>
 
-      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} scroll minWidth={700} label="Quince años de presión fiscal por nivel salarial">
+      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} label="Quince años de presión fiscal por nivel salarial">
         {/* la rejilla de tipos */}
         {[0, 5, 10, 15, 20, 25, 30, 35, 40, 45]
           .filter(v => v >= y.domain[0] && v <= y.domain[1])
           .map(v => (
             <g key={v}>
               <line x1={X0} y1={round(y(v))} x2={X1} y2={round(y(v))} stroke="var(--ink-7)" strokeWidth={0.6} />
-              <Label x={X0 - 8} y={round(y(v)) + 3} size={9} color="var(--ink-5)" anchor="end" mono>
+              <Label x={X0 - 6} y={round(y(v)) + 3} size={narrow ? 8.5 : 9} color="var(--ink-5)" anchor="end" mono>
                 {pct(v, 0)}
               </Label>
             </g>
@@ -226,18 +231,20 @@ export default function Pendiente({ anios, anioA, anioB, onAnioA, onAnioB }) {
               <circle cx={round(x(hasta))} cy={round(y(l.b.tipo))} r={mio || on ? 3.4 : 2.4} fill={mio ? 'var(--signal)' : 'var(--signal)'} />
 
               {/* guía del final de la línea a su rótulo */}
-              <line x1={X1 + 3} y1={round(yFin)} x2={X1 + 26} y2={round(yR - 3.5)} stroke="var(--ink-6)" strokeWidth={0.6} strokeDasharray="1.5 2" />
+              <line x1={X1 + 3} y1={round(yFin)} x2={XN - 4} y2={round(yR - 3.5)} stroke="var(--ink-6)" strokeWidth={0.6} strokeDasharray="1.5 2" />
 
-              <Label x={X1 + 30} y={round(yR)} size={10.5} weight={mio ? 800 : 600} color={mio ? 'var(--signal)' : 'var(--ink-2)'}>
+              <Label x={XN} y={round(yR)} size={narrow ? 9.5 : 10.5} weight={mio ? 800 : 600} color={mio ? 'var(--signal)' : 'var(--ink-2)'}>
                 {eur(l.nivel)}
               </Label>
-              <Label x={X1 + 106} y={round(yR)} size={10} weight={700} color="var(--ink)" mono>
-                {pct(l.b.tipo)}
-              </Label>
+              {!narrow && (
+                <Label x={X1 + 106} y={round(yR)} size={10} weight={700} color="var(--ink)" mono>
+                  {pct(l.b.tipo)}
+                </Label>
+              )}
               <Label
-                x={W - 6}
+                x={W - (narrow ? 2 : 6)}
                 y={round(yR)}
-                size={10}
+                size={narrow ? 9.5 : 10}
                 weight={700}
                 color={l.delta > 0.05 ? 'var(--counter)' : l.delta < -0.05 ? 'var(--ink-3)' : 'var(--ink-5)'}
                 anchor="end"
@@ -254,23 +261,27 @@ export default function Pendiente({ anios, anioA, anioB, onAnioA, onAnioB }) {
         {marcas.map(a => (
           <g key={a}>
             <line x1={round(x(a))} y1={Y1} x2={round(x(a))} y2={Y1 + 5} stroke="var(--ink-5)" strokeWidth={0.7} />
-            <Label x={round(x(a))} y={Y1 + 19} size={9.5} color="var(--ink-4)" anchor="middle" mono>
-              {a}
+            <Label x={round(x(a))} y={Y1 + 19} size={narrow ? 8.5 : 9.5} color="var(--ink-4)" anchor="middle" mono>
+              {narrow ? `’${String(a).slice(2)}` : a}
             </Label>
           </g>
         ))}
 
-        <Label x={X1 + 30} y={Y1 + 19} size={9} color="var(--ink-5)" mono>
+        <Label x={XN} y={Y1 + 19} size={narrow ? 8 : 9} color="var(--ink-5)" mono>
           NIVEL
         </Label>
-        <Label x={X1 + 106} y={Y1 + 19} size={9} color="var(--ink-5)" mono>
-          TIPO {hasta}
+        {!narrow && (
+          <Label x={X1 + 106} y={Y1 + 19} size={9} color="var(--ink-5)" mono>
+            TIPO {hasta}
+          </Label>
+        )}
+        <Label x={W - (narrow ? 2 : 6)} y={Y1 + 19} size={narrow ? 8 : 9} color="var(--ink-5)" anchor="end" mono>
+          {narrow ? 'PTOS.' : 'PUNTOS'}
         </Label>
-        <Label x={W - 6} y={Y1 + 19} size={9} color="var(--ink-5)" anchor="end" mono>
-          PUNTOS
-        </Label>
-        <Label x={X0} y={Y1 + 40} size={9} color="var(--ink-5)" mono>
-          TIPO EFECTIVO TOTAL · ↑ MÁS PRESIÓN SOBRE EL MISMO PODER DE COMPRA · ↓ MENOS
+        <Label x={X0} y={Y1 + 40} size={narrow ? 8 : 9} color="var(--ink-5)" mono>
+          {narrow
+            ? 'TIPO EFECTIVO TOTAL · ↑ MÁS PRESIÓN · ↓ MENOS'
+            : 'TIPO EFECTIVO TOTAL · ↑ MÁS PRESIÓN SOBRE EL MISMO PODER DE COMPRA · ↓ MENOS'}
         </Label>
       </ChartFrame>
     </Figure>

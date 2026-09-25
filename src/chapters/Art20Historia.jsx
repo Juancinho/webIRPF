@@ -6,13 +6,9 @@ import { useDomainZoom } from '../figures/useDomainZoom';
 import { Label } from '../figures/marks';
 import { linear, polyline, round, ticks } from '../figures/scale';
 import { eur } from '../utils/format';
+import { ANCHO_MOVIL, useNarrow } from '../hooks/useNarrow';
 
-const W = 880;
-const H = 360;
-const X0 = 26;
-const X1 = W - 116;
 const Y0 = 26;
-const Y1 = H - 52;
 
 /**
  * FIG. 14 — LA REDUCCIÓN QUE SE MUEVE.
@@ -25,6 +21,12 @@ export default function Art20Historia() {
   const [hover, setHover] = useState(null);
   const [tip, setTip] = useState(null);
   const [activos, setActivos] = useState(() => new Set(ANIOS_ART20_MUESTRA));
+  const narrow = useNarrow();
+  const W = narrow ? ANCHO_MOVIL : 880;
+  const H = narrow ? 330 : 360;
+  const X0 = narrow ? 4 : 26;
+  const X1 = W - (narrow ? 30 : 116);
+  const Y1 = H - 52;
 
   const datos = real ? CURVA_ART20_REAL : CURVA_ART20;
   const zoom = useDomainZoom([0, datos[datos.length - 1].rn], { pxRange: [X0, X1], vbWidth: W, maxZoom: 14 });
@@ -146,7 +148,7 @@ export default function Art20Historia() {
           return (
             <g key={a} opacity={on ? 1 : 0.18}>
               <path d={polyline(pts)} fill="none" stroke={tono(i)} strokeWidth={on ? 1.5 : 0.7} strokeLinejoin="round" />
-              {on && last && (
+              {on && last && !narrow && (
                 <>
                   <Label x={round(x(last.rn)) + 6} y={round(y(last[`red_${a}`])) + 3} size={9.5} weight={700} color={tono(i)} mono>
                     {a}
@@ -169,10 +171,17 @@ export default function Art20Historia() {
 
         </g>
         <line x1={X0} y1={Y1} x2={X1} y2={Y1} stroke="var(--rule)" strokeWidth={0.8} />
-        {ticks(zoom.domain[0], zoom.domain[1], 5).map(v => (
+        {ticks(zoom.domain[0], zoom.domain[1], narrow ? 4 : 5).map(v => (
           <g key={v}>
             <line x1={round(x(v))} y1={Y1} x2={round(x(v))} y2={Y1 + 5} stroke="var(--ink-5)" strokeWidth={0.7} />
-            <Label x={round(x(v))} y={Y1 + 20} size={9.5} color="var(--ink-4)" anchor="middle" mono>
+            <Label
+              x={round(x(v))}
+              y={Y1 + 20}
+              size={narrow ? 8.5 : 9.5}
+              color="var(--ink-4)"
+              anchor={narrow && x(v) < X0 + 20 ? 'start' : narrow && x(v) > X1 - 24 ? 'end' : 'middle'}
+              mono
+            >
               {v === 0 ? '0 €' : eur(v)}
             </Label>
           </g>

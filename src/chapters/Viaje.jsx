@@ -2,18 +2,24 @@ import { useRef } from 'react';
 import { useNumeroAnimado } from '../hooks/useNumeroAnimado';
 import { useFiscal } from '../state/fiscalContext';
 import { useSteps } from '../hooks/useChapters';
-import Figure from '../figures/Figure';
+import Figure, { FiguraPie } from '../figures/Figure';
 import Puente from '../figures/Puente';
 import ChartFrame from '../figures/ChartFrame';
 import { TickStrip, Label, Leader } from '../figures/marks';
 import { rnd, round } from '../figures/scale';
 import { eur, num, pct } from '../utils/format';
+import { ANCHO_MOVIL, useNarrow } from '../hooks/useNarrow';
 
-const W = 900;
 const H = 470;
-const CX = 366;
-const MAXW = 600;
-const UNIT = 500; // one mark = 500 € of labour cost
+
+/* Escritorio: rótulos de caída a la izquierda, la columna de marcas en el
+   centro y los hitos a la derecha. Móvil: la misma composición apretada en
+   360 unidades —la columna de marcas se estrecha y cada marca vale el doble
+   para que sigan pudiendo contarse—. */
+const GEO = {
+  ancho: { W: 900, CX: 366, MAXW: 600, UNIT: 500, LX: 26, RX: 690, rot: 10, cifra: 14, drop: 13 },
+  movil: { W: ANCHO_MOVIL, CX: 152, MAXW: 150, UNIT: 1000, LX: 2, RX: 238, rot: 8.5, cifra: 13, drop: 12 },
+};
 
 /**
  * 02 · EL VIAJE DE CADA EURO — FIG. 03, the descent.
@@ -25,6 +31,8 @@ export default function Viaje() {
   const { bruto, anio, nomina, params, focus, setFocus } = useFiscal();
   const stepRefs = useRef([]);
   const step = useSteps(stepRefs, 6);
+  const narrow = useNarrow();
+  const { W, CX, MAXW, UNIT, LX, RX, rot, cifra, drop } = narrow ? GEO.movil : GEO.ancho;
 
   const esAutonomo = nomina.regimen === 'autonomo';
   const total = Math.max(nomina.costeLab, 1);
@@ -49,6 +57,8 @@ export default function Viaje() {
   const dropOn = i => (i === 0 ? step >= 1 : i === 1 ? step >= 3 : step >= 5);
 
   const pctNeto = (nomina.salarioNeto / total) * 100;
+  const leyenda04 = `Una marca = ${eur(UNIT)} de coste laboral · marcas discontinuas = importe que se desprende`;
+  const fuente04 = 'Fuente · TGSS · BOE LIRPF · AEAT';
 
   return (
     <section id="viaje" className="fs-chapter fs-open-flow" aria-labelledby="viaje-t">
@@ -87,11 +97,12 @@ export default function Viaje() {
                 id="04"
                 title={`De ${eur(nomina.costeLab)} de coste laboral a ${eur(nomina.salarioNeto)} de renta neta`}
                 sub={`${anio} · euros anuales · el ancho de cada banda es proporcional al importe`}
-                legend={`Una marca = ${UNIT} € de coste laboral · marcas discontinuas = importe que se desprende`}
-                source="Fuente · TGSS · BOE LIRPF · AEAT"
+                legend={leyenda04}
+                source={fuente04}
+                sinPie={narrow}
                 summary={`De ${eur(nomina.costeLab)} de coste laboral, ${eur(nomina.cotEmp)} son cotización de la empresa, ${eur(nomina.cotTra)} cotización del trabajador y ${eur(nomina.irpfFinal)} IRPF; llegan ${eur(nomina.salarioNeto)} netos.`}
               >
-                <ChartFrame viewBox={`0 0 ${W} ${H}`} scroll style={{ maxHeight: '64vh' }}>
+                <ChartFrame viewBox={`0 0 ${W} ${H}`} style={{ maxHeight: '64vh' }}>
                   {/* guide rail: the full width of the labour cost, always present */}
                   <Rule x={CX} y0={34} y1={H - 10} />
 
@@ -110,11 +121,11 @@ export default function Viaje() {
                           seed={i + 2}
                           color="var(--ink)"
                         />
-                        <Leader x1={CX + sw / 2 + 8} y1={s.y} x2={W - 216} y2={s.y} />
-                        <Label x={W - 210} y={s.y - 3} size={10} weight={700} color="var(--ink-2)" mono>
+                        <Leader x1={CX + sw / 2 + 8} y1={s.y} x2={RX - 6} y2={s.y} />
+                        <Label x={RX} y={s.y - 3} size={rot} weight={700} color="var(--ink-2)" mono>
                           {s.label.toUpperCase()}
                         </Label>
-                        <Label x={W - 210} y={s.y + 13} size={14} weight={800} color="var(--ink)">
+                        <Label x={RX} y={s.y + 13} size={cifra} weight={800} color="var(--ink)">
                           {eur(s.v)}
                         </Label>
                       </g>
@@ -156,13 +167,13 @@ export default function Viaje() {
 
                         {d.v > 0 && (
                           <>
-                            <Label x={26} y={(a.y + b.y) / 2 - 4} size={13} weight={800} color="var(--ink-2)">
+                            <Label x={LX} y={(a.y + b.y) / 2 - 4} size={drop} weight={800} color="var(--ink-2)">
                               −{pct((d.v / total) * 100)}
                             </Label>
-                            <Label x={26} y={(a.y + b.y) / 2 + 10} size={8.5} color="var(--ink-5)" mono>
+                            <Label x={LX} y={(a.y + b.y) / 2 + 10} size={narrow ? 7.5 : 8.5} color="var(--ink-5)" mono>
                               {d.label.toUpperCase()}
                             </Label>
-                            <Label x={26} y={(a.y + b.y) / 2 + 24} size={11} weight={700} color="var(--ink-3)">
+                            <Label x={LX} y={(a.y + b.y) / 2 + 24} size={narrow ? 10 : 11} weight={700} color="var(--ink-3)">
                               −{eur(d.v)}
                             </Label>
                           </>
@@ -183,20 +194,25 @@ export default function Viaje() {
                       strokeWidth={0.9}
                       strokeDasharray="3 2.5"
                     />
-                    <Leader x1={CX - w(nomina.baseImponible) / 2 - 8} y1={324} x2={196} y2={324} dashed />
-                    <Label x={188} y={321} size={9} color="var(--counter)" anchor="end" mono>
+                    {/* en móvil la columna izquierda es de las caídas: la base va a la derecha */}
+                    {narrow ? (
+                      <Leader x1={CX + w(nomina.baseImponible) / 2 + 8} y1={324} x2={RX - 6} y2={324} dashed />
+                    ) : (
+                      <Leader x1={CX - w(nomina.baseImponible) / 2 - 8} y1={324} x2={196} y2={324} dashed />
+                    )}
+                    <Label x={narrow ? RX : 188} y={321} size={narrow ? 8 : 9} color="var(--counter)" anchor={narrow ? 'start' : 'end'} mono>
                       BASE IMPONIBLE
                     </Label>
-                    <Label x={188} y={334} size={11} weight={700} color="var(--counter)" anchor="end">
+                    <Label x={narrow ? RX : 188} y={334} size={11} weight={700} color="var(--counter)" anchor={narrow ? 'start' : 'end'}>
                       {eur(nomina.baseImponible)}
                     </Label>
                   </g>
 
                   {/* survival rate: the sentence the whole figure exists to make */}
-                  <Label x={26} y={H - 14} size={9} color="var(--ink-5)" mono>
+                  <Label x={LX} y={H - 14} size={narrow ? 8 : 9} color="var(--ink-5)" mono>
                     LLEGA A TU CUENTA
                   </Label>
-                  <Label x={26} y={H - 30} size={22} weight={800} color="var(--signal)">
+                  <Label x={LX} y={H - 30} size={22} weight={800} color="var(--signal)">
                     {pct(pctNeto)}
                   </Label>
                 </ChartFrame>
@@ -232,6 +248,11 @@ export default function Viaje() {
                   )}
                 </div>
               ))}
+              {narrow && (
+                <div className="fs-pie-aparte">
+                  <FiguraPie legend={leyenda04} source={fuente04} />
+                </div>
+              )}
             </div>
           </div>
         </div>

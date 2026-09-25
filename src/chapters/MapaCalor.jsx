@@ -6,6 +6,7 @@ import ChartFrame from '../figures/ChartFrame';
 import { Label } from '../figures/marks';
 import { linear, round } from '../figures/scale';
 import { dec, eur, pct } from '../utils/format';
+import { ANCHO_MOVIL, useNarrow } from '../hooks/useNarrow';
 
 /* Rampa secuencial de un solo tono: del papel al verde de la publicación.
    Un solo tono porque lo que se compara es intensidad, no categorías. */
@@ -23,10 +24,7 @@ const HITOS = {
   2023: 'MEI · tramo 47 %',
 };
 
-const W = 1180;
 const H = 470;
-const X0 = 74;
-const X1 = W - 158;
 const Y0 = 52;
 const FILA = 24;
 
@@ -45,6 +43,12 @@ export default function MapaCalor({ anioA, anioB }) {
   const { anio, bruto } = useFiscal();
   const [medida, setMedida] = useState('irpf');
   const [tip, setTip] = useState(null);
+  // En móvil las celdas ocupan todo el ancho y los hitos de reforma bajan a
+  // una línea de texto bajo el mapa.
+  const narrow = useNarrow();
+  const W = narrow ? ANCHO_MOVIL : 1180;
+  const X0 = narrow ? 34 : 74;
+  const X1 = W - (narrow ? 4 : 158);
 
   const campo = MEDIDAS[medida].campo;
 
@@ -109,7 +113,7 @@ export default function MapaCalor({ anioA, anioB }) {
         </span>
       </div>
 
-      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} scroll minWidth={900} label="Quince años de carga fiscal por nivel de renta">
+      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} scroll={!narrow} minWidth={900} label="Quince años de carga fiscal por nivel de renta">
         {/* ── las celdas ──────────────────────────────────────────────── */}
         {ANIOS.map(a => (
           <g key={a}>
@@ -136,9 +140,9 @@ export default function MapaCalor({ anioA, anioB }) {
               />
             )}
             <text
-              x={X0 - 12}
+              x={X0 - (narrow ? 5 : 12)}
               y={yDe(a) + alto / 2 + 3.5}
-              fontSize={10}
+              fontSize={narrow ? 9 : 10}
               fontWeight={a === primero || a === ultimo || a === anio ? 800 : 500}
               textAnchor="end"
               fill={a === primero ? 'var(--counter)' : a === ultimo ? 'var(--signal)' : a === anio ? 'var(--ink)' : 'var(--ink-4)'}
@@ -146,7 +150,7 @@ export default function MapaCalor({ anioA, anioB }) {
             >
               {a}
             </text>
-            {HITOS[a] && (
+            {HITOS[a] && !narrow && (
               <Label x={X1 + 10} y={yDe(a) + alto / 2 + 3.5} size={8.5} color="var(--ink-4)" mono>
                 {HITOS[a]}
               </Label>
@@ -168,14 +172,14 @@ export default function MapaCalor({ anioA, anioB }) {
           y={Y0 - 16}
           size={9.5}
           color="var(--signal)"
-          anchor={x(marcado) > X1 - 120 ? 'end' : 'middle'}
+          anchor={x(marcado) > X1 - (narrow ? 60 : 120) ? 'end' : narrow && x(marcado) < X0 + 60 ? 'start' : 'middle'}
           mono
         >
           TU SALARIO · {eur(marcado)}
         </Label>
 
         {/* ── el eje de renta ─────────────────────────────────────────── */}
-        {[0, 20000, 40000, 60000, 80000, 100000].map(v => (
+        {(narrow ? [0, 25000, 50000, 75000, 100000] : [0, 20000, 40000, 60000, 80000, 100000]).map(v => (
           <g key={v}>
             <line
               x1={round(x(v))}
@@ -188,7 +192,7 @@ export default function MapaCalor({ anioA, anioB }) {
             <Label
               x={round(x(v))}
               y={Y0 + ANIOS.length * FILA + 20}
-              size={9.5}
+              size={narrow ? 8.5 : 9.5}
               color="var(--ink-4)"
               anchor={v === 0 ? 'start' : v === 100000 ? 'end' : 'middle'}
               mono
@@ -197,8 +201,8 @@ export default function MapaCalor({ anioA, anioB }) {
             </Label>
           </g>
         ))}
-        <Label x={X0} y={Y0 + ANIOS.length * FILA + 38} size={9} color="var(--ink-5)" mono>
-          SALARIO BRUTO ANUAL · EUROS CONSTANTES DE 2026
+        <Label x={X0} y={Y0 + ANIOS.length * FILA + 38} size={narrow ? 8 : 9} color="var(--ink-5)" mono>
+          {narrow ? 'BRUTO ANUAL · € CONSTANTES DE 2026' : 'SALARIO BRUTO ANUAL · EUROS CONSTANTES DE 2026'}
         </Label>
 
         <rect
@@ -231,6 +235,19 @@ export default function MapaCalor({ anioA, anioB }) {
           onMouseLeave={() => setTip(null)}
         />
       </ChartFrame>
+
+      {narrow && (
+        <p className="fs-note" style={{ marginTop: 10 }}>
+          Reformas visibles en el mapa:{' '}
+          {Object.entries(HITOS).map(([a, t], i) => (
+            <span key={a}>
+              {i > 0 && ' · '}
+              <strong>{a}</strong> {t.toLowerCase()}
+            </span>
+          ))}
+          .
+        </p>
+      )}
     </Figure>
   );
 }

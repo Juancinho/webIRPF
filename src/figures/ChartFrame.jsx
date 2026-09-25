@@ -1,4 +1,6 @@
+import { useCallback, useState } from 'react';
 import { useNarrow } from '../hooks/useNarrow';
+import { useTactil } from './useTactil';
 
 /**
  * El marco común de todas las figuras.
@@ -14,13 +16,19 @@ import { useNarrow } from '../hooks/useNarrow';
  *    reescalar (`zoom`, de `useDomainZoom`).
  *
  * Las figuras categóricas —filas de países, de años o de percentiles— no
- * llevan zoom: ahí no hay eje que reescalar, así que en pantallas estrechas
- * se desplazan lateralmente conservando el tamaño del texto.
+ * llevan zoom: ahí no hay eje que reescalar. En móvil cada figura se dibuja
+ * con su propia composición vertical (`useNarrow`); `scroll` queda como red
+ * para las pocas que conservan un lienzo más ancho que la pantalla.
+ *
+ * 4. La lectura táctil (`useTactil`): tocar fija un punto, mantener y
+ *    arrastrar lo recorre, y en las figuras con eje, pellizcar amplía y el
+ *    doble toque acerca. Con el dedo encima, el recuadro sube por encima del
+ *    punto para que el dedo no lo tape.
  */
 export default function ChartFrame({
   viewBox,
   children,
-  tip = null,
+  tip,
   zoom = null,
   scroll = false,
   minWidth = 660,
@@ -30,20 +38,40 @@ export default function ChartFrame({
 }) {
   const narrow = useNarrow();
   const [, , vbW, vbH] = viewBox.split(/\s+/).map(Number);
+  const [nodo, setNodo] = useState(null);
 
-  const derecha = tip ? tip.vx / vbW > 0.62 : false;
+  const attach = zoom?.attach;
+  const unirRef = useCallback(
+    el => {
+      setNodo(el);
+      attach?.(el);
+    },
+    [attach]
+  );
+
+  const tactil = useTactil(nodo, {
+    horizontal: !!zoom,
+    zoomed: !!zoom?.zoomed,
+    onDoubleTap: zoom ? zoom.zoomAtClient : undefined,
+  });
+
+  const fx = tip ? tip.vx / vbW : 0;
+  const derecha = tip ? fx > 0.62 : false;
   const abajo = tip ? tip.vy / vbH > 0.68 : false;
+  // Con el dedo, el recuadro va encima del punto y se alinea al borde más cercano.
+  const lado = fx < 0.3 ? 'is-tl' : fx > 0.7 ? 'is-tr' : 'is-tc';
+  const claseTip = tactil ? `is-touch ${lado}` : `${derecha ? 'is-left' : ''} ${abajo ? 'is-up' : ''}`;
 
   const lienzo = (
     <div
       className={`fs-chart ${zoom ? 'fs-chart-zoom' : ''} ${zoom?.zoomed ? 'is-zoomed' : ''}`.trim()}
       style={scroll && narrow ? { minWidth } : undefined}
-      ref={zoom ? zoom.ref : undefined}
+      ref={unirRef}
       tabIndex={zoom ? 0 : undefined}
       role={zoom ? 'group' : undefined}
       aria-label={
         zoom
-          ? `${label}. Rueda o pellizca para ampliar el eje, arrastra para desplazarte, 0 para reiniciar.`
+          ? `${label}. Rueda o pellizca para ampliar el eje, arrastra para desplazarte, 0 para reiniciar. Con el dedo: toca un punto para leerlo, arrastra en horizontal para recorrerlo, doble toque para acercar.`
           : undefined
       }
       {...(zoom ? zoom.bind : {})}
@@ -63,7 +91,7 @@ export default function ChartFrame({
 
       {tip && (
         <div
-          className={`fs-tip ${derecha ? 'is-left' : ''} ${abajo ? 'is-up' : ''}`.trim()}
+          className={`fs-tip ${claseTip}`.trim()}
           style={{ left: `${(tip.vx / vbW) * 100}%`, top: `${(tip.vy / vbH) * 100}%` }}
           role="status"
         >
@@ -108,12 +136,25 @@ export default function ChartFrame({
       {scroll && narrow ? <div className="fs-scrollx">{lienzo}</div> : lienzo}
       {zoom && (
         <p className="fs-zoom-hint">
-          {zoom.zoomed
-            ? `Eje ampliado ×${zoom.k.toFixed(1)} · arrastra para desplazarte · ⟲ para ver todo`
-            : 'Rueda o pellizca sobre la figura para ampliar el eje'}
+          <span className="fs-hint-raton">
+            {zoom.zoomed
+              ? `Eje ampliado ×${zoom.k.toFixed(1)} · arrastra para desplazarte · ⟲ para ver todo`
+              : 'Rueda o pellizca sobre la figura para ampliar el eje'}
+          </span>
+          <span className="fs-hint-dedo">
+            {zoom.zoomed
+              ? `Eje ×${zoom.k.toFixed(1)} · arrastra para moverte · ⟲ para ver todo`
+              : 'Toca o desliza en horizontal para leer · pellizca para ampliar el eje'}
+          </span>
         </p>
       )}
-      {scroll && narrow && <p className="fs-zoom-hint">Desliza la figura para verla entera</p>}
+      {!zoom && tip !== undefined && (
+        <p className="fs-zoom-hint fs-hint-dedo">
+          {scroll && narrow
+            ? 'Desliza la figura para verla entera · toca un punto para leerlo'
+            : 'Toca un punto para leerlo · mantén y arrastra para recorrer la figura'}
+        </p>
+      )}
     </div>
   );
 }

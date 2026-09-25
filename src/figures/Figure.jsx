@@ -16,6 +16,7 @@ export default function Figure({
   summary,
   children,
   className = '',
+  sinPie = false,
 }) {
   const guia = id ? GUIAS[id] : null;
 
@@ -49,6 +50,20 @@ export default function Figure({
 
       {summary && <p className="fs-sr">{summary}</p>}
 
+      {!sinPie && <FiguraPie legend={legend} source={source} note={note} />}
+    </figure>
+  );
+}
+
+/**
+ * El pie de una figura: leyenda, nota y fuente. Va aparte para las figuras
+ * fijas del móvil (`sinPie`): allí la figura se queda clavada arriba mientras
+ * pasan los pasos, y un pie largo dentro de ella tapaba el texto de los pasos.
+ * El capítulo lo coloca entonces después de los pasos: nunca desaparece.
+ */
+export function FiguraPie({ legend, source, note }) {
+  return (
+    <>
       {legend && <p className="fs-figure-legend">{legend}</p>}
 
       {(source || note) && (
@@ -57,6 +72,6 @@ export default function Figure({
           {source && <p className="fs-source" style={{ margin: 0 }}><Fuente>{source}</Fuente></p>}
         </div>
       )}
-    </figure>
+    </>
   );
 }

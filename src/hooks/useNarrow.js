@@ -26,3 +26,11 @@ export function useNarrow(query = '(max-width: 700px)') {
     () => false
   );
 }
+
+/**
+ * Ancho del lienzo en móvil. Las figuras se dibujan en 880 unidades en
+ * escritorio; en un teléfono de 375 px eso encogía el texto a 3–4 px. Con un
+ * lienzo de 360 unidades, una unidad es casi un píxel y los rótulos conservan
+ * su tamaño. Cada figura recompone su dibujo para este ancho: no se escala.
+ */
+export const ANCHO_MOVIL = 360;

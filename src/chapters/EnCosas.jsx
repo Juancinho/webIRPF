@@ -6,15 +6,19 @@ import ChartFrame from '../figures/ChartFrame';
 import YearComparator from '../figures/YearComparator';
 import { Label } from '../figures/marks';
 import { dec, eur } from '../utils/format';
+import { ANCHO_MOVIL, useNarrow } from '../hooks/useNarrow';
 import { round } from '../figures/scale';
 
-const W = 880;
-const X0 = 62;
-const XG = 84;
 const PASO = 17;
 const GRUPO = 5;
 const HUECO = 8;
-const PORFILA = 30;      // glifos por línea antes de saltar: 30 × 17 px cabe de sobra
+
+/* Glifos por línea antes de saltar: 30 × 17 px caben de sobra en escritorio;
+   en móvil, dos grupos de cinco y la columna de precio conserva su sitio. */
+const GEO = {
+  ancho: { W: 880, X0: 62, XG: 84, PORFILA: 30, XC: 880 - 104 },
+  movil: { W: ANCHO_MOVIL, X0: 32, XG: 42, PORFILA: 10, XC: ANCHO_MOVIL - 66 },
+};
 const LINEA = 17;        // separación entre líneas de glifos de un mismo año
 const AIRE = 11;         // aire entre el bloque de un año y el del siguiente
 
@@ -104,6 +108,8 @@ export default function EnCosas({ bruto2026, anios, anioA, anioB, onAnioA, onAni
   const { opts } = useFiscal();
   const [unidad, setUnidad] = useState('vivienda');
   const [tip, setTip] = useState(null);
+  const narrow = useNarrow();
+  const { W, X0, XG, PORFILA, XC } = narrow ? GEO.movil : GEO.ancho;
 
   const u = UNIDADES[unidad];
 
@@ -193,11 +199,11 @@ export default function EnCosas({ bruto2026, anios, anioA, anioB, onAnioA, onAni
         </span>
       </div>
 
-      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} scroll minWidth={720} label="El sueldo medido en cosas">
+      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} label="El sueldo medido en cosas">
         <Label x={XG} y={22} size={9} color="var(--ink-5)" mono>
           CADA FIGURA = 1 {u.singular.toUpperCase()}
         </Label>
-        <Label x={W - 104} y={22} size={8.5} color="var(--ink-5)" anchor="end" mono>
+        <Label x={XC} y={22} size={8.5} color="var(--ink-5)" anchor="end" mono>
           CUÁNTOS
         </Label>
         <Label x={W - 2} y={22} size={8.5} color="var(--ink-5)" anchor="end" mono>
@@ -234,7 +240,7 @@ export default function EnCosas({ bruto2026, anios, anioA, anioB, onAnioA, onAni
               )}
 
               <text
-                x={W - 104}
+                x={XC}
                 y={y + 3.5}
                 fontSize={elegido ? 12 : 11}
                 fontWeight={elegido ? 800 : 600}
@@ -247,7 +253,7 @@ export default function EnCosas({ bruto2026, anios, anioA, anioB, onAnioA, onAni
               <text
                 x={W - 2}
                 y={y + 3.5}
-                fontSize={10}
+                fontSize={narrow ? 9 : 10}
                 textAnchor="end"
                 fill="var(--ink-4)"
                 className="num"
@@ -282,8 +288,8 @@ export default function EnCosas({ bruto2026, anios, anioA, anioB, onAnioA, onAni
           );
         })}
 
-        <Label x={XG} y={H - 22} size={9} color="var(--ink-5)" mono>
-          ← CADA HUECO SEPARA CINCO · LAS FILAS SALTAN CADA {PORFILA}
+        <Label x={XG} y={H - 22} size={narrow ? 8 : 9} color="var(--ink-5)" mono>
+          {narrow ? `CADA HUECO: CINCO · SALTO CADA ${PORFILA}` : `← CADA HUECO SEPARA CINCO · LAS FILAS SALTAN CADA ${PORFILA}`}
         </Label>
       </ChartFrame>
     </Figure>

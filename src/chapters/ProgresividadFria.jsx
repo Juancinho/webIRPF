@@ -6,11 +6,9 @@ import ChartFrame from '../figures/ChartFrame';
 import { Label } from '../figures/marks';
 import { linear, polyline, round } from '../figures/scale';
 import { eur, pct, sign } from '../utils/format';
+import { ANCHO_MOVIL, useNarrow } from '../hooks/useNarrow';
 
-const W = 880;
 const H = 420;
-const X0 = 26;
-const X1 = W - 150;
 const Y0 = 34;
 const Y1 = 250;
 const R0 = 300;
@@ -27,6 +25,13 @@ export default function ProgresividadFria() {
   const [base, setBase] = useState(2012);
   const [hover, setHover] = useState(null);
   const [tip, setTip] = useState(null);
+  const narrow = useNarrow();
+  const W = narrow ? ANCHO_MOVIL : 880;
+  const X0 = narrow ? 14 : 26;
+  const X1 = W - (narrow ? 94 : 150);
+  const rot = narrow
+    ? { ref: 'REFERENCIA', vig: 'REGLAS VIGENTES', tipo: 'CARGA TOTAL', t: 8 }
+    : { ref: 'REFERENCIA INDEXADA', vig: 'NETO CON REGLAS VIGENTES', tipo: 'TIPO EFECTIVO', t: 9 };
 
   const bruto2026 = Math.round(bruto * (INFLACION_A_2026[anio] || 1));
   const salarioBase = bruto2026 / INFLACION_A_2026[base];
@@ -137,7 +142,7 @@ export default function ProgresividadFria() {
         </select>
       </div>
 
-      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} scroll label="Progresividad en frío">
+      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} label="Progresividad en frío">
         {/* the gap is the point of the figure */}
         <path d={polyline(areaGap) + ' Z'} fill="var(--signal)" opacity={0.1} />
 
@@ -167,9 +172,9 @@ export default function ProgresividadFria() {
             <circle cx={round(x(s.anio))} cy={round(yr(s.efectivo))} r={s.anio === activo.anio ? 4 : 2.2} fill={s.anio === activo.anio ? 'var(--signal)' : 'var(--counter)'} />
             <rect
               className="fs-hit"
-              x={round(x(s.anio)) - 12}
+              x={round(x(s.anio)) - (narrow ? 9 : 12)}
               y={Y0 - 14}
-              width={24}
+              width={narrow ? 18 : 24}
               height={R1 - Y0 + 20}
               onMouseEnter={() => {
                 setHover(s.anio);
@@ -194,14 +199,14 @@ export default function ProgresividadFria() {
           </g>
         ))}
 
-        <Label x={X1 + 10} y={round(y(ultimo.netoDeflactado)) + 3} size={9} color="var(--ink-4)" mono>
-          REFERENCIA INDEXADA
+        <Label x={X1 + 10} y={round(y(ultimo.netoDeflactado)) + 3} size={rot.t} color="var(--ink-4)" mono>
+          {rot.ref}
         </Label>
         <Label x={X1 + 10} y={round(y(ultimo.netoDeflactado)) + 16} size={11} weight={700} color="var(--ink-4)">
           {eur(ultimo.netoDeflactado)}
         </Label>
-        <Label x={X1 + 10} y={round(y(ultimo.netoReal)) + 3} size={9} color="var(--ink)" mono>
-          NETO CON REGLAS VIGENTES
+        <Label x={X1 + 10} y={round(y(ultimo.netoReal)) + 3} size={rot.t} color="var(--ink)" mono>
+          {rot.vig}
         </Label>
         <Label x={X1 + 10} y={round(y(ultimo.netoReal)) + 16} size={11} weight={800} color="var(--ink)">
           {eur(ultimo.netoReal)}
@@ -217,13 +222,13 @@ export default function ProgresividadFria() {
           strokeWidth={1.4}
         />
         <line x1={X0} y1={round(yr(serie[0].efectivoBase))} x2={X1} y2={round(yr(serie[0].efectivoBase))} stroke="var(--ink-5)" strokeWidth={0.9} strokeDasharray="4 3" />
-        <Label x={X1 + 10} y={round(yr(ultimo.efectivo)) + 3} size={9} color="var(--counter)" mono>
-          TIPO EFECTIVO
+        <Label x={X1 + 10} y={round(yr(ultimo.efectivo)) + 3} size={rot.t} color="var(--counter)" mono>
+          {rot.tipo}
         </Label>
         <Label x={X1 + 10} y={round(yr(ultimo.efectivo)) + 16} size={11} weight={700} color="var(--counter)">
           {pct(ultimo.efectivo)}
         </Label>
-        <Label x={X0} y={R0 - 12} size={9} color="var(--ink-5)" mono>
+        <Label x={X0} y={R0 - 12} size={narrow ? 8 : 9} color="var(--ink-5)" mono>
           CARGA TOTAL SOBRE EL BRUTO · {pct(serie[0].efectivoBase)} EN {base}
         </Label>
 
@@ -231,7 +236,7 @@ export default function ProgresividadFria() {
           const cada = Math.max(1, Math.round(serie.length / 8));
           if (i % cada !== 0 && i !== serie.length - 1) return null;
           return (
-            <Label key={s.anio} x={round(x(s.anio))} y={R1 + 22} size={9.5} color="var(--ink-4)" anchor="middle" mono>
+            <Label key={s.anio} x={round(x(s.anio))} y={R1 + 22} size={narrow ? 8.5 : 9.5} color="var(--ink-4)" anchor="middle" mono>
               {s.anio}
             </Label>
           );

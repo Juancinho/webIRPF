@@ -6,14 +6,18 @@ import ChartFrame from '../figures/ChartFrame';
 import { Label } from '../figures/marks';
 import { round } from '../figures/scale';
 import { eur, sign } from '../utils/format';
+import { ANCHO_MOVIL, useNarrow } from '../hooks/useNarrow';
 
 const GRUPO = 5;         // las fichas se agrupan de cinco en cinco: así se cuentan
-const W = 880;
 const FILA = 26;
-const X0 = 62;
-const XC = 88;
-const X_TOTAL = W - 104;
-const X_FIN_CAMPO = X_TOTAL - 72;
+
+/* En móvil el campo de fichas mide la cuarta parte: la unidad sube antes
+   (tope de 30 fichas por fila en vez de 64) para que las fichas se sigan
+   pudiendo contar a ojo. */
+const GEO = {
+  ancho: { W: 880, X0: 62, XC: 88, X_TOTAL: 880 - 104, FIN: 72, TOPE: 64 },
+  movil: { W: ANCHO_MOVIL, X0: 32, XC: 42, X_TOTAL: ANCHO_MOVIL - 60, FIN: 62, TOPE: 30 },
+};
 const UNIDADES = [250, 500, 1000, 2000, 2500, 5000, 10000, 20000, 25000, 50000];
 
 /**
@@ -31,6 +35,9 @@ export default function Monedas({ bruto2026, elegirAnio }) {
   const { anio, opts } = useFiscal();
   const [hover, setHover] = useState(null);
   const [tip, setTip] = useState(null);
+  const narrow = useNarrow();
+  const { W, X0, XC, X_TOTAL, FIN, TOPE } = narrow ? GEO.movil : GEO.ancho;
+  const X_FIN_CAMPO = X_TOTAL - FIN;
 
   const serie = useMemo(
     () =>
@@ -52,8 +59,8 @@ export default function Monedas({ bruto2026, elegirAnio }) {
      Para rentas altas aumenta la unidad antes de comprimir las marcas: las
      etiquetas conservan siempre su espacio y la figura sigue siendo legible. */
   const maxTotal = Math.max(...serie.map(s => s.total));
-  const unidad = UNIDADES.find(u => Math.round(maxTotal / u) <= 64)
-    ?? Math.ceil(maxTotal / 64000) * 1000;
+  const unidad = UNIDADES.find(u => Math.round(maxTotal / u) <= TOPE)
+    ?? Math.ceil(maxTotal / (TOPE * 1000)) * 1000;
   const maxFichas = Math.max(...serie.map(s => Math.round(s.total / unidad)));
   const grupos = Math.floor(Math.max(0, maxFichas - 1) / GRUPO);
   const huecoGrupo = Math.min(5, Math.max(1.6, (X_FIN_CAMPO - XC) / Math.max(28, maxFichas) * 0.48));
@@ -77,8 +84,8 @@ export default function Monedas({ bruto2026, elegirAnio }) {
       note={`No incluye la cotización que paga la empresa, que no aparece como descuento en la nómina aunque forme parte del coste laboral; esa parte se mide en el capítulo 05. Las fichas son una cuantización visual: por el redondeo, la fila puede diferir del total exacto en menos de ${eur(unidad)}.`}
       summary={serie.map(s => `${s.anio}: ${eur(s.total)}`).join('; ')}
     >
-      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} scroll minWidth={700} label="Lo que pagas cada año, contado en fichas">
-        <Label x={XC} y={22} size={9} color="var(--ink-5)" mono>
+      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} label="Lo que pagas cada año, contado en fichas">
+        <Label x={XC} y={22} size={narrow ? 8.5 : 9} color="var(--ink-5)" mono>
           UNA FICHA = {eur(unidad)} DE 2026
         </Label>
         <Label x={X_TOTAL} y={22} size={8.5} color="var(--ink-5)" anchor="end" mono>
@@ -125,7 +132,7 @@ export default function Monedas({ bruto2026, elegirAnio }) {
               <text
                 x={X_TOTAL}
                 y={y + 3.5}
-                fontSize={11.5}
+                fontSize={narrow ? 11 : 11.5}
                 fontWeight={esSel ? 800 : 600}
                 textAnchor="end"
                 fill={esSel ? 'var(--signal)' : 'var(--ink-2)'}
@@ -177,8 +184,8 @@ export default function Monedas({ bruto2026, elegirAnio }) {
           );
         })}
 
-        <Label x={XC} y={H - 26} size={9} color="var(--ink-5)" mono>
-          ← CADA HUECO SEPARA CINCO FICHAS · {eur(unidad * 5)}
+        <Label x={XC} y={H - 26} size={narrow ? 8.5 : 9} color="var(--ink-5)" mono>
+          {narrow ? `CADA HUECO: CINCO FICHAS · ${eur(unidad * 5)}` : `← CADA HUECO SEPARA CINCO FICHAS · ${eur(unidad * 5)}`}
         </Label>
       </ChartFrame>
 

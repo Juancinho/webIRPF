@@ -8,11 +8,15 @@ import { Label, HundredField, YouMark } from '../figures/marks';
 import { clamp, linear, polyline, round, ticks } from '../figures/scale';
 import Puente from '../figures/Puente';
 import { eur, pct } from '../utils/format';
+import { ANCHO_MOVIL, useNarrow } from '../hooks/useNarrow';
 
-const W = 880;
+/* En móvil desaparece la columna de rótulos de la derecha: la reducción
+   máxima ya la dice la zona «plana», y el nombre del eje inferior baja al pie. */
+const GEO = {
+  ancho: { W: 880, X0: 20, X1: 880 - 130, marcas: 6 },
+  movil: { W: ANCHO_MOVIL, X0: 4, X1: ANCHO_MOVIL - 8, marcas: 4 },
+};
 const H = 400;
-const X0 = 20;
-const X1 = W - 130;
 const CURVA_Y0 = 30;
 const CURVA_Y1 = 210;
 const BAR_Y = 340;
@@ -30,6 +34,8 @@ const STEP = 200;
 export default function Acantilado() {
   const { bruto, anio, opts, marginal, nomina } = useFiscal();
   const [tip, setTip] = useState(null);
+  const narrow = useNarrow();
+  const { W, X0, X1, marcas } = narrow ? GEO.movil : GEO.ancho;
 
   const serie = useMemo(() => {
     const out = [];
@@ -116,9 +122,11 @@ export default function Acantilado() {
                       <Label x={z.x0 + 4} y={CURVA_Y0 - 22} size={9.5} color="var(--ink-3)" mono>
                         {z.t}
                       </Label>
-                      <Label x={z.x0 + 4} y={CURVA_Y0 - 6} size={9.5} color="var(--ink-5)">
-                        {z.d}
-                      </Label>
+                      {(!narrow || z.x1 - z.x0 > z.d.length * 5.2) && (
+                        <Label x={z.x0 + 4} y={CURVA_Y0 - 6} size={9.5} color="var(--ink-5)">
+                          {z.d}
+                        </Label>
+                      )}
                     </>
                   )}
                 </g>
@@ -148,15 +156,19 @@ export default function Acantilado() {
             strokeWidth={1.3}
             strokeLinejoin="round"
           />
-          <Label x={X1 + 8} y={yRed(redMax) + 4} size={10} weight={700} color="var(--ink)">
-            {eur(redMax)}
-          </Label>
-          <Label x={X1 + 8} y={yRed(redMax) + 18} size={9} color="var(--ink-4)" mono>
-            REDUCCIÓN MÁX.
-          </Label>
-          <Label x={X1 + 8} y={CURVA_Y1 + 4} size={9} color="var(--ink-4)" mono>
-            0 €
-          </Label>
+          {!narrow && (
+            <>
+              <Label x={X1 + 8} y={yRed(redMax) + 4} size={10} weight={700} color="var(--ink)">
+                {eur(redMax)}
+              </Label>
+              <Label x={X1 + 8} y={yRed(redMax) + 18} size={9} color="var(--ink-4)" mono>
+                REDUCCIÓN MÁX.
+              </Label>
+              <Label x={X1 + 8} y={CURVA_Y1 + 4} size={9} color="var(--ink-4)" mono>
+                0 €
+              </Label>
+            </>
+          )}
 
           {/* ── marginal barcode ──────────────────────────────────────── */}
           {serie.map(p => {
@@ -213,18 +225,38 @@ export default function Acantilado() {
           <Label x={round(x(pico.b))} y={round(BAR_Y - BAR_H - 24)} size={9} color="var(--counter)" anchor="middle" mono>
             MARGINAL MÁXIMO
           </Label>
-          <Label x={X1 + 8} y={BAR_Y - 2} size={9} color="var(--ink-4)" mono>
-            MARGINAL
-          </Label>
-          <Label x={X1 + 8} y={BAR_Y + 12} size={9} color="var(--ink-4)" mono>
-            TOTAL
-          </Label>
+          {narrow ? (
+            <>
+              <Label x={X0} y={CURVA_Y1 + 14} size={8.5} color="var(--ink-4)" mono>
+                ↑ REDUCCIÓN ART. 20 · €
+              </Label>
+              <Label x={X0} y={BAR_Y + 44} size={8.5} color="var(--ink-4)" mono>
+                ↑ MARGINAL TOTAL · → BRUTO ANUAL
+              </Label>
+            </>
+          ) : (
+            <>
+              <Label x={X1 + 8} y={BAR_Y - 2} size={9} color="var(--ink-4)" mono>
+                MARGINAL
+              </Label>
+              <Label x={X1 + 8} y={BAR_Y + 12} size={9} color="var(--ink-4)" mono>
+                TOTAL
+              </Label>
+            </>
+          )}
 
           {/* ── axis ─────────────────────────────────────────────────── */}
-          {ticks(zoom.domain[0], zoom.domain[1], 6).map(v => (
+          {ticks(zoom.domain[0], zoom.domain[1], marcas).map(v => (
             <g key={v}>
               <line x1={round(x(v))} y1={BAR_Y} x2={round(x(v))} y2={BAR_Y + 5} stroke="var(--ink-5)" strokeWidth={0.7} />
-              <Label x={round(x(v))} y={BAR_Y + 22} size={9.5} color="var(--ink-4)" anchor="middle" mono>
+              <Label
+                x={round(x(v))}
+                y={BAR_Y + 22}
+                size={narrow ? 8.5 : 9.5}
+                color="var(--ink-4)"
+                anchor={narrow && x(v) > X1 - 26 ? 'end' : narrow && x(v) < X0 + 20 ? 'start' : 'middle'}
+                mono
+              >
                 {v === 0 ? '0 €' : eur(v)}
               </Label>
             </g>

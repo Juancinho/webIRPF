@@ -6,6 +6,7 @@ import ChartFrame from '../figures/ChartFrame';
 import { Label } from '../figures/marks';
 import { round } from '../figures/scale';
 import { eur, pct } from '../utils/format';
+import { useNarrow } from '../hooks/useNarrow';
 
 const MESES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -23,13 +24,14 @@ const COLORES = {
   tuyo: 'transparent',
 };
 
-const CELDA = 13;
-const HUECO = 3;
-const PASO = CELDA + HUECO;
-const X0 = 96;
 const Y0 = 42;
-const W = 96 + 31 * PASO + 16;
-const H = Y0 + 12 * PASO + 30;
+
+/* En móvil la casilla se encoge para que los 31 días quepan sin desplazar:
+   el calendario se lee entero, de un vistazo. */
+const GEO = {
+  ancho: { CELDA: 13, HUECO: 3, X0: 96, FIN: 16 },
+  movil: { CELDA: 9, HUECO: 1.8, X0: 30, FIN: 4 },
+};
 
 const bisiesto = a => (a % 4 === 0 && a % 100 !== 0) || a % 400 === 0;
 const DIAS_MES = a => [31, bisiesto(a) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
@@ -45,6 +47,11 @@ const DIAS_MES = a => [31, bisiesto(a) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31
 export default function Calendario() {
   const { anio, nomina, pagas } = useFiscal();
   const [tip, setTip] = useState(null);
+  const narrow = useNarrow();
+  const { CELDA, HUECO, X0, FIN } = narrow ? GEO.movil : GEO.ancho;
+  const PASO = CELDA + HUECO;
+  const W = X0 + 31 * PASO + FIN;
+  const H = Y0 + 12 * PASO + 30;
 
   const cuna = Math.max(0, nomina.costeLab - nomina.salarioNeto);
   const parteCuna = nomina.costeLab > 0 ? cuna / nomina.costeLab : 0;
@@ -190,7 +197,7 @@ export default function Calendario() {
         </span>
       </div>
 
-      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} scroll minWidth={620} label="Calendario de casillas que representa el coste laboral anual">
+      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} label="Calendario de casillas que representa el coste laboral anual">
         {/* números de día, para poder localizar una fecha */}
         {[1, 5, 10, 15, 20, 25, 31].map(d => (
           <Label key={d} x={X0 + (d - 1) * PASO + CELDA / 2} y={Y0 - 12} size={8.5} color="var(--ink-5)" anchor="middle" mono>
@@ -199,7 +206,7 @@ export default function Calendario() {
         ))}
 
         {MESES.map((mes, m) => (
-          <Label key={mes} x={X0 - 12} y={Y0 + m * PASO + CELDA - 3} size={9.5} color="var(--ink-4)" anchor="end" mono>
+          <Label key={mes} x={X0 - (narrow ? 5 : 12)} y={Y0 + m * PASO + CELDA - (narrow ? 1 : 3)} size={narrow ? 8.5 : 9.5} color="var(--ink-4)" anchor="end" mono>
             {mes.slice(0, 3).toUpperCase()}
           </Label>
         ))}
@@ -238,19 +245,20 @@ export default function Calendario() {
               strokeWidth={2}
             />
             <Label
-              x={round(X0 + (fechaLibre.dia - 1) * PASO + 7)}
-              y={round(Y0 + fechaLibre.mes * PASO + CELDA - 3)}
-              size={9.5}
+              x={round(X0 + (fechaLibre.dia - 1) * PASO + (narrow && fechaLibre.dia > 16 ? -5 : 7))}
+              y={round(Y0 + fechaLibre.mes * PASO + CELDA - (narrow ? 1 : 3))}
+              size={narrow ? 8.5 : 9.5}
               weight={700}
               color="var(--signal)"
+              anchor={narrow && fechaLibre.dia > 16 ? 'end' : 'start'}
               mono
             >
-              {fechaLibre.dia} {MESES[fechaLibre.mes].slice(0, 3).toUpperCase()} · CORTE CONVENCIONAL
+              {fechaLibre.dia} {MESES[fechaLibre.mes].slice(0, 3).toUpperCase()} · {narrow ? 'CORTE' : 'CORTE CONVENCIONAL'}
             </Label>
           </g>
         )}
 
-        <Label x={X0} y={H - 8} size={9} color="var(--ink-5)" mono>
+        <Label x={narrow ? 2 : X0} y={H - 8} size={narrow ? 8 : 9} color="var(--ink-5)" mono>
           UNA CASILLA = 1/{totalDias} DEL COSTE LABORAL · FECHAS ILUSTRATIVAS
         </Label>
       </ChartFrame>

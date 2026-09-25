@@ -96,7 +96,7 @@ function Comparador({ serie, bruto2026, anios, anioA: a, anioB: b, onAnioA, onAn
       </p>
 
       <div className="fs-table-scroll">
-        <table className="fs-table">
+        <table className="fs-table is-apilable">
           <thead>
             <tr>
               <th scope="col">Concepto</th>
@@ -109,9 +109,9 @@ function Comparador({ serie, bruto2026, anios, anioA: a, anioB: b, onAnioA, onAn
             {filas.map(([k, va, vb, d]) => (
               <tr key={k} className={k.startsWith('Neto real') ? 'is-current' : undefined}>
                 <th scope="row">{k}</th>
-                <td>{va}</td>
-                <td>{vb}</td>
-                <td className={d === null ? undefined : d < 0 ? 'is-neg' : 'is-pos'}>
+                <td data-label={a}>{va}</td>
+                <td data-label={b}>{vb}</td>
+                <td data-label="Diferencia" className={d === null ? undefined : d < 0 ? 'is-neg' : 'is-pos'}>
                   {d === null ? '—' : sign(d)}
                 </td>
               </tr>

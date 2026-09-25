@@ -10,13 +10,10 @@ import { eur, pct } from '../utils/format';
 import CurvaTipos from './CurvaTipos';
 import Acantilado from './Acantilado';
 import Puente from '../figures/Puente';
+import { ANCHO_MOVIL, useNarrow } from '../hooks/useNarrow';
 
-const W = 880;
 const H = 330;
-const X0 = 18;
-const X1 = W - 18;
 const BASE_Y = 250;
-const UNIT = 250;
 
 /**
  * 03 · CÓMO FUNCIONA EL IRPF
@@ -27,6 +24,11 @@ const UNIT = 250;
 export default function Irpf() {
   const { anio, nomina, marginal } = useFiscal();
   const [hover, setHover] = useState(null);
+  const narrow = useNarrow();
+  const W = narrow ? ANCHO_MOVIL : 880;
+  const X0 = narrow ? 2 : 18;
+  const X1 = W - X0;
+  const UNIT = narrow ? 500 : 250;
 
   const tramos = nomina.tramos;
   const base = nomina.baseImponible;
@@ -155,7 +157,7 @@ export default function Irpf() {
                   </span>
                 </div>
               )}
-              <ChartFrame viewBox={`0 0 ${W} ${H}`} scroll>
+              <ChartFrame viewBox={`0 0 ${W} ${H}`}>
                 <Rule x1={X0} y1={BASE_Y} x2={X1} y2={BASE_Y} />
 
                 {conDatos.map(b => {
@@ -193,17 +195,19 @@ export default function Irpf() {
                         />
                       )}
 
-                      <Label x={bx0 + 3} y={BASE_Y - h - 10} size={12} weight={800} color="var(--ink)">
+                      <Label x={bx0 + 3} y={BASE_Y - h - 10} size={narrow && bw < 44 ? 10 : 12} weight={800} color="var(--ink)">
                         {pct(b.tipo * 100)}
                       </Label>
-                      {b.cuota > 0 && (
+                      {b.cuota > 0 && (!narrow || bw > 40) && (
                         <Label x={bx0 + 3} y={BASE_Y - h - 24} size={9.5} color="var(--ink-4)" mono>
                           {eur(b.cuota)}
                         </Label>
                       )}
-                      <Label x={bx0 + 3} y={BASE_Y + 18} size={9.5} color="var(--ink-4)" mono>
-                        {b.desde === 0 ? '0' : eur(b.desde)}
-                      </Label>
+                      {(!narrow || bw > 40 || b.desde === 0) && (
+                        <Label x={bx0 + 3} y={BASE_Y + 18} size={narrow ? 8.5 : 9.5} color="var(--ink-4)" mono>
+                          {b.desde === 0 ? '0' : eur(b.desde)}
+                        </Label>
+                      )}
 
                       <rect
                         className="fs-hit"
@@ -234,18 +238,20 @@ export default function Irpf() {
                   stroke="var(--signal)"
                   strokeWidth={1.4}
                 />
-                <Label
-                  x={x(Math.min(base, maxShown))}
-                  y={BASE_Y - 194}
-                  size={10}
-                  color="var(--signal)"
-                  anchor={x(base) > X1 - 150 ? 'end' : 'middle'}
-                  mono
-                >
-                  TU BASE TERMINA AQUÍ · {eur(base)}
-                </Label>
+                {(() => {
+                  // el rótulo se ancla al borde que tenga sitio: en 360 unidades
+                  // un rótulo centrado junto al margen se salía del lienzo
+                  const bx = x(Math.min(base, maxShown));
+                  const mitad = narrow ? 90 : 150;
+                  const ancla = bx > X1 - mitad ? 'end' : bx < X0 + mitad ? 'start' : 'middle';
+                  return (
+                    <Label x={bx} y={BASE_Y - 194} size={narrow ? 9 : 10} color="var(--signal)" anchor={ancla} mono>
+                      {narrow ? `TU BASE · ${eur(base)}` : `TU BASE TERMINA AQUÍ · ${eur(base)}`}
+                    </Label>
+                  );
+                })()}
 
-                <Label x={X1} y={BASE_Y + 18} size={9.5} color="var(--ink-4)" anchor="end" mono>
+                <Label x={X1} y={BASE_Y + (narrow ? 34 : 18)} size={narrow ? 8.5 : 9.5} color="var(--ink-4)" anchor="end" mono>
                   {eur(maxShown)}
                 </Label>
               </ChartFrame>
@@ -333,17 +339,20 @@ function Poster({ marginal, nomina }) {
   const nEfe = Math.max(0, Math.min(100, Math.round(efe)));
   const nMarg = Math.max(0, Math.min(100, Math.round(marg)));
 
-  const COLS = 25;
-  const SIZE = 14;
-  const GAP = 4.5;
+  // En móvil los cien euros forman un cuadrado de 10 × 10 y las cifras van a
+  // su derecha; en escritorio, cuatro filas de 25.
+  const narrow = useNarrow();
+  const COLS = narrow ? 10 : 25;
+  const SIZE = narrow ? 13 : 14;
+  const GAP = narrow ? 4 : 4.5;
   const PASO = SIZE + GAP;
   const ANCHO = COLS * PASO - GAP;
-  const ALTO = 4 * PASO - GAP;
+  const ALTO = (100 / COLS) * PASO - GAP;
   const XG = 2;
   const YA = 32;
   const YB = YA + ALTO + 66;
-  const XT = XG + ANCHO + 46;
-  const W6 = 880;
+  const XT = XG + ANCHO + (narrow ? 18 : 46);
+  const W6 = narrow ? ANCHO_MOVIL : 880;
   const H6 = YB + ALTO + 26;
 
   return (
@@ -369,7 +378,7 @@ function Poster({ marginal, nomina }) {
           source="Fuente · cálculo propio sobre la escala vigente"
           summary={`Tipo marginal del IRPF ${pct(marg)}; tipo efectivo ${pct(efe)}.`}
         >
-          <ChartFrame viewBox={`0 0 ${W6} ${H6}`} scroll minWidth={620} label="Marginal y efectivo, contados en euros">
+          <ChartFrame viewBox={`0 0 ${W6} ${H6}`} label="Marginal y efectivo, contados en euros">
             {/* ── los cien euros que ya ganas ──────────────────────────── */}
             <Label x={XG} y={YA - 12} size={9.5} color="var(--ink-4)" mono>
               DE CADA 100 € QUE YA GANAS
@@ -382,8 +391,13 @@ function Poster({ marginal, nomina }) {
               {pct(efe)}
             </Label>
             <Label x={XT} y={YA + 62} size={10.5} color="var(--ink-4)">
-              {nEfe} € de IRPF · {100 - nEfe} € de renta tras IRPF
+              {narrow ? `${nEfe} € de IRPF` : `${nEfe} € de IRPF · ${100 - nEfe} € de renta tras IRPF`}
             </Label>
+            {narrow && (
+              <Label x={XT} y={YA + 77} size={10.5} color="var(--ink-4)">
+                {100 - nEfe} € de renta tras IRPF
+              </Label>
+            )}
 
             {/* ── los cien euros siguientes ────────────────────────────── */}
             <Label x={XG} y={YB - 12} size={9.5} color="var(--ink-4)" mono>
@@ -397,8 +411,13 @@ function Poster({ marginal, nomina }) {
               {pct(marg)}
             </Label>
             <Label x={XT} y={YB + 62} size={10.5} color="var(--ink-4)">
-              {nMarg} € de IRPF · {100 - nMarg} € de renta tras IRPF
+              {narrow ? `${nMarg} € de IRPF` : `${nMarg} € de IRPF · ${100 - nMarg} € de renta tras IRPF`}
             </Label>
+            {narrow && (
+              <Label x={XT} y={YB + 77} size={10.5} color="var(--ink-4)">
+                {100 - nMarg} € de renta tras IRPF
+              </Label>
+            )}
 
             {/* ── la diferencia, dicha una sola vez ────────────────────── */}
             <line x1={XG} y1={YB - 32} x2={XG + ANCHO} y2={YB - 32} stroke="var(--rule)" strokeWidth={0.8} />

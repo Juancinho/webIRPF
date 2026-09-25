@@ -83,14 +83,33 @@ export function useDomainZoom(full, { pxRange, vbWidth, maxZoom = 40 } = {}) {
     return () => el.removeEventListener('wheel', onWheel);
   }, [onWheel]);
 
+  /** Posición (0–1) de un clientX dentro del tramo dibujado del eje. */
+  const fraccion = useCallback(
+    clientX => {
+      const el = ref.current;
+      if (!el) return 0;
+      const r = el.getBoundingClientRect();
+      const px = ((clientX - r.left) / r.width) * vbWidth;
+      return (px - pxRange[0]) / (pxRange[1] - pxRange[0] || 1);
+    },
+    [pxRange, vbWidth]
+  );
+
   const onPointerDown = e => {
-    ref.current?.setPointerCapture?.(e.pointerId);
+    if (e.target.closest?.('.fs-zoom-controls')) return;
+    const touch = e.pointerType === 'touch';
     pointers.current.set(e.pointerId, e.clientX);
     if (pointers.current.size === 2) {
+      // Pellizco: el valor que queda entre los dos dedos se mantiene bajo
+      // ellos, así que pellizcar amplía y, a la vez, mover los dos dedos
+      // desplaza el eje.
       const [a, b] = [...pointers.current.values()];
-      pinch.current = { d: Math.abs(a - b), anchor: toData((a + b) / 2) };
+      pinch.current = { d0: Math.max(24, Math.abs(a - b)), span0: dom[1] - dom[0], anchor: toData((a + b) / 2) };
       drag.current = null;
-    } else {
+    } else if (!touch || spanFull / (dom[1] - dom[0]) > 1.001) {
+      // Con el dedo, arrastrar sólo desplaza el eje cuando ya está ampliado:
+      // sin ampliar, el arrastre horizontal es lectura (useTactil).
+      if (!touch) ref.current?.setPointerCapture?.(e.pointerId);
       drag.current = { at: toData(e.clientX), dom };
     }
   };
@@ -101,20 +120,16 @@ export function useDomainZoom(full, { pxRange, vbWidth, maxZoom = 40 } = {}) {
 
     if (pointers.current.size === 2 && pinch.current) {
       const [a, b] = [...pointers.current.values()];
-      const d = Math.abs(a - b);
-      if (d > 4) {
-        zoomAt(d / pinch.current.d, pinch.current.anchor);
-        pinch.current.d = d;
-      }
+      const d = Math.max(24, Math.abs(a - b));
+      const span = clamp((pinch.current.span0 * pinch.current.d0) / d, minSpan, spanFull);
+      const t = fraccion((a + b) / 2);
+      const lo = pinch.current.anchor - t * span;
+      setDom(bound([lo, lo + span]));
       return;
     }
 
     if (drag.current) {
-      const el = ref.current;
-      if (!el) return;
-      const r = el.getBoundingClientRect();
-      const px = ((e.clientX - r.left) / r.width) * vbWidth;
-      const t = (px - pxRange[0]) / (pxRange[1] - pxRange[0] || 1);
+      const t = fraccion(e.clientX);
       const span = drag.current.dom[1] - drag.current.dom[0];
       const lo = drag.current.at - t * span;
       setDom(bound([lo, lo + span]));
@@ -147,14 +162,25 @@ export function useDomainZoom(full, { pxRange, vbWidth, maxZoom = 40 } = {}) {
 
   const k = spanFull / (dom[1] - dom[0]);
 
+  /** Ref de callback: el marco la llama con su nodo. */
+  const attach = useCallback(el => {
+    ref.current = el;
+  }, []);
+
   return {
     ref,
+    attach,
     domain: dom,
     k,
     zoomed: k > 1.001,
     reset: () => setDom(full),
     zoomIn: () => zoomAt(1.3, centro()),
     zoomOut: () => zoomAt(1 / 1.3, centro()),
+    /** Doble toque: amplía ×2 bajo el dedo; si ya está muy ampliado, vuelve a verlo todo. */
+    zoomAtClient: clientX => {
+      if (dom[1] - dom[0] <= minSpan * 1.5) setDom(full);
+      else zoomAt(2, toData(clientX));
+    },
     canZoomIn: dom[1] - dom[0] > minSpan * 1.001,
     bind: { onPointerDown, onPointerMove, onPointerUp: endPointer, onPointerCancel: endPointer, onKeyDown },
   };

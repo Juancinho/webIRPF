@@ -8,11 +8,10 @@ import Puente from '../figures/Puente';
 import { Label } from '../figures/marks';
 import { linear, round } from '../figures/scale';
 import { dec, eur, pct } from '../utils/format';
+import { ANCHO_MOVIL, useNarrow } from '../hooks/useNarrow';
 
-const W = 880;
 const H = 186;
 const X0 = 0;
-const X1 = W;
 const BAR_Y = 86;
 const BAR_H = 54;
 const HUECO = 2;
@@ -27,6 +26,9 @@ export default function Nomina() {
   const { bruto, anio, pagas, nomina, marginal, params, smi, vecesSMI, focus, setFocus } = useFiscal();
   const [pinned, setPinned] = useState(null);
   const [tip, setTip] = useState(null);
+  const narrow = useNarrow();
+  const W = narrow ? ANCHO_MOVIL : 880;
+  const X1 = W;
 
   const esAutonomo = nomina.regimen === 'autonomo';
   const base = Math.max(bruto, 1);
@@ -138,8 +140,9 @@ export default function Nomina() {
               <div className="fs-rail-item">
                 <span className="fs-stamp">Nota 01</span>
                 <p className="fs-note">
-                  Pasa el cursor por cualquier tramo de la barra —o pulsa su nombre— para ver su
-                  fórmula, su artículo y su fuente.
+                  <span className="fs-hint-raton">Pasa el cursor por</span>
+                  <span className="fs-hint-dedo">Toca</span> cualquier tramo de la barra —o pulsa su
+                  nombre— para ver su fórmula, su artículo y su fuente.
                 </p>
               </div>
             )}
@@ -220,7 +223,7 @@ export default function Nomina() {
                 {segmentos.map(seg => {
                   const dim = focus && focus !== seg.key && !pinned;
                   const centro = seg.x + seg.ancho / 2;
-                  const cabe = seg.ancho > 118;
+                  const cabe = seg.ancho > (narrow ? 96 : 118);
                   const cabeImporte = seg.ancho > 44;
                   return (
                     <g
@@ -343,6 +346,24 @@ export default function Nomina() {
                   </button>
                 ))}
               </div>
+
+              {/* Sin margen lateral, el detalle del tramo elegido aparece aquí
+                  mismo, bajo la barra que se ha tocado. */}
+              {narrow && activa && (
+                <div className="fs-detalle-movil" aria-live="polite">
+                  <span className="fs-stamp">{activa.detalle.titulo}</span>
+                  <p className="fs-note">{activa.detalle.texto}</p>
+                  <p className="fs-formula">{activa.detalle.formula}</p>
+                  {activa.detalle.fuente && (
+                    <p className="fs-source">
+                      Fuente ·{' '}
+                      <a href={activa.detalle.fuente.url} target="_blank" rel="noreferrer noopener">
+                        {activa.detalle.fuente.label}
+                      </a>
+                    </p>
+                  )}
+                </div>
+              )}
             </Figure>
 
             <Puente rotulo="Lo que el recibo no enseña">

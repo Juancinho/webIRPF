@@ -7,13 +7,15 @@ import { useDomainZoom } from '../figures/useDomainZoom';
 import { Label } from '../figures/marks';
 import { linear, polyline, round, ticks } from '../figures/scale';
 import { eur, pct } from '../utils/format';
+import { ANCHO_MOVIL, useNarrow } from '../hooks/useNarrow';
 
-const W = 880;
-const H = 400;
-const X0 = 46;
-const X1 = W - 196;   // el margen derecho sostiene tres rótulos de dos líneas
-const Y0 = 26;
-const Y1 = H - 52;
+/* Escritorio: el margen derecho sostiene tres rótulos de dos líneas.
+   Móvil: no hay sitio para ese margen, así que las tres líneas se nombran en
+   una leyenda arriba y el trazado ocupa todo el ancho. */
+const GEO = {
+  ancho: { W: 880, H: 400, X0: 46, X1: 880 - 196, Y0: 26, marcas: 6 },
+  movil: { W: ANCHO_MOVIL, H: 340, X0: 36, X1: ANCHO_MOVIL - 12, Y0: 54, marcas: 5 },
+};
 const MAXB = 80000;
 const STEP = 250;
 const SUBIDA = 1000;   // la subida de sueldo con la que se explica el marginal
@@ -54,6 +56,9 @@ export default function CurvaTipos() {
   const { bruto, anio, opts, nomina, marginal } = useFiscal();
   const [tip, setTip] = useState(null);
   const clip = useId().replace(/:/g, '');
+  const narrow = useNarrow();
+  const { W, H, X0, X1, Y0, marcas } = narrow ? GEO.movil : GEO.ancho;
+  const Y1 = H - 52;
 
   const serie = useMemo(() => {
     const out = [];
@@ -91,7 +96,7 @@ export default function CurvaTipos() {
     });
   };
 
-  const marcasX = ticks(zoom.domain[0], zoom.domain[1], 6);
+  const marcasX = ticks(zoom.domain[0], zoom.domain[1], marcas);
 
   const rotulos = separarRotulos(
     LINEAS.map(l => ({ k: l.k, y: y(serie[serie.length - 1][l.k]) })),
@@ -103,7 +108,7 @@ export default function CurvaTipos() {
     <Figure
       id="07"
       title="El marginal y el efectivo se separan: por eso un tipo alto no significa pagar ese tipo"
-      sub={`${anio} · salario bruto anual · perfil seleccionado · pasa el cursor por la figura para leer cualquier punto`}
+      sub={`${anio} · salario bruto anual · perfil seleccionado · ${narrow ? 'toca o desliza' : 'pasa el cursor'} por la figura para leer cualquier punto`}
       legend="Cada línea se nombra en su propio extremo · la vertical de puntos es tu salario"
       source="Fuente · cálculo propio sobre la escala vigente"
       summary={`A ${eur(bruto)}, tipo efectivo IRPF ${pct(nomina.tipoEfectivoIRPF * 100)}, efectivo total ${pct(nomina.tipoEfectivoTotal * 100)}, marginal total ${pct(marginal.tipoMarginalTotal * 100)}.`}
@@ -151,9 +156,20 @@ export default function CurvaTipos() {
           )}
         </g>
 
+        {/* móvil: leyenda en cabeza, una línea por serie */}
+        {narrow &&
+          LINEAS.map((l, i) => (
+            <g key={l.k} transform={`translate(${2 + i * 120} 10)`}>
+              <line x1={0} y1={0} x2={14} y2={0} stroke={l.color} strokeWidth={2.2} />
+              <Label x={19} y={3.5} size={9} weight={800} color={l.color} mono>
+                {l.label.toUpperCase()}
+              </Label>
+            </g>
+          ))}
+
         {/* etiquetas directas, siempre fuera del área recortada y separadas
             entre sí: a la derecha del eje las tres curvas llegan muy juntas */}
-        {LINEAS.map(l => {
+        {!narrow && LINEAS.map(l => {
           const ultimo = serie[serie.length - 1][l.k];
           const yR = rotulos[l.k];
           return (
@@ -181,7 +197,14 @@ export default function CurvaTipos() {
         })}
 
         {bruto >= zoom.domain[0] && bruto <= zoom.domain[1] && (
-          <Label x={round(x(bruto))} y={Y0 - 14} size={9} color="var(--signal)" anchor="middle" mono>
+          <Label
+            x={round(x(bruto))}
+            y={Y0 - 14}
+            size={9}
+            color="var(--signal)"
+            anchor={x(bruto) < X0 + 40 ? 'start' : x(bruto) > X1 - 40 ? 'end' : 'middle'}
+            mono
+          >
             TU SALARIO
           </Label>
         )}
@@ -190,7 +213,14 @@ export default function CurvaTipos() {
         {marcasX.map(v => (
           <g key={v}>
             <line x1={round(x(v))} y1={Y1} x2={round(x(v))} y2={Y1 + 5} stroke="var(--ink-5)" strokeWidth={0.7} />
-            <Label x={round(x(v))} y={Y1 + 20} size={9.5} color="var(--ink-4)" anchor="middle" mono>
+            <Label
+              x={round(x(v))}
+              y={Y1 + 20}
+              size={narrow ? 8.5 : 9.5}
+              color="var(--ink-4)"
+              anchor={narrow && x(v) > X1 - 26 ? 'end' : 'middle'}
+              mono
+            >
               {v === 0 ? '0 €' : eur(v)}
             </Label>
           </g>

@@ -483,7 +483,7 @@ export default function Desglose() {
 
                         {f.tabla && (
                           <div className="fs-table-scroll" style={{ marginTop: 12 }}>
-                            <table className="fs-table">
+                            <table className="fs-table is-apilable">
                               <thead>
                                 <tr>
                                   {f.tabla.cabeceras.map(c => (
@@ -494,12 +494,12 @@ export default function Desglose() {
                               <tbody>
                                 {f.tabla.filas.map((fila, i) => (
                                   <tr key={i}>
-                                    {fila.map((c, j) => (j === 0 ? <th key={j} scope="row">{c}</th> : <td key={j}>{c}</td>))}
+                                    {fila.map((c, j) => (j === 0 ? <th key={j} scope="row">{c}</th> : <td key={j} data-label={f.tabla.cabeceras[j]}>{c}</td>))}
                                   </tr>
                                 ))}
                                 {f.tabla.total && (
                                   <tr className="is-current">
-                                    {f.tabla.total.map((c, j) => (j === 0 ? <th key={j} scope="row">{c}</th> : <td key={j}>{c}</td>))}
+                                    {f.tabla.total.map((c, j) => (j === 0 ? <th key={j} scope="row">{c}</th> : <td key={j} data-label={f.tabla.cabeceras[j]}>{c}</td>))}
                                   </tr>
                                 )}
                               </tbody>
