@@ -112,7 +112,8 @@ export default function Calendario() {
       title: `${d.dia} de ${MESES[d.mes].toLowerCase()}`,
       sub: `Día ${d.indice + 1} de ${totalDias}`,
       rows: [
-        ['Clasificación analítica', d.etiqueta,
+        ['Cada casilla', `1/${totalDias} del coste laboral anual`],
+        ['Color de esta casilla', d.etiqueta,
           d.key === 'tuyo' ? 'var(--ink)' : COLORES[d.key]],
         ['Tu cuña fiscal', pct(parteCuna * 100)],
       ],
@@ -121,9 +122,9 @@ export default function Calendario() {
   return (
     <Figure
       id="27"
-      title={`La cuña fiscal equivale a ${diaLibre} de los ${totalDias} días de ${anio}`}
-      sub={`Conversión proporcional: cuña fiscal × días del año · la fecha de corte convencional es el ${fechaLibre.dia} de ${MESES[fechaLibre.mes].toLowerCase()}`}
-      legend={`Casilla llena = un día equivalente a la cuña fiscal · casilla vacía = un día equivalente a renta neta · los colores aplican el reparto COFOG de ${GASTO_COFOG.anio}`}
+      title={`${diaLibre} de ${totalDias} casillas representan IRPF y cotizaciones`}
+      sub={`${anio} · Cada casilla representa 1/${totalDias} del coste laboral anual. El calendario es una forma de dibujar porcentajes.`}
+      legend={`Coloreadas: parte de IRPF y cotizaciones · sin relleno: parte del salario neto · los tres colores usan las proporciones COFOG de ${GASTO_COFOG.anio}`}
       source={
         <>
           Fuente ·{' '}
@@ -137,31 +138,48 @@ export default function Calendario() {
           {' · cálculo propio'}
         </>
       }
-      note="Es una equivalencia temporal, no un calendario fiscal oficial. No indica cuándo se devengan o pagan los impuestos, cuándo se percibe el salario ni a qué partida se destina un ingreso concreto. La fecha depende únicamente de ordenar desde el 1 de enero una proporción que, en la realidad, se genera durante todo el año."
-      summary={`La cuña representa ${diaLibre} días equivalentes y la renta neta ${totalDias - diaLibre}. El corte convencional cae el ${fechaLibre.dia} de ${MESES[fechaLibre.mes].toLowerCase()}.`}
+      note="Las fechas sólo sirven para ordenar las casillas. No indican días realmente trabajados para pagar impuestos, fechas de retención o pago, ni el destino comprobado de un ingreso concreto."
+      summary={`${diaLibre} de ${totalDias} casillas representan la parte del coste laboral correspondiente a IRPF y cotizaciones. Las otras ${totalDias - diaLibre} representan la parte del salario neto. Los colores de las primeras usan las proporciones COFOG del gasto público de ${GASTO_COFOG.anio}.`}
     >
-      <div className="fs-calendar-method" aria-label="Método de la equivalencia temporal">
+      <p className="fs-body" style={{ margin: '0 0 18px', maxWidth: '78ch' }}>
+        Piensa en este calendario como una barra de {totalDias} casillas iguales. La barra completa
+        representa todo el coste laboral anual de tu puesto. Una casilla representa 1/{totalDias} de
+        ese coste, aunque tenga escrita una fecha. Pintamos tantas casillas como corresponden al
+        porcentaje formado por IRPF y cotizaciones. Las demás representan el salario neto.
+      </p>
+      <div className="fs-calendar-method" aria-label="Cálculo propio de las casillas del calendario">
         <p>
-          <span>1 · Proporción</span>
-          Se divide la suma de IRPF y cotizaciones entre el coste laboral total.
+          <span>1 · Qué parte pintamos</span>
+          {eur(nomina.irpfFinal, 2)} de IRPF + {eur(nomina.cotTra, 2)} de cotización del trabajador +{' '}
+          {eur(nomina.cotEmp, 2)} de la empresa = {eur(cuna, 2)} de cuña fiscal.
         </p>
         <p>
-          <span>2 · Conversión</span>
-          Esa proporción se multiplica por {totalDias}; el resultado son {diaLibre} días equivalentes.
+          <span>2 · Cuántas casillas son</span>
+          {eur(cuna, 2)} / {eur(nomina.costeLab, 2)} = {pct(parteCuna * 100, 2)}. Dividimos para saber qué
+          porcentaje de la barra corresponde a IRPF y cotizaciones. Luego calculamos ese mismo porcentaje
+          de sus {totalDias} casillas: {diaLibre} coloreadas, tras redondear.
         </p>
         <p>
-          <span>3 · Clasificación</span>
-          Los días llenos se distribuyen según el gasto agregado COFOG, sin atribuir impuestos concretos a partidas concretas.
+          <span>3 · Qué significa cada color</span>
+          De las {diaLibre} casillas coloreadas, {tramos.map(t => `${t.n} para ${t.label.toLowerCase()}`).join('; ')}.
+          Ese segundo reparto usa COFOG, que clasifica el gasto público español de {GASTO_COFOG.anio}
+          {' '}según su finalidad. Las {totalDias - diaLibre} casillas sin relleno representan el neto.
         </p>
       </div>
 
+      <p className="fs-note" style={{ margin: '0 0 18px', maxWidth: '78ch' }}>
+        Colocamos las casillas coloreadas desde el 1 de enero sólo para poder contarlas. Por eso la
+        primera sin relleno cae el {fechaLibre.dia} de {MESES[fechaLibre.mes].toLowerCase()}.
+        Esa fecha y los cambios de color no señalan pagos ni cambios reales en tu nómina.
+      </p>
+
       <div className="fs-readout" style={{ marginBottom: 18 }}>
         <span>
-          <span className="fs-readout-k">Cuña expresada en días</span>
-          <span className="fs-readout-v">{diaLibre} días</span>
+          <span className="fs-readout-k">Casillas coloreadas</span>
+          <span className="fs-readout-v">{diaLibre} de {totalDias}</span>
         </span>
         <span>
-          <span className="fs-readout-k">Corte convencional</span>
+          <span className="fs-readout-k">Primera casilla sin relleno</span>
           <span className="fs-readout-v fs-signal">
             {fechaLibre.dia} de {MESES[fechaLibre.mes].toLowerCase()}
           </span>
@@ -172,7 +190,7 @@ export default function Calendario() {
         </span>
       </div>
 
-      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} scroll minWidth={620} label="El calendario fiscal del año">
+      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} scroll minWidth={620} label="Calendario de casillas que representa el coste laboral anual">
         {/* números de día, para poder localizar una fecha */}
         {[1, 5, 10, 15, 20, 25, 31].map(d => (
           <Label key={d} x={X0 + (d - 1) * PASO + CELDA / 2} y={Y0 - 12} size={8.5} color="var(--ink-5)" anchor="middle" mono>
@@ -233,7 +251,7 @@ export default function Calendario() {
         )}
 
         <Label x={X0} y={H - 8} size={9} color="var(--ink-5)" mono>
-          UNA CASILLA = UN DÍA · {totalDias} DÍAS DE {anio}
+          UNA CASILLA = 1/{totalDias} DEL COSTE LABORAL · FECHAS ILUSTRATIVAS
         </Label>
       </ChartFrame>
 
@@ -248,7 +266,7 @@ export default function Calendario() {
               }}
             />
             {g.label}
-            <span className="fs-key-v">{g.n} días</span>
+            <span className="fs-key-v">{g.n} casillas</span>
           </span>
         ))}
       </div>

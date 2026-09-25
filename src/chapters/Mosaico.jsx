@@ -104,7 +104,7 @@ export default function Mosaico() {
           · reglas fiscales · AEAT, BOE y TGSS · interpolación y cálculo propios
         </>
       }
-      note="No es una estadística observada de recaudación por percentil. El INE publica seis referencias salariales —P10, P25, mediana, media, P75 y P90—, no veinte grupos completos. La figura interpola un salario representativo para cada grupo de cinco percentiles y le aplica el mismo perfil fiscal seleccionado. La cola superior a P90 se extrapola y es la parte con mayor incertidumbre."
+      note="Es una estimación propia de IRPF y cotización del trabajador, no una estadística de recaudación publicada por la AEAT. El INE da cinco puntos de la distribución salarial: P10, P25, P50, P75 y P90; también publica la media, que no es un percentil. Estimamos un salario para el punto medio de cada grupo de cinco percentiles y calculamos su carga con el mismo perfil fiscal. La cola superior a P90 se extrapola y es la parte más incierta. Las operaciones se detallan en «Cómo está calculado», método M3."
       summary={conX.map(b => `Percentil ${Math.round(b.p0)}-${Math.round(b.p1)}: tipo ${pct(b.tipo * 100)}, aporta ${pct(b.parteRec * 100)}`).join('. ')}
     >
       <div className="fs-readout" style={{ marginBottom: 16 }}>
@@ -125,7 +125,7 @@ export default function Mosaico() {
       </div>
 
       <ol className="fs-method-chain" aria-label="Cómo se construye la estimación de la figura 25">
-        <li><strong>1 · Datos observados</strong><span>P10, P25, P50, media, P75 y P90 del INE.</span></li>
+        <li><strong>1 · Datos observados</strong><span>P10, P25, P50, P75 y P90 del INE. La media se muestra como referencia, pero no se usa para interpolar.</span></li>
         <li><strong>2 · Interpolación</strong><span>Un salario central para cada grupo de cinco percentiles.</span></li>
         <li><strong>3 · Cálculo fiscal</strong><span>IRPF y cotización del trabajador con un perfil común.</span></li>
         <li><strong>4 · Normalización</strong><span>Cuota de masa salarial y de recaudación estimada.</span></li>

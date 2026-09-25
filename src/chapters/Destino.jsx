@@ -101,11 +101,10 @@ export default function Destino() {
             el gasto público
           </h2>
           <p className="fs-kicker">
-            Este capítulo cambia del cálculo individual a la contabilidad nacional. La clasificación
-            COFOG ordena el gasto consolidado de las administraciones según su finalidad. Para hacer
-            comparable esa estructura con el caso anterior, aplicamos sus porcentajes a la cuña fiscal
-            calculada; el resultado es una correspondencia hipotética, no el seguimiento de unos euros
-            concretos desde la nómina hasta una partida presupuestaria.
+            Partimos de tu caso: IRPF estimado y cotizaciones de la empresa y del trabajador. Juntos
+            forman la cuña fiscal, la diferencia entre coste laboral y salario neto. Después usamos
+            esa cantidad como escala para mostrar cómo se reparte el gasto público español por
+            funciones. Es una comparación proporcional entre dos datos distintos.
           </p>
         </div>
 
@@ -115,8 +114,10 @@ export default function Destino() {
             <div className="fs-rail-item">
               <span className="fs-stamp">Qué es COFOG</span>
               <p className="fs-note">
-                La clasificación funcional del gasto público que usan Eurostat y la IGAE: ordena el
-                gasto por finalidad —sanidad, pensiones, defensa— en vez de por quién lo ejecuta.
+                COFOG significa «Clasificación de las Funciones del Gobierno». Agrupa el gasto de las
+                administraciones según para qué se utiliza, por ejemplo pensiones, sanidad o defensa,
+                con independencia de qué administración lo paga. La IGAE publica estos datos para
+                España; aquí se usa el ejercicio provisional de 2023.
               </p>
             </div>
           </aside>
@@ -124,11 +125,12 @@ export default function Destino() {
           <div className="fs-field">
             <RioDeLosEuros />
 
-        <Puente rotulo="Una equivalencia temporal, no un calendario de pagos">
-          La figura anterior expresa una proporción en euros. El calendario conserva esa misma
-          proporción y la multiplica por los días del año. La fecha resultante es sólo una frontera
-          gráfica: <strong>no indica que antes de ella se trabaje para una institución y después para
-          uno mismo</strong>, ni coincide con fechas de retención, ingreso o devengo.
+        <Puente rotulo="La misma proporción, ahora en casillas">
+          El calendario usa sus 365 o 366 fechas como una barra dividida en partes iguales. La barra
+          completa representa el coste laboral anual. Pintamos la fracción correspondiente a IRPF y
+          cotizaciones, y dejamos sin relleno la fracción del salario neto. Las fechas sólo permiten
+          contar las casillas: <strong>no indican cuándo trabajas para una institución, cuándo cobras
+          o cuándo se pagan los impuestos</strong>.
         </Puente>
 
         <Calendario />
@@ -250,9 +252,9 @@ function RioDeLosEuros() {
   return (
     <Figure
       id="26"
-      title={`Aplicando el reparto COFOG, ${eur(euros(social.parte))} de tu aportación equivalen a protección social`}
-      sub={`${anio} · correspondencia proporcional de tu cuña fiscal con el gasto público consolidado · clasificación funcional COFOG de ${GASTO_COFOG.anio}`}
-      legend={`Dos afluentes —cotizaciones e IRPF— desembocan en una caja común · el ancho de cada cinta es su parte del gasto · los días se cuentan sobre ${DIAS_LABORABLES} jornadas laborables`}
+      title={`En esta comparación, ${eur(euros(social.parte))} equivalen a protección social`}
+      sub={`${anio} · tu cuña fiscal repartida según los porcentajes del gasto público español de ${GASTO_COFOG.anio}`}
+      legend={`Dos afluentes, cotizaciones e IRPF, forman la cuña fiscal · las cintas de la derecha aplican porcentajes COFOG · la vista en días usa ${DIAS_LABORABLES} jornadas de referencia`}
       source={
         <>
           Fuente ·{' '}
@@ -263,6 +265,7 @@ function RioDeLosEuros() {
           <a href="https://ec.europa.eu/eurostat/en/web/products-manuals-and-guidelines/-/ks-gq-19-010" target="_blank" rel="noreferrer noopener">
             Eurostat · manual COFOG
           </a>
+          {' · cálculo propio de la correspondencia proporcional'}
         </>
       }
       note="Los ingresos públicos se integran, con las excepciones previstas legalmente, en recursos que no permiten atribuir cada euro de IRPF a una función concreta. Las cotizaciones tienen una relación específica con el sistema contributivo, pero tampoco reproducen el reparto general de COFOG. La figura aplica una regla proporcional común para comparar escalas; no describe trazabilidad presupuestaria."
@@ -270,6 +273,15 @@ function RioDeLosEuros() {
         .map(p => `${p.label}: ${eur(euros(p.parte))} (${pct(p.parte * 100)})`)
         .join('. ')}
     >
+      <p className="fs-note" style={{ margin: '0 0 16px', maxWidth: '78ch' }}>
+        El río reúne {eur(nomina.cotEmp, 2)} de cotización empresarial, {eur(nomina.cotTra, 2)} de
+        cotización del trabajador y {eur(irpf, 2)} de IRPF estimado: {eur(cuna, 2)} en total. El coste
+        laboral es {eur(nomina.costeLab, 2)}; de él, {eur(nomina.salarioNeto, 2)} llega como salario neto y
+        queda fuera del río. Para cada destino multiplicamos {eur(cuna, 2)} por su porcentaje del gasto
+        COFOG de {GASTO_COFOG.anio}. Por ejemplo, protección social representa{' '}
+        {pct(social.parte * 100)} y da {eur(euros(social.parte))}. Es un cálculo propio de escala,
+        no el destino comprobado de tus pagos.
+      </p>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center', marginBottom: 14 }}>
         <span className="fs-seg">
           {Object.entries(UNIDADES).map(([k, u]) => (
@@ -299,11 +311,11 @@ function RioDeLosEuros() {
       {estrecho ? (
         <div className="fs-rio">
           <p className="fs-rio-origen">
-            <span style={{ color: 'var(--signal)' }}>Cotizaciones {eur(cot)}</span>
+            <span style={{ color: 'var(--signal)' }}>Cotizaciones {eur(cot, 2)}</span>
             {' + '}
-            <span style={{ color: 'var(--counter)' }}>IRPF {eur(irpf)}</span>
+            <span style={{ color: 'var(--counter)' }}>IRPF {eur(irpf, 2)}</span>
             {' = '}
-            <strong>{eur(cuna)}</strong> a la caja común
+            <strong>{eur(cuna, 2)}</strong> a la caja común
           </p>
           {grupos.map(g => (
             <section key={g.key} className="fs-rio-grupo">
@@ -378,7 +390,7 @@ function RioDeLosEuros() {
               />
               <rect x={XS0} y={round(y0)} width={XS1 - XS0} height={round(y1 - y0)} fill={f.color} />
               <Label x={XS0} y={round(y0) - 8} size={9.5} weight={700} color={f.color} mono>
-                {f.label} · {eur(f.valor)}
+                {f.label} · {eur(f.valor, 2)}
               </Label>
             </g>
           );

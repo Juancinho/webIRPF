@@ -163,15 +163,15 @@ export const GUIAS = {
   },
   '26': {
     titulo: 'El río de los euros',
-    que: 'A dónde iría tu aportación si se repartiera igual que se reparte el gasto público.',
-    lee: 'Dos afluentes —cotizaciones e IRPF— desembocan en una caja común, y la caja se abre en las funciones del gasto. El ancho de cada cinta es su parte. Arriba se cambia la unidad.',
-    ojo: 'El presupuesto no está afectado: ningún impuesto financia una función concreta. No dice a dónde fue tu dinero, sino cómo se repartiría si siguiera el reparto del gasto.',
+    que: 'Qué importes equivaldrían a cada función pública si tu cuña fiscal siguiera las proporciones del gasto de España.',
+    lee: 'A la izquierda se suman tu IRPF estimado y las cotizaciones de la empresa y del trabajador. El salario neto queda fuera. A la derecha, cada cinta recibe el porcentaje que esa función ocupa en el gasto público de 2023. El ancho representa esa equivalencia.',
+    ojo: 'COFOG clasifica gastos por finalidad, pero no sigue el recorrido de tus ingresos. El cálculo de la derecha es una proyección proporcional propia, no un destino real de tus pagos.',
   },
   '27': {
-    titulo: 'La misma cifra, en días',
-    que: 'Cuántos días del año trabajas para el sistema antes de empezar a cobrar para ti.',
-    lee: 'Cada casilla es un día del año. Las llenas equivalen a la cuña fiscal; las vacías, a renta neta. Los colores aplican el reparto del gasto de la figura anterior.',
-    ojo: 'Es una equivalencia proporcional, no un calendario de pagos: los impuestos no se devengan así, y la fecha sale de ordenar una proporción desde el 1 de enero.',
+    titulo: 'Un porcentaje pintado en el calendario',
+    que: 'Usamos las 365 o 366 casillas del calendario como una barra dividida en partes iguales para mostrar qué porcentaje del coste laboral corresponde a IRPF y cotizaciones.',
+    lee: 'Cada casilla representa una parte igual del coste laboral anual, no el sueldo de esa fecha. Las casillas coloreadas representan la parte de IRPF y cotizaciones; las vacías, la parte que llega al salario neto. Entre las coloreadas, cada color corresponde a uno de los tres grupos del gasto público español de 2023.',
+    ojo: 'Las casillas se pintan desde enero sólo para poder contarlas. Ningún color indica que trabajaste ese día para una partida pública ni que tus impuestos se pagaron entonces.',
   },
   '28': {
     titulo: 'El saldo de la deuda',

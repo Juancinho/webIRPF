@@ -1,6 +1,11 @@
 import { useMemo } from 'react';
 import { useFiscal } from '../state/fiscalContext';
-import { ANIOS, obtenerParametros, INFLACION_A_2026, ULTIMO_ANIO_SALARIAL_OFICIAL } from '../engine/irpf';
+import {
+  ANIOS, obtenerParametros, INFLACION_A_2026, ULTIMO_ANIO_SALARIAL_OFICIAL,
+  CRECIMIENTO_PROYECCION_SALARIAL, DISTRIBUCION_SALARIAL, GASTO_COFOG,
+  calcularNomina,
+} from '../engine/irpf';
+import { salarioEnPercentil } from './distribucionUtil';
 import { CRONOLOGIA, PREGUNTAS, FUENTES } from './appendixData';
 import { dec, eur, pct } from '../utils/format';
 import Fuente from '../figures/Fuente';
@@ -10,7 +15,26 @@ import Fuente from '../figures/Fuente';
  * A methodology · B parameters · C law · D questions · E sources · F limits.
  */
 export default function Apendice() {
-  const { anio, bruto, nomina, marginal, params } = useFiscal();
+  const { anio, bruto, nomina, marginal, params, opts } = useFiscal();
+
+  const dist = DISTRIBUCION_SALARIAL[anio];
+  const bandasMosaico = useMemo(() =>
+    Array.from({ length: 20 }, (_, i) => {
+      const salario = salarioEnPercentil(i * 5 + 2.5, dist);
+      const calculo = calcularNomina(salario, anio, opts);
+      return { salario, carga: calculo.irpfFinal + calculo.cotTra };
+    }), [anio, dist, opts]);
+  const bandaEjemplo = bandasMosaico[10];
+  const sumaSalarios = bandasMosaico.reduce((total, banda) => total + banda.salario, 0);
+  const sumaCargas = bandasMosaico.reduce((total, banda) => total + banda.carga, 0);
+  const parteMasaEjemplo = bandaEjemplo.salario / sumaSalarios;
+  const parteCargaEjemplo = bandaEjemplo.carga / sumaCargas;
+  const cuna = Math.max(0, nomina.costeLab - nomina.salarioNeto);
+  const parteCuna = nomina.costeLab > 0 ? cuna / nomina.costeLab : 0;
+  const totalDias = new Date(anio, 1, 29).getMonth() === 1 ? 366 : 365;
+  const diasCuna = Math.round(parteCuna * totalDias);
+  const gastoSocial = GASTO_COFOG.grupos[0].partidas.reduce((total, partida) => total + partida.valor, 0);
+  const parteSocial = gastoSocial / GASTO_COFOG.total;
 
   const parametros = useMemo(
     () =>
@@ -143,22 +167,105 @@ export default function Apendice() {
             </article>
             <article id="metodo-distribucion">
               <span className="fs-stamp">Método M3 · distribución</span>
-              <h4>Cinco percentiles observados; el resto se estima</h4>
+              <h4>Del dato del INE a veinte grupos estimados</h4>
               <p>
-                P10, P25, P50, P75 y P90 proceden de la tabla 28191 del INE. Entre ellos se interpola
-                linealmente. Por debajo de P10 y por encima de P90 se extrapola con curvas suaves; P95 y P99
-                no son observaciones publicadas. Las figuras señalan esa incertidumbre y enlazan la tabla.
+                La tabla 28191 del INE publica P10, P25, P50, P75 y P90, además de la media. La media
+                es un promedio, no un punto de la escala de percentiles. El mosaico usa los cinco
+                percentiles como anclas; el resto de salarios y toda la carga fiscal son cálculos propios.
               </p>
             </article>
             <article id="metodo-equivalencias">
               <span className="fs-stamp">Método M4 · equivalencias</span>
-              <h4>De una proporción a días, euros o unidades</h4>
+              <h4>De la cuña a un reparto y a casillas de calendario</h4>
               <p>
-                Calendario, monedas y poder de compra transforman una magnitud ya calculada mediante una
-                división y una multiplicación declaradas en cada figura. Son equivalencias editoriales, no
-                nuevos datos oficiales ni una trazabilidad del impuesto hacia partidas de gasto.
+                El río combina una cifra calculada para tu perfil con porcentajes del gasto público
+                español de 2023. El calendario dibuja esa proporción en casillas fechadas.
+                Ambas transformaciones se detallan a continuación.
               </p>
             </article>
+          </div>
+
+          <div className="fs-method-ledger" aria-labelledby="metodo-mosaico-t">
+            <div className="fs-method-head">
+              <span className="fs-stamp">Cálculo propio · figura 25 · {anio}</span>
+              <h4 id="metodo-mosaico-t" className="fs-title-sm">Cómo se calcula el mosaico salarial</h4>
+              <p className="fs-note">
+                Ejemplo con el grupo de percentiles 50 a 55 y el perfil fiscal que tienes seleccionado.
+                Las otras diecinueve columnas siguen exactamente las mismas operaciones.
+              </p>
+            </div>
+            <ol className="fs-method-steps">
+              <PasoMetodo n="01" titulo="Cinco anclas salariales publicadas por el INE" formula={`P50 = ${eur(dist.p50, 2)}; P75 = ${eur(dist.p75, 2)}`}>
+                La tabla 28191 ofrece P10, P25, mediana o P50, P75 y P90 para el total nacional.
+                También ofrece el salario medio, que no entra en la interpolación.{' '}
+                {anio > ULTIMO_ANIO_SALARIAL_OFICIAL
+                  ? `Las referencias de ${anio} se proyectan a partir de ${ULTIMO_ANIO_SALARIAL_OFICIAL}: cada cifra se multiplica por (1 + ${pct(CRECIMIENTO_PROYECCION_SALARIAL * 100)}) elevado a ${anio - ULTIMO_ANIO_SALARIAL_OFICIAL}. Ese crecimiento es un supuesto propio, no un dato del INE de ${anio}.`
+                  : `Las referencias de ${anio} son datos publicados del INE.`}
+              </PasoMetodo>
+              <PasoMetodo n="02" titulo="Un salario para cada grupo de cinco percentiles" formula={`P52,5 = P50 + (2,5 / 25) × (P75 − P50) ≈ ${eur(bandaEjemplo.salario, 2)}`}>
+                El grupo 50 a 55 se representa por su punto medio, P52,5. Entre dos percentiles
+                conocidos usamos una recta. Por debajo de P10 se usa una curva de potencia; por
+                encima de P90, una curva logarítmica limitada cerca de P100. Las fórmulas propias
+                son: bajo P10, salario = P10 × (percentil / 10)^(1 / 0,7); sobre P90, salario = P90
+                × [1 − ln(1 − (percentil − 90) / 10)], con el percentil limitado a 99,4. Así, el
+                último grupo, centrado en P97,5, recibe {eur(salarioEnPercentil(97.5, dist), 2)}.
+                Esa extrapolación es especialmente incierta; ninguna banda es un registro observado
+                de salarios individuales.
+              </PasoMetodo>
+              <PasoMetodo n="03" titulo="Carga de ese salario representativo" formula={`IRPF + cotización del trabajador = ${eur(bandaEjemplo.carga, 2)}`}>
+                Se ejecuta el mismo cálculo fiscal para cada uno de los veinte salarios con el perfil
+                seleccionado. La cotización empresarial queda fuera de esta figura. La altura del
+                bloque es {eur(bandaEjemplo.carga, 2)} / {eur(bandaEjemplo.salario, 2)} ≈{' '}
+                {pct((bandaEjemplo.carga / bandaEjemplo.salario) * 100)} del salario bruto.
+              </PasoMetodo>
+              <PasoMetodo n="04" titulo="Ancho y área del bloque" formula={`Ancho: ${eur(bandaEjemplo.salario, 2)} / ${eur(sumaSalarios, 2)} ≈ ${pct(parteMasaEjemplo * 100)}; área relativa: ${eur(bandaEjemplo.carga, 2)} / ${eur(sumaCargas, 2)} ≈ ${pct(parteCargaEjemplo * 100)}`}>
+                Cada grupo representa al 5 % de los asalariados del modelo, así que el factor de
+                población es igual para todos y se cancela al comparar. El ancho es su parte de la
+                masa salarial estimada. Como altura = carga / salario, el área es proporcional a la
+                carga calculada. Dividir entre la suma de las veinte cargas da su participación
+                estimada. Es una identidad del modelo, no una medición de recaudación de la AEAT.
+              </PasoMetodo>
+            </ol>
+          </div>
+
+          <div className="fs-method-ledger" aria-labelledby="metodo-gasto-t">
+            <div className="fs-method-head">
+              <span className="fs-stamp">Cálculo propio · figuras 26 y 27 · {anio}</span>
+              <h4 id="metodo-gasto-t" className="fs-title-sm">Cómo se calculan el río y el calendario</h4>
+              <p className="fs-note">
+                COFOG significa «Clasificación de las Funciones del Gobierno». Ordena el gasto de las
+                administraciones por finalidad, como protección social, sanidad o educación. Usamos
+                los importes provisionales de España de {GASTO_COFOG.anio}, publicados por la IGAE.
+              </p>
+            </div>
+            <ol className="fs-method-steps">
+              <PasoMetodo n="01" titulo="Importe que entra en el río" formula={`${eur(nomina.cotEmp, 2)} + ${eur(nomina.cotTra, 2)} + ${eur(nomina.irpfFinal, 2)} = ${eur(cuna, 2)}`}>
+                Se suman la cotización de la empresa, la del trabajador y el IRPF estimado. La misma
+                cifra se obtiene restando al coste laboral, {eur(nomina.costeLab, 2)}, el salario neto,
+                {eur(nomina.salarioNeto, 2)}. La cotización empresarial forma parte del coste laboral;
+                no es un descuento adicional de tu salario bruto. El neto queda fuera del río.
+              </PasoMetodo>
+              <PasoMetodo n="02" titulo="Porcentaje COFOG y equivalencia en euros" formula={`${dec(gastoSocial, 0)} M€ / ${dec(GASTO_COFOG.total, 0)} M€ ≈ ${pct(parteSocial * 100, 2)}; ${eur(cuna, 2)} × ${pct(parteSocial * 100, 2)} ≈ ${eur(cuna * parteSocial, 2)}`}>
+                Protección social representa {gastoSocial.toLocaleString('es-ES')} de los{' '}
+                {GASTO_COFOG.total.toLocaleString('es-ES')} millones de euros del gasto COFOG de
+                {GASTO_COFOG.anio}. Para cada otra función se hace la misma división y se multiplica
+                por tu cuña. El porcentaje procede del gasto agregado; el importe en euros del río
+                es una proyección propia. No identifica el destino efectivo de tus pagos.
+              </PasoMetodo>
+              <PasoMetodo n="03" titulo="Proporción del coste laboral" formula={`${eur(cuna, 2)} / ${eur(nomina.costeLab, 2)} ≈ ${pct(parteCuna * 100, 2)}`}>
+                Dividir responde a una pregunta concreta: de todo lo que cuesta este puesto de
+                trabajo, ¿qué parte corresponde al IRPF y a las dos cotizaciones? El resto corresponde
+                al salario neto estimado.
+              </PasoMetodo>
+              <PasoMetodo n="04" titulo="Esa proporción, dibujada en casillas" formula={`${pct(parteCuna * 100, 2)} × ${totalDias} casillas ≈ ${diasCuna} casillas coloreadas`}>
+                El calendario se usa como una barra de {totalDias} partes iguales: cada casilla
+                representa 1/{totalDias} del coste laboral anual, aunque lleve una fecha. Se redondea
+                al entero más cercano. Las {diasCuna} coloreadas representan la parte de cuña y las{' '}
+                {totalDias - diasCuna} sin relleno, la parte del neto. Los tres colores de las casillas
+                pintadas vuelven a usar las proporciones COFOG; colocarlas desde enero sólo ayuda a
+                contarlas y no marca fechas de pago.
+              </PasoMetodo>
+            </ol>
           </div>
         </Seccion>
 
