@@ -11,8 +11,8 @@ import { useURLState } from '../hooks/useURLState';
 import { FiscalCtx } from './fiscalContext';
 
 /** Provider for the single fiscal state; the hook lives in `fiscalContext.js`. */
-export function FiscalProvider({ children }) {
-  const { bruto, anio, pagas, opts, set, setOpts, getShareURL } = useURLState();
+export function FiscalProvider({ children, inicial }) {
+  const { bruto, anio, pagas, opts, set, setOpts, getShareURL } = useURLState(inicial);
   const [focus, setFocus] = useState(null);
 
   const nomina = useMemo(() => calcularNomina(bruto, anio, opts), [bruto, anio, opts]);

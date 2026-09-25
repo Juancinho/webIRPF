@@ -1,5 +1,6 @@
 import { StrictMode } from 'react';
 import { renderToString } from 'react-dom/server';
+import { prerender } from 'react-dom/static';
 import App from './App.jsx';
 
 /**
@@ -14,10 +15,20 @@ import App from './App.jsx';
  * llega sin parámetros en la URL, así que no hay nada que un lector pueda ver
  * y un rastreador no.
  */
-export function render() {
-  return renderToString(
-    <StrictMode>
-      <App />
-    </StrictMode>
-  );
+const arbol = pagina => (
+  <StrictMode>
+    <App pagina={pagina} />
+  </StrictMode>
+);
+
+/* Los capítulos se cargan aparte en el cliente (React.lazy). Una primera
+   pasada con `prerender` resuelve esos módulos; a partir de ahí
+   `renderToString` los pinta en su sitio y en orden, sin los bloques ocultos
+   y los scripts de recolocación que añade el renderizado en streaming. */
+let listo = null;
+
+export async function render(pagina = null) {
+  listo ??= prerender(arbol(null));
+  await listo;
+  return renderToString(arbol(pagina));
 }

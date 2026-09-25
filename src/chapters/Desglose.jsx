@@ -402,7 +402,7 @@ export default function Desglose() {
         {dibujo.map(bloque => (
           <section key={bloque.titulo} className="fs-dbloque">
             <header className="fs-dbloque-head">
-              <h4 className="fs-dbloque-t">{bloque.titulo}</h4>
+              <h3 className="fs-dbloque-t">{bloque.titulo}</h3>
               {bloque.intro && <p className="fs-dbloque-i">{bloque.intro}</p>}
             </header>
 

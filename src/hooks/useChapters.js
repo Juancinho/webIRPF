@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
  * Document navigation, not product navigation: observes the chapter sections
  * and reports which one is being read plus overall reading progress.
  */
-export function useChapters(ids) {
+export function useChapters(ids, version = 0) {
   const [active, setActive] = useState(ids[0]);
   const [progress, setProgress] = useState(0);
   const [past, setPast] = useState(false);
@@ -40,7 +40,9 @@ export function useChapters(ids) {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
     };
-  }, [ids]);
+    // `version` cambia cuando un capítulo diferido se monta y su nodo se
+    // sustituye: hay que volver a observar los nodos nuevos.
+  }, [ids, version]);
 
   return { active, progress, past };
 }

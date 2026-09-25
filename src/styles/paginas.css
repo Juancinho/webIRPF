@@ -1,0 +1,343 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   PÁGINAS DE ENTRADA — la respuesta que precede al informe
+   Sólo existen en /sueldo-neto/… y en las páginas temáticas; la portada no
+   las carga. Misma tipografía, mismo papel y mismos filetes que el informe:
+   una columna de lectura, sin tarjetas.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.fs-lp {
+  padding: clamp(18px, 3vh, 28px) 0 clamp(40px, 7vh, 72px);
+  border-bottom: 1px solid var(--ink);
+}
+
+.fs-lp-cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 24px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.fs-lp-marca {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.fs-lp-miga ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.fs-lp-miga li + li::before {
+  content: '/';
+  margin: 0 8px;
+  color: var(--ink-6);
+}
+
+.fs-lp-miga a {
+  color: var(--ink-3);
+  text-decoration: none;
+}
+
+.fs-lp-miga a:hover,
+.fs-lp a:hover {
+  color: var(--signal);
+}
+
+.fs-lp-cuerpo {
+  max-width: 820px;
+  padding-top: clamp(28px, 5vh, 56px);
+}
+
+.fs-lp-h1 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(34px, 5.2vw, 64px);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin: 10px 0 0;
+  text-wrap: balance;
+}
+
+.fs-lp-entradilla {
+  margin: 20px 0 0;
+  font-size: clamp(17px, 1.3vw, 20px);
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 60ch;
+}
+
+.fs-lp-entradilla strong {
+  color: var(--ink);
+}
+
+/* ── las cifras: una rejilla de lectura, no tarjetas ─────────────────────── */
+.fs-lp-cifras {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  margin: 30px 0 0;
+  border-top: 1px solid var(--ink);
+}
+
+.fs-lp-cifras > div {
+  padding: 12px 16px 14px 0;
+  border-bottom: 1px solid var(--rule-soft);
+}
+
+.fs-lp-cifras dt {
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.fs-lp-cifras dd {
+  margin: 4px 0 0;
+}
+
+.fs-lp-v {
+  display: block;
+  font-family: var(--sans);
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums lining-nums;
+  color: var(--ink);
+}
+
+.fs-lp-cifras .is-destacada .fs-lp-v {
+  color: var(--signal);
+  font-size: 26px;
+}
+
+.fs-lp-nota {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--ink-3);
+}
+
+.fs-lp-ir {
+  margin: 22px 0 0;
+}
+
+.fs-lp-ir a,
+.fs-lp-vecinos a,
+.fs-lp-enlaces a,
+.fs-lp-seccion a {
+  color: var(--signal);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.fs-lp-ir a {
+  display: inline-block;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 10px 0;
+}
+
+/* ── texto ──────────────────────────────────────────────────────────────── */
+.fs-lp-seccion {
+  margin-top: clamp(34px, 5vh, 52px);
+  padding-top: 18px;
+  border-top: 1px solid var(--rule);
+}
+
+.fs-lp-seccion h2 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(23px, 2.2vw, 30px);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin: 0 0 12px;
+}
+
+.fs-lp-seccion p {
+  font-size: 16.5px;
+  line-height: 1.62;
+  color: var(--ink-2);
+  margin: 0 0 12px;
+  max-width: 64ch;
+}
+
+.fs-lp-seccion .fs-table-scroll {
+  margin-top: 16px;
+}
+
+.fs-lp-seccion .fs-table a {
+  font-weight: 700;
+}
+
+.fs-lp-tabla-nota {
+  margin-top: 8px;
+}
+
+.fs-lp-preguntas h3 {
+  font-family: var(--sans);
+  font-size: 15.5px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 18px 0 6px;
+}
+
+/* ── navegación entre páginas ───────────────────────────────────────────── */
+.fs-lp-vecinos {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 12px;
+  align-items: center;
+  margin-top: clamp(34px, 5vh, 52px);
+  padding: 14px 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.fs-lp-vecinos a {
+  padding: 8px 0;
+}
+
+.fs-lp-vecinos a[rel='next'] {
+  text-align: right;
+}
+
+.fs-lp-enlaces {
+  margin-top: 30px;
+}
+
+.fs-lp-enlaces ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+  margin: 8px 0 20px;
+  padding: 0;
+  list-style: none;
+  font-size: 14.5px;
+}
+
+.fs-lp-enlaces li a {
+  display: inline-block;
+  padding: 6px 0;
+}
+
+.fs-lp-aviso {
+  margin-top: 16px;
+  max-width: 70ch;
+}
+
+/* el paso de la respuesta al informe */
+.fs-lp-sigue {
+  margin: clamp(40px, 7vh, 72px) 0 0;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.fs-lp-sigue::after {
+  content: ' ↓';
+}
+
+@media (max-width: 560px) {
+  .fs-lp-cifras {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fs-lp-cifras > div:nth-child(even) {
+    padding-left: 12px;
+    border-left: 1px solid var(--rule-soft);
+  }
+
+  .fs-lp-cifras .is-destacada {
+    grid-column: 1 / -1;
+    border-left: 0 !important;
+    padding-left: 0 !important;
+  }
+
+  .fs-lp-cifras .is-destacada ~ div:nth-child(even) {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .fs-lp-cifras .is-destacada ~ div:nth-child(odd) {
+    padding-left: 12px;
+    border-left: 1px solid var(--rule-soft);
+  }
+
+  .fs-lp-v {
+    font-size: 18px;
+  }
+
+  .fs-lp-cifras .is-destacada .fs-lp-v {
+    font-size: 26px;
+  }
+
+  .fs-lp-vecinos {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .fs-lp-vecinos > a:nth-child(2) {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    text-align: center;
+  }
+}
+
+.fs-lp-seccion p.fs-lp-tabla-nota {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-3);
+}
+
+.fs-lp-aviso a {
+  color: var(--signal);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+}
+
+/* el capítulo prerenderizado, mientras espera a montarse: no añade caja, y
+   el navegador no lo maqueta ni lo pinta hasta que se acerca a la vista */
+.fs-diferido {
+  display: contents;
+}
+
+.fs-diferido > section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 2400px;
+}
+
+/* en estas páginas los rótulos pequeños van un tono más oscuro: a 10 px el
+   --ink-4 no llega al contraste AA sobre el papel */
+.fs-lp .fs-stamp,
+.fs-lp .fs-note,
+.fs-lp .fs-table thead th,
+.fs-lp .fs-table td::before {
+  color: var(--ink-3);
+}

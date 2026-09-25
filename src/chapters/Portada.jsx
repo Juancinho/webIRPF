@@ -9,13 +9,18 @@ import { dec, eur, num } from '../utils/format';
 
 const MAX = 150000;
 
+/** h1 en la portada; h2 cuando la página tiene su propio titular encima. */
+function Titular({ secundaria, children, ...rest }) {
+  return secundaria ? <h2 {...rest}>{children}</h2> : <h1 {...rest}>{children}</h1>;
+}
+
 /**
  * 00 · PORTADA — the cover of the paper.
  * The calculator is not below the hero: the calculator IS the hero
  * (DESIGN.md §9). Masthead, salary, ruler, net and source metadata coexist in
  * one composition. On phones the ruler rotates instead of shrinking.
  */
-export default function Portada() {
+export default function Portada({ secundaria = false }) {
   const { bruto, anio, pagas, nomina, porPaga, smi, vecesSMI, percentil, setBruto } = useFiscal();
   const narrow = useNarrow();
 
@@ -48,7 +53,9 @@ export default function Portada() {
         </div>
 
         <div className="fs-cover-main">
-          <h1 id="portada-t" className="fs-title">
+          {/* En las páginas de entrada el titular de la página es la respuesta:
+              la portada del informe pasa a ser un encabezado de segundo nivel. */}
+          <Titular secundaria={secundaria} id="portada-t" className="fs-title">
             Tu sueldo{' '}
             <br />
             bajo el{' '}
@@ -56,7 +63,7 @@ export default function Portada() {
             microscopio{' '}
             <br />
             fiscal
-          </h1>
+          </Titular>
 
           <div>
             <p className="fs-label" style={{ marginBottom: 6 }}>Salario bruto anual</p>

@@ -37,14 +37,14 @@ function writeURLState(url, state) {
   }
 }
 
-export function useURLState() {
+export function useURLState(inicial) {
   const init = () => {
     /* Al prerenderizar el informe no hay ventana: se parte de los valores por
        defecto, que son justo los que verá quien llegue sin parámetros. */
     const p = new URLSearchParams(typeof window === 'undefined' ? '' : window.location.search);
     const nHijos = intParam(p, 'hijos', DEFAULT_OPTS.nHijos, 0, 6);
     return {
-      bruto: intParam(p, 'bruto', 35000, 0, 200000),
+      bruto: intParam(p, 'bruto', inicial?.bruto ?? 35000, 0, 200000),
       anio: intParam(p, 'anio', 2026, 2012, 2026),
       pagas: p.get('pagas') === '14' ? 14 : 12,
       opts: {
