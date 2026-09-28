@@ -23,7 +23,7 @@ const TEXTO = {
   ssTra: (n, e) =>
     `${n} € corresponden a la cotización del trabajador. Figuran en la nómina como descuento y, en este supuesto, suman ${e} al año.`,
   irpf: (n, e) =>
-    `${n} € corresponden a la retención estimada de IRPF. Su importe depende de la renta y de las circunstancias incluidas en el cálculo; la liquidación definitiva se regulariza en la declaración. Aquí son ${e} al año.`,
+    `${n} € corresponden al IRPF estimado por el modelo. Su importe depende de la renta y de las circunstancias incluidas en el cálculo; no es la retención oficial exacta ni la cuota definitiva de la declaración. Aquí son ${e} al año.`,
   neto: (n, e) =>
     `${n} € de cada cien constituyen la renta neta estimada: ${e} al año. La diferencia entre el coste laboral y esta cuantía es la cuña fiscal.`,
 };

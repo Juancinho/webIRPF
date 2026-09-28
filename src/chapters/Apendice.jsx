@@ -83,11 +83,18 @@ export default function Apendice() {
         {/* ── A ─────────────────────────────────────────────────────────── */}
         <Seccion letra="A" titulo="Metodología y trazabilidad" id="metodo-calculos">
           <p className="fs-body">
-            El motor calcula, para cada año entre 2012 y 2026, la secuencia completa: coste laboral,
+            El motor aproxima, para cada año entre 2012 y 2026, esta secuencia: coste laboral,
             cotizaciones de empresa y trabajador, rendimiento íntegro, gastos deducibles del art.
-            19.2.f, reducción por rendimientos del trabajo del art. 20, base imponible, cuota
-            íntegra por tramos, cuota del mínimo personal y familiar, deducción por obtención de
+            19.2.f, reducción por rendimientos del trabajo del art. 20, base de cálculo, cuota
+            previa por tramos, cuota del mínimo personal y familiar, deducción por obtención de
             rendimientos del trabajo y límite del 43 % de retención.
+          </p>
+          <p className="fs-body">
+            El importe llamado <strong>IRPF estimado</strong> sirve para calcular un neto orientativo.
+            No es la retención oficial exacta de la empresa ni la cuota definitiva de la declaración.
+            La escala del art. 101 se refiere a retenciones; la cuota anual de la renta general
+            utiliza las escalas estatal y autonómica por separado. Las retenciones practicadas son
+            anticipos que se descuentan al liquidar el impuesto.
           </p>
           <p className="fs-body">
             Las comparaciones históricas se expresan en <strong>euros constantes de 2026</strong>{' '}
@@ -130,14 +137,23 @@ export default function Apendice() {
                 <a href="https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764#a20" target="_blank" rel="noreferrer noopener">art. 20 LIRPF</a>.
               </PasoMetodo>
               <PasoMetodo n="04" titulo="Cuota por tramos" formula={`${eur(nomina.cuotaIntegra)} − ${eur(nomina.cuotaMinimo)} = ${eur(nomina.cuotaTeorica)}`}>
-                La escala progresiva se aplica a la base y, por separado, al mínimo personal y familiar.
-                La diferencia es la cuota teórica. Consulta la{' '}
-                <a href="https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764#a63" target="_blank" rel="noreferrer noopener">escala del art. 63 LIRPF</a>
+                Primero se aplica la escala progresiva a la base de {eur(nomina.baseImponible)}:
+                resulta {eur(nomina.cuotaIntegra)}. Después se comienza otra vez desde el primer
+                tramo y se aplica esa misma escala al mínimo personal y familiar de{' '}
+                {eur(nomina.minimoPersonalYFamiliar)}: resulta {eur(nomina.cuotaMinimo)}.
+                La resta de ambas cuotas es {eur(nomina.cuotaTeorica)}. El mínimo representa
+                necesidades básicas, no una entrega de dinero ni una resta directa de la base.
+                {opts.modoEscala === 'solo_estatal' && anio >= 2015
+                  ? ' En la vista solo estatal se usa únicamente la escala estatal.'
+                  : ' El modelo usa la escala combinada del perfil; la declaración real separa escala y mínimo estatales y autonómicos.'}
+                {' '}Consulta la{' '}
+                <a href="https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764#a63" target="_blank" rel="noreferrer noopener">escala estatal del art. 63</a>
+                , la <a href="https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764#a101" target="_blank" rel="noreferrer noopener">escala de retenciones del art. 101</a>
                 {' '}y los <a href="https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764#a56" target="_blank" rel="noreferrer noopener">arts. 56–61</a>.
               </PasoMetodo>
-              <PasoMetodo n="05" titulo="Deducciones y límite" formula={`${eur(nomina.cuotaTeorica)} − ${eur(nomina.deduccionSMI)} → ${eur(nomina.irpfFinal)} de IRPF`}>
+              <PasoMetodo n="05" titulo="Deducciones y límite" formula={`${eur(nomina.cuotaTeorica)} − ${eur(nomina.deduccionSMI)} → ${eur(nomina.irpfFinal)} de IRPF estimado`}>
                 Se resta la deducción por rendimientos del trabajo cuando existe y se aplica el límite de
-                retención modelizado. El resultado nunca baja de cero.
+                retención modelizado. El resultado nunca baja de cero y no representa la cuota anual definitiva.
               </PasoMetodo>
               <PasoMetodo n="06" titulo="Neto disponible" formula={`${eur(bruto)} − ${eur(nomina.cotTra)} − ${eur(nomina.irpfFinal)} = ${eur(nomina.salarioNeto)}`}>
                 El neto anual se divide entre 12 o 14 pagas sólo para mostrar la periodicidad; la suma anual

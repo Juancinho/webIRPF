@@ -457,7 +457,7 @@ function TuParte({ anio, irpf }) {
           const y0 = yIrpf;
           return (
             <g>
-              <Label x={0} y={y0 - 12} size={10} color="var(--ink-3)" mono>IRPF DE UN AÑO · {eur(irpfComparable)}</Label>
+              <Label x={0} y={y0 - 12} size={10} color="var(--ink-3)" mono>IRPF ESTIMADO DE UN AÑO · {eur(irpfComparable)}</Label>
               {Array.from({ length: bloquesIrpf }, (_, i) => {
                 const [cx, cy] = cell(i, 0, y0);
                 return <rect key={i} x={round(cx)} y={round(cy)} width={SIZE} height={SIZE} fill="var(--counter)" />;
@@ -469,11 +469,11 @@ function TuParte({ anio, irpf }) {
 
       <div style={{ marginTop: 20 }}>
         <span className="fs-label">
-          Comparación hipotética: {anioSel} {anioSel === 1 ? 'año' : 'años'} de IRPF íntegro
+          Comparación hipotética: {anioSel} {anioSel === 1 ? 'año' : 'años'} de IRPF estimado
         </span>
         <div className="fs-scrub">
           <label className="fs-sr" htmlFor="deuda-horizonte">
-            Años de IRPF íntegro con los que comparar la deuda por habitante
+            Años de IRPF estimado con los que comparar la deuda por habitante
           </label>
           <input
             id="deuda-horizonte"
@@ -483,7 +483,7 @@ function TuParte({ anio, irpf }) {
             step="1"
             value={anioSel}
             onChange={e => setHorizonte(+e.target.value)}
-            aria-valuetext={`${anioSel} años de IRPF íntegro`}
+            aria-valuetext={`${anioSel} años de IRPF estimado`}
           />
           <div className="fs-scrub-ticks">
             <span>1 año</span>

@@ -21,7 +21,7 @@ import Puente from '../figures/Puente';
 import ChartFrame from '../figures/ChartFrame';
 import { useDomainZoom } from '../figures/useDomainZoom';
 import { Label, Series } from '../figures/marks';
-import { linear, polyline, round, ticks } from '../figures/scale';
+import { linear, polyline, round, ticks, valorEn } from '../figures/scale';
 import { eur, pct, sign } from '../utils/format';
 import { ANCHO_MOVIL, useNarrow } from '../hooks/useNarrow';
 
@@ -547,7 +547,8 @@ function Atlas({ anio, bruto2026, elegirAnio }) {
   const y = linear([0, hi], [Y1, Y0]);
 
   const path = a => polyline(datos.map(d => [x(d.bruto), y(d[`${key}_${a}`])]));
-  const ultimo = a => datos[datos.length - 1][`${key}_${a}`];
+  // valor de cada año en el borde derecho visible (sigue al zoom y al arrastre)
+  const ultimo = a => valorEn(datos, d => d.bruto, d => d[`${key}_${a}`], zoom.domain[1]);
 
   const exportCSV = () => {
     const aniosArr = ANIOS.filter(a => activos.has(a));

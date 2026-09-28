@@ -16,6 +16,7 @@ function writeURLState(url, state) {
     pagas: state.pagas,
     regimen: state.opts.regimen,
     ccaa: state.opts.ccaa,
+    escala: state.opts.modoEscala,
     tributacion: state.opts.tributacion,
     hijos: state.opts.nHijos,
     menores3: state.opts.nHijosMenores3,
@@ -25,6 +26,7 @@ function writeURLState(url, state) {
     pagas: 12,
     regimen: DEFAULT_OPTS.regimen,
     ccaa: DEFAULT_OPTS.ccaa,
+    escala: DEFAULT_OPTS.modoEscala,
     tributacion: DEFAULT_OPTS.tributacion,
     hijos: DEFAULT_OPTS.nHijos,
     menores3: DEFAULT_OPTS.nHijosMenores3,
@@ -50,6 +52,7 @@ export function useURLState(inicial) {
       opts: {
         regimen: ['asalariado', 'autonomo'].includes(p.get('regimen')) ? p.get('regimen') : DEFAULT_OPTS.regimen,
         ccaa: Object.hasOwn(REGIONES, p.get('ccaa')) ? p.get('ccaa') : DEFAULT_OPTS.ccaa,
+        modoEscala: p.get('escala') === 'solo_estatal' ? 'solo_estatal' : DEFAULT_OPTS.modoEscala,
         tributacion: ['individual', 'conjunta'].includes(p.get('tributacion')) ? p.get('tributacion') : DEFAULT_OPTS.tributacion,
         nHijos,
         nHijosMenores3: intParam(p, 'menores3', DEFAULT_OPTS.nHijosMenores3, 0, nHijos),

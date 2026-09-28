@@ -66,3 +66,27 @@ export function spread(n, a, b, inset = 0) {
 
 /** Clamp helper used by drag interactions. */
 export const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+
+/**
+ * Valor de una serie ordenada en una abscisa cualquiera, interpolado entre
+ * los dos puntos vecinos. Lo usan los rótulos del margen derecho: al ampliar,
+ * el borde del trazado ya no es el último dato sino `zoom.domain[1]`, y el
+ * hilo del rótulo debe salir de la curva justo ahí.
+ */
+export function valorEn(datos, xDe, yDe, v) {
+  if (!datos.length) return 0;
+  if (v <= xDe(datos[0])) return yDe(datos[0]);
+  const n = datos.length - 1;
+  if (v >= xDe(datos[n])) return yDe(datos[n]);
+  let lo = 0;
+  let hi = n;
+  while (hi - lo > 1) {
+    const mid = (lo + hi) >> 1;
+    if (xDe(datos[mid]) <= v) lo = mid;
+    else hi = mid;
+  }
+  const xa = xDe(datos[lo]);
+  const xb = xDe(datos[hi]);
+  const t = (v - xa) / (xb - xa || 1);
+  return yDe(datos[lo]) + t * (yDe(datos[hi]) - yDe(datos[lo]));
+}

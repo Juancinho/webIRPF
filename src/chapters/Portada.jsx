@@ -21,7 +21,7 @@ function Titular({ secundaria, children, ...rest }) {
  * one composition. On phones the ruler rotates instead of shrinking.
  */
 export default function Portada({ secundaria = false }) {
-  const { bruto, anio, pagas, nomina, porPaga, smi, vecesSMI, percentil, setBruto } = useFiscal();
+  const { bruto, anio, pagas, nomina, porPaga, smi, vecesSMI, percentil, setBruto, opts } = useFiscal();
   const narrow = useNarrow();
 
   const pctCoste = nomina.costeLab > 0 ? (nomina.salarioNeto / nomina.costeLab) * 100 : 0;
@@ -80,11 +80,15 @@ export default function Portada({ secundaria = false }) {
 
             <div style={{ marginTop: 26, display: 'flex', flexWrap: 'wrap', gap: '24px 44px', alignItems: 'flex-end' }}>
               <div>
-                <p className="fs-label" style={{ marginBottom: 4 }}>Neto anual</p>
+                <p className="fs-label" style={{ marginBottom: 4 }}>Neto anual{opts.modoEscala === 'solo_estatal' && anio >= 2015 ? ' · simulación solo estatal' : ''}</p>
                 <p className="fs-data-md fs-signal num" style={{ margin: 0 }}>{eur(netoAnimado)}</p>
                 <p className="fs-note" style={{ marginTop: 6 }}>
                   {eur(porPaga)} al mes · {pagas} pagas
                 </p>
+                <p className="fs-note">Estimación de nómina, no cuota definitiva de la renta.</p>
+                {opts.modoEscala === 'solo_estatal' && anio >= 2015 && (
+                  <p className="fs-note">Sin cuota autonómica. No representa el neto real completo.</p>
+                )}
               </div>
 
               <div>

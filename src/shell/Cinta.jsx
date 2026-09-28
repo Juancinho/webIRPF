@@ -19,6 +19,7 @@ export default function Cinta({ visible }) {
   const [perfilOpen, setPerfilOpen] = useState(false);
   const [draft, setDraft] = useState(null);
   const [abierta, setAbierta] = useState(false);
+  const [oculta, setOculta] = useState(false);
   const ref = useRef(null);
   const movil = useNarrow('(max-width: 719px)');
 
@@ -26,13 +27,20 @@ export default function Cinta({ visible }) {
   useEffect(() => {
     const el = ref.current;
     const apply = () => {
-      const h = visible && el ? el.offsetHeight : 0;
+      const h = visible && !oculta && el ? el.offsetHeight : 0;
       document.documentElement.style.setProperty('--cinta-h', `${h}px`);
     };
     apply();
     window.addEventListener('resize', apply);
     return () => window.removeEventListener('resize', apply);
-  }, [visible, perfilOpen, movil]);
+  }, [visible, perfilOpen, movil, oculta]);
+
+  const ocultar = () => { setAbierta(false); setPerfilOpen(false); setOculta(true); };
+  const mostrar = visible && oculta && (
+    <button type="button" className="fs-cinta-mostrar" onClick={() => setOculta(false)}>
+      Mostrar barra de perfil
+    </button>
+  );
 
   useEffect(() => {
     if (!abierta) return undefined;
@@ -162,11 +170,11 @@ export default function Cinta({ visible }) {
   if (movil) {
     return (
       <>
-        {perfilOpen && (
+        {perfilOpen && !oculta && (
           <PerfilSheet opts={opts} anio={anio} setOpt={setOpt} setOpts={setOpts} onClose={() => setPerfilOpen(false)} />
         )}
 
-        {(abierta || perfilOpen) && visible && (
+        {(abierta || perfilOpen) && visible && !oculta && (
           <button
             type="button"
             className="fs-cm-velo"
@@ -175,7 +183,8 @@ export default function Cinta({ visible }) {
           />
         )}
 
-        <div className={`fs-cinta fs-cm ${visible ? 'is-on' : ''} ${abierta ? 'is-open' : ''}`} ref={ref}>
+        {mostrar}
+        {!oculta && <div className={`fs-cinta fs-cm ${visible ? 'is-on' : ''} ${abierta ? 'is-open' : ''}`} ref={ref}>
           {abierta && !perfilOpen && (
             <div className="fs-cm-panel" id="fs-cm-panel" role="region" aria-label="Ajustes del cálculo">
               <div className="fs-cm-fila">
@@ -201,7 +210,7 @@ export default function Cinta({ visible }) {
                   aria-expanded={perfilOpen}
                   onClick={() => setPerfilOpen(o => !o)}
                 >
-                  Perfil · {region.name.split('/')[0].trim()}
+                  Perfil · {opts.modoEscala === 'solo_estatal' && anio >= 2015 ? 'Solo estatal' : region.name.split('/')[0].trim()}
                 </button>
               </div>
 
@@ -212,6 +221,7 @@ export default function Cinta({ visible }) {
           )}
 
           <div className="fs-cm-barra">
+            <button type="button" className="fs-cinta-ocultar" onClick={ocultar} aria-label="Ocultar barra de perfil" title="Ocultar barra de perfil">×</button>
             <button
               type="button"
               className="fs-cm-cifras"
@@ -225,7 +235,7 @@ export default function Cinta({ visible }) {
               </span>
               <span className="fs-cm-flecha" aria-hidden="true">→</span>
               <span className="fs-cm-par">
-                <span className="fs-cinta-k">Neto {anio}</span>
+                <span className="fs-cinta-k">Neto {anio}{opts.modoEscala === 'solo_estatal' && anio >= 2015 ? ' · simulado' : ''}</span>
                 <span className="fs-cm-v is-net">{eur(nomina.salarioNeto)}</span>
               </span>
               <span className="fs-cm-accion">
@@ -234,18 +244,19 @@ export default function Cinta({ visible }) {
               </span>
             </button>
           </div>
-        </div>
+        </div>}
       </>
     );
   }
 
   return (
     <>
-      {perfilOpen && (
+      {perfilOpen && !oculta && (
         <PerfilSheet opts={opts} anio={anio} setOpt={setOpt} setOpts={setOpts} onClose={() => setPerfilOpen(false)} />
       )}
 
-      <div className={`fs-cinta ${visible ? 'is-on' : ''}`} ref={ref}>
+      {mostrar}
+      {!oculta && <div className={`fs-cinta ${visible ? 'is-on' : ''}`} ref={ref}>
         <div className="fs-cinta-inner">
           <div>
             <div className="fs-cinta-pair">
@@ -255,7 +266,7 @@ export default function Cinta({ visible }) {
               <span className="fs-cinta-k">€</span>
             </div>
             <div className="fs-cinta-pair" style={{ marginTop: 2 }}>
-              <span className="fs-cinta-k">Neto</span>
+              <span className="fs-cinta-k">Neto{opts.modoEscala === 'solo_estatal' && anio >= 2015 ? ' · simulado' : ''}</span>
               <span className="fs-cinta-v is-net">{eur(nomina.salarioNeto)}</span>
               <span className="fs-cinta-note">
                 {eur(porPaga)}/mes · {dec(pctCoste)} € de cada 100 € de coste
@@ -276,11 +287,12 @@ export default function Cinta({ visible }) {
             aria-expanded={perfilOpen}
             onClick={() => setPerfilOpen(o => !o)}
           >
-              Perfil<span className="fs-profile-label"> · {region.name.split('/')[0].trim()}</span>
+              Perfil<span className="fs-profile-label"> · {opts.modoEscala === 'solo_estatal' && anio >= 2015 ? 'Solo estatal' : region.name.split('/')[0].trim()}</span>
           </button>
+            <button type="button" className="fs-cinta-ocultar" onClick={ocultar} aria-label="Ocultar barra de perfil" title="Ocultar barra de perfil">×</button>
           </div>
         </div>
-      </div>
+      </div>}
     </>
   );
 }
@@ -333,6 +345,19 @@ function PerfilSheet({ opts, anio, setOpt, setOpts, onClose }) {
         <span className="fs-field-hint">
           {region.desc}
           {anio < 2024 && ' Antes de 2024 se aplica la escala estándar.'}
+        </span>
+      </div>
+
+      <div className="fs-field-row">
+        <span className="fs-label">Escala de IRPF</span>
+        <span className="fs-seg">
+          <button type="button" aria-pressed={opts.modoEscala !== 'solo_estatal' || anio < 2015} onClick={() => setOpt('modoEscala', 'completa')}>Estatal + autonómica</button>
+          <button type="button" aria-pressed={opts.modoEscala === 'solo_estatal' && anio >= 2015} disabled={anio < 2015} onClick={() => setOpt('modoEscala', 'solo_estatal')}>Solo estatal</button>
+        </span>
+        <span className="fs-field-hint">
+          {anio < 2015
+            ? 'La vista solo estatal no está disponible para 2012–2014.'
+            : 'La vista estatal + autonómica es orientativa y usa escalas combinadas aproximadas. Solo estatal es una simulación: aplica únicamente los tipos estatales a la base y al mínimo; conserva los demás supuestos. No equivale al IRPF total.'}
         </span>
       </div>
 

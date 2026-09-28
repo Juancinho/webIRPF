@@ -169,7 +169,11 @@ export const PREGUNTAS = [
   },
   {
     q: '¿Qué es el IRPF y cómo funciona?',
-    a: 'El Impuesto sobre la Renta de las Personas Físicas es un impuesto personal, progresivo y directo sobre la renta obtenida en España (arts. 1-14 LIRPF). La progresividad implica que el tipo marginal aumenta por tramos: cada tipo se aplica únicamente a la parte de base comprendida en su intervalo. Para trabajadores por cuenta ajena, el pagador practica retenciones a cuenta e ingresa su importe en la Agencia Tributaria.\n\nEn el modelo de esta publicación, del rendimiento íntegro se restan cotizaciones y gastos deducibles para obtener el rendimiento neto; después se aplican las reducciones correspondientes. La escala se aplica a la base y el mínimo personal y familiar interviene mediante el procedimiento legal de cálculo de la cuota.'
+    a: 'El Impuesto sobre la Renta de las Personas Físicas es un impuesto personal, progresivo y directo sobre la renta obtenida en España (arts. 1-14 LIRPF). La progresividad implica que cada tipo se aplica únicamente a la parte de base comprendida en su intervalo. Para trabajadores por cuenta ajena, el pagador practica retenciones a cuenta e ingresa su importe en la Agencia Tributaria.\n\nLa escala del art. 101 se usa para determinar el tipo de retención; la cuota anual de la renta general se calcula con la escala estatal del art. 63 y la autonómica correspondiente, además de mínimos y deducciones. La cifra «IRPF estimado» de FiscalScope es orientativa: no es ni la retención oficial exacta de una empresa ni la cuota definitiva de una declaración.'
+  },
+  {
+    q: '¿Lo que me retienen en la nómina es lo que pago finalmente de IRPF?',
+    a: 'No necesariamente. La retención en nómina es un anticipo del impuesto. En la declaración se calcula la cuota anual conforme a todas las rentas y circunstancias que correspondan y se descuentan las retenciones y demás pagos a cuenta ya realizados. La diferencia puede dar un importe a ingresar o a devolver. La escala de retenciones del art. 101 y las escalas estatal y autonómica de la cuota anual responden a cálculos distintos. FiscalScope no calcula esa regularización definitiva.'
   },
   {
     q: '¿Qué es la reducción Art.20 y por qué es tan importante?',
@@ -177,7 +181,7 @@ export const PREGUNTAS = [
   },
   {
     q: 'Diferencia entre Mínimo Personal y Mínimo Exento',
-    a: 'Son conceptos distintos. El mínimo personal y familiar interviene en el cálculo de la cuota para reconocer una parte de renta destinada a necesidades básicas. El límite excluyente de la obligación de retener determina cuándo el pagador debe practicar retención, según la situación personal y familiar.\n\nSuperar el límite de retención no significa que todo el salario pase a tributar de una vez: se aplica el procedimiento completo de cálculo y sus límites. Por eso conviene distinguir entre retención en nómina, cuota anual y mínimo personal.'
+    a: 'Son conceptos distintos. El mínimo personal y familiar representa renta destinada a necesidades básicas tuyas y, cuando corresponde, de hijos o ascendientes. Para una persona sin cargas, el mínimo estatal general es 5.550 € desde 2015. No recibes esos 5.550 € ni se restan íntegros del impuesto. Se calcula la cuota que generarían al aplicarles la escala desde su primer tramo y esa cuota se descuenta de la calculada sobre la base. Por ejemplo, en la escala estatal actual, 5.550 € × 9,5 % = 527,25 € de cuota del mínimo estatal. La comunidad calcula por separado su parte y puede tener otro mínimo.\n\nEl mínimo exento o límite excluyente de retención es otra cosa: ayuda a determinar si el pagador debe retener en la nómina. Superarlo no significa que todo el salario pase a tributar de una vez. La retención mensual, la cuota anual y el mínimo personal responden a reglas diferentes.'
   },
   {
     q: '¿Qué son los 2.000€ de gastos deducibles (Art.19.2.f)?',

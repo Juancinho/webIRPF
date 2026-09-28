@@ -1,5 +1,6 @@
 import { Fragment } from 'react';
 import { ANIO, DESTACADOS } from './contenido.js';
+import EscalasLegales from './EscalasLegales.jsx';
 
 /** `**negrita**` → <strong>. Es la única marca que usan los textos. */
 function Rico({ children }) {
@@ -67,6 +68,8 @@ export default function Aterrizaje({ pagina }) {
             <a href={informe.ancla}>{informe.texto} ↓</a>
           </p>
 
+          {pagina.ruta === '/tramos-irpf-2026/' && <EscalasLegales />}
+
           {secciones.map(s => (
             <div key={s.titulo} className="fs-lp-seccion">
               <h2>{s.titulo}</h2>
@@ -96,6 +99,7 @@ export default function Aterrizaje({ pagina }) {
               )}
             </div>
           ))}
+
 
           {preguntas.length > 0 && (
             <div className="fs-lp-seccion fs-lp-preguntas">
@@ -137,9 +141,10 @@ export default function Aterrizaje({ pagina }) {
           </nav>
 
           <p className="fs-note fs-lp-aviso">
-            Cálculo orientativo con los parámetros oficiales de 2026 (BOE, TGSS, AEAT): retención
-            estimada para un asalariado sin otras rentas. La declaración de la renta puede
-            regularizarla. No es asesoramiento fiscal.
+            Cálculo orientativo con parámetros oficiales de 2026 (BOE, TGSS, AEAT) y una
+            escala combinada aproximada para estimar el descuento de IRPF de un asalariado sin otras
+            rentas. No reproduce la retención oficial exacta ni calcula la cuota definitiva de la
+            declaración. No es asesoramiento fiscal.
             {fuente && (
               <>
                 {' '}Fuente de los datos:{' '}

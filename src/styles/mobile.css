@@ -114,7 +114,12 @@
 
 .fs-cm-barra {
   padding: 0 var(--gutter);
+  display: flex;
+  align-items: center;
 }
+
+.fs-cm-barra .fs-cinta-ocultar { order: 2; flex: 0 0 32px; }
+.fs-cm-barra .fs-cm-cifras { min-width: 0; }
 
 .fs-cm-cifras {
   width: 100%;

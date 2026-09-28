@@ -1,4 +1,6 @@
 // =============================================================================
+
+import { ESCALA_ESTATAL } from './escalasLegales.js';
 // MOTOR FISCAL IRPF 2012-2026  — versión extendida
 // Soporta: asalariado / autónomo · CCAA · tributación conjunta · cargas familiares
 // =============================================================================
@@ -31,27 +33,27 @@ export const REFORMA_ANIOS = [
 export const REGIONES = {
   default: {
     name: 'Estándar / Resto CCAA',
-    desc: 'Aragón, Asturias, Baleares, Cantabria, Castilla-La Mancha, Castilla y León, Extremadura, Galicia, La Rioja, Murcia, Canarias, Ceuta y Melilla. Diferencias menores entre ellas; se aplica la escala promedio estándar.',
+    desc: 'Referencia combinada simplificada basada en los tipos generales de retención del art. 101 LIRPF. No representa exactamente la escala autonómica de ninguna comunidad.',
     tramos2024: null,
   },
   madrid: {
     name: 'C. de Madrid',
-    desc: 'Tras la rebaja de 2023-2024 (Ley 4/2024), Madrid es la CCAA con la fiscalidad más baja del régimen común. Su tipo mínimo baja al 18% y el máximo al 45,5%.',
+    desc: 'El modelo utiliza una escala combinada aproximada. La escala autonómica legal de Madrid, con sus límites propios, puede consultarse en la página de tramos.',
     tramos2024: [[12450,0.18],[17707,0.215],[33007,0.27],[53407,0.355],[60000,0.405],[300000,0.435],[Infinity,0.455]],
   },
   cataluna: {
     name: 'Cataluña',
-    desc: 'Cataluña tiene el tipo marginal máximo más alto (50%) y más tramos que cualquier otra CCAA del régimen común.',
+    desc: 'El modelo utiliza una escala combinada aproximada. La escala autonómica legal de Cataluña tiene sus propios límites.',
     tramos2024: [[12450,0.215],[17707,0.24],[21000,0.265],[33007,0.295],[53407,0.35],[90000,0.415],[120000,0.45],[175000,0.47],[Infinity,0.50]],
   },
   valencia: {
     name: 'C. Valenciana',
-    desc: 'Tipos elevados en tramos altos (hasta 54%). Pequeñas rebajas en tramos bajos desde 2023.',
+    desc: 'El modelo utiliza una escala combinada aproximada. La escala autonómica legal valenciana cambió para 2026 y se muestra por separado en la página de tramos.',
     tramos2024: [[12450,0.195],[20200,0.24],[35200,0.30],[60000,0.37],[120000,0.455],[175000,0.475],[Infinity,0.54]],
   },
   andalucia: {
     name: 'Andalucía',
-    desc: 'Tras la rebaja de 2022-2023 (Ley 7/2022), Andalucía bajó significativamente sus tipos y se sitúa entre las CCAA más competitivas fiscalmente.',
+    desc: 'El modelo utiliza una escala combinada aproximada. La escala autonómica legal andaluza tiene sus propios límites.',
     tramos2024: [[12450,0.185],[20200,0.235],[28000,0.295],[35200,0.305],[60000,0.365],[300000,0.435],[Infinity,0.455]],
   },
   foral: {
@@ -125,6 +127,9 @@ export function reduccionTrabajo(anio, rn) {
   return 0;
 }
 
+// Escala de referencia del simulador. Desde 2021 sus límites y tipos coinciden
+// con la tabla general de retenciones del art. 101 LIRPF; no equivale a la
+// suma legal de la tarifa estatal y cada tarifa autonómica.
 export function getTramosIRPF(anio) {
   if (anio <= 2014) return [[17707,0.2475],[33007,0.30],[53407,0.40],[120000,0.47],[175000,0.49],[300000,0.51],[Infinity,0.52]];
   if (anio === 2015) return [[12450,0.195],[20200,0.245],[34000,0.305],[60000,0.38],[Infinity,0.46]];
@@ -137,6 +142,13 @@ export function getTramosConCCAA(anio, ccaa = 'default') {
   const reg = REGIONES[ccaa];
   if (reg?.tramos2024) return reg.tramos2024;
   return getTramosIRPF(anio);
+}
+
+export function getTramosSoloEstatal(anio) {
+  if (anio < 2015) return null;
+  if (anio === 2015) return [[12450, 0.095], [20200, 0.12], [34000, 0.15], [60000, 0.185], [Infinity, 0.225]];
+  if (anio <= 2020) return [[12450, 0.095], [20200, 0.12], [35200, 0.15], [60000, 0.185], [Infinity, 0.225]];
+  return ESCALA_ESTATAL;
 }
 
 // ── SS tipos ─────────────────────────────────────────────────────────────────
@@ -275,6 +287,7 @@ export function calcularMinimoFamiliar({ nHijos = 0, nHijosMenores3 = 0, nAscend
 export const DEFAULT_OPTS = {
   regimen: 'asalariado',
   ccaa: 'default',
+  modoEscala: 'completa',
   tributacion: 'individual',
   nHijos: 0,
   nHijosMenores3: 0,
@@ -285,11 +298,14 @@ export function calcularNomina(bruto, anio, opts = {}) {
   const {
     regimen = 'asalariado',
     ccaa = 'default',
+    modoEscala = 'completa',
     tributacion = 'individual',
     nHijos = 0, nHijosMenores3 = 0, nAscendientes = 0,
   } = opts;
 
-  const tramos = getTramosConCCAA(anio, ccaa);
+  const tramos = modoEscala === 'solo_estatal' && anio >= 2015
+    ? getTramosSoloEstatal(anio)
+    : getTramosConCCAA(anio, ccaa);
   const minimoPersonal = anio <= 2014 ? 5151 : 5550;
   const minimoFamiliar = calcularMinimoFamiliar({ nHijos, nHijosMenores3, nAscendientes });
   const minimoPersonalYFamiliar = minimoPersonal + minimoFamiliar;

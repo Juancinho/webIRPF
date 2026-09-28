@@ -23,7 +23,7 @@ const HUECO = 2;
  * fuera de la barra, para que se lea de un vistazo y sin descifrar tramas.
  */
 export default function Nomina() {
-  const { bruto, anio, pagas, nomina, marginal, params, smi, vecesSMI, focus, setFocus } = useFiscal();
+  const { bruto, anio, pagas, nomina, marginal, params, smi, vecesSMI, focus, setFocus, opts } = useFiscal();
   const [pinned, setPinned] = useState(null);
   const [tip, setTip] = useState(null);
   const narrow = useNarrow();
@@ -42,7 +42,7 @@ export default function Nomina() {
       sub: `${eur(nomina.salarioNeto / pagas)} al mes en ${pagas} pagas`,
       detalle: {
         titulo: 'Salario neto',
-        texto: 'Lo que efectivamente ingresa en tu cuenta a lo largo del año, antes de la declaración anual de la renta.',
+        texto: 'Neto orientativo después del descuento de IRPF que estima el modelo. La nómina real puede aplicar otra retención y la declaración anual puede regularizarla.',
         formula: `${eur(bruto)} − ${eur(nomina.cotTra)} − ${eur(nomina.irpfFinal)} = ${eur(nomina.salarioNeto)}`,
         fuente: null,
       },
@@ -72,18 +72,17 @@ export default function Nomina() {
     },
     {
       key: 'irpf',
-      label: 'IRPF retenido',
+      label: 'IRPF estimado',
       valor: nomina.irpfFinal,
       color: 'var(--ink)',
-      sub: `Tipo efectivo ${pct(nomina.tipoEfectivoIRPF * 100)} sobre el bruto`,
+      sub: `${pct(nomina.tipoEfectivoIRPF * 100)} del bruto en el modelo`,
       detalle: {
-        titulo: 'IRPF final',
-        texto:
-          'Es la cuota que resulta de aplicar la escala progresiva a tu base imponible, restar la cuota del mínimo personal y familiar y, si procede, la deducción por rendimientos del trabajo. El desglose de abajo lo abre paso a paso.',
-        formula: `Cuota íntegra ${eur(nomina.cuotaIntegra)} − mínimo ${eur(nomina.cuotaMinimo)}${nomina.deduccionSMI > 0 ? ` − deducción ${eur(nomina.deduccionSMI)}` : ''} = ${eur(nomina.irpfFinal)}`,
+        titulo: 'IRPF estimado del modelo',
+        texto: `Es el importe de IRPF que usa la simulación para estimar el neto. ${opts.modoEscala === 'solo_estatal' && anio >= 2015 ? 'El modo solo estatal es un escenario parcial, sin la parte autonómica.' : opts.ccaa === 'default' ? 'El perfil estándar toma como referencia la escala de retenciones del art. 101.' : 'El perfil autonómico usa una escala combinada aproximada.'} No es la retención oficial exacta ni la cuota definitiva de la declaración.`,
+        formula: `Cuota previa ${eur(nomina.cuotaIntegra)} − mínimo ${eur(nomina.cuotaMinimo)}${nomina.deduccionSMI > 0 ? ` − deducción ${eur(nomina.deduccionSMI)}` : ''} → ${eur(nomina.irpfFinal)} estimados tras límites`,
         fuente: {
-          label: 'BOE — LIRPF Ley 35/2006',
-          url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764&p=20260321&tn=1#a63',
+          label: opts.ccaa === 'default' && opts.modoEscala !== 'solo_estatal' ? 'BOE · LIRPF art. 101, escala de retenciones' : 'Escalas y límites del modelo',
+          url: opts.ccaa === 'default' && opts.modoEscala !== 'solo_estatal' ? 'https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764#a101' : '/tramos-irpf-2026/',
         },
       },
     },
@@ -160,10 +159,10 @@ export default function Nomina() {
 
             {nomina.irpfFinal === 0 && bruto > 0 && (
               <div className="fs-rail-item">
-                <span className="fs-stamp">Sin IRPF</span>
+                <span className="fs-stamp">Sin IRPF estimado</span>
                 <p className="fs-note">
-                  A este nivel de renta la cuota resultante es cero: el mínimo personal y familiar
-                  absorbe la cuota íntegra.
+                  El modelo da cero de IRPF a este nivel de renta. Esto no determina por sí solo
+                  la cuota de una declaración anual con otras rentas o circunstancias.
                 </p>
               </div>
             )}
@@ -197,9 +196,10 @@ export default function Nomina() {
                 en la nómina
               </h2>
               <p className="fs-kicker">
-                Primero, la nómina tal como se liquida: salario bruto, cotización del trabajador,
-                retención de IRPF y renta neta. Después ampliaremos el perímetro para incluir el
-                coste laboral que no figura como salario en el recibo.
+                Primero, una nómina orientativa: salario bruto, cotización del trabajador,
+                descuento de IRPF estimado y renta neta. No calcula la retención oficial exacta ni
+                el impuesto definitivo. Después ampliaremos el perímetro para incluir el coste
+                laboral que no figura como salario en el recibo.
               </p>
             </div>
 

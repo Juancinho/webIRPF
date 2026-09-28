@@ -345,7 +345,7 @@ function pasos({ bruto, anio, nomina, params, esAutonomo }) {
           ? `Sobre el rendimiento íntegro se restan ${eur(nomina.gastosFijos)} de gastos deducibles (art. 19.2.f)${art20 > 0 ? ` y ${eur(art20)} de reducción por rendimientos del trabajo (art. 20)` : ', sin reducción del art. 20 a tu nivel de renta'}.`
           : `Antes de 2015 no existían los 2.000 € de gastos deducibles del art. 19.2.f${art20 > 0 ? `; sí se aplica la reducción del art. 20, de ${eur(art20)}` : ''}.`,
         `El resultado, ${eur(nomina.baseImponible)}, es la base imponible: no es dinero que se te descuente, sino la cifra sobre la que se aplica la escala progresiva.`,
-        `Además, la tarifa se aplica separadamente a la base y al mínimo personal y familiar (${eur(nomina.minimoPersonalYFamiliar)}); la diferencia determina la cuota íntegra en este cálculo simplificado.`,
+        `Además, la tarifa del modelo se aplica separadamente a la base y al mínimo personal y familiar (${eur(nomina.minimoPersonalYFamiliar)}); la diferencia da una cuota teórica, todavía antes de deducciones y límites. No es la cuota anual definitiva.`,
       ],
       formula: `${eur(nomina.rnPrevio)} − ${eur(nomina.gastosFijos)} − ${eur(art20)} = ${eur(nomina.baseImponible)}`,
       fuente: { label: 'BOE — LIRPF arts. 19, 20 y 56-61', url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764&p=20260321&tn=1#a20' },
@@ -354,11 +354,11 @@ function pasos({ bruto, anio, nomina, params, esAutonomo }) {
       id: 'F · IRPF y renta neta',
       titulo: 'El resultado del cálculo',
       cuerpo: [
-        `Aplicada la escala y restado el mínimo${nomina.deduccionSMI > 0 ? ` y la deducción por rendimientos del trabajo (${eur(nomina.deduccionSMI)})` : ''}, el IRPF final es ${eur(nomina.irpfFinal)}: un ${pct(nomina.tipoEfectivoIRPF * 100)} de tu bruto.`,
+        `Aplicada la escala del modelo y restado el mínimo${nomina.deduccionSMI > 0 ? ` y la deducción por rendimientos del trabajo (${eur(nomina.deduccionSMI)})` : ''}, el IRPF estimado es ${eur(nomina.irpfFinal)}: un ${pct(nomina.tipoEfectivoIRPF * 100)} de tu bruto. Es una cifra orientativa para este recorrido, no la cuota definitiva de la renta.`,
         `De los ${eur(nomina.costeLab)} que costó tu trabajo, llegan ${eur(nomina.salarioNeto)}: ${pct((nomina.salarioNeto / Math.max(nomina.costeLab, 1)) * 100)} del total.`,
       ],
       formula: `${eur(bruto)} − ${eur(nomina.cotTra)} − ${eur(nomina.irpfFinal)} = ${eur(nomina.salarioNeto)}`,
-      fuente: { label: 'BOE — LIRPF art. 63 (escala)', url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764&p=20260321&tn=1#a63' },
+      fuente: { label: 'BOE · LIRPF arts. 63 y 101 (escalas distintas)', url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764' },
     },
   ];
 }

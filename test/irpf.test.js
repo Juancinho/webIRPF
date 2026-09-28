@@ -5,6 +5,8 @@ import {
   ANIOS,
   REGIONES,
   calcularNomina,
+  getTramosSoloEstatal,
+  getTramosIRPF,
   calcularSSAutonomo,
   calcularTipoMarginal,
   CARGA_PERSONAL_OCDE_2025,
@@ -16,6 +18,7 @@ import {
   percentilDe,
   ULTIMO_ANIO_SALARIAL_OFICIAL,
 } from '../src/engine/irpf.js';
+import { ESCALA_ESTATAL, ESCALAS_AUTONOMICAS_2026 } from '../src/engine/escalasLegales.js';
 
 const closeTo = (actual, expected, tolerance = 0.02) => {
   assert.ok(Math.abs(actual - expected) <= tolerance, `${actual} no está a ±${tolerance} de ${expected}`);
@@ -88,6 +91,27 @@ test('los tipos marginales son finitos en todo el rango de la interfaz', () => {
       assert.ok(Number.isFinite(marginal.tipoMarginalTotal));
       assert.ok(Number.isFinite(marginal.tipoMarginalIRPF));
     }
+  }
+});
+
+test('la vista solo estatal aplica únicamente la tarifa estatal al cálculo simulado', () => {
+  const estatal = calcularNomina(35_000, 2026, { ccaa: 'madrid', modoEscala: 'solo_estatal' });
+  const referencia = calcularNomina(35_000, 2026, { ccaa: 'madrid' });
+  assert.deepEqual(estatal.tramos, getTramosSoloEstatal(2026));
+  assert.notDeepEqual(estatal.tramos, referencia.tramos);
+  closeTo(estatal.cuotaMinimo, 5_550 * 0.095);
+  assert.equal(getTramosSoloEstatal(2014), null);
+  assert.deepEqual(calcularNomina(35_000, 2014, { modoEscala: 'solo_estatal' }).tramos, calcularNomina(35_000, 2014).tramos);
+});
+
+test('la escala de retención de referencia no se confunde con las escalas de cuota anual', () => {
+  assert.notDeepEqual(getTramosIRPF(2026), ESCALA_ESTATAL);
+  assert.deepEqual(getTramosSoloEstatal(2026), ESCALA_ESTATAL);
+  assert.equal(Object.keys(ESCALAS_AUTONOMICAS_2026).length, 4);
+  for (const region of Object.values(ESCALAS_AUTONOMICAS_2026)) {
+    assert.match(region.norma, /art\./);
+    assert.match(region.fuente, /^https:\/\/www\.boe\.es\/.*#a/);
+    assert.equal(region.tramos.at(-1)[0], Infinity);
   }
 });
 

@@ -84,8 +84,8 @@ export function paginaSueldo(bruto) {
       parrafos: [
         `El salario bruto de ${B} paga primero la **cotización del trabajador a la Seguridad Social**: ${eur(n.cotTra)} al año, el ${pct(obtenerParametros(ANIO).tipoTra * 100, 2)} de la base de cotización.`,
         sinIrpf
-          ? `A este nivel de renta **no hay retención de IRPF**: el mínimo personal, la reducción por rendimientos del trabajo${n.deduccionSMI > 0 ? ' y la deducción para salarios cercanos al SMI' : ''} dejan la cuota en cero.`
-          : `Después, la **retención de IRPF**: ${eur(n.irpfFinal)} al año. Sale de aplicar la escala a una base imponible de ${eur(n.baseImponible)} —el bruto menos la cotización, los 2.000 € de gastos deducibles${n.redTrabajo > 0 ? ` y ${eur(n.redTrabajo)} de reducción por rendimientos del trabajo` : ''}— y restar la cuota del mínimo personal (${eur(n.cuotaMinimo)}).`,
+          ? `A este nivel, el **descuento de IRPF estimado por el modelo es cero**: el mínimo personal, la reducción por rendimientos del trabajo${n.deduccionSMI > 0 ? ' y la deducción para salarios cercanos al SMI' : ''} dejan la cuota modelizada en cero. Esto no determina la cuota de una declaración con otras rentas.`
+          : `Después, el **descuento de IRPF estimado por el modelo**: ${eur(n.irpfFinal)} al año. Sale de aplicar la escala simplificada a una base de ${eur(n.baseImponible)} (bruto menos cotización, 2.000 € de gastos deducibles${n.redTrabajo > 0 ? ` y ${eur(n.redTrabajo)} de reducción por rendimientos del trabajo` : ''}) y restar la cuota del mínimo personal (${eur(n.cuotaMinimo)}). No es la retención oficial exacta ni la cuota definitiva de la declaración.`,
         `Lo que queda, **${N}**, es la renta neta: ${eur(mes12)} al mes en 12 pagas o ${eur(mes14)} en 14.`,
       ],
     },
@@ -163,10 +163,10 @@ export function paginaSueldo(bruto) {
         r: `En ${ANIO}, ${eur(mes12)} al mes en 12 pagas o ${eur(mes14)} en 14 pagas, para un asalariado soltero sin hijos con la escala general. Al año son ${N} netos.`,
       },
       {
-        p: `¿Cuánto IRPF se paga con ${B} brutos?`,
+        p: `¿Cuánto IRPF estima descontar la calculadora con ${B} brutos?`,
         r: sinIrpf
-          ? `Ninguno: a este nivel la retención de IRPF es cero. Sólo se descuenta la cotización a la Seguridad Social, ${eur(n.cotTra)} al año.`
-          : `${eur(n.irpfFinal)} al año, un tipo efectivo del ${pct(n.tipoEfectivoIRPF * 100)} sobre el bruto. A eso se suman ${eur(n.cotTra)} de cotización a la Seguridad Social.`,
+          ? `Cero en este modelo: sólo descuenta ${eur(n.cotTra)} anuales de cotización a la Seguridad Social. La retención real y la cuota anual pueden diferir.`
+          : `${eur(n.irpfFinal)} al año, el ${pct(n.tipoEfectivoIRPF * 100)} del bruto, además de ${eur(n.cotTra)} de cotización. Es una estimación para el neto, no el impuesto definitivo de la declaración.`,
       },
       {
         p: `¿Cuánto le cuesta a la empresa un sueldo de ${B}?`,
@@ -252,50 +252,51 @@ function paginaTramos() {
     tipo: 'tema',
     ruta: '/tramos-irpf-2026/',
     estado: { bruto: 35000 },
-    titulo: `Tramos del IRPF ${ANIO}: escala, tipos y ejemplos de cálculo`,
-    descripcion: `Los seis tramos del IRPF en ${ANIO}, del 19 % al 47 %, con la cuota que genera cada base imponible y por qué el tipo del último tramo nunca se aplica al sueldo entero.`,
+    titulo: `Tramos del IRPF ${ANIO}: retención, escala estatal y autonómica`,
+    descripcion: `Diferencia entre la escala de retenciones de la nómina y las escalas estatal y autonómicas que intervienen en la declaración anual del IRPF de ${ANIO}.`,
     miga: [{ nombre: 'Inicio', ruta: '/' }, { nombre: `Tramos del IRPF ${ANIO}`, ruta: '/tramos-irpf-2026/' }],
-    sello: `IRPF ${ANIO} · escala general`,
+    sello: `IRPF ${ANIO} · dos partes`,
     h1: `Los tramos del IRPF en ${ANIO}`,
-    entradilla: `La escala general del IRPF —parte estatal más parte autonómica común— tiene seis tramos, del **19 %** al **47 %**. Cada tipo se aplica sólo a la porción de base imponible que cae dentro de su tramo.`,
+    entradilla: `Hay que separar **lo que te retienen en la nómina** de **lo que resulta al hacer la declaración anual**. La escala del 19 % al 47 % del art. 101 sirve para calcular retenciones a cuenta. Para la cuota anual de la renta general intervienen una escala estatal y otra autonómica, con límites que no siempre coinciden. FiscalScope hace una estimación orientativa del descuento en nómina; no calcula aquí la cuota definitiva de la declaración.`,
     cifras: [
-      { k: 'Tipo mínimo', v: pct(tramos[0][1] * 100, 0), nota: `hasta ${eur(tramos[0][0])}` },
-      { k: 'Tipo máximo', v: pct(tramos[tramos.length - 1][1] * 100, 0), nota: `desde ${eur(tramos[tramos.length - 2][0])}` },
-      { k: 'Mínimo personal', v: eur(obtenerParametros(ANIO).irpfMinimo), nota: 'tributa al 0 %' },
+      { k: 'Primer tipo estatal', v: '9,50 %', nota: 'hasta 12.450 €' },
+      { k: 'Último tipo estatal', v: '24,50 %', nota: 'desde 300.000 €' },
+      { k: 'Mínimo personal estatal', v: eur(obtenerParametros(ANIO).irpfMinimo), nota: 'reduce la cuota mediante la escala' },
     ],
     secciones: [
       {
-        titulo: `La escala de ${ANIO}`,
-        parrafos: ['La escala no ha cambiado desde 2021, cuando se añadió el tramo del 47 % para bases de más de 300.000 €. Lo que sí cambia cada año son los mínimos, las reducciones y las deducciones que determinan a qué base se aplica.'],
+        titulo: `La escala de retenciones que toma como referencia el modelo estándar`,
+        parrafos: ['La siguiente tabla reproduce los límites y tipos de la escala general de retención del art. 101. Su encabezado legal habla de «base para calcular el tipo de retención», que no debe confundirse sin más con la base liquidable general de la declaración. FiscalScope utiliza estos tipos sobre una base simplificada para estimar el descuento de IRPF en el perfil estándar; no reproduce el algoritmo completo de retenciones de la AEAT. Las escalas legales para calcular la cuota anual se muestran arriba.'],
         tabla: {
-          cabeceras: ['Base imponible', 'Tipo del tramo'],
+          cabeceras: ['Base para calcular el tipo de retención', 'Tipo del tramo'],
           filas: tramos.map(([lim, t], k) => [
             `${k === 0 ? '0 €' : eur(tramos[k - 1][0])} — ${Number.isFinite(lim) ? eur(lim) : 'en adelante'}`,
             pct(t * 100, 0),
           ]),
-          nota: 'Escala combinada estatal y autonómica general. Desde 2024 varias comunidades aplican tipos autonómicos propios.',
+          nota: 'Fuente: LIRPF art. 101. Esta es una escala de retención, no una tabla de la cuota anual. Su aplicación a la base simplificada del simulador es un cálculo propio orientativo. Los perfiles autonómicos de la calculadora usan otras escalas combinadas aproximadas.',
         },
       },
       {
-        titulo: 'Cuánto genera cada base',
+        titulo: 'Ejemplos dentro del modelo, no cuotas definitivas',
         parrafos: [
-          'La cuota íntegra suma lo que genera cada tramo. Una base de 35.000 € no paga el 30 % de 35.000 €: paga el 19 % de los primeros 12.450 €, el 24 % de los 7.750 siguientes y el 30 % de lo que queda.',
-          `A esa cuota se le resta después la cuota del mínimo personal (${eur(cuota(5550))} para una persona sin cargas), que es la parte de la renta que la ley considera necesaria para vivir.`,
+          'En el modelo estándar, la cuota previa al mínimo suma lo que genera cada tramo de la escala de referencia. Una base simplificada de 35.000 € no se multiplica entera por el 30 %: se aplica el 19 % a los primeros 12.450 €, el 24 % a los 7.750 € siguientes y el 30 % al resto. Esto explica la progresividad del modelo, no calcula la cuota final de la declaración.',
+          `El mínimo personal y familiar representa la parte de renta destinada a las necesidades básicas del contribuyente y de los familiares que dan derecho a él. No son ${eur(5550)} que Hacienda entrega ni ${eur(5550)} que se restan directamente del impuesto. FiscalScope calcula cuánto impuesto produciría ese mínimo con **la misma escala combinada de referencia** y resta esa cuota: ${eur(5550)} × 19 % = ${eur(cuota(5550), 2)} en el caso estándar sin cargas. En la declaración real se hace el cálculo estatal y el autonómico por separado; algunas comunidades tienen, además, mínimos autonómicos distintos.`,
         ],
         tabla: {
-          cabeceras: ['Base imponible', 'Cuota íntegra', 'Tipo medio sobre la base'],
+          cabeceras: ['Base simplificada del modelo', 'Cuota previa al mínimo', 'Tipo medio sobre esa base'],
           filas: bases.map(b => [eur(b), eur(cuota(b)), pct((cuota(b) / b) * 100)]),
         },
       },
       {
         titulo: 'De la base al sueldo',
         parrafos: [
-          `La base imponible no es el sueldo bruto. Con 35.000 € brutos, la base queda en ${eur(ejemplo.baseImponible)} tras restar la cotización y los gastos deducibles, y el IRPF final es ${eur(ejemplo.irpfFinal)}: un **${pct(ejemplo.tipoEfectivoIRPF * 100)}** del bruto, aunque el último euro caiga en el tramo del ${pct(ejemplo.tipoMargIRPF * 100, 0)}.`,
+          `La base usada por el simulador no es el sueldo bruto. Con 35.000 € brutos, queda en ${eur(ejemplo.baseImponible)} tras restar la cotización y los gastos deducibles. El descuento de IRPF estimado por el modelo es ${eur(ejemplo.irpfFinal)}, un **${pct(ejemplo.tipoEfectivoIRPF * 100)}** del bruto. No es una previsión exacta de la retención de tu empresa ni la cuota definitiva que resultará en la declaración.`,
         ],
       },
     ],
     preguntas: [
-      { p: `¿Cuáles son los tramos del IRPF en ${ANIO}?`, r: tramos.map(([lim, t], k) => `${pct(t * 100, 0)} ${k === 0 ? `hasta ${eur(lim)}` : Number.isFinite(lim) ? `de ${eur(tramos[k - 1][0])} a ${eur(lim)}` : `desde ${eur(tramos[k - 1][0])}`}`).join('; ') + '.' },
+      { p: `¿Hay una única tabla de tramos para toda España en ${ANIO}?`, r: 'No. Hay una escala estatal y una escala autonómica propia de cada comunidad. El 19 %–47 % que se ve en la referencia estándar es una simplificación del modelo, no una tarifa legal universal.' },
+      { p: '¿Por qué lo retenido en nómina puede diferir de lo que debo por el año?', r: 'La retención es un pago anticipado. La declaración calcula la cuota anual con las reglas que correspondan a tus rentas y circunstancias y después descuenta las retenciones ya practicadas. Por eso el resultado puede ser a ingresar o a devolver. FiscalScope no calcula aquí esa regularización definitiva.' },
       { p: '¿Si paso de tramo cobro menos?', r: 'No. Pasar de tramo sólo cambia el tipo de los euros que caen en el tramo nuevo; los anteriores siguen tributando igual. Una subida de sueldo siempre deja más neto que antes.' },
     ],
     enlaces: TEMAS_ENLACES.filter(t => t.ruta !== '/tramos-irpf-2026/'),
@@ -464,11 +465,11 @@ function paginaSMI() {
     ruta: '/smi-2026-neto/',
     estado: { bruto: Math.round(smi) },
     titulo: `SMI ${ANIO} en neto: ${eur(n.salarioNeto)} al año, ${eur(n.salarioNeto / 14)} al mes en 14 pagas`,
-    descripcion: `El salario mínimo de ${ANIO} es de ${eur(smi)} brutos al año (${eur(smi / 14)} en 14 pagas). En neto quedan ${eur(n.salarioNeto)}: no paga IRPF y cotiza ${eur(n.cotTra)} a la Seguridad Social.`,
+    descripcion: `El salario mínimo de ${ANIO} es de ${eur(smi)} brutos al año (${eur(smi / 14)} en 14 pagas). Neto orientativo: ${eur(n.salarioNeto)}, con IRPF estimado nulo y ${eur(n.cotTra)} de cotización.`,
     miga: [{ nombre: 'Inicio', ruta: '/' }, { nombre: `SMI ${ANIO}`, ruta: '/smi-2026-neto/' }],
     sello: `Salario mínimo ${ANIO}`,
     h1: `El salario mínimo de ${ANIO}, en neto`,
-    entradilla: `El SMI de ${ANIO} es de **${eur(smi)} brutos al año**: ${eur(smi / 14)} al mes en 14 pagas. Quien lo cobra **no paga IRPF** y, tras la cotización a la Seguridad Social, recibe **${eur(n.salarioNeto)} netos**: ${eur(n.salarioNeto / 14)} por paga.`,
+    entradilla: `El SMI de ${ANIO} es de **${eur(smi)} brutos al año**: ${eur(smi / 14)} al mes en 14 pagas. En el caso simplificado de FiscalScope, el **descuento de IRPF estimado es cero** y, tras la cotización a la Seguridad Social, quedan **${eur(n.salarioNeto)} netos orientativos**: ${eur(n.salarioNeto / 14)} por paga. La cuota anual depende de todas las rentas y circunstancias.`,
     cifras: [
       { k: 'SMI bruto anual', v: eur(smi) },
       { k: 'Neto anual', v: eur(n.salarioNeto), destacada: true },
@@ -477,7 +478,7 @@ function paginaSMI() {
     ],
     secciones: [
       {
-        titulo: 'Por qué no paga IRPF',
+        titulo: 'Por qué el modelo estima cero de IRPF',
         parrafos: [
           `El mínimo personal (5.550 €), la reducción por rendimientos del trabajo del artículo 20 y, desde 2025, una deducción específica para salarios cercanos al SMI (${eur(n.deduccionSMI)} en ${ANIO}) dejan la cuota en cero. La deducción se reduce a partir del SMI y desaparece en torno a los ${eur(smi + n.deduccionSMI / 0.2)} brutos.`,
           `La cotización del trabajador sí se paga: ${eur(n.cotTra)} al año. La empresa, además, cotiza ${eur(n.cotEmp)}, así que un puesto con el salario mínimo cuesta ${eur(n.costeLab)}.`,
@@ -491,7 +492,7 @@ function paginaSMI() {
     ],
     preguntas: [
       { p: `¿Cuánto es el SMI ${ANIO} en neto?`, r: `${eur(n.salarioNeto)} al año, ${eur(n.salarioNeto / 14)} por paga en 14 pagas o ${eur(n.salarioNeto / 12)} en 12.` },
-      { p: '¿El salario mínimo paga IRPF?', r: `No. En ${ANIO} la retención de IRPF sobre el SMI es cero; sólo se descuenta la cotización a la Seguridad Social.` },
+      { p: '¿El salario mínimo tiene retención de IRPF?', r: `En este caso simplificado de ${ANIO}, el descuento de IRPF estimado es cero y se descuenta la cotización a la Seguridad Social. Una declaración con otras rentas o circunstancias debe calcularse por separado.` },
     ],
     enlaces: TEMAS_ENLACES.filter(t => t.ruta !== '/smi-2026-neto/'),
     informe: { ancla: '#nomina', texto: 'Ver la nómina del salario mínimo, paso a paso' },

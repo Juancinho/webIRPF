@@ -39,6 +39,17 @@ export default function Desglose() {
 
   const limiteActivo = nomina.limiteRetencion < nomina.cuotaSMI && nomina.cuotaSMI > 0;
   const escalaCuota = Math.max(nomina.cuotaIntegra, nomina.minimoPersonalYFamiliar, 1);
+  const nombreEscala = opts.modoEscala === 'solo_estatal' && anio >= 2015
+    ? 'escala estatal del año seleccionado'
+    : 'escala combinada del perfil seleccionado';
+  const partesMinimo = [];
+  let inicioMinimo = 0;
+  for (const [limite, tipo] of nomina.tramos) {
+    const importe = Math.max(0, Math.min(nomina.minimoPersonalYFamiliar, limite) - inicioMinimo);
+    if (importe > 0) partesMinimo.push(`${eur(importe)} × ${pct(tipo * 100)}`);
+    inicioMinimo = limite;
+    if (limite >= nomina.minimoPersonalYFamiliar) break;
+  }
 
   /* ── la cotización, concepto a concepto ───────────────────────────────
      El tipo agregado (32,15 % la empresa, 6,45 % tú) no explica nada por sí
@@ -144,7 +155,7 @@ export default function Desglose() {
     },
     {
       titulo: 'Lo que se descuenta en la nómina',
-      intro: 'La cotización del trabajador y la retención de IRPF son conceptos distintos, se calculan con bases distintas y se ingresan en organismos distintos.',
+      intro: 'La cotización del trabajador y el descuento estimado de IRPF son conceptos distintos. La retención real la calcula e ingresa el pagador; esta figura muestra una aproximación.',
       escala: nomina.costeLab,
       escalaLabel: 'coste laboral',
       filas: [
@@ -242,14 +253,14 @@ export default function Desglose() {
       escalaLabel: 'cuota íntegra y mínimo',
       filas: [
         {
-          flujo: 'total', tipo: 'op', k: 'J', label: 'Cuota íntegra por tramos', valor: nomina.cuotaIntegra, suma: true,
+          flujo: 'total', tipo: 'op', k: 'J', label: 'Cuota previa por tramos del modelo', valor: nomina.cuotaIntegra, suma: true,
           sub: `${tramos.length} tramo${tramos.length > 1 ? 's' : ''} aplicados sobre ${eur(nomina.baseImponible)}`,
           formulas: [
             ['J = Σ tramos', 'cada tipo, sólo sobre la parte de base que cae en su tramo'],
             ['J', tramos.map(t => `${eur(t.dentro)} × ${pct(t.tipo * 100)}`).join('  +  ') + ` = ${eur(nomina.cuotaIntegra)}`],
           ],
           texto: 'Ningún tipo se aplica nunca a todo tu sueldo: sólo al tramo de base que le corresponde.',
-          fuente: ['BOE — LIRPF art. 63', `${BOE}#a63`],
+          fuente: [opts.modoEscala === 'solo_estatal' && anio >= 2015 ? 'BOE · LIRPF art. 63' : 'Modelo orientativo · BOE art. 101 y leyes autonómicas', `${BOE}#${opts.modoEscala === 'solo_estatal' && anio >= 2015 ? 'a63' : 'a101'}`],
           tabla: {
             cabeceras: ['Tramo de base', 'Tu base dentro', 'Tipo', 'Cuota que genera'],
             filas: tramos.map(t => [
@@ -258,16 +269,16 @@ export default function Desglose() {
               pct(t.tipo * 100),
               eur(t.cuota),
             ]),
-            total: ['Cuota íntegra', '', '', eur(nomina.cuotaIntegra)],
+            total: ['Cuota previa del modelo', '', '', eur(nomina.cuotaIntegra)],
           },
         },
         {
           flujo: 'ref', tipo: 'op', k: 'I', label: 'Mínimo personal y familiar', valor: nomina.minimoPersonalYFamiliar, hueco: true,
-          sub: 'Magnitud legal que se convierte en cuota y se resta',
+          sub: 'Parte de renta protegida por las necesidades personales y familiares',
           formulas: [
             ['I', `${eur(nomina.minimoPersonal)} personal${nomina.minimoFamiliar > 0 ? ` + ${eur(nomina.minimoFamiliar)} familiar` : ''} = ${eur(nomina.minimoPersonalYFamiliar)}`],
           ],
-          texto: `No se resta directamente de la base: se le aplica la escala y la cuota resultante se descuenta después, conforme al procedimiento de los arts. 56–61.${opts.nHijos > 0 ? ` Tus ${opts.nHijos} hijo${opts.nHijos > 1 ? 's' : ''} a cargo incorporan ${eur(nomina.minimoFamiliar)} al mínimo familiar.` : ''}`,
+          texto: `Es la cantidad que la ley reserva para las necesidades básicas de la persona y, si procede, de hijos o ascendientes a cargo. No es dinero que recibas ni una resta directa de ${eur(nomina.minimoPersonalYFamiliar)} en tu impuesto. En este modelo se calcula la cuota que generaría esa cantidad y se descuenta de la cuota previa J.${opts.nHijos > 0 ? ` Tus ${opts.nHijos} hijo${opts.nHijos > 1 ? 's' : ''} a cargo añaden ${eur(nomina.minimoFamiliar)} al mínimo familiar.` : ''} En una declaración real, la parte estatal y la autonómica se calculan por separado y la comunidad puede fijar un mínimo distinto.`,
           fuente: ['BOE — LIRPF arts. 56-61', `${BOE}#a57`],
           tabla: nomina.minimoFamiliar > 0
             ? {
@@ -284,11 +295,11 @@ export default function Desglose() {
           flujo: 'resta', tipo: 'op', k: 'K', label: 'Cuota del mínimo personal y familiar', valor: -nomina.cuotaMinimo,
           sub: 'Se resta de la cuota, no de la base',
           formulas: [
-            ['K = escala(I)', `la misma escala aplicada a ${eur(nomina.minimoPersonalYFamiliar)} da ${eur(nomina.cuotaMinimo)}`],
-            ['J − K', `${eur(nomina.cuotaIntegra)} − ${eur(nomina.cuotaMinimo)} = ${eur(nomina.cuotaTeorica)}`],
+            ['K = escala(I)', `${partesMinimo.join(' + ')} = ${eur(nomina.cuotaMinimo, 2)}`],
+            ['J − K', `${eur(nomina.cuotaIntegra, 2)} − ${eur(nomina.cuotaMinimo, 2)} = ${eur(nomina.cuotaTeorica, 2)}`],
           ],
-          texto: `La misma escala aplicada a ${eur(nomina.minimoPersonalYFamiliar)} produce ${eur(nomina.cuotaMinimo)}.`,
-          fuente: ['BOE — LIRPF art. 63', `${BOE}#a63`],
+          texto: `«La misma escala» significa los tipos progresivos que acabamos de aplicar a tu base para obtener J, pero ahora empezando de cero y aplicándolos al mínimo de ${eur(nomina.minimoPersonalYFamiliar)}. En tu perfil es la ${nombreEscala}. ${partesMinimo.length === 1 ? 'Todo el mínimo cabe en el primer tramo.' : 'El mínimo alcanza varios tramos, así que se reparte entre ellos.'} La operación concreta es ${partesMinimo.join(' + ')} = ${eur(nomina.cuotaMinimo, 2)}. Esa es la cuota K que se resta de J.`,
+          fuente: [opts.modoEscala === 'solo_estatal' && anio >= 2015 ? 'BOE · LIRPF art. 63' : 'Modelo orientativo · BOE art. 101 y leyes autonómicas', `${BOE}#${opts.modoEscala === 'solo_estatal' && anio >= 2015 ? 'a63' : 'a101'}`],
         },
         ...(nomina.deduccionSMI > 0
           ? [{
@@ -312,13 +323,15 @@ export default function Desglose() {
             }]
           : []),
         {
-          flujo: 'total', tipo: 'hito', k: 'N', label: 'IRPF final', valor: nomina.irpfFinal,
-          sub: `Tipo efectivo ${pct(nomina.tipoEfectivoIRPF * 100)} sobre el bruto`,
+          flujo: 'total', tipo: 'hito', k: 'N', label: 'IRPF estimado del modelo', valor: nomina.irpfFinal,
+          sub: `${pct(nomina.tipoEfectivoIRPF * 100)} del bruto en el modelo`,
           formulas: [
             ['N = mín(L, M)', 'la cuota calculada, con el tope reglamentario de retención'],
             ['Tipo efectivo', `${eur(nomina.irpfFinal)} ÷ ${eur(bruto)} = ${pct(nomina.tipoEfectivoIRPF * 100)}`],
           ],
-          texto: 'Retención anual estimada con los datos del perfil. La declaración puede regularizarla al incorporar el resto de circunstancias fiscales.',
+          texto: esAutonomo
+            ? 'Estimación simplificada del IRPF de esta actividad. No es una retención de nómina ni la cuota definitiva de la declaración.'
+            : 'Descuento anual orientativo para estimar tu neto. No reproduce exactamente el cálculo de retenciones de la empresa ni calcula la cuota definitiva de la declaración; las retenciones reales se descuentan al liquidar el impuesto.',
         },
       ],
     },

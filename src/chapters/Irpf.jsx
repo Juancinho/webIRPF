@@ -22,7 +22,8 @@ const BASE_Y = 250;
  * FIG. 09 el simulador de subida.
  */
 export default function Irpf() {
-  const { anio, nomina, marginal } = useFiscal();
+  const { anio, nomina, marginal, opts } = useFiscal();
+  const soloEstatal = opts.modoEscala === 'solo_estatal' && anio >= 2015;
   const [hover, setHover] = useState(null);
   const narrow = useNarrow();
   const W = narrow ? ANCHO_MOVIL : 880;
@@ -94,18 +95,18 @@ export default function Irpf() {
             <div className="fs-rail-item">
               <span className="fs-stamp">Escala aplicada</span>
               <p className="fs-note">
-                {anio >= 2024
-                  ? 'Estatal + autonómica, según el perfil.'
-                  : 'Estatal estándar: antes de 2024 las divergencias autonómicas eran menores.'}
+                {soloEstatal
+                  ? 'Solo escala estatal. Simulación, no IRPF total.'
+                  : 'Escala combinada orientativa del modelo. Los límites legales estatales y autonómicos no siempre coinciden.'}
               </p>
               <p className="fs-source">
                 Fuente ·{' '}
                 <a
-                  href="https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764&p=20260321&tn=1#a63"
+                  href={`https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764#${soloEstatal ? 'a63' : 'a101'}`}
                   target="_blank"
                   rel="noreferrer noopener"
                 >
-                  BOE — LIRPF art. 63
+                  BOE · LIRPF art. {soloEstatal ? '63' : '101'}
                 </a>
               </p>
             </div>
@@ -132,7 +133,7 @@ export default function Irpf() {
               title="Tu base imponible termina dentro de un tramo, no en la cima de la escala"
               sub={`${anio} · base imponible ${eur(base)} · la altura de cada columna es su tipo, el ancho su tramo de renta`}
               legend={`Una marca = ${UNIT} € de base imponible · marcas llenas = renta tuya dentro del tramo · marcas huecas = capacidad del tramo que no alcanzas`}
-              source="Fuente · BOE · LIRPF art. 63 · escala combinada"
+              source={soloEstatal ? 'Fuente · BOE · LIRPF art. 63 · escala estatal' : 'Fuente · BOE · LIRPF art. 101 y leyes autonómicas · combinación aproximada de FiscalScope'}
               summary={conDatos
                 .map(b => `Tramo ${pct(b.tipo * 100)}: ${eur(b.dentro)} dentro, cuota ${eur(b.cuota)}`)
                 .join('. ')}
@@ -257,12 +258,16 @@ export default function Irpf() {
               </ChartFrame>
 
               <p className="fs-note" style={{ marginTop: 14 }}>
-                Cuota íntegra <strong>{eur(nomina.cuotaIntegra)}</strong> − cuota del mínimo personal
-                y familiar <strong>{eur(nomina.cuotaMinimo)}</strong>
-                {nomina.deduccionSMI > 0 && (
-                  <> − deducción por rendimientos del trabajo <strong>{eur(nomina.deduccionSMI)}</strong></>
-                )}{' '}
-                = IRPF <strong>{eur(nomina.irpfFinal)}</strong>
+                Cuota previa del modelo <strong>{eur(nomina.cuotaIntegra)}</strong> menos cuota del
+                mínimo personal y familiar <strong>{eur(nomina.cuotaMinimo)}</strong> da una cuota
+                teórica de <strong>{eur(nomina.cuotaTeorica)}</strong>. Tras las deducciones y el
+                límite de retención que procedan, el descuento de IRPF estimado es{' '}
+                <strong>{eur(nomina.irpfFinal)}</strong>. No es la cuota definitiva de la declaración.
+              </p>
+              <p className="fs-note">
+                El mínimo personal y familiar no se resta en euros del impuesto. Se calcula cuánto
+                gravaría esta misma escala a ese mínimo y esa cuota se descuenta de la cuota íntegra.
+                {soloEstatal && ' Aquí solo se muestra la parte estatal; no es el IRPF real completo.'}
               </p>
             </Figure>
 

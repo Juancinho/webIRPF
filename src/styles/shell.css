@@ -420,6 +420,36 @@
   transform: none;
 }
 
+.fs-cinta-mostrar {
+  position: fixed;
+  right: var(--gutter);
+  bottom: max(0px, env(safe-area-inset-bottom));
+  z-index: 45;
+  border: 1px solid var(--rule);
+  border-bottom: 0;
+  border-radius: 8px 8px 0 0;
+  background: var(--bone-raised);
+  color: var(--ink);
+  padding: 9px 14px;
+  font: 600 11px var(--sans);
+  cursor: pointer;
+}
+
+.fs-cinta-ocultar {
+  border: 0;
+  background: transparent;
+  color: var(--ink-4);
+  font: 400 23px var(--sans);
+  cursor: pointer;
+  min-width: 32px;
+  min-height: 36px;
+}
+
+.fs-cinta-ocultar:hover,
+.fs-cinta-ocultar:focus-visible {
+  color: var(--ink);
+}
+
 .fs-cinta-inner {
   max-width: var(--page-max);
   margin: 0 auto;

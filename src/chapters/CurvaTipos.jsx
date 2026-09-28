@@ -5,7 +5,7 @@ import Figure from '../figures/Figure';
 import ChartFrame from '../figures/ChartFrame';
 import { useDomainZoom } from '../figures/useDomainZoom';
 import { Label } from '../figures/marks';
-import { linear, polyline, round, ticks } from '../figures/scale';
+import { linear, polyline, round, ticks, valorEn } from '../figures/scale';
 import { eur, pct } from '../utils/format';
 import { ANCHO_MOVIL, useNarrow } from '../hooks/useNarrow';
 
@@ -98,8 +98,12 @@ export default function CurvaTipos() {
 
   const marcasX = ticks(zoom.domain[0], zoom.domain[1], marcas);
 
+  /* Cada rótulo cuelga de su curva en el borde derecho **visible**: al
+     ampliar o desplazar, ese borde es zoom.domain[1], no el último dato. */
+  const borde = l => valorEn(serie, p => p.b, p => p[l.k], zoom.domain[1]);
+
   const rotulos = separarRotulos(
-    LINEAS.map(l => ({ k: l.k, y: y(serie[serie.length - 1][l.k]) })),
+    LINEAS.map(l => ({ k: l.k, y: y(borde(l)) })),
     Y0 + 14,
     Y1 - 4
   );
@@ -170,7 +174,7 @@ export default function CurvaTipos() {
         {/* etiquetas directas, siempre fuera del área recortada y separadas
             entre sí: a la derecha del eje las tres curvas llegan muy juntas */}
         {!narrow && LINEAS.map(l => {
-          const ultimo = serie[serie.length - 1][l.k];
+          const ultimo = borde(l);
           const yR = rotulos[l.k];
           return (
             <g key={l.k}>
