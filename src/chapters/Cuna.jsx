@@ -50,9 +50,9 @@ export default function Cuna() {
             de coste laboral
           </h2>
           <p className="fs-kicker">
-            La cuña fiscal mide la diferencia entre el coste laboral total y la renta neta. La
-            expresamos sobre cien euros para separar sus componentes y para comparar el mismo
-            indicador, con una metodología homogénea, entre países.
+            La cuña fiscal es la parte del coste de tu puesto que no llega a tu cuenta. Incluye el
+            IRPF estimado y {nomina.regimen === 'autonomo' ? 'tu cuota de autónomos' : 'las cotizaciones que pagáis tú y la empresa'}. Aquí dividimos el coste
+            laboral en cien partes para ver cuánto representa cada concepto.
           </p>
         </div>
 
@@ -80,9 +80,10 @@ export default function Cuna() {
             <div className="fs-rail-item">
               <span className="fs-stamp">Dos perspectivas</span>
               <p className="fs-note">
-                Sobre el bruto, la cuña de tu nómina es {pct(((bruto - nomina.salarioNeto) / Math.max(bruto, 1)) * 100)}.
-                Sobre el coste laboral total, {pct(nomina.cunaFiscal * 100)}. Misma realidad, dos
-                denominadores.
+                De tu salario bruto se descuentan el{' '}
+                {pct(((bruto - nomina.salarioNeto) / Math.max(bruto, 1)) * 100)} entre IRPF estimado y
+                tu cotización. {nomina.regimen === 'autonomo' ? 'En este perfil no hay cotización empresarial adicional.' : 'La cuña fiscal incluye además la cotización de la empresa.'} Supone el{' '}
+                {pct(nomina.cunaFiscal * 100)} del coste laboral completo.
               </p>
             </div>
           </aside>
@@ -92,8 +93,8 @@ export default function Cuna() {
               {pct(nomina.cunaFiscal * 100)}
             </p>
             <p className="fs-body" style={{ marginTop: 10 }}>
-              Es tu cuña fiscal sobre el coste laboral total: la suma de IRPF y cotizaciones en este
-              supuesto. En la medida estandarizada de la OCDE, España se sitúa en el{' '}
+              Es la parte de tu coste laboral que corresponde a IRPF estimado y cotizaciones en este
+              modelo. Para un caso estándar distinto del tuyo, la OCDE calcula para España el{' '}
               {pct(ESPANA.total)} y la media de la OCDE en el {pct(MEDIA.total)}.
             </p>
 

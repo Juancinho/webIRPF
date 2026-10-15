@@ -204,7 +204,7 @@ export function HundredField({
             onMouseEnter={onFocus ? () => onFocus(g.key) : undefined}
             onMouseLeave={onFocus ? () => onFocus(null) : undefined}
           >
-            <title>{`${g.label} — ${Math.round(g.value)} de cada ${total}`}</title>
+            <title>{`${g.label}: ${Math.round(g.value)} de cada ${total}`}</title>
           </rect>
         );
       })}

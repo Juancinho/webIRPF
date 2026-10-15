@@ -120,11 +120,11 @@ export function paginaSueldo(bruto) {
       titulo: 'Según la comunidad autónoma',
       parrafos: [
         mejor.neto - peor.neto >= 1
-          ? `Desde 2024 la parte autonómica de la escala cambia el resultado. Con ${B}, la diferencia entre la comunidad más favorable y la menos favorable de esta tabla es de **${eur(mejor.neto - peor.neto)}** netos al año.`
+          ? `En el modelo, la escala autonómica elegida cambia el resultado. Con ${B}, la diferencia entre el neto más alto y el más bajo de esta tabla es de **${eur(mejor.neto - peor.neto)}** al año.`
           : `A este nivel de renta la comunidad autónoma apenas cambia el resultado: la cuota es muy pequeña o nula en todas.`,
       ],
       tabla: {
-        cabeceras: ['Comunidad', 'IRPF', 'Neto anual', 'Al mes (12)'],
+        cabeceras: ['Perfil', 'IRPF estimado', 'Neto anual', 'Al mes (12)'],
         filas: regiones.map(r => [r.nombre, eur(r.irpf), eur(r.neto), eur(r.neto / 12)]),
         nota: 'País Vasco y Navarra tienen régimen foral propio y no se calculan aquí.',
       },
@@ -270,7 +270,7 @@ function paginaTramos() {
         tabla: {
           cabeceras: ['Base para calcular el tipo de retención', 'Tipo del tramo'],
           filas: tramos.map(([lim, t], k) => [
-            `${k === 0 ? '0 €' : eur(tramos[k - 1][0])} — ${Number.isFinite(lim) ? eur(lim) : 'en adelante'}`,
+            `${k === 0 ? '0 €' : eur(tramos[k - 1][0])} a ${Number.isFinite(lim) ? eur(lim) : 'sin límite'}`,
             pct(t * 100, 0),
           ]),
           nota: 'Fuente: LIRPF art. 101. Esta es una escala de retención, no una tabla de la cuota anual. Su aplicación a la base simplificada del simulador es un cálculo propio orientativo. Los perfiles autonómicos de la calculadora usan otras escalas combinadas aproximadas.',
@@ -280,7 +280,7 @@ function paginaTramos() {
         titulo: 'Ejemplos dentro del modelo, no cuotas definitivas',
         parrafos: [
           'En el modelo estándar, la cuota previa al mínimo suma lo que genera cada tramo de la escala de referencia. Una base simplificada de 35.000 € no se multiplica entera por el 30 %: se aplica el 19 % a los primeros 12.450 €, el 24 % a los 7.750 € siguientes y el 30 % al resto. Esto explica la progresividad del modelo, no calcula la cuota final de la declaración.',
-          `El mínimo personal y familiar representa la parte de renta destinada a las necesidades básicas del contribuyente y de los familiares que dan derecho a él. No son ${eur(5550)} que Hacienda entrega ni ${eur(5550)} que se restan directamente del impuesto. FiscalScope calcula cuánto impuesto produciría ese mínimo con **la misma escala combinada de referencia** y resta esa cuota: ${eur(5550)} × 19 % = ${eur(cuota(5550), 2)} en el caso estándar sin cargas. En la declaración real se hace el cálculo estatal y el autonómico por separado; algunas comunidades tienen, además, mínimos autonómicos distintos.`,
+          `El mínimo personal y familiar protege la renta que la ley considera necesaria para tus gastos básicos y, si procede, los de familiares a cargo. En el caso estándar sin hijos, es de ${eur(5550)}. Para reflejarlo, el modelo calcula cuánto IRPF producirían esos ${eur(5550)} empezando por el primer tramo: ${eur(5550)} × 19 % = ${eur(cuota(5550), 2)}. Esa cuota se resta de la calculada sobre toda la base. No recibes ${eur(5550)} ni se descuentan ${eur(5550)} directamente del impuesto. En la declaración real, las partes estatal y autonómica se calculan por separado y algunas comunidades tienen mínimos distintos.`,
         ],
         tabla: {
           cabeceras: ['Base simplificada del modelo', 'Cuota previa al mínimo', 'Tipo medio sobre esa base'],
@@ -295,7 +295,7 @@ function paginaTramos() {
       },
     ],
     preguntas: [
-      { p: `¿Hay una única tabla de tramos para toda España en ${ANIO}?`, r: 'No. Hay una escala estatal y una escala autonómica propia de cada comunidad. El 19 %–47 % que se ve en la referencia estándar es una simplificación del modelo, no una tarifa legal universal.' },
+      { p: `¿Hay una única tabla de tramos para toda España en ${ANIO}?`, r: 'No. Hay una escala estatal y una escala autonómica propia de cada comunidad. El rango del 19 % al 47 % que se ve en la referencia estándar es una simplificación del modelo, no una tarifa legal universal.' },
       { p: '¿Por qué lo retenido en nómina puede diferir de lo que debo por el año?', r: 'La retención es un pago anticipado. La declaración calcula la cuota anual con las reglas que correspondan a tus rentas y circunstancias y después descuenta las retenciones ya practicadas. Por eso el resultado puede ser a ingresar o a devolver. FiscalScope no calcula aquí esa regularización definitiva.' },
       { p: '¿Si paso de tramo cobro menos?', r: 'No. Pasar de tramo sólo cambia el tipo de los euros que caen en el tramo nuevo; los anteriores siguen tributando igual. Una subida de sueldo siempre deja más neto que antes.' },
     ],
@@ -322,7 +322,7 @@ function paginaComunidades() {
     miga: [{ nombre: 'Inicio', ruta: '/' }, { nombre: 'IRPF por comunidades', ruta: '/irpf-por-comunidades-2026/' }],
     sello: `IRPF ${ANIO} · comunidades autónomas`,
     h1: `El mismo sueldo, distinto neto según la comunidad`,
-    entradilla: `El IRPF se reparte entre el Estado y las comunidades autónomas, y cada comunidad fija su parte de la escala. Con 45.000 € brutos, entre ${REGIONES[extremos[0].k].name} y ${REGIONES[extremos[extremos.length - 1].k].name} hay **${eur(extremos[0].v - extremos[extremos.length - 1].v)}** netos al año de diferencia.`,
+    entradilla: `La cuota anual del IRPF tiene una parte estatal y otra autonómica. Cada comunidad fija sus tramos y tipos para su parte. En la estimación de FiscalScope, con 45.000 € brutos, la diferencia entre ${REGIONES[extremos[0].k].name} y ${REGIONES[extremos[extremos.length - 1].k].name} es de **${eur(extremos[0].v - extremos[extremos.length - 1].v)}** netos al año. No es una comparación de declaraciones reales.`,
     cifras: extremos.map(e => ({ k: REGIONES[e.k].name, v: eur(e.v), nota: e.v === base45 ? 'escala general' : `${e.v >= base45 ? '+' : '−'}${eur(Math.abs(e.v - base45))} frente a la general` })),
     secciones: [
       {
@@ -331,7 +331,7 @@ function paginaComunidades() {
         tabla: {
           cabeceras: ['Comunidad', ...sueldos.map(b => `${num(b / 1000)}.000 €`)],
           filas: claves.map(fila),
-          nota: 'La fila «Estándar» agrupa las comunidades cuya escala autonómica es cercana a la general. País Vasco y Navarra tienen régimen foral propio y no se incluyen.',
+          nota: '«Estándar» es una referencia simplificada de la calculadora, no una escala autonómica legal. País Vasco y Navarra tienen régimen foral propio y no se incluyen.',
         },
       },
       {
@@ -394,7 +394,7 @@ function paginaCuna() {
     ],
     enlaces: TEMAS_ENLACES.filter(t => t.ruta !== '/cuna-fiscal-espana-ocde/'),
     informe: { ancla: '#cuna', texto: 'Ver los 38 países de la OCDE, uno a uno' },
-    fuente: { texto: `OCDE — ${CUNA_OCDE_META.informe}`, url: CUNA_OCDE_META.fuente },
+    fuente: { texto: `OCDE · ${CUNA_OCDE_META.informe}`, url: CUNA_OCDE_META.fuente },
   };
 }
 
@@ -413,7 +413,7 @@ function paginaSalarioMedio() {
     miga: [{ nombre: 'Inicio', ruta: '/' }, { nombre: 'Salario medio', ruta: '/salario-medio-espana/' }],
     sello: `Distribución salarial · INE`,
     h1: 'Salario medio y salario mediano en España',
-    entradilla: `Según la Encuesta Anual de Estructura Salarial del INE, en ${ULTIMO_ANIO_SALARIAL_OFICIAL} el salario **medio** fue de **${eur(ofi.media)}** brutos al año y el **mediano** —el que deja a la mitad por debajo— de **${eur(ofi.p50)}**. La media es más alta porque los sueldos altos tiran de ella.`,
+    entradilla: `Según la Encuesta Anual de Estructura Salarial del INE, en ${ULTIMO_ANIO_SALARIAL_OFICIAL} el salario **medio** fue de **${eur(ofi.media)}** brutos al año. El **mediano** fue de **${eur(ofi.p50)}**: la mitad de los asalariados cobró menos y la otra mitad, más. La media es más alta porque los sueldos altos elevan el promedio.`,
     cifras: [
       { k: `Mediana ${ULTIMO_ANIO_SALARIAL_OFICIAL}`, v: eur(ofi.p50), destacada: true },
       { k: `Media ${ULTIMO_ANIO_SALARIAL_OFICIAL}`, v: eur(ofi.media) },
@@ -448,7 +448,7 @@ function paginaSalarioMedio() {
     ],
     enlaces: TEMAS_ENLACES.filter(t => t.ruta !== '/salario-medio-espana/'),
     informe: { ancla: '#lugar', texto: 'Ver en qué percentil está tu sueldo' },
-    fuente: { texto: 'INE — Encuesta Anual de Estructura Salarial, tabla 28191', url: 'https://www.ine.es/jaxiT3/Tabla.htm?t=28191' },
+    fuente: { texto: 'INE · Encuesta Anual de Estructura Salarial, tabla 28191', url: 'https://www.ine.es/jaxiT3/Tabla.htm?t=28191' },
   };
 }
 
@@ -593,7 +593,7 @@ function paginaArt20() {
     ],
     enlaces: TEMAS_ENLACES.filter(t => t.ruta !== '/reduccion-rendimientos-trabajo-articulo-20/'),
     informe: { ancla: '#fig-08', texto: 'Ver el acantilado del artículo 20 en la figura' },
-    fuente: { texto: 'BOE — Ley 35/2006 del IRPF, artículo 20', url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764&p=20260321&tn=1#a20' },
+    fuente: { texto: 'BOE · Ley 35/2006 del IRPF, artículo 20', url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764&p=20260321&tn=1#a20' },
   };
 }
 
@@ -611,14 +611,14 @@ function paginaDeflactar() {
     tipo: 'tema',
     ruta: '/deflactar-irpf-progresividad-en-frio/',
     estado: { bruto: 30000 },
-    titulo: 'Deflactar el IRPF: cuánto cuesta la progresividad en frío (2012–2026)',
+    titulo: 'Deflactar IRPF: cuánto cuesta la progresividad en frío (2012 a 2026)',
     descripcion: `Con el poder adquisitivo de 2012, un sueldo de 30.000 € de ${ANIO} deja ${eur(Math.abs(f30.neto26 - f30.neto12))} ${f30.neto26 < f30.neto12 ? 'menos' : 'más'} netos al año. Qué es la progresividad en frío.`,
     miga: [{ nombre: 'Inicio', ruta: '/' }, { nombre: 'Progresividad en frío', ruta: '/deflactar-irpf-progresividad-en-frio/' }],
-    sello: 'Inflación y fiscalidad · 2012–2026',
+    sello: 'Inflación y fiscalidad · 2012 a 2026',
     h1: 'Progresividad en frío: lo que la inflación hace con el IRPF',
     entradilla: `Si tu sueldo sube justo lo que suben los precios, tu poder adquisitivo no cambia; pero si los tramos, mínimos y reducciones del IRPF no suben con él, pagas un porcentaje mayor. Eso es la **progresividad en frío**, y **deflactar la tarifa** es actualizar esos umbrales con la inflación.`,
     cifras: [
-      { k: 'Inflación acumulada 2012–2026', v: pct((INFLACION_A_2026[2012] - 1) * 100) },
+      { k: 'Inflación acumulada de 2012 a 2026', v: pct((INFLACION_A_2026[2012] - 1) * 100) },
       { k: 'Carga con 30.000 € de 2026', v: pct(f30.ef26 * 100), nota: `${pct(f30.ef12 * 100)} con las reglas de 2012` },
     ],
     secciones: [
@@ -668,7 +668,7 @@ function paginaCotizaciones() {
           cabeceras: ['Concepto', 'Empresa', 'Trabajador'],
           filas: c.empresa.map(([nombre, t]) => {
             const tra = c.trabajador.find(x => x[0] === nombre);
-            return [nombre, pct(t * 100, 2), tra ? pct(tra[1] * 100, 2) : '—'];
+            return [nombre, pct(t * 100, 2), tra ? pct(tra[1] * 100, 2) : 'No aplica'];
           }).concat([['Total', pct(c.tipoEmp * 100, 2), pct(c.tipoTra * 100, 2)]]),
         },
       },
@@ -686,7 +686,7 @@ function paginaCotizaciones() {
     ],
     enlaces: TEMAS_ENLACES.filter(t => t.ruta !== '/cotizaciones-seguridad-social-2026/'),
     informe: { ancla: '#fig-03', texto: 'Ver cada cotización aplicada a tu sueldo' },
-    fuente: { texto: 'TGSS — Bases y tipos de cotización', url: 'https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/CotizacionRecaudacionTrabajadores/36537' },
+    fuente: { texto: 'TGSS · Bases y tipos de cotización', url: 'https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/CotizacionRecaudacionTrabajadores/36537' },
   };
 }
 

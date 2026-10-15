@@ -112,7 +112,7 @@ function Comparador({ serie, bruto2026, anios, anioA: a, anioB: b, onAnioA, onAn
                 <td data-label={a}>{va}</td>
                 <td data-label={b}>{vb}</td>
                 <td data-label="Diferencia" className={d === null ? undefined : d < 0 ? 'is-neg' : 'is-pos'}>
-                  {d === null ? '—' : sign(d)}
+                  {d === null ? 'Sin dato' : sign(d)}
                 </td>
               </tr>
             ))}

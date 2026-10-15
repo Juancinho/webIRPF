@@ -42,7 +42,7 @@ export default function Portada({ secundaria = false }) {
             <p className="fs-masthead-sub">
               Informe fiscal interactivo
               <br />
-              España · 2012—2026
+              España · 2012 a 2026
             </p>
           </div>
           <p className="fs-masthead-meta">

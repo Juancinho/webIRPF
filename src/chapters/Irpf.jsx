@@ -122,9 +122,9 @@ export default function Irpf() {
               </h2>
               <p className="fs-kicker">
                 El IRPF combina varios tipos, no uno solo. Cada tipo se aplica únicamente a la
-                porción de base comprendida en su tramo. Por eso el tipo marginal —el del siguiente
-                euro— y el tipo efectivo —la cuota total dividida por el bruto— responden a preguntas
-                distintas.
+                porción de base comprendida en su tramo. El tipo marginal te dice qué pasa con el
+                siguiente euro que ganas. El tipo efectivo mide el IRPF total en relación con tu
+                sueldo bruto.
               </p>
             </div>
 
@@ -146,7 +146,7 @@ export default function Irpf() {
                   </span>
                   <span>
                     <span className="fs-readout-k">Intervalo</span>
-                    <strong>{eur(activa.desde)} — {Number.isFinite(activa.hasta) ? eur(activa.hasta) : 'sin límite'}</strong>
+                    <strong>{eur(activa.desde)} a {Number.isFinite(activa.hasta) ? eur(activa.hasta) : 'sin límite'}</strong>
                   </span>
                   <span>
                     <span className="fs-readout-k">Tu base aquí</span>
@@ -224,7 +224,7 @@ export default function Irpf() {
                         onFocus={() => setHover(b.i)}
                         onBlur={() => setHover(null)}
                       >
-                        <title>{`Tramo al ${pct(b.tipo * 100)} — ${eur(b.dentro)} de tu base, ${eur(b.cuota)} de cuota`}</title>
+                        <title>{`Tramo al ${pct(b.tipo * 100)}: ${eur(b.dentro)} de tu base y ${eur(b.cuota)} de cuota`}</title>
                       </rect>
                     </g>
                   );
@@ -259,14 +259,17 @@ export default function Irpf() {
 
               <p className="fs-note" style={{ marginTop: 14 }}>
                 Cuota previa del modelo <strong>{eur(nomina.cuotaIntegra)}</strong> menos cuota del
-                mínimo personal y familiar <strong>{eur(nomina.cuotaMinimo)}</strong> da una cuota
-                teórica de <strong>{eur(nomina.cuotaTeorica)}</strong>. Tras las deducciones y el
+                mínimo personal y familiar <strong>{eur(nomina.cuotaMinimo)}</strong> deja una cuota
+                teórica de <strong>{eur(nomina.cuotaTeorica)}</strong>. Si la resta es negativa,
+                queda en cero. Tras las deducciones y el
                 límite de retención que procedan, el descuento de IRPF estimado es{' '}
                 <strong>{eur(nomina.irpfFinal)}</strong>. No es la cuota definitiva de la declaración.
               </p>
               <p className="fs-note">
-                El mínimo personal y familiar no se resta en euros del impuesto. Se calcula cuánto
-                gravaría esta misma escala a ese mínimo y esa cuota se descuenta de la cuota íntegra.
+                El mínimo personal y familiar es la parte de renta que se considera necesaria para
+                tus necesidades básicas y, si corresponde, las de tu familia. El modelo calcula
+                cuánto IRPF generarían esos euros empezando por el primer tramo y resta esa cuota
+                de la cuota previa. No te descuentan del impuesto el importe entero del mínimo.
                 {soloEstatal && ' Aquí solo se muestra la parte estatal; no es el IRPF real completo.'}
               </p>
             </Figure>
@@ -428,14 +431,14 @@ function Poster({ marginal, nomina }) {
             <line x1={XG} y1={YB - 32} x2={XG + ANCHO} y2={YB - 32} stroke="var(--rule)" strokeWidth={0.8} />
             <Label x={XG} y={YB - 40} size={10.5} weight={700} color="var(--counter)">
               {nMarg - nEfe > 0
-                ? `Son ${nMarg - nEfe} cuadrados más — y sólo en esta segunda fila`
+                ? `Son ${nMarg - nEfe} cuadrados más, sólo en esta segunda fila`
                 : 'A tu nivel de renta las dos filas coinciden'}
             </Label>
           </ChartFrame>
 
           <p className="fs-note" style={{ marginTop: 14 }}>
             Sobre tu bruto, el IRPF asciende a <strong>{eur(nomina.irpfFinal)}</strong>. Si te subieran
-            el sueldo, el siguiente euro tributaría al {pct(marg)} — sólo ese euro.{' '}
+            el sueldo, el siguiente euro tributaría al {pct(marg)}. Ese tipo sólo afectaría a ese euro.{' '}
             <a className="fs-enlace" href="#fig-09">
               Calcula tu subida real en la FIG. 09 ↓
             </a>

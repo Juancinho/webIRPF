@@ -182,7 +182,7 @@ function Serie({ anioActual }) {
     <Figure
       id="28"
       title={`${nombre[0].toUpperCase()}${nombre.slice(1)}: ${formatoMetrica(valorSerie(ultimo, metrica, modo), metrica)} en 2026 (estimación)`}
-      sub={`España · 2012—2025 observado · 2026 estimado · ${unidad} · selecciona una magnitud para evitar superponer unidades distintas`}
+      sub={`España · datos observados de 2012 a 2025 · estimación para 2026 · ${unidad} · elige una magnitud`}
       legend="Una marca por año · líneas verticales = distancia al cero · verde = año seleccionado · pasa el cursor para inspeccionar"
       source={<FuenteDeuda ipc poblacion />}
       note="La serie real multiplica cada importe nominal por el factor de IPC que lo expresa en euros de 2026. La ratio deuda/PIB no se deflacta: ya relaciona dos magnitudes nominales del mismo ejercicio. El PIB mostrado se infiere del saldo y de la ratio. El punto de 2026 es una estimación, no un cierre anual observado."
@@ -255,7 +255,7 @@ function Serie({ anioActual }) {
                 }}
                 onMouseLeave={() => { setHover(null); setTip(null); }}
               >
-                <title>{`${d.anio} — ${formatoMetrica(v, metrica)}`}</title>
+                <title>{`${d.anio}: ${formatoMetrica(v, metrica)}`}</title>
               </rect>
             </g>
           );
@@ -272,7 +272,7 @@ function Serie({ anioActual }) {
         ))}
         {variacion !== null && (
           <Label x={X0} y={H - 10} size={9} color="var(--ink-4)" mono>
-            VARIACIÓN {act.anio - 1}—{act.anio} · {variacion >= 0 ? '+' : '−'}{formatoMetrica(Math.abs(variacion), metrica)}
+            VARIACIÓN DE {act.anio - 1} A {act.anio} · {variacion >= 0 ? '+' : '−'}{formatoMetrica(Math.abs(variacion), metrica)}
           </Label>
         )}
       </ChartFrame>
@@ -314,7 +314,7 @@ function Cascada() {
     <Figure
       id="29"
       title={`El saldo varió ${conSigno(total)} mM € entre 2012 y 2026 (estimación) en términos ${modo === 'real' ? 'reales' : 'nominales'}`}
-      sub={`Cambio respecto al cierre anterior · 2013—2025 observado, 2026 estimado · miles de millones de ${modo === 'real' ? 'euros constantes de 2026' : 'euros corrientes'}`}
+      sub={`Cambio respecto al cierre anterior · datos observados de 2013 a 2025 y estimación para 2026 · miles de millones de ${modo === 'real' ? 'euros constantes de 2026' : 'euros corrientes'}`}
       legend="Cada columna parte de cero · arriba = aumento · abajo = reducción · las pequeñas marcas permiten comparar magnitudes sin rellenar el área"
       source={<FuenteDeuda ipc />}
       note="La variación del saldo no equivale exactamente al déficit del ejercicio. En la vista real, un descenso puede indicar que el saldo nominal creció menos que los precios; no significa necesariamente que se amortizara deuda en euros corrientes. La variación de 2026 usa el punto estimado de la serie."
@@ -379,7 +379,7 @@ function Cascada() {
           );
         })}
         <Label x={X0} y={H - 14} size={narrow ? 8 : 9} color="var(--ink-5)" mono>
-          12—26 · CAMBIO ANUAL DEL SALDO · {modo === 'real' ? 'EUROS DE 2026' : 'EUROS CORRIENTES'}
+          2012 A 2026 · CAMBIO ANUAL DEL SALDO · {modo === 'real' ? 'EUROS DE 2026' : 'EUROS CORRIENTES'}
         </Label>
       </ChartFrame>
     </Figure>
@@ -441,10 +441,10 @@ function TuParte({ anio, irpf }) {
       <div className="fs-readout fs-readout-wide">
         <span><span className="fs-readout-k">Deuda por habitante</span><span className="fs-readout-v">{eur(deuda)}</span></span>
         <span><span className="fs-readout-k">IRPF anual comparable</span><span className="fs-readout-v fs-signal">{eur(irpfComparable)}</span></span>
-        <span><span className="fs-readout-k">Años equivalentes</span><span className="fs-readout-v">{anios ? dec(anios) : '—'}</span></span>
+        <span><span className="fs-readout-k">Años equivalentes</span><span className="fs-readout-v">{anios ? dec(anios) : 'No aplica'}</span></span>
         <span><span className="fs-readout-k">Sobre el PIB</span><span className="fs-readout-v">{pct(d.pctPIB)}</span></span>
         <span><span className="fs-readout-k">Población</span><span className="fs-readout-v">{dec(d.poblacion, 2)} M</span></span>
-        <span><span className="fs-readout-k">Cambio anual por habitante</span><span className="fs-readout-v">{previo ? `${conSigno(deuda - (modo === 'real' ? previo.perCapitaReal : previo.perCapita))} €` : '—'}</span></span>
+        <span><span className="fs-readout-k">Cambio anual por habitante</span><span className="fs-readout-v">{previo ? `${conSigno(deuda - (modo === 'real' ? previo.perCapitaReal : previo.perCapita))} €` : 'Sin año anterior'}</span></span>
       </div>
 
       <ChartFrame viewBox={`0 0 ${W} ${H}`} label="Deuda por habitante frente a IRPF anual">
@@ -487,7 +487,7 @@ function TuParte({ anio, irpf }) {
           />
           <div className="fs-scrub-ticks">
             <span>1 año</span>
-            <span>{anios ? `${dec(anios)} años · lo cubren entero` : '—'}</span>
+            <span>{anios ? `${dec(anios)} años · lo cubren entero` : 'No aplica'}</span>
             <span>{topeAnios} años</span>
           </div>
         </div>
@@ -507,8 +507,8 @@ function TuParte({ anio, irpf }) {
         </div>
         <p className="fs-note" style={{ marginTop: 10, maxWidth: '70ch' }}>
           {restante > 0
-            ? `Los bloques verdes de la fila de arriba son la parte que quedaría cubierta: ${anioSel} ${anioSel === 1 ? 'año entero' : 'años enteros'} de tu IRPF ${anioSel === 1 ? 'llega' : 'llegan'} hasta ahí. Harían falta ${anios ? dec(anios) : '—'} años para llegar al final.`
-            : `Con ${anioSel} ${anioSel === 1 ? 'año' : 'años'} ya está cubierta entera: bastaban ${anios ? dec(anios) : '—'}. Sigue siendo una comparación de escala, no una deuda que te corresponda pagar.`}
+            ? `Los bloques verdes de la fila superior muestran la parte equivalente a ${anioSel} ${anioSel === 1 ? 'año' : 'años'} de tu IRPF estimado. Para igualar toda la deuda por habitante harían falta ${anios ? `${dec(anios)} años` : 'más años de los que muestra el gráfico'}.`
+            : `El importe elegido ya iguala la deuda por habitante. Harían falta ${anios ? `${dec(anios)} años` : 'más años de los que muestra el gráfico'} de tu IRPF estimado. Es una comparación de cantidades, no una deuda que te corresponda pagar.`}
         </p>
       </div>
     </Figure>

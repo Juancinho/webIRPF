@@ -9,7 +9,7 @@ export const CRONOLOGIA = [
     mes: 'Ene',
     tipo: 'irpf',
     titulo: 'Tipos adicionales temporales IRPF',
-    subtitulo: 'RDL 20/2011 — Plan de estabilidad',
+    subtitulo: 'RDL 20/2011 · Plan de estabilidad',
     url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2011-20638',
     descripcion: 'Se añaden tipos adicionales "temporales" de 0,75% a 7% sobre los tramos ordinarios. El tipo marginal máximo sube hasta el 52%. Tenía que durar dos años; duró cuatro.',
     metricas: [
@@ -22,7 +22,7 @@ export const CRONOLOGIA = [
     mes: 'Jul',
     tipo: 'ss',
     titulo: 'Subida cotizaciones SS',
-    subtitulo: 'RDL 20/2012 — Medidas de ajuste',
+    subtitulo: 'RDL 20/2012 · Medidas de ajuste',
     url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2012-9364',
     descripcion: 'Se suben las bases máximas de cotización y se incrementan los tipos de SS en varios epígrafes. Congelación del SMI.',
     metricas: [
@@ -33,8 +33,8 @@ export const CRONOLOGIA = [
     anio: 2015,
     mes: 'Ene',
     tipo: 'irpf',
-    titulo: 'Reforma del IRPF — fase 1',
-    subtitulo: 'Ley 26/2014 — Reforma LIRPF',
+    titulo: 'Reforma del IRPF, fase 1',
+    subtitulo: 'Ley 26/2014 · Reforma LIRPF',
     url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2014-12327',
     descripcion: 'La Ley 26/2014 reduce los tramos de 7 a 5, modifica los tipos, amplía la reducción por rendimientos del trabajo del art. 20 e introduce 2.000 € de otros gastos deducibles en el art. 19. El mínimo personal pasa a 5.550 €.',
     metricas: [
@@ -48,7 +48,7 @@ export const CRONOLOGIA = [
     anio: 2016,
     mes: 'Ene',
     tipo: 'irpf',
-    titulo: 'Reforma del IRPF — fase 2',
+    titulo: 'Reforma del IRPF, fase 2',
     subtitulo: 'Segunda parte de la Ley 26/2014',
     url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2014-12327',
     descripcion: 'La segunda fase de la Ley 26/2014 sitúa el tipo mínimo en el 19% y el máximo en el 45%, y aplica los umbrales previstos para la nueva redacción del art. 20.',
@@ -63,7 +63,7 @@ export const CRONOLOGIA = [
     mes: 'Ene',
     tipo: 'mixto',
     titulo: 'Actualización del SMI y del art. 20',
-    subtitulo: 'Ley 6/2018, art. 59 — ampliación del art. 20',
+    subtitulo: 'Ley 6/2018, art. 59 · ampliación del art. 20',
     url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2018-9268#a59',
     descripcion: 'El SMI aumenta un 22,3% y el umbral inferior del art. 20 pasa a 16.825 €. En el cálculo del IRPF, esta ampliación incrementa la reducción aplicable a parte de las rentas del trabajo más bajas.',
     metricas: [
@@ -90,7 +90,7 @@ export const CRONOLOGIA = [
     mes: 'Ene',
     tipo: 'ss',
     titulo: 'MEI + cuotas autónomos por ingresos reales',
-    subtitulo: 'Ley 21/2021 — Sistema de cuotas progresivo autónomos',
+    subtitulo: 'Ley 21/2021 · Sistema de cuotas progresivo autónomos',
     url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2021-21652#df-4',
     descripcion: 'La cotización de los trabajadores autónomos pasa a vincularse a sus rendimientos netos mediante 15 tramos. Además, el Mecanismo de Equidad Intergeneracional añade 0,6 puntos porcentuales a la cotización total destinada al sistema de pensiones.',
     metricas: [
@@ -143,7 +143,7 @@ export const CRONOLOGIA = [
     anio: 2026,
     mes: 'Feb',
     tipo: 'smi',
-    titulo: 'SMI 17.094 € — nueva deducción en cuota',
+    titulo: 'SMI 17.094 € y nueva deducción en cuota',
     subtitulo: 'RD 126/2026 y RDL 5/2026',
     url: 'https://www.boe.es/eli/es/rd/2026/02/18/126',
     urls: [
@@ -165,7 +165,7 @@ export const PREGUNTAS = [
   },
   {
     q: '¿Qué es la progresividad en frío?',
-    a: 'Es el aumento de la carga efectiva que puede producirse cuando la renta nominal crece con los precios, pero los umbrales del impuesto no se actualizan en la misma proporción. El poder adquisitivo puede permanecer estable mientras una parte mayor de la renta queda sujeta a tramos superiores o se reducen beneficios ligados a límites nominales.\n\nDeflactar una serie convierte importes pasados a euros de poder adquisitivo comparable. Indexar —o deflactar, en el uso habitual referido a la tarifa— consiste en actualizar tramos, mínimos, reducciones y deducciones con el IPC. Esto no cambia los tipos legales; cambia los umbrales nominales a los que se aplican. La referencia indexada de esta publicación es un contrafactual, no una norma que estuviera vigente.'
+    a: 'Puede ocurrir cuando el sueldo sube con los precios, pero los límites del IRPF no se actualizan. Aunque puedas comprar lo mismo, una parte mayor de tu renta puede caer en tramos más altos o dejar de beneficiarse de una reducción.\n\nPara comprobarlo, expresamos los importes de distintos años en euros de poder adquisitivo comparable. También simulamos qué habría pasado si tramos, mínimos, reducciones y deducciones se hubieran actualizado con el IPC. Esa simulación no cambia los tipos legales y no describe una norma que estuviera vigente.'
   },
   {
     q: '¿Qué es el IRPF y cómo funciona?',
@@ -180,11 +180,11 @@ export const PREGUNTAS = [
     a: 'El art. 20 de la LIRPF regula una reducción aplicable a determinados rendimientos netos del trabajo. Su cuantía depende de los umbrales y condiciones vigentes en cada ejercicio.\n\nPor debajo del umbral inferior la reducción alcanza su máximo; entre los umbrales disminuye de forma gradual hasta desaparecer. En esa zona, un euro adicional de rendimiento puede aumentar la base imponible en más de un euro porque, además, reduce parte del beneficio. Ese mecanismo eleva el tipo marginal efectivo sin modificar el tipo legal del tramo.'
   },
   {
-    q: 'Diferencia entre Mínimo Personal y Mínimo Exento',
-    a: 'Son conceptos distintos. El mínimo personal y familiar representa renta destinada a necesidades básicas tuyas y, cuando corresponde, de hijos o ascendientes. Para una persona sin cargas, el mínimo estatal general es 5.550 € desde 2015. No recibes esos 5.550 € ni se restan íntegros del impuesto. Se calcula la cuota que generarían al aplicarles la escala desde su primer tramo y esa cuota se descuenta de la calculada sobre la base. Por ejemplo, en la escala estatal actual, 5.550 € × 9,5 % = 527,25 € de cuota del mínimo estatal. La comunidad calcula por separado su parte y puede tener otro mínimo.\n\nEl mínimo exento o límite excluyente de retención es otra cosa: ayuda a determinar si el pagador debe retener en la nómina. Superarlo no significa que todo el salario pase a tributar de una vez. La retención mensual, la cuota anual y el mínimo personal responden a reglas diferentes.'
+    q: '¿En qué se diferencian el mínimo personal y el límite para retener en nómina?',
+    a: 'El mínimo personal y familiar protege la parte de renta que la ley considera necesaria para cubrir tus gastos básicos y, si corresponde, los de familiares a cargo. Para una persona sin cargas, el mínimo estatal general es de 5.550 € desde 2015. No recibes esa cantidad ni se resta entera del impuesto. Se calcula cuánto IRPF produciría si empezáramos por el primer tramo y esa cuota se resta de la calculada sobre la base. En la escala estatal actual, 5.550 € × 9,5 % = 527,25 €. La comunidad calcula su parte por separado y puede tener otro mínimo.\n\nEl límite para retener en nómina es distinto: ayuda a determinar si la empresa debe practicar una retención. Superarlo no hace que todo tu sueldo pase a tributar de golpe. Además, la retención es un anticipo; la cuota anual se determina al hacer la declaración.'
   },
   {
-    q: '¿Qué son los 2.000€ de gastos deducibles (Art.19.2.f)?',
+    q: '¿Qué son los 2.000 € de gastos deducibles del artículo 19?',
     a: 'Desde 2015, el art. 19.2.f establece una cuantía general de otros gastos deducibles para obtener el rendimiento neto del trabajo, sin exigir la acreditación individual de ese importe. No debe confundirse con una deducción directa en cuota.\n\nSu efecto fiscal depende del tipo marginal y del resto del cálculo. Con un marginal del 19%, una reducción adicional de base de 2.000 € tendría, de forma aislada, un efecto de hasta 380 €; el resultado efectivo puede variar por mínimos, reducciones y límites.'
   },
   {
@@ -205,12 +205,12 @@ export const FUENTES = [
     url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764&p=20260321&tn=1#a63'
   },
   {
-    concepto: 'Reducción Art.20 — redacción 2026',
+    concepto: 'Reducción Art.20, redacción 2026',
     fuente: 'Art. 20 LIRPF (BOE)',
     url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764&p=20260321&tn=1#a20'
   },
   {
-    concepto: 'Reducción Art.20 — redacción 2019',
+    concepto: 'Reducción Art.20, redacción 2019',
     fuente: 'Ley 6/2018, art. 59 (BOE-A-2018-9268)',
     url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2018-9268#a59'
   },
@@ -226,7 +226,7 @@ export const FUENTES = [
   },
   {
     concepto: 'Deducción por obtención de rentas del trabajo (SMI)',
-    fuente: 'AEAT — Manual IRPF 2025',
+    fuente: 'AEAT · Manual IRPF 2025',
     url: 'https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c18-cuota-liquida-resultante-autoliquidacion/deducciones-cuota-liquida-total/deduccion-obtencion-rendimientos-trabajo.html'
   },
   {
@@ -236,12 +236,12 @@ export const FUENTES = [
   },
   {
     concepto: 'Cotizaciones SS 2019 (archivado)',
-    fuente: 'Wayback Machine — TGSS 2019',
+    fuente: 'Wayback Machine · TGSS 2019',
     url: 'https://web.archive.org/web/20190223131030/https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/CotizacionRecaudacionTrabajadores/36537'
   },
   {
     concepto: 'IPC acumulado dic.2019 / dic.2025 (INE)',
-    fuente: 'INE — Variaciones del IPC',
+    fuente: 'INE · Variaciones del IPC',
     url: 'https://www.ine.es/varipc/verVariaciones.do?idmesini=12&anyoini=2019&idmesfin=12&anyofin=2025&ntipo=1&enviar=Calcular'
   },
   {

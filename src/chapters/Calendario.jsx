@@ -130,7 +130,7 @@ export default function Calendario() {
     <Figure
       id="27"
       title={`${diaLibre} de ${totalDias} casillas representan IRPF y cotizaciones`}
-      sub={`${anio} · Cada casilla representa 1/${totalDias} del coste laboral anual. El calendario es una forma de dibujar porcentajes.`}
+      sub={`${anio} · Dividimos el coste laboral anual en ${totalDias} partes iguales y dibujamos una por cada fecha del calendario.`}
       legend={`Coloreadas: parte de IRPF y cotizaciones · sin relleno: parte del salario neto · los tres colores usan las proporciones COFOG de ${GASTO_COFOG.anio}`}
       source={
         <>
@@ -149,10 +149,11 @@ export default function Calendario() {
       summary={`${diaLibre} de ${totalDias} casillas representan la parte del coste laboral correspondiente a IRPF y cotizaciones. Las otras ${totalDias - diaLibre} representan la parte del salario neto. Los colores de las primeras usan las proporciones COFOG del gasto público de ${GASTO_COFOG.anio}.`}
     >
       <p className="fs-body" style={{ margin: '0 0 18px', maxWidth: '78ch' }}>
-        Piensa en este calendario como una barra de {totalDias} casillas iguales. La barra completa
-        representa todo el coste laboral anual de tu puesto. Una casilla representa 1/{totalDias} de
-        ese coste, aunque tenga escrita una fecha. Pintamos tantas casillas como corresponden al
-        porcentaje formado por IRPF y cotizaciones. Las demás representan el salario neto.
+        Este calendario no cuenta días trabajados ni fechas de pago. Lo usamos como una barra con{' '}
+        {totalDias} casillas iguales para representar el coste anual de tu puesto. Si el coste entero
+        ocupara todas las casillas, cada una sería 1/{totalDias} del total. Coloreamos la proporción
+        que equivale al IRPF estimado y a las cotizaciones; dejamos sin relleno la parte que llega
+        como salario neto.
       </p>
       <div className="fs-calendar-method" aria-label="Cálculo propio de las casillas del calendario">
         <p>
@@ -162,15 +163,16 @@ export default function Calendario() {
         </p>
         <p>
           <span>2 · Cuántas casillas son</span>
-          {eur(cuna, 2)} / {eur(nomina.costeLab, 2)} = {pct(parteCuna * 100, 2)}. Dividimos para saber qué
-          porcentaje de la barra corresponde a IRPF y cotizaciones. Luego calculamos ese mismo porcentaje
-          de sus {totalDias} casillas: {diaLibre} coloreadas, tras redondear.
+          {eur(cuna, 2)} / {eur(nomina.costeLab, 2)} = {pct(parteCuna * 100, 2)}. Es la parte del coste
+          laboral que no llega a tu cuenta. Al aplicar ese porcentaje a las {totalDias} casillas y
+          redondear al entero más cercano, salen {diaLibre} casillas coloreadas.
         </p>
         <p>
           <span>3 · Qué significa cada color</span>
           De las {diaLibre} casillas coloreadas, {tramos.map(t => `${t.n} para ${t.label.toLowerCase()}`).join('; ')}.
-          Ese segundo reparto usa COFOG, que clasifica el gasto público español de {GASTO_COFOG.anio}
-          {' '}según su finalidad. Las {totalDias - diaLibre} casillas sin relleno representan el neto.
+          Esos tres colores reparten la cuña según COFOG, la clasificación del gasto público español
+          de {GASTO_COFOG.anio} por finalidad. Es una comparación hipotética, no el destino real de tus pagos.
+          Las otras {totalDias - diaLibre} casillas representan el neto.
         </p>
       </div>
 
@@ -228,7 +230,7 @@ export default function Calendario() {
               onMouseLeave={() => setTip(null)}
               style={{ cursor: 'pointer' }}
             >
-              <title>{`${d.dia} de ${MESES[d.mes].toLowerCase()} — ${d.etiqueta}`}</title>
+              <title>{`${d.dia} de ${MESES[d.mes].toLowerCase()}: ${d.etiqueta}`}</title>
             </rect>
           );
         })}

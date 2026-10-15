@@ -101,10 +101,10 @@ export default function Destino() {
             el gasto público
           </h2>
           <p className="fs-kicker">
-            Partimos de tu caso: IRPF estimado y cotizaciones de la empresa y del trabajador. Juntos
-            forman la cuña fiscal, la diferencia entre coste laboral y salario neto. Después usamos
-            esa cantidad como escala para mostrar cómo se reparte el gasto público español por
-            funciones. Es una comparación proporcional entre dos datos distintos.
+            Partimos de tu caso: IRPF estimado y cotizaciones de la empresa y del trabajador. Puedes
+            comparar la cuña completa o sólo los descuentos que aparecen en tu nómina. Después
+            aplicamos a la cantidad elegida los porcentajes del gasto público español por funciones.
+            Es una comparación proporcional entre dos datos distintos, no el destino de tus pagos.
           </p>
         </div>
 
@@ -127,7 +127,8 @@ export default function Destino() {
 
         <Puente rotulo="La misma proporción, ahora en casillas">
           El calendario usa sus 365 o 366 fechas como una barra dividida en partes iguales. La barra
-          completa representa el coste laboral anual. Pintamos la fracción correspondiente a IRPF y
+          completa representa siempre el coste laboral anual, aunque arriba elijas ver sólo los
+          descuentos de tu nómina. Pintamos la fracción correspondiente a IRPF y
           cotizaciones, y dejamos sin relleno la fracción del salario neto. Las fechas sólo permiten
           contar las casillas: <strong>no indican cuándo trabajas para una institución, cuándo cobras
           o cuándo se pagan los impuestos</strong>.
@@ -151,14 +152,19 @@ export default function Destino() {
 function RioDeLosEuros() {
   const { bruto, anio, nomina, pagas } = useFiscal();
   const estrecho = useNarrow();
+  const [perspectiva, setPerspectiva] = useState('completa');
   const [unidad, setUnidad] = useState('anual');
   const grad = useId().replace(/:/g, '');
   const [activa, setActiva] = useState(null);
   const [tip, setTip] = useState(null);
 
   const cuna = Math.max(0, nomina.costeLab - nomina.salarioNeto);
-  const cot = nomina.cotEmp + nomina.cotTra;
+  const soloNomina = perspectiva === 'nomina';
+  const cot = soloNomina ? nomina.cotTra : nomina.cotEmp + nomina.cotTra;
   const irpf = nomina.irpfFinal;
+  const totalRio = soloNomina ? cot + irpf : cuna;
+  const baseReferencia = soloNomina ? bruto : nomina.costeLab;
+  const nombreBase = soloNomina ? 'salario bruto' : 'coste laboral';
   const totalCofog = GASTO_COFOG.total;
 
   /* ── la geometría del río ────────────────────────────────────────────── */
@@ -190,8 +196,8 @@ function RioDeLosEuros() {
       };
     });
 
-    return { partidas: hojas, grupos: gr, yCorte: TOP + (cot / Math.max(cuna, 1)) * FH };
-  }, [cot, cuna, totalCofog]);
+    return { partidas: hojas, grupos: gr, yCorte: TOP + (cot / Math.max(totalRio, 1)) * FH };
+  }, [cot, totalRio, totalCofog]);
 
   /* Los rótulos se colocan en la altura de su partida y luego se separan: con
      dieciséis filas y caudales tan desiguales, si no, se pisan. */
@@ -214,7 +220,7 @@ function RioDeLosEuros() {
     return Object.fromEntries(out.map(o => [o.key, o.y]));
   }, [partidas]);
 
-  const euros = parte => cuna * parte;
+  const euros = parte => totalRio * parte;
 
   /* Tres unidades para la misma cifra. Los euros al año dicen el tamaño; los
      euros al mes lo hacen comparable con una nómina; los días de trabajo lo
@@ -223,15 +229,15 @@ function RioDeLosEuros() {
     anual: { k: 'Al año', f: parte => eur(euros(parte)) },
     mensual: { k: 'Al mes', f: parte => eur(euros(parte) / 12) },
     dias: {
-      k: 'En días de trabajo',
+      k: 'En jornadas equivalentes',
       f: parte => {
-        const d = parte * (cuna / Math.max(nomina.costeLab, 1)) * DIAS_LABORABLES;
+        const d = parte * (totalRio / Math.max(baseReferencia, 1)) * DIAS_LABORABLES;
         return d >= 1 ? `${dec(d, 1)} d` : `${dec(d * 8, 1)} h`;
       },
     },
   };
   const medir = UNIDADES[unidad].f;
-  const diasTotales = (cuna / Math.max(nomina.costeLab, 1)) * DIAS_LABORABLES;
+  const diasTotales = (totalRio / Math.max(baseReferencia, 1)) * DIAS_LABORABLES;
 
   const mostrar = (p, vy) =>
     setTip({
@@ -240,7 +246,7 @@ function RioDeLosEuros() {
       title: eur(euros(p.parte)),
       sub: p.label,
       rows: [
-        ['De tu aportación', pct(p.parte * 100), 'var(--signal)'],
+        ['Del importe comparado', pct(p.parte * 100), 'var(--signal)'],
         ['Al mes', eur(euros(p.parte) / 12)],
         ['Equivalencia temporal', UNIDADES.dias.f(p.parte)],
         ['Gasto real ' + GASTO_COFOG.anio, `${Math.round(p.valor / 1000)} mil M€`],
@@ -253,8 +259,8 @@ function RioDeLosEuros() {
     <Figure
       id="26"
       title={`En esta comparación, ${eur(euros(social.parte))} equivalen a protección social`}
-      sub={`${anio} · tu cuña fiscal repartida según los porcentajes del gasto público español de ${GASTO_COFOG.anio}`}
-      legend={`Dos afluentes, cotizaciones e IRPF, forman la cuña fiscal · las cintas de la derecha aplican porcentajes COFOG · la vista en días usa ${DIAS_LABORABLES} jornadas de referencia`}
+      sub={`${anio} · ${soloNomina ? 'descuentos de tu nómina' : 'cuña fiscal completa'} comparados con el gasto público español de ${GASTO_COFOG.anio}`}
+      legend={`Dos afluentes, ${soloNomina ? 'tu cotización e IRPF' : 'cotizaciones de empresa y trabajador e IRPF'} · las cintas de la derecha aplican porcentajes COFOG · la vista en días usa ${DIAS_LABORABLES} jornadas de referencia`}
       source={
         <>
           Fuente ·{' '}
@@ -268,19 +274,44 @@ function RioDeLosEuros() {
           {' · cálculo propio de la correspondencia proporcional'}
         </>
       }
-      note="Los ingresos públicos se integran, con las excepciones previstas legalmente, en recursos que no permiten atribuir cada euro de IRPF a una función concreta. Las cotizaciones tienen una relación específica con el sistema contributivo, pero tampoco reproducen el reparto general de COFOG. La figura aplica una regla proporcional común para comparar escalas; no describe trazabilidad presupuestaria."
+      note="No podemos saber a qué servicio público fue cada euro de IRPF. Las cotizaciones financian prestaciones contributivas, por lo que tampoco se reparten realmente como el gasto público general. Las cintas de la derecha son una comparación proporcional, no el recorrido de tus pagos."
       summary={partidas
         .map(p => `${p.label}: ${eur(euros(p.parte))} (${pct(p.parte * 100)})`)
         .join('. ')}
     >
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center', marginBottom: 14 }}>
+        <span className="fs-stamp">Qué importe comparamos</span>
+        <span className="fs-seg fs-rio-perspectiva" role="group" aria-label="Importe de origen del río">
+          <button type="button" aria-pressed={!soloNomina} onClick={() => { setPerspectiva('completa'); setActiva(null); setTip(null); }}>
+            Cuña completa
+          </button>
+          <button type="button" aria-pressed={soloNomina} onClick={() => { setPerspectiva('nomina'); setActiva(null); setTip(null); }}>
+            Descuentos de tu nómina
+          </button>
+        </span>
+      </div>
       <p className="fs-note" style={{ margin: '0 0 16px', maxWidth: '78ch' }}>
-        El río reúne {eur(nomina.cotEmp, 2)} de cotización empresarial, {eur(nomina.cotTra, 2)} de
-        cotización del trabajador y {eur(irpf, 2)} de IRPF estimado: {eur(cuna, 2)} en total. El coste
-        laboral es {eur(nomina.costeLab, 2)}; de él, {eur(nomina.salarioNeto, 2)} llega como salario neto y
-        queda fuera del río. Para cada destino multiplicamos {eur(cuna, 2)} por su porcentaje del gasto
-        COFOG de {GASTO_COFOG.anio}. Por ejemplo, protección social representa{' '}
-        {pct(social.parte * 100)} y da {eur(euros(social.parte))}. Es un cálculo propio de escala,
-        no el destino comprobado de tus pagos.
+        {soloNomina ? (
+          <>
+            Aquí sólo entran los importes descontados de tu bruto en la simulación: {eur(irpf, 2)}
+            {' '}de IRPF estimado y {eur(nomina.cotTra, 2)} de tu cotización. Suman{' '}
+            <strong>{eur(totalRio, 2)}</strong> de {eur(bruto, 2)} brutos. La empresa aporta además{' '}
+            {eur(nomina.cotEmp, 2)}, pero esa cotización <strong>no se descuenta de tu nómina</strong>
+            {' '}y queda fuera de esta vista.
+          </>
+        ) : (
+          <>
+            El río completo suma {eur(nomina.cotEmp, 2)} de cotización empresarial,{' '}
+            {eur(nomina.cotTra, 2)} de tu cotización y {eur(irpf, 2)} de IRPF estimado.
+            {' '}Son <strong>{eur(totalRio, 2)}</strong>, la diferencia entre el coste laboral de{' '}
+            {eur(nomina.costeLab, 2)} y tu neto de {eur(nomina.salarioNeto, 2)}.
+            {' '}La cotización empresarial no se descuenta de tu nómina.
+          </>
+        )}
+        {' '}A la derecha aplicamos a esos {eur(totalRio, 2)} los porcentajes del gasto público de{' '}
+        {GASTO_COFOG.anio}. Protección social representa el {pct(social.parte * 100)}:
+        {' '}{eur(totalRio, 2)} × {pct(social.parte * 100)} ≈ {eur(euros(social.parte))}.
+        Es una equivalencia calculada aquí, no una medición de adónde fue tu dinero.
       </p>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center', marginBottom: 14 }}>
         <span className="fs-seg">
@@ -292,7 +323,7 @@ function RioDeLosEuros() {
         </span>
         <span className="fs-note" style={{ margin: 0 }}>
           {unidad === 'dias'
-            ? `La cuña equivale a ${dec(diasTotales, 0)} de ${DIAS_LABORABLES} jornadas de referencia`
+            ? `Suponemos ${DIAS_LABORABLES} jornadas iguales de ${nombreBase} al año: el importe comparado equivale a ${dec(diasTotales, 0)} jornadas`
             : 'La misma cifra, en tres unidades'}
         </span>
       </div>
@@ -311,11 +342,11 @@ function RioDeLosEuros() {
       {estrecho ? (
         <div className="fs-rio">
           <p className="fs-rio-origen">
-            <span style={{ color: 'var(--signal)' }}>Cotizaciones {eur(cot, 2)}</span>
+            <span style={{ color: 'var(--signal)' }}>{soloNomina ? 'Tu cotización' : 'Cotizaciones de empresa y trabajador'} {eur(cot, 2)}</span>
             {' + '}
             <span style={{ color: 'var(--counter)' }}>IRPF {eur(irpf, 2)}</span>
             {' = '}
-            <strong>{eur(cuna, 2)}</strong> a la caja común
+            <strong>{eur(totalRio, 2)}</strong> para esta comparación
           </p>
           {grupos.map(g => (
             <section key={g.key} className="fs-rio-grupo">
@@ -343,7 +374,7 @@ function RioDeLosEuros() {
           ))}
         </div>
       ) : (
-      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} label="El destino de tu aportación">
+      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} label={`Comparación de ${soloNomina ? 'los descuentos de nómina' : 'la cuña fiscal completa'} con el reparto del gasto público`}>
         <defs>
           {[
             ['cot', 'var(--signal)', 'var(--ink-4)'],
@@ -360,11 +391,11 @@ function RioDeLosEuros() {
         </defs>
         {/* ── los dos afluentes ──────────────────────────────────────────── */}
         {[
-          { key: 'cot', label: 'COTIZACIONES', valor: cot, color: 'var(--signal)', y0: TOP },
+          { key: 'cot', label: soloNomina ? 'TU COTIZACIÓN' : 'COTIZACIONES', valor: cot, color: 'var(--signal)', y0: TOP },
           { key: 'irpf', label: 'IRPF', valor: irpf, color: 'var(--counter)', y0: 0 },
         ].map((f, i) => {
-          const hCot = ((cot / Math.max(cuna, 1)) * (FH - SG));
-          const hIrpf = ((irpf / Math.max(cuna, 1)) * (FH - SG));
+          const hCot = ((cot / Math.max(totalRio, 1)) * (FH - SG));
+          const hIrpf = ((irpf / Math.max(totalRio, 1)) * (FH - SG));
           const y0 = i === 0 ? TOP : TOP + hCot + SG;
           const y1 = i === 0 ? TOP + hCot : TOP + hCot + SG + hIrpf;
           const t0 = i === 0 ? TOP : yCorte;
@@ -399,7 +430,7 @@ function RioDeLosEuros() {
         {/* ── el tronco ──────────────────────────────────────────────────── */}
         <rect x={XT0} y={TOP} width={XT1 - XT0} height={FH} fill="var(--ink)" />
         <Label x={XS0} y={TOP - 26} size={9.5} weight={700} color="var(--ink)" mono>
-          LA CAJA COMÚN · {eur(cuna)}
+          IMPORTE QUE COMPARAMOS · {eur(totalRio)}
         </Label>
 
         {/* ── tronco → los tres destinos grandes ─────────────────────────── */}
@@ -530,7 +561,7 @@ function RioDeLosEuros() {
                   width={W - XG1}
                   height={21}
                 >
-                  <title>{`${p.label} — ${eur(euros(p.parte))} de tu aportación, ${pct(p.parte * 100)} del gasto público`}</title>
+                  <title>{`${p.label}: ${eur(euros(p.parte))} como equivalencia; ${pct(p.parte * 100)} del gasto público`}</title>
                 </rect>
               </g>
             );
@@ -538,19 +569,27 @@ function RioDeLosEuros() {
         )}
 
         <Label x={XS0} y={TOP + FH + 24} size={9} color="var(--ink-5)" mono>
-          TU APORTACIÓN ANUAL · {eur(cuna)} · {eur(cuna / pagas)} POR PAGA · {pct((cuna / Math.max(nomina.costeLab, 1)) * 100)} DE LO QUE CUESTA TU PUESTO
+          {soloNomina ? 'DESCUENTOS DE NÓMINA' : 'CUÑA FISCAL ESTIMADA'} · {eur(totalRio)} AL AÑO · EQUIVALENTE A {eur(totalRio / pagas)} POR PAGA · {pct((totalRio / Math.max(baseReferencia, 1)) * 100)} DEL {nombreBase.toUpperCase()}
         </Label>
       </ChartFrame>
       )}
 
       <p className="fs-note" style={{ marginTop: 16, maxWidth: '72ch' }}>
-        Tu sueldo bruto de <strong>{eur(bruto)}</strong> le cuesta a tu empresa{' '}
-        <strong>{eur(nomina.costeLab)}</strong>, y <strong>{eur(cuna)}</strong> de esa cifra no
-        llegan a tu cuenta. Repartidos como se reparte el gasto público, la partida más grande con
-        diferencia son las <strong>pensiones de jubilación</strong>:{' '}
-        <strong>{eur(euros(partidas[0].parte))}</strong> al año, {eur(euros(partidas[0].parte) / 12)} al
-        mes. A sanidad le corresponden {eur(euros(partidas.find(p => p.key === 'salud').parte))} y a
-        educación {eur(euros(partidas.find(p => p.key === 'educacion').parte))}.
+        {soloNomina ? (
+          <>De tu bruto de <strong>{eur(bruto)}</strong>, el modelo descuenta{' '}
+          <strong>{eur(totalRio)}</strong> entre IRPF y tu cotización. La empresa paga su propia
+          cotización aparte.</>
+        ) : (
+          <>Tu sueldo bruto de <strong>{eur(bruto)}</strong> le cuesta a la empresa{' '}
+          <strong>{eur(nomina.costeLab)}</strong>. De esa cifra, <strong>{eur(totalRio)}</strong> no
+          llegan a tu cuenta.</>
+        )}
+        {' '}Si repartimos el importe comparado según el gasto público, la equivalencia más
+        grande sería para <strong>pensiones de jubilación</strong>: {' '}
+        <strong>{eur(euros(partidas[0].parte))}</strong> al año. Para sanidad serían{' '}
+        {eur(euros(partidas.find(p => p.key === 'salud').parte))} y para educación{' '}
+        {eur(euros(partidas.find(p => p.key === 'educacion').parte))}. No son cantidades asignadas
+        de verdad a esos servicios.
       </p>
     </Figure>
   );

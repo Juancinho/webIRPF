@@ -279,7 +279,7 @@ export function Percentiles() {
               <Label x={X0} y={y + 22} size={9.5} color="var(--ink-5)">
                 {nota}
               </Label>
-              <title>{`${k} — ${eur(v)}`}</title>
+              <title>{`${k}: ${eur(v)}`}</title>
             </g>
           );
         })}
@@ -370,7 +370,7 @@ export function EvolucionDistribucion() {
           ? `En euros de hoy, la mediana salarial ha pasado de ${eur(primero.p50)} a ${eur(ultimo.p50)}`
           : `En euros corrientes, la mediana salarial ha pasado de ${eur(primero.p50)} a ${eur(ultimo.p50)}`
       }
-      sub={`${real ? 'Euros constantes de 2026' : 'Euros nominales de cada año'} · banda P10–P90, cuartiles y mediana · pulsa un año para llevar la publicación a él`}
+      sub={`${real ? 'Euros constantes de 2026' : 'Euros nominales de cada año'} · banda de P10 a P90, cuartiles y mediana · pulsa un año para llevar la publicación a él`}
       legend="Banda clara = del percentil 10 al 90 · banda oscura = del 25 al 75 · línea continua = mediana · línea de puntos azul = media · puntos verdes = tu salario llevado a cada año con el IPC"
       source="Fuente · INE · EAES tabla 28191"
       note={`Los años posteriores a ${ULTIMO_ANIO_SALARIAL_OFICIAL} son proyección propia, no dato publicado.`}
@@ -382,8 +382,8 @@ export function EvolucionDistribucion() {
           <span className="fs-readout-v">Mediana {eur(act.p50)}</span>
         </span>
         <span>
-          <span className="fs-readout-k">P10 — P90</span>
-          <span className="fs-readout-v">{eur(act.p10)} — {eur(act.p90)}</span>
+          <span className="fs-readout-k">De P10 a P90</span>
+          <span className="fs-readout-v">{eur(act.p10)} a {eur(act.p90)}</span>
         </span>
         <span>
           <span className="fs-readout-k">Media</span>
@@ -463,7 +463,7 @@ export function EvolucionDistribucion() {
               onMouseLeave={() => { setHover(null); setTip(null); }}
               onClick={() => setAnio(d.anio)}
             >
-              <title>{`${d.anio} — mediana ${eur(d.p50)}, media ${eur(d.media)}, tu salario ${eur(d.tuyo)} (percentil ${Math.round(d.tuPercentil)})`}</title>
+              <title>{`${d.anio}: mediana ${eur(d.p50)}, media ${eur(d.media)}, tu salario ${eur(d.tuyo)} (percentil ${Math.round(d.tuPercentil)})`}</title>
             </rect>
           </g>
         ))}
@@ -495,7 +495,7 @@ export function EvolucionDistribucion() {
       </ChartFrame>
 
       <p className="fs-note" style={{ marginTop: 12, maxWidth: '72ch' }}>
-        La <strong style={{ color: 'var(--counter)' }}>media</strong> —los puntos azules— va
+        La <strong style={{ color: 'var(--counter)' }}>media</strong>, marcada con puntos azules, va
         siempre por encima de la mediana porque los salarios más altos tiran de ella hacia
         arriba; la mediana, en cambio, parte la población exactamente por la mitad. Los puntos
         verdes son <strong style={{ color: 'var(--signal)' }}>tu salario llevado a cada

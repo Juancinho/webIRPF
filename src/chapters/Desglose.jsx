@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useFiscal } from '../state/fiscalContext';
 import { conceptosCotizacion } from '../engine/irpf';
+import { ESCALAS_AUTONOMICAS_2026 } from '../engine/escalasLegales';
 import Figure from '../figures/Figure';
 import { dec, eur, pct } from '../utils/format';
 
@@ -39,7 +40,25 @@ export default function Desglose() {
 
   const limiteActivo = nomina.limiteRetencion < nomina.cuotaSMI && nomina.cuotaSMI > 0;
   const escalaCuota = Math.max(nomina.cuotaIntegra, nomina.minimoPersonalYFamiliar, 1);
-  const nombreEscala = opts.modoEscala === 'solo_estatal' && anio >= 2015
+  const soloEstatal = opts.modoEscala === 'solo_estatal' && anio >= 2015;
+  const normaAutonomica = !soloEstatal && anio >= 2024
+    ? ESCALAS_AUTONOMICAS_2026[opts.ccaa]
+    : null;
+  const fuentesEscala = soloEstatal
+    ? [['BOE · LIRPF art. 63 (escala estatal)', `${BOE}#a63`]]
+    : [
+        ['BOE · LIRPF art. 101 (retenciones)', `${BOE}#a101`],
+        ['BOE · LIRPF art. 63 (cuota estatal)', `${BOE}#a63`],
+        ...(normaAutonomica
+          ? [[`${normaAutonomica.nombre} · ${normaAutonomica.norma}`, normaAutonomica.fuente]]
+          : []),
+      ];
+  const aclaracionEscala = normaAutonomica
+    ? `Los tramos de esta fila son una aproximación de FiscalScope, no la suma exacta de las dos escalas legales. Los enlaces permiten consultar las normas; muestran su redacción de 2026${anio !== 2026 ? `, no la aplicable históricamente en ${anio}` : ''}. El art. 101 se refiere a retenciones; las escalas estatal y autonómica intervienen en la declaración anual.`
+    : !soloEstatal
+      ? 'Los tramos del perfil estándar son una referencia simplificada del modelo. No corresponden a la escala legal de ninguna comunidad concreta.'
+      : null;
+  const nombreEscala = soloEstatal
     ? 'escala estatal del año seleccionado'
     : 'escala combinada del perfil seleccionado';
   const partesMinimo = [];
@@ -68,7 +87,7 @@ export default function Desglose() {
       const suma = lista.reduce((a, [, t]) => a + t, 0);
       const solid = importeTotal - base * suma;
       if (solid > 0.5) {
-        cuerpo.push(['Cuota de solidaridad sobre el exceso', '—', eur(solid)]);
+        cuerpo.push(['Cuota de solidaridad sobre el exceso', 'No aplica', eur(solid)]);
       }
       return { cuerpo, suma, solid };
     };
@@ -88,7 +107,7 @@ export default function Desglose() {
     filas: datos.cuerpo,
     total: [
       `Total${datos.solid > 0.5 ? ' (con solidaridad)' : ''}`,
-      datos.solid > 0.5 ? '—' : pct(datos.suma * 100, 2),
+      datos.solid > 0.5 ? 'Tipo variable' : pct(datos.suma * 100, 2),
       eur(lista === 'emp' ? nomina.cotEmp : nomina.cotTra),
     ],
   });
@@ -108,7 +127,7 @@ export default function Desglose() {
           sub: 'Lo que tu empresa paga de verdad por ti',
           texto: esAutonomo
             ? 'En el régimen de autónomos no existe parte empresarial: el coste de tu actividad coincide con tu rendimiento íntegro, así que A y C son la misma cifra.'
-            : 'Es el desembolso total de la empresa para tenerte contratado. Suma tu salario bruto (C) y la cotización que la empresa ingresa a la Seguridad Social por encima de tu sueldo (B). Tú nunca ves ese dinero en tu cuenta —no aparece en el recibo de nómina— pero forma parte del coste real de tu trabajo, y es el denominador que usa la OCDE para medir la cuña fiscal.',
+            : 'Es lo que gasta la empresa para tenerte contratado. Suma tu salario bruto (C) y la cotización que paga a la Seguridad Social por ti (B). Esa cotización no llega a tu cuenta, pero forma parte del coste de tu puesto. La OCDE usa este coste para calcular la cuña fiscal.',
           formulas: esAutonomo
             ? [['A = C', `${eur(bruto)}`]]
             : [
@@ -116,7 +135,7 @@ export default function Desglose() {
                 ['A', `${eur(bruto)} + ${eur(nomina.cotEmp)} = ${eur(nomina.costeLab)}`],
               ],
           remate: `De cada 100 € que le cuestas a la empresa, tú ves ${dec(netoPor100, 1)} € netos.`,
-          fuente: ['TGSS — Bases y tipos de cotización', TGSS],
+          fuente: ['TGSS · Bases y tipos de cotización', TGSS],
         },
         {
           flujo: 'resta', tipo: 'op', k: 'B', label: esAutonomo ? 'Sin cotización patronal' : 'Cotización de la empresa a la Seguridad Social',
@@ -124,7 +143,7 @@ export default function Desglose() {
           sub: esAutonomo ? 'No aplica en el RETA' : `${pct(params.tipoEmp * 100, 2)} de la base de cotización`,
           texto: esAutonomo
             ? 'Como autónomo asumes íntegramente tu cotización; no hay contraparte empresarial que ingrese nada por encima de tu rendimiento.'
-            : `La empresa cotiza por ti sumando varios conceptos con nombre y norma propios: contingencias comunes, desempleo, FOGASA, formación profesional y accidentes de trabajo${params.mei[0] > 0 ? `, más el MEI —Mecanismo de Equidad Intergeneracional— que se añadió en 2023 como refuerzo del Fondo de Reserva de las pensiones` : ''}. Ninguno aparece en tu recibo. El tipo de desempleo corresponde a contrato indefinido (en temporal es mayor) y el de accidentes es el tipo medio: depende de la actividad de la empresa según la tarifa de primas.`,
+            : `La empresa paga cotizaciones por contingencias comunes, desempleo, FOGASA, formación profesional y accidentes de trabajo${params.mei[0] > 0 ? ', además del MEI (Mecanismo de Equidad Intergeneracional), vigente desde 2023' : ''}. No se descuentan de tu bruto: son un coste adicional para la empresa. Aquí usamos el tipo de desempleo de un contrato indefinido y un tipo medio para accidentes. Este último puede cambiar según la actividad de la empresa.`,
           formulas: esAutonomo
             ? null
             : [
@@ -138,7 +157,7 @@ export default function Desglose() {
           remate: topeActivo && !esAutonomo
             ? `Tu bruto supera la base máxima de ${eur(params.baseMax)}: los ${eur(cot.exceso)} de exceso no cotizan al tipo ordinario, sólo soportan la cuota de solidaridad.`
             : null,
-          fuente: ['TGSS — Bases y tipos de cotización', TGSS],
+          fuente: ['TGSS · Bases y tipos de cotización', TGSS],
         },
         {
           flujo: 'total', tipo: 'hito', k: 'C', label: 'Salario bruto anual', valor: bruto,
@@ -165,7 +184,7 @@ export default function Desglose() {
           sub: esAutonomo ? 'Según el tramo de rendimientos netos' : `${pct(params.tipoTra * 100, 2)} de la base de cotización`,
           texto: esAutonomo
             ? 'Desde 2023 la cuota depende de los rendimientos netos previstos, repartidos en quince tramos (RDL 13/2022). No es un porcentaje del bruto, sino una cuota fija por tramo.'
-            : `Es la primera línea de descuento de tu nómina, y la única que no es IRPF. Se calcula sobre la misma base que la de la empresa —el bruto topado en ${eur(params.baseMax)}— pero con tipos mucho menores, y se compone de estos conceptos:`,
+            : `Es un descuento de tu nómina distinto del IRPF. Se calcula sobre la base de cotización, que en este caso es el bruto con un máximo de ${eur(params.baseMax)}. El trabajador paga estos conceptos:`,
           formulas: esAutonomo
             ? [['D', `base del tramo × 12 × tipo combinado = ${eur(nomina.cotTra)}`]]
             : [
@@ -179,14 +198,14 @@ export default function Desglose() {
           remate: esAutonomo
             ? null
             : `Por cada euro que cotizas tú, la empresa cotiza ${dec(params.tipoEmp / params.tipoTra, 1)}.`,
-          fuente: ['TGSS — Bases y tipos de cotización', TGSS],
+          fuente: ['TGSS · Bases y tipos de cotización', TGSS],
         },
         {
-          flujo: 'total', tipo: 'hito', k: 'E', label: 'Rendimiento íntegro del trabajo', valor: nomina.rnPrevio,
+          flujo: 'total', tipo: 'hito', k: 'E', label: 'Rendimiento tras restar tu cotización', valor: nomina.rnPrevio,
           sub: 'El punto de partida del IRPF, no tu bruto',
-          texto: 'Aquí empieza el impuesto. Las cotizaciones del trabajador se deducen antes de determinar el rendimiento sobre el que se calcula el IRPF, así que el impuesto nunca se aplica sobre tu bruto entero: se aplica sobre esta cifra, ya reducida.',
+          texto: 'Primero se resta del bruto tu cotización a la Seguridad Social. Después se aplican los gastos y reducciones que correspondan para obtener la base usada en el cálculo del IRPF. Esta cifra es un paso intermedio, no otro descuento de tu nómina.',
           formulas: [['E = C − D', `${eur(bruto)} − ${eur(nomina.cotTra)} = ${eur(nomina.rnPrevio)}`]],
-          fuente: ['BOE — LIRPF art. 19', `${BOE}#a19`],
+          fuente: ['BOE · LIRPF art. 19', `${BOE}#a19`],
         },
       ],
     },
@@ -206,13 +225,13 @@ export default function Desglose() {
           texto: anio >= 2015
             ? 'Cuantía general de otros gastos deducibles que se aplica sin acreditar gastos individuales. La Ley 26/2014 la introdujo con efectos desde 2015.'
             : 'No existía: la Ley 26/2014 la introdujo con efectos desde 2015.',
-          fuente: ['BOE — LIRPF art. 19.2.f', `${BOE}#a19`],
+          fuente: ['BOE · LIRPF art. 19.2.f', `${BOE}#a19`],
         },
         {
           flujo: 'resta', tipo: 'op', k: 'G', label: 'Reducción por rendimientos del trabajo', valor: -nomina.redTrabajo,
           sub: nomina.redTrabajo > 0
-            ? 'Art. 20 — reducción aplicable a determinados rendimientos bajos'
-            : 'Art. 20 — agotada a tu nivel de renta',
+            ? 'Art. 20: reducción aplicable a determinados rendimientos bajos'
+            : 'Art. 20: agotada a tu nivel de renta',
           formulas: typeof params.art20Meta.uInf === 'number'
             ? [['Tramo plano', `${eur(params.art20Meta.rMax)} hasta ${eur(params.art20Meta.uInf)} de rendimiento`],
                ['Tramo de caída', `se retira hasta llegar a cero en ${eur(params.art20Meta.uSup)}`],
@@ -222,7 +241,7 @@ export default function Desglose() {
           texto: nomina.redTrabajo > 0
             ? `A tu nivel de renta la reducción es de ${eur(nomina.redTrabajo)}. Se retira progresivamente al subir el rendimiento, y esa retirada es el acantilado del capítulo 03.`
             : 'A tu nivel de renta esta reducción ya se ha agotado: sólo actúa por debajo del umbral superior del art. 20.',
-          fuente: ['BOE — LIRPF art. 20', `${BOE}#a20`],
+          fuente: ['BOE · LIRPF art. 20', `${BOE}#a20`],
         },
         ...(nomina.reduccionConjunta > 0
           ? [{
@@ -230,14 +249,14 @@ export default function Desglose() {
               sub: 'Unidad familiar',
               formulas: [['G2', `${eur(nomina.reduccionConjunta)}, limitada al rendimiento neto disponible`]],
               texto: 'Reducción adicional por declarar de forma conjunta, limitada al rendimiento neto disponible.',
-              fuente: ['BOE — LIRPF art. 84', `${BOE}#a84`],
+              fuente: ['BOE · LIRPF art. 84', `${BOE}#a84`],
             }]
           : []),
         {
           flujo: 'total', tipo: 'hito', k: 'H', label: 'Base imponible', valor: nomina.baseImponible, hueco: true,
           sub: 'No es dinero que se te descuente: es la cifra sobre la que se aplica la escala',
           formulas: [
-            ['H = E − F − G' + (nomina.reduccionConjunta > 0 ? ' − G2' : ''), 'rendimiento íntegro menos gastos y reducciones'],
+            ['H = E − F − G' + (nomina.reduccionConjunta > 0 ? ' − G2' : ''), 'bruto menos cotización, gastos y reducciones'],
             ['H', `${eur(nomina.rnPrevio)} − ${eur(nomina.gastosFijos)} − ${eur(nomina.redTrabajo)}${nomina.reduccionConjunta > 0 ? ` − ${eur(nomina.reduccionConjunta)}` : ''} = ${eur(nomina.baseImponible)}`],
           ],
           texto: `Queda ${eur(bruto - nomina.baseImponible)} por debajo de tu bruto. Se dibuja hueca porque no es una salida de dinero, sino la magnitud que se grava.`,
@@ -260,11 +279,12 @@ export default function Desglose() {
             ['J', tramos.map(t => `${eur(t.dentro)} × ${pct(t.tipo * 100)}`).join('  +  ') + ` = ${eur(nomina.cuotaIntegra)}`],
           ],
           texto: 'Ningún tipo se aplica nunca a todo tu sueldo: sólo al tramo de base que le corresponde.',
-          fuente: [opts.modoEscala === 'solo_estatal' && anio >= 2015 ? 'BOE · LIRPF art. 63' : 'Modelo orientativo · BOE art. 101 y leyes autonómicas', `${BOE}#${opts.modoEscala === 'solo_estatal' && anio >= 2015 ? 'a63' : 'a101'}`],
+          fuente: fuentesEscala,
+          aclaracionFuente: aclaracionEscala,
           tabla: {
             cabeceras: ['Tramo de base', 'Tu base dentro', 'Tipo', 'Cuota que genera'],
             filas: tramos.map(t => [
-              `${eur(t.desde)} — ${Number.isFinite(t.hasta) ? eur(t.hasta) : '∞'}`,
+              `${eur(t.desde)} a ${Number.isFinite(t.hasta) ? eur(t.hasta) : 'sin límite'}`,
               eur(t.dentro),
               pct(t.tipo * 100),
               eur(t.cuota),
@@ -279,7 +299,7 @@ export default function Desglose() {
             ['I', `${eur(nomina.minimoPersonal)} personal${nomina.minimoFamiliar > 0 ? ` + ${eur(nomina.minimoFamiliar)} familiar` : ''} = ${eur(nomina.minimoPersonalYFamiliar)}`],
           ],
           texto: `Es la cantidad que la ley reserva para las necesidades básicas de la persona y, si procede, de hijos o ascendientes a cargo. No es dinero que recibas ni una resta directa de ${eur(nomina.minimoPersonalYFamiliar)} en tu impuesto. En este modelo se calcula la cuota que generaría esa cantidad y se descuenta de la cuota previa J.${opts.nHijos > 0 ? ` Tus ${opts.nHijos} hijo${opts.nHijos > 1 ? 's' : ''} a cargo añaden ${eur(nomina.minimoFamiliar)} al mínimo familiar.` : ''} En una declaración real, la parte estatal y la autonómica se calculan por separado y la comunidad puede fijar un mínimo distinto.`,
-          fuente: ['BOE — LIRPF arts. 56-61', `${BOE}#a57`],
+          fuente: ['BOE · LIRPF arts. 56-61', `${BOE}#a57`],
           tabla: nomina.minimoFamiliar > 0
             ? {
                 cabeceras: ['Concepto', 'Importe'],
@@ -296,10 +316,11 @@ export default function Desglose() {
           sub: 'Se resta de la cuota, no de la base',
           formulas: [
             ['K = escala(I)', `${partesMinimo.join(' + ')} = ${eur(nomina.cuotaMinimo, 2)}`],
-            ['J − K', `${eur(nomina.cuotaIntegra, 2)} − ${eur(nomina.cuotaMinimo, 2)} = ${eur(nomina.cuotaTeorica, 2)}`],
+            ['Cuota teórica', `máximo entre cero y (${eur(nomina.cuotaIntegra, 2)} − ${eur(nomina.cuotaMinimo, 2)}) = ${eur(nomina.cuotaTeorica, 2)}`],
           ],
-          texto: `«La misma escala» significa los tipos progresivos que acabamos de aplicar a tu base para obtener J, pero ahora empezando de cero y aplicándolos al mínimo de ${eur(nomina.minimoPersonalYFamiliar)}. En tu perfil es la ${nombreEscala}. ${partesMinimo.length === 1 ? 'Todo el mínimo cabe en el primer tramo.' : 'El mínimo alcanza varios tramos, así que se reparte entre ellos.'} La operación concreta es ${partesMinimo.join(' + ')} = ${eur(nomina.cuotaMinimo, 2)}. Esa es la cuota K que se resta de J.`,
-          fuente: [opts.modoEscala === 'solo_estatal' && anio >= 2015 ? 'BOE · LIRPF art. 63' : 'Modelo orientativo · BOE art. 101 y leyes autonómicas', `${BOE}#${opts.modoEscala === 'solo_estatal' && anio >= 2015 ? 'a63' : 'a101'}`],
+          texto: `El mínimo personal y familiar de tu perfil es ${eur(nomina.minimoPersonalYFamiliar)}. Para calcular cuánto reduce el IRPF, partimos de cero y vemos qué cuota produciría ese importe en los tramos del modelo (${nombreEscala}). ${partesMinimo.length === 1 ? 'Como cabe en el primer tramo, sólo se le aplica ese tipo.' : 'Como supera el primer tramo, cada parte lleva el tipo que le corresponde.'} El cálculo es ${partesMinimo.join(' + ')} = ${eur(nomina.cuotaMinimo, 2)}. Restamos esa cuota K de la cuota previa J, no ${eur(nomina.minimoPersonalYFamiliar)} del impuesto. Si la resta fuese negativa, el resultado queda en cero.`,
+          fuente: fuentesEscala,
+          aclaracionFuente: aclaracionEscala,
         },
         ...(nomina.deduccionSMI > 0
           ? [{
@@ -308,7 +329,7 @@ export default function Desglose() {
               formulas: [['L', `${eur(nomina.cuotaTeorica)} − ${eur(nomina.deduccionSMI)} = ${eur(nomina.cuotaSMI)}`]],
               texto: 'Deducción directa en cuota que se retira progresivamente a medida que el salario se aleja del mínimo interprofesional.',
               fuente: [
-                'AEAT — Deducción por obtención de rendimientos del trabajo',
+                'AEAT · Deducción por obtención de rendimientos del trabajo',
                 'https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c18-cuota-liquida-resultante-autoliquidacion/deducciones-cuota-liquida-total/deduccion-obtencion-rendimientos-trabajo.html',
               ],
             }]
@@ -319,7 +340,7 @@ export default function Desglose() {
               sub: 'Un tope reglamentario que en tu caso manda sobre el cálculo',
               formulas: [['M', `(${eur(bruto)} − ${eur(params.minimoExento)}) × 43 % = ${eur(nomina.limiteRetencion)}`]],
               texto: 'La retención no puede superar el 43 % de la diferencia entre el bruto y el mínimo exento de retención. Ese tope es menor que la cuota calculada, así que es el que se aplica.',
-              fuente: ['BOE — RIRPF art. 85.3', 'https://www.boe.es/buscar/act.php?id=BOE-A-2007-6820'],
+              fuente: ['BOE · RIRPF art. 85.3', 'https://www.boe.es/buscar/act.php?id=BOE-A-2007-6820'],
             }]
           : []),
         {
@@ -524,12 +545,16 @@ export default function Desglose() {
 
                         {f.fuente && (
                           <p className="fs-source">
-                            Fuente ·{' '}
-                            <a href={f.fuente[1]} target="_blank" rel="noreferrer noopener">
-                              {f.fuente[0]}
-                            </a>
+                            {Array.isArray(f.fuente[0]) ? 'Normas para consultar · ' : 'Fuente · '}
+                            {(Array.isArray(f.fuente[0]) ? f.fuente : [f.fuente]).map(([nombre, url], i) => (
+                              <span key={url}>
+                                {i > 0 && ' · '}
+                                <a href={url} target="_blank" rel="noreferrer noopener">{nombre}</a>
+                              </span>
+                            ))}
                           </p>
                         )}
+                        {f.aclaracionFuente && <p className="fs-note">{f.aclaracionFuente}</p>}
                       </div>
                     )}
                   </li>

@@ -19,21 +19,21 @@
 export const GUIAS = {
   '02': {
     titulo: 'El reparto de tu bruto',
-    que: 'Parte tu salario bruto en los tres sitios a los que va: lo que llega a tu cuenta, lo que se lleva el IRPF y lo que se lleva tu cotización.',
+    que: 'Muestra cómo se divide tu salario bruto entre el neto que cobras, el IRPF estimado y tu cotización a la Seguridad Social.',
     lee: 'La barra entera es el 100 % de tu bruto. El ancho de cada tramo es proporcional a su importe y cada uno lleva su cifra al lado, sin leyenda que descifrar.',
     ojo: 'El denominador aquí es el bruto. Lo que la empresa paga por encima de tu sueldo no está en esta barra: aparece en el capítulo siguiente.',
   },
   '03': {
     titulo: 'El libro de cálculo',
     que: 'El camino entero de un euro, operación a operación, desde lo que cuesta tu puesto hasta lo que acaba en tu cuenta.',
-    lee: 'Barra llena, dinero. Rayada, lo que se descuenta de lo que había. De trazos, una magnitud de cálculo que no sale de tu bolsillo. Todas comparten escala.',
+    lee: 'Las barras llenas muestran importes de dinero; las rayadas, descuentos. Las de contorno discontinuo son cifras que se usan para calcular el impuesto, no pagos adicionales.',
     ojo: 'Despliega cualquier fila para ver su fórmula y su norma. La base imponible no es un descuento: es la cifra sobre la que se aplica la escala.',
   },
   '04': {
     titulo: 'El caudal que se estrecha',
-    que: 'El mismo recorrido del capítulo anterior, pero visto como un caudal: cuatro estadios y tres desprendimientos.',
+    que: 'Sigue el dinero desde el coste total del puesto hasta el sueldo neto que recibes.',
     lee: 'El ancho de cada banda es proporcional al importe y cada marca vale una cantidad fija de euros. Los hilos que se van por los lados son el dinero que se desprende en ese paso.',
-    ojo: 'Se lee desplazándote: cada párrafo enciende el tramo del dibujo del que habla.',
+    ojo: 'Al desplazarte por los párrafos se resalta el paso correspondiente en el dibujo.',
   },
   '05': {
     titulo: 'Dónde cae tu base',
@@ -62,14 +62,14 @@ export const GUIAS = {
   '09': {
     titulo: 'Qué te queda de una subida',
     que: 'Cuánto llega de verdad a tu cuenta de una subida de sueldo, y cuánto se queda por el camino.',
-    lee: 'Mueve el importe. El bloque reparte cien euros de esa subida —no de tu sueldo— entre lo que llega y lo que no.',
+    lee: 'Elige una subida. Los cien bloques reparten esa subida, no tu sueldo actual, entre el neto que cobrarías y los descuentos.',
     ojo: 'El marginal de una subida grande es la media de los tramos que atraviesa: no tiene por qué ser el tipo de tu tramo de hoy.',
   },
   '10': {
     titulo: 'Quince fiscalidades',
-    que: 'Qué te habría dejado el mismo poder de compra bajo las normas de cada uno de los quince años.',
-    lee: 'Una fila por año. La vertical es el neto del último ejercicio: a la derecha, los que dejaban más; a la izquierda, los que dejaban menos. Pulsa un año para llevar el informe a él.',
-    ojo: 'El bruto se reexpresa en euros de cada año: lo que cambia de fila a fila no es tu sueldo, es la fiscalidad.',
+    que: 'Cuánto neto habrías cobrado en cada año manteniendo el mismo poder adquisitivo.',
+    lee: 'Cada fila representa un año. La línea vertical marca el neto del año actual. Los puntos a su derecha indican más neto; los de la izquierda, menos. Pulsa un año para verlo en todo el informe.',
+    ojo: 'Ajustamos el bruto por inflación para mantener su poder de compra. Así comparamos cómo cambian los resultados del modelo fiscal entre años.',
   },
   '11': {
     titulo: 'La diferencia, en fichas',
@@ -91,9 +91,9 @@ export const GUIAS = {
   },
   '14': {
     titulo: 'La progresividad en frío',
-    que: 'Qué pasa si tu sueldo sube justo lo que el IPC: tu poder de compra no cambia, el impuesto sí.',
+    que: 'Qué le ocurre al neto cuando el sueldo sube al ritmo de los precios y los umbrales fiscales no lo hacen.',
     lee: 'Continua, con las reglas aprobadas de verdad. Discontinua, el mismo caso con los umbrales indexados al IPC. La distancia es el efecto.',
-    ojo: 'No es una subida votada por nadie: es no mover los números de la ley mientras los precios se mueven.',
+    ojo: 'La diferencia es una simulación del efecto de no actualizar los umbrales con la inflación, no un impuesto nuevo.',
   },
   '15': {
     titulo: 'Una norma reescrita seis veces',
@@ -116,7 +116,7 @@ export const GUIAS = {
   '18': {
     titulo: 'El sueldo, medido en cosas',
     que: 'El mismo sueldo medido en cosas que se pueden señalar, en vez de en euros constantes.',
-    lee: 'Una fila por año. Cada figura es una unidad —un m², un mes de alquiler, una mensualidad del SMI— y se cuentan las que caben en tu neto.',
+    lee: 'Cada fila es un año. Cuenta cuántos metros cuadrados, meses de alquiler o mensualidades del SMI caben en tu sueldo neto de ese año.',
     ojo: 'Cada fila se mueve por dos motivos: lo que te dejó la fiscalidad y lo que costaba esa cosa ese año. No todo el cambio es fiscal.',
   },
   '19': {
@@ -129,7 +129,7 @@ export const GUIAS = {
     titulo: 'La misma cuña, treinta y ocho países',
     que: 'La misma medida calculada igual para treinta y ocho países, que es la única forma de saber si la cuña española es mucho o poco.',
     lee: 'Cada fila son cien euros de coste laboral en un país. La parte clara es lo que llega al trabajador; las tres oscuras son IRPF, cotización del trabajador y cotización de la empresa.',
-    ojo: 'Es un caso estandarizado —soltero, sin hijos, al salario medio de cada país—, no tu caso. Compara sistemas fiscales, no personas.',
+    ojo: 'La OCDE usa un caso común: persona soltera, sin hijos y con el salario medio de su país. No son tus cifras personales.',
   },
   '21': {
     titulo: 'Cuánta gente cobra cada sueldo',
@@ -147,7 +147,7 @@ export const GUIAS = {
     titulo: 'Mil asalariados, uno por punto',
     que: 'La distribución entera contada en personas: mil puntos colocados por su sueldo.',
     lee: 'Los puntos se apilan cuando coinciden, así que la altura del montón es cuánta gente cobra ese sueldo. No hay eje vertical: la forma es el dato. El punto verde eres tú.',
-    ojo: 'Los escalones salen de interpolar entre los cinco percentiles publicados, no de la realidad. Los que pasan de 100.000 € van contados aparte, a la derecha.',
+    ojo: 'Los puntos intermedios se estiman a partir de cinco percentiles publicados por el INE. Los sueldos superiores a 100.000 € se cuentan aparte, a la derecha.',
   },
   '24': {
     titulo: 'La escalera también se mueve',
@@ -156,22 +156,22 @@ export const GUIAS = {
     ojo: 'Si tu sueldo sube como el IPC pero la escala sube más, bajas de posición sin perder poder adquisitivo. Son dos cosas distintas.',
   },
   '25': {
-    titulo: 'Quién sostiene la recaudación',
-    que: 'De qué parte de la escala salarial sale lo que se recauda sobre las nóminas.',
-    lee: 'Veinte grupos de cinco percentiles. El ancho es la masa salarial que cobra el grupo; la altura, su tipo efectivo. Como recaudación es masa por tipo, el área de cada bloque es su aportación.',
+    titulo: 'Carga estimada por sueldo',
+    que: 'Qué parte de la carga calculada en el modelo corresponde a cada grupo salarial.',
+    lee: 'Hay veinte grupos de cinco percentiles. El ancho representa su parte de los salarios estimados y la altura, la carga media calculada. El área de cada bloque muestra su parte del total del modelo.',
     ojo: 'Es un modelo: aplica el mismo perfil a todos los tramos, así que no es la recaudación real. El último grupo descansa sobre la extrapolación de la cola alta.',
   },
   '26': {
     titulo: 'El río de los euros',
-    que: 'Qué importes equivaldrían a cada función pública si tu cuña fiscal siguiera las proporciones del gasto de España.',
-    lee: 'A la izquierda se suman tu IRPF estimado y las cotizaciones de la empresa y del trabajador. El salario neto queda fuera. A la derecha, cada cinta recibe el porcentaje que esa función ocupa en el gasto público de 2023. El ancho representa esa equivalencia.',
-    ojo: 'COFOG clasifica gastos por finalidad, pero no sigue el recorrido de tus ingresos. El cálculo de la derecha es una proyección proporcional propia, no un destino real de tus pagos.',
+    que: 'Cómo quedaría repartido el importe de tu nómina o de la cuña completa si se le aplicaran los porcentajes del gasto público español.',
+    lee: 'El selector cambia el importe de origen. «Cuña completa» suma IRPF estimado y cotizaciones de empresa y trabajador; «Descuentos de tu nómina» suma sólo IRPF y cotización del trabajador. A la derecha, cada cinta aplica el porcentaje de esa función en el gasto público de 2023 al importe elegido.',
+    ojo: 'COFOG clasifica el gasto por finalidad, pero no muestra adónde fue tu dinero. Los importes de la derecha son equivalencias hipotéticas. El calendario siguiente vuelve a usar siempre la cuña completa.',
   },
   '27': {
     titulo: 'Un porcentaje pintado en el calendario',
-    que: 'Usamos las 365 o 366 casillas del calendario como una barra dividida en partes iguales para mostrar qué porcentaje del coste laboral corresponde a IRPF y cotizaciones.',
-    lee: 'Cada casilla representa una parte igual del coste laboral anual, no el sueldo de esa fecha. Las casillas coloreadas representan la parte de IRPF y cotizaciones; las vacías, la parte que llega al salario neto. Entre las coloreadas, cada color corresponde a uno de los tres grupos del gasto público español de 2023.',
-    ojo: 'Las casillas se pintan desde enero sólo para poder contarlas. Ningún color indica que trabajaste ese día para una partida pública ni que tus impuestos se pagaron entonces.',
+    que: 'Muestra la cuña fiscal como parte del coste laboral anual. El calendario sirve para contar esa proporción en 365 o 366 casillas.',
+    lee: 'Cada casilla vale 1/365 o 1/366 del coste laboral. Calculamos la proporción de IRPF y cotizaciones, la multiplicamos por el número de casillas y coloreamos el resultado. Las casillas sin relleno representan el neto. Los tres colores reparten la parte coloreada según categorías del gasto público de 2023.',
+    ojo: 'La fecha de cada casilla sólo indica su posición en la cuadrícula. No es un día en que hayas pagado impuestos ni una prueba de que tu dinero fue a ese gasto.',
   },
   '28': {
     titulo: 'El saldo de la deuda',

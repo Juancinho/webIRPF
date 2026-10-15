@@ -676,7 +676,7 @@ export const DEUDA_ESPANA = {
 export const GASTO_COFOG = Object.freeze({
   anio: 2023,
   total: 680952,
-  fuente: 'IGAE — Clasificación funcional del gasto de las AAPP (COFOG), 2023 provisional',
+  fuente: 'IGAE · Clasificación funcional del gasto de las AAPP (COFOG), 2023 provisional',
   url: 'https://www.igae.pap.hacienda.gob.es/sitios/igae/es-ES/Contabilidad/ContabilidadNacional/Publicaciones/paginas/iacogof.aspx',
   grupos: [
     {
@@ -730,7 +730,7 @@ export const GASTO_COFOG = Object.freeze({
 // Vivienda: idealista, informe de precios, valor de diciembre de cada año.
 // SMI: BOE, Real Decreto de cada ejercicio (ya en SMI_ANUAL).
 export const PRECIOS_REFERENCIA = Object.freeze({
-  fuente: 'idealista — informes de precio de vivienda (valores de diciembre)',
+  fuente: 'idealista · informes de precio de vivienda (valores de diciembre)',
   url: 'https://www.idealista.com/sala-de-prensa/informes-precio-vivienda/',
   ultimoAnio: 2025,
   // euros por metro cuadrado de vivienda en venta

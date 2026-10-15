@@ -14,7 +14,7 @@ const URLS = {
   idealista: 'https://www.idealista.com/sala-de-prensa/informes-precio-vivienda/',
 };
 
-const REFERENCIA_RE = /(ajuste log-normal propio|interpolaci[oó]n y c[aá]lculo(?:s)? propio(?:s)?|c[aá]lculo(?:s)? propio(?:s)?|LIRPF(?:\s+arts?\.?\s*[\d.,–—-]+(?:\s+y\s+[\d.,–—-]+)?)?|RIRPF(?:\s+art\.?\s*[\d.]+)?|EAES(?:,?\s*tabla)?\s*28191|Banco de Espa[nñ]a|Eurostat|idealista|TGSS|AEAT|OCDE|IGAE|INE|BOE)/gi;
+const REFERENCIA_RE = /(ajuste log-normal propio|interpolaci[oó]n y c[aá]lculo(?:s)? propio(?:s)?|c[aá]lculo(?:s)? propio(?:s)?|LIRPF(?:\s+arts?\.?\s*[\d.,–—-]+(?:\s+[ay]\s+[\d.,–—-]+)?)?|RIRPF(?:\s+art\.?\s*[\d.]+)?|EAES(?:,?\s*tabla)?\s*28191|Banco de Espa[nñ]a|Eurostat|idealista|TGSS|AEAT|OCDE|IGAE|INE|BOE)/gi;
 
 function articuloUrl(base, texto) {
   const articulo = texto.match(/art(?:s)?\.?\s*(\d+)/i)?.[1];

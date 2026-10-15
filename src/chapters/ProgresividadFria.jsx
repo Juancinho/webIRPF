@@ -194,7 +194,7 @@ export default function ProgresividadFria() {
               }}
               onMouseLeave={() => { setHover(null); setTip(null); }}
             >
-              <title>{`${s.anio} — neto real ${eur(s.netoReal)}, referencia indexada ${eur(s.netoDeflactado)}`}</title>
+              <title>{`${s.anio}: neto real ${eur(s.netoReal)}, referencia indexada ${eur(s.netoDeflactado)}`}</title>
             </rect>
           </g>
         ))}

@@ -178,7 +178,7 @@ export default function Monedas({ bruto2026, elegirAnio }) {
                 onClick={() => elegirAnio(s.anio)}
                 style={{ cursor: 'pointer' }}
               >
-                <title>{`${s.anio} — ${eur(s.total)} entre IRPF y cotización`}</title>
+                <title>{`${s.anio}: ${eur(s.total)} entre IRPF y cotización`}</title>
               </rect>
             </g>
           );

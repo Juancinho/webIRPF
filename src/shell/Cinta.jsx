@@ -38,7 +38,7 @@ export default function Cinta({ visible }) {
   const ocultar = () => { setAbierta(false); setPerfilOpen(false); setOculta(true); };
   const mostrar = visible && oculta && (
     <button type="button" className="fs-cinta-mostrar" onClick={() => setOculta(false)}>
-      Mostrar barra de perfil
+      ↑ Mostrar barra de perfil
     </button>
   );
 
@@ -221,7 +221,7 @@ export default function Cinta({ visible }) {
           )}
 
           <div className="fs-cm-barra">
-            <button type="button" className="fs-cinta-ocultar" onClick={ocultar} aria-label="Ocultar barra de perfil" title="Ocultar barra de perfil">×</button>
+            <button type="button" className="fs-cinta-ocultar" onClick={ocultar} aria-label="Ocultar barra de perfil" title="Ocultar barra de perfil"><span aria-hidden="true">↓</span></button>
             <button
               type="button"
               className="fs-cm-cifras"
@@ -289,7 +289,7 @@ export default function Cinta({ visible }) {
           >
               Perfil<span className="fs-profile-label"> · {opts.modoEscala === 'solo_estatal' && anio >= 2015 ? 'Solo estatal' : region.name.split('/')[0].trim()}</span>
           </button>
-            <button type="button" className="fs-cinta-ocultar" onClick={ocultar} aria-label="Ocultar barra de perfil" title="Ocultar barra de perfil">×</button>
+            <button type="button" className="fs-cinta-ocultar" onClick={ocultar} aria-label="Ocultar barra de perfil" title="Ocultar barra de perfil"><span aria-hidden="true">↓</span></button>
           </div>
         </div>
       </div>}
@@ -356,7 +356,7 @@ function PerfilSheet({ opts, anio, setOpt, setOpts, onClose }) {
         </span>
         <span className="fs-field-hint">
           {anio < 2015
-            ? 'La vista solo estatal no está disponible para 2012–2014.'
+            ? 'La vista solo estatal no está disponible de 2012 a 2014.'
             : 'La vista estatal + autonómica es orientativa y usa escalas combinadas aproximadas. Solo estatal es una simulación: aplica únicamente los tipos estatales a la base y al mínimo; conserva los demás supuestos. No equivale al IRPF total.'}
         </span>
       </div>
@@ -391,7 +391,7 @@ function PerfilSheet({ opts, anio, setOpt, setOpts, onClose }) {
       />
 
       <p className="fs-source" style={{ marginTop: 14 }}>
-        <Fuente>Fuente · BOE · LIRPF arts. 56–61 · Leyes autonómicas de medidas tributarias</Fuente>
+        <Fuente>Fuente · BOE · LIRPF arts. 56 a 61 · Leyes autonómicas de medidas tributarias</Fuente>
       </p>
     </div>
   );

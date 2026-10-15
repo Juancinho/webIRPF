@@ -143,7 +143,7 @@ export default function Cierre() {
       // pie
       x.fillStyle = '#4d5559';
       x.font = '400 13px Inter, system-ui, sans-serif';
-      x.fillText('Cálculo propio sobre BOE · AEAT · TGSS · INE — estimación orientativa, no asesoramiento fiscal', 64, 596);
+      x.fillText('Cálculo propio sobre BOE · AEAT · TGSS · INE. Estimación orientativa, no asesoramiento fiscal', 64, 596);
 
       const blob = await new Promise(r => c.toBlob(r, 'image/png'));
       const url = URL.createObjectURL(blob);

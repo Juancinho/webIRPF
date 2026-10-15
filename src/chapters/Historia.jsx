@@ -125,7 +125,7 @@ export default function Historia() {
               </p>
               <p className="fs-source">
                 <a href="https://www.ine.es/varipc/" target="_blank" rel="noreferrer noopener">
-                  INE — Variación del IPC
+                  INE · Variación del IPC
                 </a>
               </p>
             </div>
@@ -232,7 +232,7 @@ export default function Historia() {
         <div className="fs-field" style={{ maxWidth: 'var(--reading-max)', margin: '0 auto' }}>
           <Puente rotulo="Quince años, de una vez">
             La figura anterior sigue nueve alturas de la escala. Esta las pone todas: quince
-            ejercicios y cien niveles de renta, con el par A–B resaltado.
+            ejercicios y cien niveles de renta, con el par A y B resaltado.
             El color representa una única magnitud fiscal y permite localizar periodos o tramos que
             se apartan del patrón general.
           </Puente>
@@ -480,7 +480,7 @@ function Dumbbells({ serie, anio, mejor, elegirAnio, bruto2026 }) {
                 onClick={() => elegirAnio(s.anio)}
                 style={{ cursor: 'pointer' }}
               >
-                <title>{`${s.anio} — ${eur(s.neto)} netos reales (${sign(dif)} frente a hoy). Pulsa para leer el informe con la fiscalidad de ${s.anio}.`}</title>
+                <title>{`${s.anio}: ${eur(s.neto)} netos reales (${sign(dif)} frente a hoy). Pulsa para leer el informe con la fiscalidad de ${s.anio}.`}</title>
               </rect>
             </g>
           );

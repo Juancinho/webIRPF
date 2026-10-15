@@ -301,7 +301,7 @@ function pasos({ bruto, anio, nomina, params, esAutonomo }) {
           : 'Se compone de tu salario bruto más la cotización empresarial a la Seguridad Social.',
       ],
       formula: `${eur(bruto)} + ${eur(nomina.cotEmp)} = ${eur(nomina.costeLab)}`,
-      fuente: { label: 'TGSS — Bases y tipos de cotización', url: 'https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/CotizacionRecaudacionTrabajadores/36537' },
+      fuente: { label: 'TGSS · Bases y tipos de cotización', url: 'https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/CotizacionRecaudacionTrabajadores/36537' },
     },
     {
       id: 'B · Cotización de la empresa',
@@ -313,7 +313,7 @@ function pasos({ bruto, anio, nomina, params, esAutonomo }) {
             `Son ${eur(nomina.cotEmp)} al año. Forman parte del coste empresarial y no se descuentan del salario bruto del trabajador.`,
           ],
       formula: esAutonomo ? null : `mín(${eur(bruto)}, ${eur(params.baseMax)}) × ${pct(params.tipoEmp * 100, 2)} = ${eur(nomina.cotEmp)}`,
-      fuente: { label: 'TGSS — Cotización', url: 'https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/CotizacionRecaudacionTrabajadores/36537' },
+      fuente: { label: 'TGSS · Cotización', url: 'https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/CotizacionRecaudacionTrabajadores/36537' },
     },
     {
       id: 'C · Salario bruto',
@@ -335,7 +335,7 @@ function pasos({ bruto, anio, nomina, params, esAutonomo }) {
         `El resultado, ${eur(nomina.rnPrevio)}, es el rendimiento íntegro del trabajo: el punto de partida del IRPF.`,
       ],
       formula: `${eur(bruto)} − ${eur(nomina.cotTra)} = ${eur(nomina.rnPrevio)}`,
-      fuente: { label: 'BOE — LIRPF art. 19', url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764&p=20260321&tn=1#a19' },
+      fuente: { label: 'BOE · LIRPF art. 19', url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764&p=20260321&tn=1#a19' },
     },
     {
       id: 'E · De rendimiento a base imponible',
@@ -348,7 +348,7 @@ function pasos({ bruto, anio, nomina, params, esAutonomo }) {
         `Además, la tarifa del modelo se aplica separadamente a la base y al mínimo personal y familiar (${eur(nomina.minimoPersonalYFamiliar)}); la diferencia da una cuota teórica, todavía antes de deducciones y límites. No es la cuota anual definitiva.`,
       ],
       formula: `${eur(nomina.rnPrevio)} − ${eur(nomina.gastosFijos)} − ${eur(art20)} = ${eur(nomina.baseImponible)}`,
-      fuente: { label: 'BOE — LIRPF arts. 19, 20 y 56-61', url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764&p=20260321&tn=1#a20' },
+      fuente: { label: 'BOE · LIRPF arts. 19, 20 y 56-61', url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764&p=20260321&tn=1#a20' },
     },
     {
       id: 'F · IRPF y renta neta',

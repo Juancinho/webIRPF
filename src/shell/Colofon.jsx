@@ -22,7 +22,7 @@ export default function Colofon() {
           <div>
             <span className="fs-stamp">Periodo</span>
             <p className="fs-note" style={{ marginTop: 6 }}>
-              2012—2026<br />
+              2012 a 2026<br />
               Euros constantes de 2026 salvo indicación
             </p>
           </div>

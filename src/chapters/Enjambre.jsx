@@ -119,7 +119,7 @@ export default function Enjambre() {
       title={`Mil asalariados, ${k === 1 ? 'uno' : 'dos'} por punto: por delante de ${Math.round(percentil)} de cada cien`}
       sub={`${anio} · eje lineal completo de 0 a ${eur(tope)} · cada punto es ${k === 1 ? 'una milésima' : 'dos milésimas'} de los asalariados`}
       legend="Los puntos se apilan cuando coinciden: la altura del montón es cuánta gente cobra ese sueldo · el punto verde eres tú · la línea de 100.000 € abre la cola alta sin agruparla"
-      source="Fuente · INE — Encuesta Anual de Estructura Salarial, tabla 28191"
+      source="Fuente · INE · Encuesta Anual de Estructura Salarial, tabla 28191"
       note={`Los ${salariosAltos / k} puntos estimados por encima de ${eur(UMBRAL_ALTO)} conservan ahora su posición salarial. El INE no publica P95 ni P99 en esta tabla: toda la cola por encima del percentil 90 es una extrapolación suave y debe leerse como estimación, no como dato censal.`}
       summary={hitos.map(h => `${h.label}: ${eur(h.s)}`).concat(`Por encima de ${eur(UMBRAL_ALTO)}: ${salariosAltos} de cada 1.000`).join('; ')}
     >
@@ -246,8 +246,8 @@ export default function Enjambre() {
             setTip({
               vx: c.cx,
               vy: cy(c.n - 1),
-              title: c.sMax - c.sMin < 400 ? eur(c.sMin) : `${eur(c.sMin)} – ${eur(c.sMax)}`,
-              sub: `Percentil ${c.pMin.toFixed(1)} – ${c.pMax.toFixed(1)}`,
+              title: c.sMax - c.sMin < 400 ? eur(c.sMin) : `${eur(c.sMin)} a ${eur(c.sMax)}`,
+              sub: `Percentil ${c.pMin.toFixed(1)} a ${c.pMax.toFixed(1)}`,
               rows: [
                 ['En esta columna', `${c.n * k} de cada 1.000`, 'var(--signal)'],
                 ['Cobran menos', pct(c.pMin, 1)],

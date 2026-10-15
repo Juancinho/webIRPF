@@ -33,17 +33,17 @@ export default function Prologo() {
 
           <ol className="fs-prologo-ruta">
             <li>
-              <span>01—03</span>
+              <span>01 a 03</span>
               <strong>Cálculo personal</strong>
               <p>Nómina, coste laboral e IRPF para el perfil elegido.</p>
             </li>
             <li>
-              <span>04—06</span>
+              <span>04 a 06</span>
               <strong>Comparación</strong>
               <p>Tiempo, OCDE y distribución salarial, con supuestos comunes y unidades declaradas.</p>
             </li>
             <li>
-              <span>07—08</span>
+              <span>07 a 08</span>
               <strong>Contexto agregado</strong>
               <p>Gasto por funciones y deuda pública; no son una cuenta individual del contribuyente.</p>
             </li>

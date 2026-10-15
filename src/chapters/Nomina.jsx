@@ -65,7 +65,7 @@ export default function Nomina() {
           ? `Cuota anual = base del tramo × 12 × tipo combinado = ${eur(nomina.cotTra)}`
           : `mín(${eur(bruto)}, ${eur(params.baseMax)}) × ${pct(params.tipoTra * 100, 2)} = ${eur(nomina.cotTra)}`,
         fuente: {
-          label: 'TGSS — Bases y tipos de cotización',
+          label: 'TGSS · Bases y tipos de cotización',
           url: 'https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/CotizacionRecaudacionTrabajadores/36537',
         },
       },
@@ -140,8 +140,8 @@ export default function Nomina() {
                 <span className="fs-stamp">Nota 01</span>
                 <p className="fs-note">
                   <span className="fs-hint-raton">Pasa el cursor por</span>
-                  <span className="fs-hint-dedo">Toca</span> cualquier tramo de la barra —o pulsa su
-                  nombre— para ver su fórmula, su artículo y su fuente.
+                  <span className="fs-hint-dedo">Toca</span> un tramo de la barra o pulsa su nombre
+                  para ver la fórmula, la norma y la fuente.
                 </p>
               </div>
             )}
@@ -180,7 +180,7 @@ export default function Nomina() {
                     target="_blank"
                     rel="noreferrer noopener"
                   >
-                    BOE — RIRPF art. 85.3
+                    BOE · RIRPF art. 85.3
                   </a>
                 </p>
               </div>

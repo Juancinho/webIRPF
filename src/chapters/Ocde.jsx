@@ -57,7 +57,7 @@ export default function Ocde() {
       sub={`${CUNA_OCDE_META.informe} · datos ${CUNA_OCDE_META.ejercicio} · ${CUNA_OCDE_META.supuesto} · cada fila son 100 € de coste laboral`}
       legend="Cada barra suma 100 € · la parte clara es lo que llega al trabajador · las tres oscuras son IRPF, cotización del trabajador y cotización de la empresa"
       source={`Fuente · OCDE ${CUNA_OCDE_META.informe}, tabla ${CUNA_OCDE_META.tabla}`}
-      note="Supuesto estandarizado —persona soltera, sin hijos, con el salario medio de su país— que no incluye IVA ni otros impuestos indirectos. Sirve para situar a España, no para calcular tu nómina."
+      note="La OCDE compara a una persona soltera, sin hijos y con el salario medio de su país. No incluye el IVA ni otros impuestos indirectos. Sirve para comparar países, no para calcular tu nómina."
       summary={filas.map(p => `${p.pais}: llegan ${Math.round(p.neto)} de cada 100`).join('; ')}
     >
       <div className="fs-readout">
@@ -155,7 +155,7 @@ export default function Ocde() {
                     fill={fill}
                     opacity={k === 'neto' && !destacada ? 0.58 : 1}
                   >
-                    <title>{`${p.pais} · ${label} — ${pct(p[k])} del coste laboral`}</title>
+                    <title>{`${p.pais} · ${label}: ${pct(p[k])} del coste laboral`}</title>
                   </rect>
                 );
                 cx += w;

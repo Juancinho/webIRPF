@@ -82,7 +82,7 @@ export default function Art20Historia() {
       title="La reducción del art. 20, redibujada seis veces en quince años"
       sub={`${real ? 'Euros constantes de 2026' : 'Euros nominales de cada año'} · eje horizontal: rendimiento neto previo · eje vertical: reducción aplicable`}
       legend="Cada curva se nombra en su propio extremo · la caída de cada una es el tramo donde aparece el acantilado de ese año"
-      source="Fuente · BOE — LIRPF art. 20, redacciones sucesivas"
+      source="Fuente · BOE · LIRPF art. 20, redacciones sucesivas"
       note={
         real
           ? 'En euros constantes se compara el poder adquisitivo cubierto por cada versión: una reducción nominalmente mayor puede equivaler a una cuantía real menor si los precios han crecido más.'
@@ -93,12 +93,12 @@ export default function Art20Historia() {
       <div className="fs-readout">
         <span>
           <span className="fs-readout-k">Rendimiento neto</span>
-          <span className="fs-readout-v">{hover ? eur(hover.rn) : '—'}</span>
+          <span className="fs-readout-v">{hover ? eur(hover.rn) : 'Sin selección'}</span>
         </span>
         {ANIOS_ART20_MUESTRA.filter(a => activos.has(a)).map(a => (
           <span key={a}>
             <span className="fs-readout-k">{a}</span>
-            <span className="fs-readout-v" style={{ color: tono(ANIOS_ART20_MUESTRA.indexOf(a)) }}>{hover ? eur(hover[`red_${a}`]) : '—'}</span>
+            <span className="fs-readout-v" style={{ color: tono(ANIOS_ART20_MUESTRA.indexOf(a)) }}>{hover ? eur(hover[`red_${a}`]) : 'Sin selección'}</span>
           </span>
         ))}
       </div>

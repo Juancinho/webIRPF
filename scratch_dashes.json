@@ -1,0 +1,732 @@
+[
+  {
+    "file": "index.html",
+    "line": 3,
+    "text": "<!-- FiscalScope Nº 01 — informe fiscal interactivo -->"
+  },
+  {
+    "file": "index.html",
+    "line": 100,
+    "text": "\"name\": \"Presión fiscal sobre las rentas del trabajo en España, 2012—2026\","
+  },
+  {
+    "file": "index.html",
+    "line": 121,
+    "text": "{ \"@type\": \"CreativeWork\", \"name\": \"BOE — Ley 35/2006 del IRPF\", \"url\": \"https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764\" },"
+  },
+  {
+    "file": "index.html",
+    "line": 122,
+    "text": "{ \"@type\": \"CreativeWork\", \"name\": \"TGSS — Bases y tipos de cotización\", \"url\": \"https://www.seg-social.es/\" },"
+  },
+  {
+    "file": "index.html",
+    "line": 123,
+    "text": "{ \"@type\": \"CreativeWork\", \"name\": \"INE — Encuesta Anual de Estructura Salarial\", \"url\": \"https://www.ine.es/jaxiT3/Tabla.htm?t=28191\" },"
+  },
+  {
+    "file": "index.html",
+    "line": 124,
+    "text": "{ \"@type\": \"CreativeWork\", \"name\": \"OCDE — Taxing Wages\", \"url\": \"https://www.oecd.org/tax/taxing-wages.htm\" },"
+  },
+  {
+    "file": "index.html",
+    "line": 125,
+    "text": "{ \"@type\": \"CreativeWork\", \"name\": \"Banco de España — Deuda de las AAPP\", \"url\": \"https://www.bde.es/\" }"
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 11,
+    "text": "1. MOTOR FISCAL — DATOS BASE"
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 246,
+    "text": "6. CALCULADORA PRINCIPAL — Con régimen, CCAA, familia, tributación"
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 392,
+    "text": "DISTRIBUCIÓN SALARIAL DE ESPAÑA — Percentiles anuales"
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 452,
+    "text": "// Densidad log-normal calibrada con mediana y media reales — para dibujar la"
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 471,
+    "text": "CUÑA FISCAL OCDE — Taxing Wages 2026 (datos referidos a 2025)"
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 499,
+    "text": "DEUDA PÚBLICA DE ESPAÑA — Banco de España (PDE) y proyecciones"
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 712,
+    "text": "<div style={{ fontSize: '0.6rem', letterSpacing: '0.13em', textTransform: 'uppercase', color: 'var(--ink-faded)', marginTop: 2 }}>IRPF · 2012—2026</div>"
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 830,
+    "text": "Se llama <strong style={{ fontWeight: 600 }}>progresividad en frío</strong>. Tu sueldo nominal sube para compensar la inflación, pero los tramos del IRPF, los mínimos personales y las reducciones permanecen congelados. Pagas un tipo efectivo más alto sin haber ganado, en términos reales, un solo euro. Esta página audita ese fenómeno entre 2012 y 2026 — para asalariados y autónomos, en cualquier comunidad autónoma, con tu situación familiar real."
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 1038,
+    "text": "<div className=\"eyebrow\">Paso 1 — Seguridad Social</div>"
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 1079,
+    "text": "<div className=\"eyebrow\">Paso 2 — Rendimiento</div>"
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 1099,
+    "text": "<div className=\"eyebrow\">Paso 3 — Cuota por tramos</div>"
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 1115,
+    "text": "<td className=\"mono\" style={{ fontSize: '0.75rem' }}>{fmtEUR(t.desde)}–{t.hasta === Infinity ? '∞' : fmtEUR(t.hasta)}</td>"
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 1132,
+    "text": "<div className=\"eyebrow\">Paso 4 — Liquidación</div>"
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 1391,
+    "text": "<td className=\"mono\" style={{ fontSize: '0.78rem' }}>{fmtEUR(desde)} – {lim === Infinity ? '∞' : fmtEUR(lim)}</td>"
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 1455,
+    "text": "CURVA IRPF — IRPF pagado por salario bruto, con comparativa multi-año"
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 1527,
+    "text": "// Paleta rotada por hue cada ~24° — cada año claramente distinto del anterior."
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 1544,
+    "text": "2026: '#1a1613', // tinta (año actual — destaca por ser casi negro)"
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 1549,
+    "text": "// Salario de referencia controlado por el usuario — marca la línea vertical en el gráfico"
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 1848,
+    "text": "{/* ===== CALLOUT DINÁMICO — diferencias exactas para el salario seleccionado ===== */}"
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 1929,
+    "text": "{/* ====== TABLA DE REFERENCIA — VERSIÓN COMPACTA MÓVIL ====== */}"
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 2024,
+    "text": "DISTRIBUCIÓN SALARIAL — Tu posición social vs tu posición fiscal"
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 2035,
+    "text": "// Recalcula posición social en ambos años — comparación bidireccional"
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 2372,
+    "text": "CUÑA FISCAL OCDE — Comparativa internacional + simulador \"Si España fuera...\""
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 2414,
+    "text": "La cuña fiscal mide la diferencia entre lo que le cuestas a tu empresa y lo que recibes en neto. Incluye IRPF, cotizaciones del trabajador <strong>y</strong> cotizaciones del empleador (las que no aparecen en tu nómina pero salen del mismo \"coste total\"). Según el informe <strong>Taxing Wages 2026</strong> de la OCDE, en España alcanza el <strong style={{ color: 'var(--crimson)' }}>41,4%</strong> — 6,3 puntos por encima de la media OCDE y la décima más alta del mundo desarrollado."
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 2455,
+    "text": "Cada barra suma 100% del coste laboral total. La parte verde (Neto) es lo que finalmente recibe el trabajador en su cuenta bancaria. España es la sexta más cara — solo Bélgica, Alemania, Francia, Austria e Italia se llevan más en proporción del coste laboral."
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 2546,
+    "text": "? <>Si España aplicara el sistema de <strong>{referencia.pais}</strong>, con tu mismo coste laboral cobrarías <strong className=\"num\" style={{ color: 'var(--ochre)' }}>+{fmtEUR(diferencia)}</strong> al año — unos {fmtEUR(diferencia / 12)} más al mes en tu cuenta.</>"
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 2559,
+    "text": "El Gobierno suele argumentar que la <strong>presión fiscal española</strong> (recaudación / PIB) está por debajo de la media UE. Es cierto, pero engañoso: ese ratio mide cuánto recauda el Estado en relación a la economía total, no cuánto pesa sobre el trabajador. La cuña fiscal sí lo mide, y aquí España aparece como el décimo país más caro de la OCDE — por encima de Dinamarca, Noruega, Reino Unido o Estados Unidos."
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 2577,
+    "text": "TU DEUDA — Cuánto te toca de la deuda pública española"
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 2624,
+    "text": "Cada español carga con una parte proporcional de la deuda pública. A finales de 2025, esa cifra superaba los 34.000 € por habitante, según el Banco de España. Esta sección calcula cuántos años tendrías que destinar el <strong>total</strong> de tu IRPF — sin gastar un euro en sanidad, educación o pensiones — solo para amortizar tu cuota personal de la deuda nacional."
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 2670,
+    "text": "Pagas <strong className=\"num\" style={{ color: 'var(--ochre)' }}>{fmtEUR(irpfAnual)}</strong> de IRPF al año. Tu parte proporcional de la deuda pública española en {anio} asciende a <strong className=\"num\" style={{ color: 'var(--crimson)' }}>{fmtEUR(datos.perCapita)}</strong>. Tendrías que destinar el <strong>100% de tu IRPF durante <span style={{ color: 'var(--crimson)' }}>{aniosParaPagar.toFixed(1)} años</span></strong> solo para pagar tu cuota personal — sin financiar sanidad, educación, pensiones, defensa ni infraestructuras."
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 2700,
+    "text": "<div className=\"eyebrow\">Evolución 2012 — 2026</div>"
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 2750,
+    "text": "Los datos de deuda total y % PIB proceden del <strong>Banco de España</strong>, criterio Protocolo de Déficit Excesivo (PDE) — el indicador estandarizado de Eurostat. La población corresponde a la Estadística Continua de Población (ECP) del INE."
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 2770,
+    "text": "{ anio: 2015, tag: 'IRPF', titulo: 'Reforma Montoro — Fase I', texto: 'Ley 26/2014. Simplificación a 5 tramos, máximo 46%. Gastos deducibles 2.000€ (art. 19.2.f). Mínimo personal a 5.550€.' },"
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 2771,
+    "text": "{ anio: 2016, tag: 'IRPF', titulo: 'Reforma Montoro — Fase II', texto: 'Tipo mínimo al 19%, máximo al 45%. Esta escala vigente sin cambios hasta 2020.' },"
+  },
+  {
+    "file": "remixed-c6d73035.tsx",
+    "line": 2909,
+    "text": "MOTOR v2.0 · DATOS 2012–2026 · AUDITORÍA ABIERTA"
+  },
+  {
+    "file": "src\\App.jsx",
+    "line": 40,
+    "text": "* de entrada, el informe arranca con su caso —su sueldo— y va precedido de la"
+  },
+  {
+    "file": "src\\App.jsx",
+    "line": 67,
+    "text": "/* Un salto a un ancla —índice, enlaces entre capítulos— lleva a su"
+  },
+  {
+    "file": "src\\chapters\\Acantilado.jsx",
+    "line": 28,
+    "text": "* FIG. 08 — EL ACANTILADO."
+  },
+  {
+    "file": "src\\chapters\\Acantilado.jsx",
+    "line": 309,
+    "text": "* FIG. 09 — EL SIMULADOR DE SUBIDA."
+  },
+  {
+    "file": "src\\chapters\\Apendice.jsx",
+    "line": 14,
+    "text": "* 07 · APÉNDICE — a research appendix, not a marketing footer."
+  },
+  {
+    "file": "src\\chapters\\Apendice.jsx",
+    "line": 153,
+    "text": "{' '}y los <a href=\"https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764#a56\" target=\"_blank\" rel=\"noreferrer noopener\">arts. 56–61</a>."
+  },
+  {
+    "file": "src\\chapters\\Art20Historia.jsx",
+    "line": 14,
+    "text": "* FIG. 14 — LA REDUCCIÓN QUE SE MUEVE."
+  },
+  {
+    "file": "src\\chapters\\Calendario.jsx",
+    "line": 40,
+    "text": "* FIG. 23 — EL CALENDARIO FISCAL."
+  },
+  {
+    "file": "src\\chapters\\Calendario.jsx",
+    "line": 43,
+    "text": "* y otra para otro. Convierte una proporción —cuña / coste laboral— en días"
+  },
+  {
+    "file": "src\\chapters\\CampoCuna.jsx",
+    "line": 32,
+    "text": "* FIG. 19 — CIEN EUROS DE COSTE LABORAL, AL DESPLAZARSE."
+  },
+  {
+    "file": "src\\chapters\\CampoCuna.jsx",
+    "line": 35,
+    "text": "* tiempo: primero son cien bloques iguales —cien euros que cuesta tu puesto—,"
+  },
+  {
+    "file": "src\\chapters\\Cierre.jsx",
+    "line": 14,
+    "text": "* EL CIERRE — la contraportada."
+  },
+  {
+    "file": "src\\chapters\\Cierre.jsx",
+    "line": 18,
+    "text": "* imagen descargable de 1200 × 630 —la proporción de una tarjeta social— para"
+  },
+  {
+    "file": "src\\chapters\\Cuna.jsx",
+    "line": 14,
+    "text": "* 05 · LA CUÑA FISCAL — the inverted chapter."
+  },
+  {
+    "file": "src\\chapters\\CurvaTipos.jsx",
+    "line": 50,
+    "text": "* FIG. 07 — LA CURVA DE TIPOS."
+  },
+  {
+    "file": "src\\chapters\\Desglose.jsx",
+    "line": 12,
+    "text": "* FIG. 03 — EL DESGLOSE COMPLETO, DIBUJADO COMO LO QUE ES: UNA CASCADA."
+  },
+  {
+    "file": "src\\chapters\\Desglose.jsx",
+    "line": 77,
+    "text": "explicar —la cuota de solidaridad del exceso sobre la base máxima— se"
+  },
+  {
+    "file": "src\\chapters\\Destino.jsx",
+    "line": 40,
+    "text": "* a punta. No añaden dato ninguno —la cifra ya está en el ancho— pero"
+  },
+  {
+    "file": "src\\chapters\\Destino.jsx",
+    "line": 79,
+    "text": "* FIG. 25 — EL RÍO DE LOS EUROS."
+  },
+  {
+    "file": "src\\chapters\\Destino.jsx",
+    "line": 82,
+    "text": "* gasto agregado por funciones? Dos magnitudes del caso personal —cotizaciones"
+  },
+  {
+    "file": "src\\chapters\\Destino.jsx",
+    "line": 83,
+    "text": "* e IRPF— se usan como escala y se proyectan sobre el reparto COFOG."
+  },
+  {
+    "file": "src\\chapters\\Distribucion.jsx",
+    "line": 22,
+    "text": "FIG. 17 — LA CURVA DE LA DISTRIBUCIÓN"
+  },
+  {
+    "file": "src\\chapters\\Distribucion.jsx",
+    "line": 217,
+    "text": "FIG. 18 — LOS PERCENTILES"
+  },
+  {
+    "file": "src\\chapters\\Distribucion.jsx",
+    "line": 309,
+    "text": "FIG. 20 — LA DISTRIBUCIÓN A LO LARGO DEL TIEMPO"
+  },
+  {
+    "file": "src\\chapters\\Distribucion.jsx",
+    "line": 373,
+    "text": "sub={`${real ? 'Euros constantes de 2026' : 'Euros nominales de cada año'} · banda P10–P90, cuartiles y mediana · pulsa un año para llevar la publicación a él`}"
+  },
+  {
+    "file": "src\\chapters\\EnCosas.jsx",
+    "line": 95,
+    "text": "* FIG. 17 — TU SUELDO, MEDIDO EN COSAS."
+  },
+  {
+    "file": "src\\chapters\\EnCosas.jsx",
+    "line": 100,
+    "text": "* señalar con el dedo —metros cuadrados, mensualidades de alquiler, salarios"
+  },
+  {
+    "file": "src\\chapters\\EnCosas.jsx",
+    "line": 101,
+    "text": "* mínimos— y cuenta cuántos caben en el mismo sueldo, año por año."
+  },
+  {
+    "file": "src\\chapters\\Enjambre.jsx",
+    "line": 25,
+    "text": "* FIG. 22 — MIL ASALARIADOS."
+  },
+  {
+    "file": "src\\chapters\\Enjambre.jsx",
+    "line": 32,
+    "text": "* El apilado es una columna por diámetro de punto —un dot plot de Wilkinson,"
+  },
+  {
+    "file": "src\\chapters\\Enjambre.jsx",
+    "line": 33,
+    "text": "* no un enjambre aleatorio— así que la figura sale idéntica en cada carga y"
+  },
+  {
+    "file": "src\\chapters\\Enjambre.jsx",
+    "line": 249,
+    "text": "title: c.sMax - c.sMin < 400 ? eur(c.sMin) : `${eur(c.sMin)} – ${eur(c.sMax)}`,"
+  },
+  {
+    "file": "src\\chapters\\Enjambre.jsx",
+    "line": 250,
+    "text": "sub: `Percentil ${c.pMin.toFixed(1)} – ${c.pMax.toFixed(1)}`,"
+  },
+  {
+    "file": "src\\chapters\\Epocas.jsx",
+    "line": 13,
+    "text": "* datos dibujados dos veces. Aquí queda lo que aquella figura no hacía —"
+  },
+  {
+    "file": "src\\chapters\\Historia.jsx",
+    "line": 231,
+    "text": "el sitio —y romper la retícula es justo lo que pide el capítulo. */}"
+  },
+  {
+    "file": "src\\chapters\\Historia.jsx",
+    "line": 235,
+    "text": "ejercicios y cien niveles de renta, con el par A–B resaltado."
+  },
+  {
+    "file": "src\\chapters\\Historia.jsx",
+    "line": 282,
+    "text": "* Antes esto eran dos figuras con los mismos datos —una en orden cronológico y"
+  },
+  {
+    "file": "src\\chapters\\Historia.jsx",
+    "line": 283,
+    "text": "* otra ordenada por neto— y nadie sabía en qué se diferenciaban. Es una sola,"
+  },
+  {
+    "file": "src\\chapters\\Historia.jsx",
+    "line": 298,
+    "text": "// En móvil caben las dos columnas que responden a la pregunta —neto real y"
+  },
+  {
+    "file": "src\\chapters\\Historia.jsx",
+    "line": 299,
+    "text": "// distancia a hoy—; el IRPF efectivo y la cuña quedan en la lectura de arriba"
+  },
+  {
+    "file": "src\\chapters\\Irpf.jsx",
+    "line": 309,
+    "text": "* FIG. 06 — LA LECCIÓN, EN EUROS CONTABLES."
+  },
+  {
+    "file": "src\\chapters\\Irpf.jsx",
+    "line": 312,
+    "text": "* distinta: se entienden contando euros. Dos campos de cien cuadrados —uno por"
+  },
+  {
+    "file": "src\\chapters\\Irpf.jsx",
+    "line": 313,
+    "text": "* los cien euros que ya ganas, otro por los cien siguientes— con los euros que"
+  },
+  {
+    "file": "src\\chapters\\MapaCalor.jsx",
+    "line": 32,
+    "text": "* FIG. 15 — QUINCE AÑOS EN UNA SOLA IMAGEN."
+  },
+  {
+    "file": "src\\chapters\\MapaCalor.jsx",
+    "line": 39,
+    "text": "* —una columna es el mismo poder adquisitivo— cuenta lo que ninguna ley"
+  },
+  {
+    "file": "src\\chapters\\Monedas.jsx",
+    "line": 24,
+    "text": "* FIG. 11 — LO QUE PAGAS, CONTADO EN FICHAS."
+  },
+  {
+    "file": "src\\chapters\\Monedas.jsx",
+    "line": 31,
+    "text": "* Sólo cuenta lo que sale de tu nómina —IRPF y cotización del trabajador—,"
+  },
+  {
+    "file": "src\\chapters\\Mosaico.jsx",
+    "line": 16,
+    "text": "* FIG. 20 — QUIÉN PAGA EL TOTAL."
+  },
+  {
+    "file": "src\\chapters\\Mosaico.jsx",
+    "line": 24,
+    "text": "* datos —¿quién sostiene la recaudación?— sin tener que elegir entre mirar"
+  },
+  {
+    "file": "src\\chapters\\Mosaico.jsx",
+    "line": 116,
+    "text": "percentil {Math.round(miBanda.p0)}–{Math.round(miBanda.p1)}"
+  },
+  {
+    "file": "src\\chapters\\Mosaico.jsx",
+    "line": 160,
+    "text": "sub: `Percentil ${Math.round(b.p0)}–${Math.round(b.p1)}`,"
+  },
+  {
+    "file": "src\\chapters\\Mosaico.jsx",
+    "line": 258,
+    "text": "{narrow ? 'P' : 'Percentil '}{Math.round(activo.p0)}–{Math.round(activo.p1)} · {eur(activo.salario)} · aporta{' '}"
+  },
+  {
+    "file": "src\\chapters\\Nomina.jsx",
+    "line": 20,
+    "text": "* 01 · TU NÓMINA — FIG. 02, el reparto del bruto."
+  },
+  {
+    "file": "src\\chapters\\Ocde.jsx",
+    "line": 22,
+    "text": "* FIG. 17 — ESPAÑA EN LA OCDE."
+  },
+  {
+    "file": "src\\chapters\\Ocde.jsx",
+    "line": 24,
+    "text": "* reaches the worker and what does not — the same unit as FIG. 16, so the two"
+  },
+  {
+    "file": "src\\chapters\\Ocde.jsx",
+    "line": 40,
+    "text": "// En móvil las filas son algo más altas —se tocan con el dedo— y la barra"
+  },
+  {
+    "file": "src\\chapters\\Pendiente.jsx",
+    "line": 42,
+    "text": "* FIG. 16 — QUINCE AÑOS DE PRESIÓN FISCAL, ALTURA POR ALTURA."
+  },
+  {
+    "file": "src\\chapters\\Pendiente.jsx",
+    "line": 50,
+    "text": "* El selector de años no recorta la serie —están siempre los quince— sino que"
+  },
+  {
+    "file": "src\\chapters\\Portada.jsx",
+    "line": 18,
+    "text": "* 00 · PORTADA — the cover of the paper."
+  },
+  {
+    "file": "src\\chapters\\Portada.jsx",
+    "line": 121,
+    "text": "* FIG. 01 — LA REGLA. A measured instrument: axis, tick floor, the reader's"
+  },
+  {
+    "file": "src\\chapters\\Portada.jsx",
+    "line": 122,
+    "text": "* mark. Horizontal on the page, vertical in portrait — the scroll direction"
+  },
+  {
+    "file": "src\\chapters\\Viaje.jsx",
+    "line": 17,
+    "text": "360 unidades —la columna de marcas se estrecha y cada marca vale el doble"
+  },
+  {
+    "file": "src\\chapters\\Viaje.jsx",
+    "line": 18,
+    "text": "para que sigan pudiendo contarse—. */"
+  },
+  {
+    "file": "src\\chapters\\Viaje.jsx",
+    "line": 25,
+    "text": "* 02 · EL VIAJE DE CADA EURO — FIG. 03, the descent."
+  },
+  {
+    "file": "src\\chapters\\Viaje.jsx",
+    "line": 290,
+    "text": "/** Protected explanatory content: steps A–L of the original fiscal breakdown. */"
+  },
+  {
+    "file": "src\\engine\\irpf.js",
+    "line": 4,
+    "text": "// MOTOR FISCAL IRPF 2012-2026  — versión extendida"
+  },
+  {
+    "file": "src\\engine\\irpf.js",
+    "line": 438,
+    "text": "// ── Datos precomputados (gráficos existentes — usan opts por defecto) ──────────"
+  },
+  {
+    "file": "src\\entry-server.jsx",
+    "line": 9,
+    "text": "* Sin esto, lo que se sirve es un documento vacío y todo el texto —las"
+  },
+  {
+    "file": "src\\entry-server.jsx",
+    "line": 10,
+    "text": "* treinta figuras, sus títulos, sus notas y sus fuentes— sólo existe después"
+  },
+  {
+    "file": "src\\figures\\ChartFrame.jsx",
+    "line": 18,
+    "text": "* Las figuras categóricas —filas de países, de años o de percentiles— no"
+  },
+  {
+    "file": "src\\figures\\Figure.jsx",
+    "line": 6,
+    "text": "* legend · source. No borders, no background, no rounded corners — the page"
+  },
+  {
+    "file": "src\\figures\\Fuente.jsx",
+    "line": 17,
+    "text": "const REFERENCIA_RE = /(ajuste log-normal propio|interpolaci[oó]n y c[aá]lculo(?:s)? propio(?:s)?|c[aá]lculo(?:s)? propio(?:s)?|LIRPF(?:\\s+arts?\\.?\\s*[\\d.,–—-]+(?:\\s+y\\s+[\\d.,–—-]+)?)?|RIRPF(?:\\s+art\\.?\\s*[\\d.]+)?|EAES(?:,?\\s*tabla)?\\s*28191|Banco de Espa[nñ]a|Eurostat|idealista|TGSS|AEAT|OCDE|IGAE|INE|BOE)/gi;"
+  },
+  {
+    "file": "src\\figures\\marks.jsx",
+    "line": 13,
+    "text": "* subtract — geometry carries the sign, never colour."
+  },
+  {
+    "file": "src\\figures\\marks.jsx",
+    "line": 164,
+    "text": "* A field of countable blocks — one block = one honest unit (1 € of 100,"
+  },
+  {
+    "file": "src\\figures\\marks.jsx",
+    "line": 168,
+    "text": "groups,          // [{ key, label, value, color }] — values sum to `total`"
+  },
+  {
+    "file": "src\\figures\\marks.jsx",
+    "line": 217,
+    "text": "* a leader — no legend, ever (DESIGN.md §49)."
+  },
+  {
+    "file": "src\\figures\\Puente.jsx",
+    "line": 5,
+    "text": "* publicación: es un álbum de gráficos. El puente es el tejido que faltaba —"
+  },
+  {
+    "file": "src\\figures\\scale.js",
+    "line": 2,
+    "text": "FIGURE PRIMITIVES — scales, deterministic texture, path helpers."
+  },
+  {
+    "file": "src\\figures\\scale.js",
+    "line": 32,
+    "text": "* Deterministic pseudo-random in [0,1) — lieflat-charts' `rnd`."
+  },
+  {
+    "file": "src\\figures\\scale.js",
+    "line": 44,
+    "text": "/** Rounded to 2dp — keeps the emitted SVG small and diff-friendly. */"
+  },
+  {
+    "file": "src\\figures\\useDomainZoom.js",
+    "line": 7,
+    "text": "* En vez de escalar el dibujo —que engorda trazos y tipografía como si fuera"
+  },
+  {
+    "file": "src\\figures\\useDomainZoom.js",
+    "line": 8,
+    "text": "* una foto— esto mueve el **dominio** del eje. La figura vuelve a calcular sus"
+  },
+  {
+    "file": "src\\figures\\useDomainZoom.js",
+    "line": 86,
+    "text": "/** Posición (0–1) de un clientX dentro del tramo dibujado del eje. */"
+  },
+  {
+    "file": "src\\figures\\useTactil.js",
+    "line": 6,
+    "text": "* Cada figura sabe reaccionar al ratón —`onMouseEnter`, `onMouseMove`,"
+  },
+  {
+    "file": "src\\figures\\useTactil.js",
+    "line": 7,
+    "text": "* `onMouseLeave`— y ninguna sabía nada del dedo. En vez de reescribir treinta"
+  },
+  {
+    "file": "src\\figures\\useTactil.js",
+    "line": 17,
+    "text": "*   directamente —el vertical sigue desplazando la página— salvo cuando el eje"
+  },
+  {
+    "file": "src\\figures\\YearComparator.jsx",
+    "line": 5,
+    "text": "* El color identifica el papel del año —A o B— y no una valoración del dato."
+  },
+  {
+    "file": "src\\hooks\\useNarrow.js",
+    "line": 32,
+    "text": "* escritorio; en un teléfono de 375 px eso encogía el texto a 3–4 px. Con un"
+  },
+  {
+    "file": "src\\hooks\\useNumeroAnimado.js",
+    "line": 14,
+    "text": "* El primer valor no se anima —entrar en la página con los números corriendo"
+  },
+  {
+    "file": "src\\hooks\\useNumeroAnimado.js",
+    "line": 15,
+    "text": "* sería decorativo, no informativo— y con `prefers-reduced-motion` el valor se"
+  },
+  {
+    "file": "src\\paginas\\Aterrizaje.jsx",
+    "line": 24,
+    "text": "* LA RESPUESTA — cabeza de las páginas de entrada."
+  },
+  {
+    "file": "src\\paginas\\contenido.js",
+    "line": 3,
+    "text": "Cada página responde a una búsqueda concreta —«30.000 € brutos cuánto es"
+  },
+  {
+    "file": "src\\paginas\\contenido.js",
+    "line": 4,
+    "text": "neto», «tramos del IRPF 2026», «cuña fiscal España»— con su propia cifra y"
+  },
+  {
+    "file": "src\\paginas\\contenido.js",
+    "line": 298,
+    "text": "{ p: `¿Hay una única tabla de tramos para toda España en ${ANIO}?`, r: 'No. Hay una escala estatal y una escala autonómica propia de cada comunidad. El 19 %–47 % que se ve en la referencia estándar es una simplificación del modelo, no una tarifa legal universal.' },"
+  },
+  {
+    "file": "src\\paginas\\contenido.js",
+    "line": 614,
+    "text": "titulo: 'Deflactar el IRPF: cuánto cuesta la progresividad en frío (2012–2026)',"
+  },
+  {
+    "file": "src\\paginas\\contenido.js",
+    "line": 617,
+    "text": "sello: 'Inflación y fiscalidad · 2012–2026',"
+  },
+  {
+    "file": "src\\paginas\\contenido.js",
+    "line": 621,
+    "text": "{ k: 'Inflación acumulada 2012–2026', v: pct((INFLACION_A_2026[2012] - 1) * 100) },"
+  },
+  {
+    "file": "src\\shell\\chapters.js",
+    "line": 1,
+    "text": "/** The publication's table of contents — ten movements, one argument. */"
+  },
+  {
+    "file": "src\\shell\\Cinta.jsx",
+    "line": 9,
+    "text": "* LA CINTA — the persistent instrument (VISUAL_PLAN_V4 §6)."
+  },
+  {
+    "file": "src\\shell\\Cinta.jsx",
+    "line": 168,
+    "text": "importan —bruto y neto— y un botón; los mandos se despliegan encima,"
+  },
+  {
+    "file": "src\\shell\\Cinta.jsx",
+    "line": 359,
+    "text": "? 'La vista solo estatal no está disponible para 2012–2014.'"
+  },
+  {
+    "file": "src\\shell\\Cinta.jsx",
+    "line": 394,
+    "text": "<Fuente>Fuente · BOE · LIRPF arts. 56–61 · Leyes autonómicas de medidas tributarias</Fuente>"
+  },
+  {
+    "file": "src\\shell\\Indice.jsx",
+    "line": 75,
+    "text": "/** A full-screen index sheet — document navigation, opened on demand. */"
+  },
+  {
+    "file": "src\\shell\\montajeDiferido.js",
+    "line": 6,
+    "text": "golpe los once capítulos —veintinueve figuras, miles de nodos SVG— bloqueaba"
+  }
+]

@@ -84,7 +84,7 @@ export default function Apendice() {
         <Seccion letra="A" titulo="Metodología y trazabilidad" id="metodo-calculos">
           <p className="fs-body">
             El motor aproxima, para cada año entre 2012 y 2026, esta secuencia: coste laboral,
-            cotizaciones de empresa y trabajador, rendimiento íntegro, gastos deducibles del art.
+            cotizaciones de empresa y trabajador, rendimiento tras cotización, gastos deducibles del art.
             19.2.f, reducción por rendimientos del trabajo del art. 20, base de cálculo, cuota
             previa por tramos, cuota del mínimo personal y familiar, deducción por obtención de
             rendimientos del trabajo y límite del 43 % de retención.
@@ -127,8 +127,8 @@ export default function Apendice() {
                 {' '}y de las órdenes anuales de cotización.
               </PasoMetodo>
               <PasoMetodo n="02" titulo="Rendimiento previo" formula={`${eur(bruto)} − ${eur(nomina.cotTra)} = ${eur(nomina.rnPrevio)}`}>
-                La cotización del trabajador reduce el rendimiento íntegro antes de aplicar los gastos y
-                reducciones del trabajo.
+                Restamos del bruto la cotización del trabajador. Después aplicamos los gastos y
+                reducciones del trabajo para obtener la base usada por el modelo.
               </PasoMetodo>
               <PasoMetodo n="03" titulo="Gastos y reducciones" formula={`${eur(nomina.rnPrevio)} − ${eur(nomina.gastosFijos)} − ${eur(nomina.redTrabajo)}${nomina.reduccionConjunta > 0 ? ` − ${eur(nomina.reduccionConjunta)}` : ''} = ${eur(nomina.baseImponible)}`}>
                 Se aplican los gastos deducibles del{' '}
@@ -136,20 +136,21 @@ export default function Apendice() {
                 {' '}y, si procede, la reducción del{' '}
                 <a href="https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764#a20" target="_blank" rel="noreferrer noopener">art. 20 LIRPF</a>.
               </PasoMetodo>
-              <PasoMetodo n="04" titulo="Cuota por tramos" formula={`${eur(nomina.cuotaIntegra)} − ${eur(nomina.cuotaMinimo)} = ${eur(nomina.cuotaTeorica)}`}>
-                Primero se aplica la escala progresiva a la base de {eur(nomina.baseImponible)}:
-                resulta {eur(nomina.cuotaIntegra)}. Después se comienza otra vez desde el primer
-                tramo y se aplica esa misma escala al mínimo personal y familiar de{' '}
-                {eur(nomina.minimoPersonalYFamiliar)}: resulta {eur(nomina.cuotaMinimo)}.
-                La resta de ambas cuotas es {eur(nomina.cuotaTeorica)}. El mínimo representa
-                necesidades básicas, no una entrega de dinero ni una resta directa de la base.
+              <PasoMetodo n="04" titulo="Cuota por tramos" formula={`máx(0; ${eur(nomina.cuotaIntegra)} − ${eur(nomina.cuotaMinimo)}) = ${eur(nomina.cuotaTeorica)}`}>
+                Los tramos del modelo calculan primero {eur(nomina.cuotaIntegra)} sobre una base de{' '}
+                {eur(nomina.baseImponible)}. El mínimo personal y familiar protege una parte de esa
+                renta destinada a necesidades básicas. Para reflejarlo, calculamos qué cuota
+                producirían {eur(nomina.minimoPersonalYFamiliar)} si empezáramos por el primer
+                tramo: {eur(nomina.cuotaMinimo)}. Al restarla de la cuota anterior quedan{' '}
+                {eur(nomina.cuotaTeorica)}. Si la resta sale negativa, queda en cero. No recibes
+                el importe del mínimo ni se resta entero del impuesto.
                 {opts.modoEscala === 'solo_estatal' && anio >= 2015
                   ? ' En la vista solo estatal se usa únicamente la escala estatal.'
                   : ' El modelo usa la escala combinada del perfil; la declaración real separa escala y mínimo estatales y autonómicos.'}
                 {' '}Consulta la{' '}
                 <a href="https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764#a63" target="_blank" rel="noreferrer noopener">escala estatal del art. 63</a>
                 , la <a href="https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764#a101" target="_blank" rel="noreferrer noopener">escala de retenciones del art. 101</a>
-                {' '}y los <a href="https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764#a56" target="_blank" rel="noreferrer noopener">arts. 56–61</a>.
+                {' '}y los <a href="https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764#a56" target="_blank" rel="noreferrer noopener">arts. 56 a 61</a>.
               </PasoMetodo>
               <PasoMetodo n="05" titulo="Deducciones y límite" formula={`${eur(nomina.cuotaTeorica)} − ${eur(nomina.deduccionSMI)} → ${eur(nomina.irpfFinal)} de IRPF estimado`}>
                 Se resta la deducción por rendimientos del trabajo cuando existe y se aplica el límite de
@@ -194,9 +195,11 @@ export default function Apendice() {
               <span className="fs-stamp">Método M4 · equivalencias</span>
               <h4>De la cuña a un reparto y a casillas de calendario</h4>
               <p>
-                El río combina una cifra calculada para tu perfil con porcentajes del gasto público
-                español de 2023. El calendario dibuja esa proporción en casillas fechadas.
-                Ambas transformaciones se detallan a continuación.
+                El río puede mostrar la cuña completa, con el IRPF estimado y las cotizaciones de
+                empresa y trabajador, o sólo los descuentos de nómina, sin la cotización empresarial.
+                En ambos casos aplica hipotéticamente los porcentajes del gasto público español de
+                2023. El calendario utiliza siempre la cuña completa como parte del coste laboral.
+                Ninguno de los dos gráficos sigue el destino real de tus pagos.
               </p>
             </article>
           </div>
@@ -259,14 +262,21 @@ export default function Apendice() {
                 Se suman la cotización de la empresa, la del trabajador y el IRPF estimado. La misma
                 cifra se obtiene restando al coste laboral, {eur(nomina.costeLab, 2)}, el salario neto,
                 {eur(nomina.salarioNeto, 2)}. La cotización empresarial forma parte del coste laboral;
-                no es un descuento adicional de tu salario bruto. El neto queda fuera del río.
+                no es un descuento adicional de tu salario bruto. Si eliges «Descuentos de tu nómina»,
+                el río usa sólo {eur(nomina.cotTra, 2)} de tu cotización + {eur(nomina.irpfFinal, 2)} de
+                IRPF estimado = {eur(nomina.cotTra + nomina.irpfFinal, 2)}. El neto queda fuera en
+                ambas vistas.
               </PasoMetodo>
               <PasoMetodo n="02" titulo="Porcentaje COFOG y equivalencia en euros" formula={`${dec(gastoSocial, 0)} M€ / ${dec(GASTO_COFOG.total, 0)} M€ ≈ ${pct(parteSocial * 100, 2)}; ${eur(cuna, 2)} × ${pct(parteSocial * 100, 2)} ≈ ${eur(cuna * parteSocial, 2)}`}>
                 Protección social representa {gastoSocial.toLocaleString('es-ES')} de los{' '}
                 {GASTO_COFOG.total.toLocaleString('es-ES')} millones de euros del gasto COFOG de
                 {GASTO_COFOG.anio}. Para cada otra función se hace la misma división y se multiplica
-                por tu cuña. El porcentaje procede del gasto agregado; el importe en euros del río
-                es una proyección propia. No identifica el destino efectivo de tus pagos.
+                por el importe elegido: {eur(cuna, 2)} con la cuña completa o{' '}
+                {eur(nomina.cotTra + nomina.irpfFinal, 2)} con sólo los descuentos de nómina.
+                En esta segunda vista, protección social equivaldría a{' '}
+                {eur((nomina.cotTra + nomina.irpfFinal) * parteSocial, 2)}. El porcentaje procede del
+                gasto agregado; el importe en euros del río es una proyección propia. No identifica
+                el destino efectivo de tus pagos.
               </PasoMetodo>
               <PasoMetodo n="03" titulo="Proporción del coste laboral" formula={`${eur(cuna, 2)} / ${eur(nomina.costeLab, 2)} ≈ ${pct(parteCuna * 100, 2)}`}>
                 Dividir responde a una pregunta concreta: de todo lo que cuesta este puesto de
@@ -274,19 +284,19 @@ export default function Apendice() {
                 al salario neto estimado.
               </PasoMetodo>
               <PasoMetodo n="04" titulo="Esa proporción, dibujada en casillas" formula={`${pct(parteCuna * 100, 2)} × ${totalDias} casillas ≈ ${diasCuna} casillas coloreadas`}>
-                El calendario se usa como una barra de {totalDias} partes iguales: cada casilla
-                representa 1/{totalDias} del coste laboral anual, aunque lleve una fecha. Se redondea
-                al entero más cercano. Las {diasCuna} coloreadas representan la parte de cuña y las{' '}
-                {totalDias - diasCuna} sin relleno, la parte del neto. Los tres colores de las casillas
-                pintadas vuelven a usar las proporciones COFOG; colocarlas desde enero sólo ayuda a
-                contarlas y no marca fechas de pago.
+                Si el coste laboral completo ocupara las {totalDias} casillas del año, cada casilla
+                sería 1/{totalDias} de ese coste. Por eso multiplicamos el porcentaje de la cuña por{' '}
+                {totalDias} y redondeamos: salen {diasCuna} casillas coloreadas. Las otras{' '}
+                {totalDias - diasCuna} representan el salario neto. Dentro de la parte coloreada,
+                los tres colores aplican las proporciones COFOG. Las fechas sólo ordenan las
+                casillas; no son días en que hayas pagado esos importes.
               </PasoMetodo>
             </ol>
           </div>
         </Seccion>
 
         {/* ── B ─────────────────────────────────────────────────────────── */}
-        <Seccion letra="B" titulo="Parámetros, 2012—2026">
+        <Seccion letra="B" titulo="Parámetros, 2012 a 2026">
           <div className="fs-table-scroll">
             <table className="fs-table is-fija">
               <caption>
@@ -321,10 +331,10 @@ export default function Apendice() {
                     <td>{eur(p.baseMax)}</td>
                     <td>{pct(p.tipoEmp * 100, 2)}</td>
                     <td>{pct(p.tipoTra * 100, 2)}</td>
-                    <td>{p.mei > 0 ? pct(p.mei * 100, 2) : '—'}</td>
-                    <td>{p.gastosFijos > 0 ? eur(p.gastosFijos) : '—'}</td>
-                    <td>{typeof p.art20.uInf === 'number' ? eur(p.art20.uInf) : '—'}</td>
-                    <td>{typeof p.art20.rMax === 'number' ? eur(p.art20.rMax) : '—'}</td>
+                    <td>{p.mei > 0 ? pct(p.mei * 100, 2) : 'No aplica'}</td>
+                    <td>{p.gastosFijos > 0 ? eur(p.gastosFijos) : 'No aplica'}</td>
+                    <td>{typeof p.art20.uInf === 'number' ? eur(p.art20.uInf) : 'No aplica'}</td>
+                    <td>{typeof p.art20.rMax === 'number' ? eur(p.art20.rMax) : 'No aplica'}</td>
                     <td>{eur(p.minimoExento)}</td>
                     <td>{eur(p.irpfMinimo)}</td>
                     <td>{eur(p.smi)}</td>
@@ -421,7 +431,7 @@ export default function Apendice() {
                   <th scope="row">Distribución salarial</th>
                   <td>
                     <a href="https://www.ine.es/jaxiT3/Tabla.htm?t=28191" target="_blank" rel="noreferrer noopener">
-                      INE — EAES, tabla 28191
+                      INE · EAES, tabla 28191
                     </a>
                   </td>
                 </tr>
@@ -429,7 +439,7 @@ export default function Apendice() {
                   <th scope="row">Cuña fiscal internacional</th>
                   <td>
                     <a href="https://doi.org/10.1787/3a5169ef-en" target="_blank" rel="noreferrer noopener">
-                      OCDE — Taxing Wages 2026, tabla 1.2
+                      OCDE · Taxing Wages 2026, tabla 1.2
                     </a>
                   </td>
                 </tr>
@@ -437,11 +447,11 @@ export default function Apendice() {
                   <th scope="row">Gasto público por funciones</th>
                   <td>
                     <a href="https://www.igae.pap.hacienda.gob.es/sitios/igae/es-ES/Contabilidad/ContabilidadNacional/Publicaciones/paginas/iacogof.aspx" target="_blank" rel="noreferrer noopener">
-                      IGAE — Clasificación funcional del gasto de las AAPP (COFOG)
+                      IGAE · Clasificación funcional del gasto de las AAPP (COFOG)
                     </a>
                     {' · '}
                     <a href="https://ec.europa.eu/eurostat/en/web/products-manuals-and-guidelines/-/ks-gq-19-010" target="_blank" rel="noreferrer noopener">
-                      Eurostat — Manual COFOG 2019
+                      Eurostat · Manual COFOG 2019
                     </a>
                   </td>
                 </tr>
@@ -449,7 +459,7 @@ export default function Apendice() {
                   <th scope="row">Deuda pública</th>
                   <td>
                     <a href="https://datos.bde.es/datos/es/datasets/000/033.html" target="_blank" rel="noreferrer noopener">
-                      Banco de España — Deuda de las AAPP según el PDE
+                      Banco de España · Deuda de las AAPP según el PDE
                     </a>
                     {' · INE (población e IPC)'}
                   </td>

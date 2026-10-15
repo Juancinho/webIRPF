@@ -93,7 +93,7 @@ export default function Acantilado() {
         }
         sub={`${anio} · eje común: salario bruto anual de 0 a ${eur(MAXB)} · arriba la reducción en euros, abajo el tipo marginal total (IRPF + SS)`}
         legend={`Una marca = ${eur(STEP)} de bruto · la altura de cada marca es el tipo marginal total en ese punto`}
-        source="Fuente · BOE — LIRPF art. 20 · cálculo propio"
+        source="Fuente · BOE · LIRPF art. 20 · cálculo propio"
         note={
           redMax > 0
             ? `La reducción se mantiene hasta ${eur(bPlana ?? 0)} de bruto y se agota a partir de ${eur(bCero ?? 0)}. Entre ambos puntos, cada euro adicional aumenta el rendimiento y reduce simultáneamente el beneficio fiscal, por lo que la base imponible crece más de un euro.`
@@ -185,7 +185,7 @@ export default function Acantilado() {
                 strokeWidth={esPico ? 1.6 : 1}
                 opacity={esPico ? 1 : 0.75}
               >
-                <title>{`${eur(p.b)} de bruto — tipo marginal total ${pct(p.marg)}`}</title>
+                <title>{`${eur(p.b)} de bruto: tipo marginal total ${pct(p.marg)}`}</title>
               </line>
             );
           })}
@@ -454,8 +454,8 @@ function CienEuros() {
 
       <p className="fs-note" style={{ marginTop: 14, maxWidth: '72ch' }}>
         Ese {pct(d.marginal)} es el <strong>tipo marginal combinado</strong> para esta subida
-        concreta. Integra el incremento de IRPF, las cotizaciones y —cuando corresponde— la
-        reducción del art. 20 que deja de aplicarse. No debe confundirse con el tipo efectivo
+        concreta. Incluye el aumento de IRPF y cotizaciones. También recoge el efecto de perder
+        parte de la reducción del art. 20, si ocurre. No debe confundirse con el tipo efectivo
         calculado sobre el salario completo.
       </p>
     </Figure>
@@ -561,9 +561,10 @@ function ComoFunciona() {
         </div>
         <p className="fs-note" style={{ marginTop: 10, maxWidth: '68ch' }}>
           Mil euros brutos más dejan {eur(caso.dNeto)} netos: un tipo marginal del{' '}
-          <strong>{pct((1 - caso.dNeto / 1000) * 100)}</strong>. La base sube {eur(caso.dBase)} —{' '}
-          {eur(caso.dBase - 1000)} más que el propio aumento— porque la reducción que se retira
-          también se grava. Afecta sólo a los euros dentro de esta franja, no a todo el salario.
+          <strong>{pct((1 - caso.dNeto / 1000) * 100)}</strong>. La base sobre la que se calcula el
+          IRPF aumenta {eur(caso.dBase)}, es decir, {eur(caso.dBase - 1000)} más que el bruto.
+          Ocurre porque también has perdido parte de la reducción. Afecta a esta subida, no a todo
+          el salario que ya cobrabas.
         </p>
       </div>
     </div>

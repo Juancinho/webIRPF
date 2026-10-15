@@ -268,22 +268,18 @@ export default function CurvaTipos() {
         <p className="fs-body">
           El eje horizontal recorre todos los salarios brutos posibles, de cero a {eur(MAXB)}. Para
           cada uno se calcula una nómina completa con las normas de {anio} y se dibujan{' '}
-          <strong>tres formas distintas de medir lo mismo</strong>. No son alternativas: las tres
-          son ciertas a la vez, y confundirlas es la causa de casi todas las discusiones sobre
-          impuestos.
+          <strong>tres porcentajes</strong>. Cada uno responde a una pregunta distinta.
         </p>
 
         <ol className="fs-explica-lista">
           <li>
             <span className="fs-explica-k" style={{ color: 'var(--counter)' }}>Marginal total</span>
             <p>
-              Qué pasa con <strong>el euro siguiente</strong>, no con los que ya has ganado. Si
-              cobraras {eur(SUBIDA)} más al año, no te llegarían {eur(SUBIDA)}: te llegarían{' '}
-              <strong>{eur(SUBIDA * marginal.netoMarginal)}</strong> y se irían{' '}
-              {eur(SUBIDA * marginal.tipoMarginalTotal)} entre IRPF y cotización. Ese reparto —
-              {pct(marginal.tipoMarginalTotal * 100)} frente a {pct(marginal.netoMarginal * 100)}—
-              es tu tipo marginal, y es el número que decide si compensa una hora extra o un
-              ascenso.
+              Mide qué pasaría con una pequeña subida, no con el sueldo que ya cobras. Si ganaras{' '}
+              {eur(SUBIDA)} más al año, te llegarían aproximadamente{' '}
+              <strong>{eur(SUBIDA * marginal.netoMarginal)}</strong> netos. Los otros{' '}
+              {eur(SUBIDA * marginal.tipoMarginalTotal)} serían IRPF y cotización. Eso equivale a
+              un marginal total del {pct(marginal.tipoMarginalTotal * 100)}.
             </p>
           </li>
           <li>
@@ -292,8 +288,7 @@ export default function CurvaTipos() {
               Todo el IRPF de un año dividido entre todo el bruto de ese año:{' '}
               {eur(nomina.irpfFinal)} ÷ {eur(bruto)} ={' '}
               <strong>{pct(nomina.tipoEfectivoIRPF * 100)}</strong>. No hay ningún tramo que se
-              aplique a tu sueldo entero, así que esta cifra siempre queda por debajo del tipo que
-              aparece en la tabla de la escala.
+              aplique a tu sueldo entero. Por eso este porcentaje no es el tipo de tu último tramo.
             </p>
           </li>
           <li>
@@ -302,29 +297,27 @@ export default function CurvaTipos() {
               Lo mismo, sumando tu cotización a la Seguridad Social: ({eur(nomina.irpfFinal)} +{' '}
               {eur(nomina.cotTra)}) ÷ {eur(bruto)} ={' '}
               <strong>{pct(nomina.tipoEfectivoTotal * 100)}</strong>. Es la parte de tu bruto que
-              no llega a tu cuenta. No incluye la cotización que paga la empresa: esa vive en el
-              capítulo 05.
+              no llega a tu cuenta. No incluye la cotización de la empresa, que se paga además del
+              sueldo bruto.
             </p>
           </li>
         </ol>
 
         <p className="fs-body">
           <strong>Por qué las tres líneas se separan.</strong> Con una escala progresiva, cada
-          tramo grava sólo la porción de base que cae dentro de él. La línea azul salta de golpe
-          cada vez que cruzas un tramo —por eso tiene escalones— mientras que las otras dos suben
-          despacio, porque reparten la factura entre todos tus euros, incluidos los primeros, que
-          apenas pagan. La distancia vertical entre ellas es exactamente la confusión que genera
-          decir «estoy en el tramo del {pct(nomina.tipoMargIRPF * 100, 0)}»: ese tipo sólo toca al
-          último euro, mientras que sobre el conjunto del sueldo pagas{' '}
-          <strong>{pct(nomina.tipoEfectivoIRPF * 100)}</strong> de IRPF.
+          tramo grava sólo la parte de base que cae dentro de él. Por eso la línea del marginal
+          salta al cruzar algunos tramos, mientras los tipos efectivos cambian más despacio: se
+          calculan sobre todo el sueldo. Estar en el tramo del{' '}
+          {pct(nomina.tipoMargIRPF * 100, 0)} no significa pagar ese porcentaje por todo lo ganado.
+          En conjunto, el IRPF estimado supone el{' '}
+          <strong>{pct(nomina.tipoEfectivoIRPF * 100)}</strong> de tu bruto.
         </p>
 
         <p className="fs-note" style={{ maxWidth: '72ch' }}>
-          Dos detalles que conviene ver en la propia curva: la línea azul <em>no</em> sube siempre —
-          en los salarios bajos tiene un pico, porque al retirarse la reducción del artículo 20 la
-          base crece más deprisa que el sueldo (es la figura siguiente)— y, pasada la base máxima
-          de cotización, deja de crecer por el lado de la Seguridad Social, así que a partir de ahí
-          el marginal lo mueve sólo el IRPF.
+          La línea del marginal puede tener un pico en los salarios bajos. Ocurre cuando se retira
+          la reducción del artículo 20: la base aumenta más deprisa que el sueldo. Más adelante,
+          al superar la base máxima de cotización, la cotización ordinaria deja de aumentar; desde
+          ese punto, el cambio del marginal depende principalmente del IRPF.
         </p>
       </div>
     </Figure>

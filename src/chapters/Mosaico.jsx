@@ -94,7 +94,7 @@ export default function Mosaico() {
   return (
     <Figure
       id="25"
-      title={`En este modelo, la mitad superior concentra el ${pct(mitadAlta * 100, 0)} de la recaudación estimada`}
+      title={`En el modelo, la mitad que más cobra acumula el ${pct(mitadAlta * 100, 0)} de la carga calculada`}
       sub={`${anio} · ancho = masa salarial estimada del tramo · altura = tipo efectivo calculado · área = participación estimada en IRPF y cotización del trabajador`}
       legend="Veinte grupos del mismo tamaño, cinco percentiles cada uno · el área combina salario representativo y carga efectiva calculada · tu grupo va en verde"
       source={
@@ -106,14 +106,14 @@ export default function Mosaico() {
           · reglas fiscales · AEAT, BOE y TGSS · interpolación y cálculo propios
         </>
       }
-      note="Es una estimación propia de IRPF y cotización del trabajador, no una estadística de recaudación publicada por la AEAT. El INE da cinco puntos de la distribución salarial: P10, P25, P50, P75 y P90; también publica la media, que no es un percentil. Estimamos un salario para el punto medio de cada grupo de cinco percentiles y calculamos su carga con el mismo perfil fiscal. La cola superior a P90 se extrapola y es la parte más incierta. Las operaciones se detallan en «Cómo está calculado», método M3."
+      note="Esto no es una estadística de recaudación de la AEAT. El INE publica cinco percentiles salariales: P10, P25, P50, P75 y P90. También publica la media, que no es un percentil. Estimamos un salario para cada grupo de cinco percentiles y aplicamos a todos el mismo perfil fiscal. Por encima de P90 extrapolamos, así que esa parte es la más incierta. Las cuentas están en «Cómo está calculado», método M3."
       summary={conX.map(b => `Percentil ${Math.round(b.p0)}-${Math.round(b.p1)}: tipo ${pct(b.tipo * 100)}, aporta ${pct(b.parteRec * 100)}`).join('. ')}
     >
       <div className="fs-readout" style={{ marginBottom: 16 }}>
         <span>
           <span className="fs-readout-k">Tu tramo</span>
           <span className="fs-readout-v fs-signal">
-            percentil {Math.round(miBanda.p0)}–{Math.round(miBanda.p1)}
+            percentil {Math.round(miBanda.p0)} a {Math.round(miBanda.p1)}
           </span>
         </span>
         <span>
@@ -121,7 +121,7 @@ export default function Mosaico() {
           <span className="fs-readout-v">{pct(miBanda.tipo * 100)}</span>
         </span>
         <span>
-          <span className="fs-readout-k">Aporta del total</span>
+          <span className="fs-readout-k">Parte de la carga calculada</span>
           <span className="fs-readout-v">{pct(miBanda.parteRec * 100)}</span>
         </span>
       </div>
@@ -130,10 +130,10 @@ export default function Mosaico() {
         <li><strong>1 · Datos observados</strong><span>P10, P25, P50, P75 y P90 del INE. La media se muestra como referencia, pero no se usa para interpolar.</span></li>
         <li><strong>2 · Interpolación</strong><span>Un salario central para cada grupo de cinco percentiles.</span></li>
         <li><strong>3 · Cálculo fiscal</strong><span>IRPF y cotización del trabajador con un perfil común.</span></li>
-        <li><strong>4 · Normalización</strong><span>Cuota de masa salarial y de recaudación estimada.</span></li>
+        <li><strong>4 · Reparto</strong><span>Calculamos qué parte del salario y de la carga del modelo corresponde a cada grupo.</span></li>
       </ol>
 
-      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} label="Quién sostiene la recaudación">
+      <ChartFrame viewBox={`0 0 ${W} ${H}`} tip={tip} label="Carga estimada por grupo salarial">
         {/* rejilla de tipos */}
         {[0, 0.1, 0.2, 0.3, 0.4, 0.5].filter(v => v <= techo).map(v => (
           <g key={v}>
@@ -157,12 +157,12 @@ export default function Mosaico() {
                   vx: (b.x0 + b.x1) / 2,
                   vy: y(b.tipo),
                   title: pct(b.tipo * 100),
-                  sub: `Percentil ${Math.round(b.p0)}–${Math.round(b.p1)}`,
+                  sub: `Percentil ${Math.round(b.p0)} a ${Math.round(b.p1)}`,
                   rows: [
                     ['Salario del tramo', eur(b.salario), 'var(--signal)'],
                     ['Pago estimado', eur(b.pagado)],
                     ['Masa salarial estimada', pct(b.parteMasa * 100)],
-                    ['Recaudación estimada', pct(b.parteRec * 100)],
+                    ['Parte de la carga calculada', pct(b.parteRec * 100)],
                   ],
                 });
               }}
@@ -255,7 +255,7 @@ export default function Mosaico() {
 
         {hover !== null && (
           <Label x={X1} y={Y0 - 14} size={narrow ? 9.5 : 10} weight={700} color="var(--ink)" anchor="end">
-            {narrow ? 'P' : 'Percentil '}{Math.round(activo.p0)}–{Math.round(activo.p1)} · {eur(activo.salario)} · aporta{' '}
+            {narrow ? 'P' : 'Percentil '}{Math.round(activo.p0)} a {Math.round(activo.p1)} · {eur(activo.salario)} · aporta{' '}
             {pct(activo.parteRec * 100)}
           </Label>
         )}

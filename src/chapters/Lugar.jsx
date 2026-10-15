@@ -57,7 +57,7 @@ export default function Lugar() {
               </p>
               <p className="fs-source">
                 <a href="https://www.ine.es/jaxiT3/Tabla.htm?t=28191" target="_blank" rel="noreferrer noopener">
-                  INE — Tabla 28191
+                  INE · Tabla 28191
                 </a>
               </p>
             </div>
@@ -84,7 +84,7 @@ export default function Lugar() {
             </p>
             <p className="fs-body" style={{ marginTop: 12, marginBottom: 36 }}>
               Es tu percentil en {anio}: ganas más que {Math.round(percentil)} de cada 100
-              asalariados. La mediana está en <strong>{eur(dist.p50)}</strong> — la mitad de los
+              asalariados. La mediana está en <strong>{eur(dist.p50)}</strong>: la mitad de los
               asalariados cobra menos que eso.
             </p>
 
